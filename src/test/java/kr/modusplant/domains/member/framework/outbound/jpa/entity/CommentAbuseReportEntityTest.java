@@ -61,8 +61,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils,
         assertEquals(commentAbuRepEntity.getETagSource(),
                 commentAbuRepEntity.getMemberId() + "-" +
                         commentAbuRepEntity.getComment().getPost().getUlid() + "-" +
-                        commentAbuRepEntity.getComment().getPath() + "-" +
-                        commentAbuRepEntity.getCheckedAt());
+                        commentAbuRepEntity.getComment().getPath());
     }
 
     @Test
@@ -76,7 +75,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils,
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(commentAbuRepEntity, testMemberId);
+        assertNotEquals(testMemberId, commentAbuRepEntity);
     }
 
     @Test

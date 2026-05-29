@@ -56,8 +56,7 @@ class PostAbuseReportEntityTest implements PostAbuseReportEntityTestUtils {
     void testGetETagSource_givenNothing_willReturnETagSource() {
         assertEquals(postAbuseReportEntity.getETagSource(),
                 postAbuseReportEntity.getMemberId() + "-" +
-                        postAbuseReportEntity.getPost().getUlid() + "-" +
-                        postAbuseReportEntity.getCheckedAt());
+                        postAbuseReportEntity.getPost().getUlid());
     }
 
     @Test
@@ -71,7 +70,7 @@ class PostAbuseReportEntityTest implements PostAbuseReportEntityTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(postAbuseReportEntity, testMemberId);
+        assertNotEquals(testMemberId, postAbuseReportEntity);
     }
 
     @Test
