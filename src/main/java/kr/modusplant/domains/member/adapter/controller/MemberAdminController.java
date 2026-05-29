@@ -1,11 +1,14 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
+import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
+import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
@@ -52,6 +55,18 @@ public class MemberAdminController {
         ReportId reportId = ReportId.create(record.reportUlid());
         if (reportRepository.isIdExistInProposalOrBugReport(reportId)) {
             reportRepository.removeProposalOrBugReport(reportId);
+        }
+    }
+
+    public List<PostAbuseReportDashboardReadModel> getPostAbuseReport(PostAbuseReportGetRecord record) {
+        if (record.lastPostUlid() != null) {
+            ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.lastPostUlid());
+            memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+            return reportDashboardRepository.getPostAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), record.lastPostUlid());
+        } else {
+            return reportDashboardRepository.getPostAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), null);
         }
     }
 }

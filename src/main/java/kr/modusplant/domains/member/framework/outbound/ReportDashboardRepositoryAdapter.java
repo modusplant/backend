@@ -1,16 +1,20 @@
 package kr.modusplant.domains.member.framework.outbound;
 
+import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.framework.outbound.jooq.record.PostAbuseReportDashboardRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ProposalOrBugReportDashboardRecord;
+import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
+import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
@@ -30,6 +34,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     private final PostAbuseReportDashboardJpaRepository postAbuseReportDashboardJpaRepository;
 
     private final ProposalOrBugReportDashboardJooqRepository proposalOrBugReportDashboardJooqRepository;
+    private final PostAbuseReportDashboardJooqRepository postAbuseReportDashboardJooqRepository;
 
     @Override
     public ProposalOrBugReportDashboardReadModel checkProposalOrBugReport(ReportId reportId) {
@@ -75,5 +80,18 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
             dashboardEntity.updateLastReportedAt(reportTime);
             postAbuseReportDashboardJpaRepository.save(dashboardEntity);
         }
+    }
+
+    @Override
+    public List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
+            ReportPageSize reportPageSize,
+            @Nullable AbuseReportStatus status,
+            @Nullable String lastPostUlid) {
+
+        String statusResult = status != null ? status.name() : null;
+        List<PostAbuseReportDashboardRecord> records =
+                postAbuseReportDashboardJooqRepository.getDashboardsByPageSizeAndStatus(
+                        reportPageSize.getValue(), statusResult, lastPostUlid);
+        return postAbuseReportDashboardJooqRepository.getPostAbuseReportDashboardReadModels(records);
     }
 }
