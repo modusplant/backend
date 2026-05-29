@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
 
 @Repository
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
         if (emptyOrMemberEntity.isPresent()) {
             return memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow());
         } else {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER, "member");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
     }
 

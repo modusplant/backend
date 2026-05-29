@@ -1,7 +1,7 @@
 package kr.modusplant.shared.framework.aws.event;
 
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class ImageRemoveTask {
 
     public static ImageRemoveTask create(String imageFileKey) {
         if (StringUtils.isBlank(imageFileKey)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_IMAGE_FILE_KEY, "imageFileKey");
+            throw new InvalidValueException(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEY, "imageFileKey");
         } else {
             return new ImageRemoveTask(imageFileKey);
         }
