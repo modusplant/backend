@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
@@ -34,7 +34,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         commentEntity = createCommentEntityBuilder()
                 .post(
-                        createPostEntityBuilder()
+                        createPublishedPostEntityBuilder()
                                 .primaryCategory(primaryCategoryEntity)
                                 .secondaryCategory(
                                         createSecondaryCategoryEntityBuilderWithId()
@@ -56,7 +56,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
         SecondaryCategoryEntity secondaryCategory = createSecondaryCategoryEntityBuilder().primaryCategory(primaryCategory).build();
         entityManager.persist(primaryCategory);
         entityManager.persist(secondaryCategory);
-        PostEntity postEntity = createPostEntityBuilder()
+        PostEntity postEntity = createPublishedPostEntityBuilder()
                 .primaryCategory(primaryCategory)
                 .secondaryCategory(secondaryCategory)
                 .authMember(member)

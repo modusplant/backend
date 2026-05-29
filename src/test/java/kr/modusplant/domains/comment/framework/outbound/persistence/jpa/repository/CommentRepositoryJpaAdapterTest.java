@@ -3,11 +3,11 @@ package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.reposit
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.compositekey.CommentCompositeKeyTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.common.util.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.common.util.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;

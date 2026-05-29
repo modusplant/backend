@@ -44,15 +44,12 @@ public class CommentAbuseReportEntity {
     @ToString.Exclude
     private CommentEntity comment;
 
-    @Column(name = CHECKED_AT)
-    private LocalDateTime checkedAt;
-
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
     public String getETagSource() {
-        return getMemberId() + "-" + getComment().getPost().getUlid() + "-" + getComment().getPath() + "-" + getCheckedAt();
+        return getMemberId() + "-" + getComment().getPost().getUlid() + "-" + getComment().getPath();
     }
 
     @Override
@@ -70,10 +67,9 @@ public class CommentAbuseReportEntity {
                 .append(getMember()).append(getComment()).toHashCode();
     }
 
-    private CommentAbuseReportEntity(MemberEntity member, CommentEntity comment, LocalDateTime checkedAt) {
+    private CommentAbuseReportEntity(MemberEntity member, CommentEntity comment) {
         this.member = member;
         this.comment = comment;
-        this.checkedAt = checkedAt;
     }
 
     public static CommentAbuseReportEntityBuilder builder() {
@@ -83,7 +79,6 @@ public class CommentAbuseReportEntity {
     public static final class CommentAbuseReportEntityBuilder {
         private MemberEntity member;
         private CommentEntity comment;
-        private LocalDateTime checkedAt;
 
         public CommentAbuseReportEntityBuilder member(final MemberEntity member) {
             this.member = member;
@@ -95,20 +90,14 @@ public class CommentAbuseReportEntity {
             return this;
         }
 
-        public CommentAbuseReportEntityBuilder checkedAt(final LocalDateTime checkedAt) {
-            this.checkedAt = checkedAt;
-            return this;
-        }
-
         public CommentAbuseReportEntityBuilder commentAbuseReport(final CommentAbuseReportEntity commentAbuRep) {
             this.member = commentAbuRep.getMember();
             this.comment = commentAbuRep.getComment();
-            this.checkedAt = commentAbuRep.getCheckedAt();
             return this;
         }
 
         public CommentAbuseReportEntity build() {
-            return new CommentAbuseReportEntity(this.member, this.comment, this.checkedAt);
+            return new CommentAbuseReportEntity(this.member, this.comment);
         }
     }
 }

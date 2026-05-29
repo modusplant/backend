@@ -1,20 +1,20 @@
 package kr.modusplant.domains.account.social.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.account.identity.common.util.framework.outbound.jpa.entity.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.common.util.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.account.social.common.util.domain.vo.AgreedTermsTestUtils;
 import kr.modusplant.domains.account.social.common.util.domain.vo.SocialMemberProfileTestUtils;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.outbound.jpa.mapper.supers.SocialIdentityJpaMapper;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
-import kr.modusplant.domains.term.framework.outbound.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.repository.MemberTermJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

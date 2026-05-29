@@ -1,6 +1,6 @@
 package kr.modusplant.shared.framework.redis.listener;
 
-import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.RedisConnection;

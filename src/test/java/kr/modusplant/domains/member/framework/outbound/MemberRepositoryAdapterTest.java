@@ -1,20 +1,20 @@
 package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
-import kr.modusplant.shared.event.ImageRemoveEvent;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
-import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
@@ -30,8 +30,8 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
+import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ActivitySubjectCommentIdRecordTestUtils.testActivitySubjectCommentIdRecord;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
-import static kr.modusplant.domains.member.framework.outbound.jooq.record.common.util.ActivitySubjectCommentIdRecordTestUtils.testActivitySubjectCommentIdRecord;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -185,14 +185,14 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
     @DisplayName("발행된 게시글과 프로필 이미지가 있을 때 withdraw로 회원 탈퇴하면서 이벤트 발행")
     void testWithdraw_givenExistedPublishedPostsAndProfileImage_willPublishEventsWhileWithdraw() {
         // given
-        willDoNothing().given(eventPublisher).publishEvent(any(ImagesRemoveEvent.class));
+        willDoNothing().given(eventPublisher).publishEvent(any(ImagesRemoveTask.class));
         willDoNothing().given(eventPublisher).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(TEST_POST_ULID_ARRAY);
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of(TEST_POST_CONTENT_JSON_NODE));
         given(activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(any())).willReturn(List.of(TEST_POST_ULID));
         given(activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(any())).willReturn(List.of(testActivitySubjectCommentIdRecord));
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntity()).build()));
-        willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveEvent.class));
+        willDoNothing().given(eventPublisher).publishEvent(any(ImageRemoveTask.class));
         given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
 
         // when
@@ -200,9 +200,9 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
-        verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveTask.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
-        verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveEvent.class));
+        verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveTask.class));
         verify(activitySubjectPostJooqRepository, times(1)).archiveAllByPostUlids(any());
         verify(activitySubjectPostJooqRepository, times(1)).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
         verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());
@@ -234,9 +234,9 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
 
         // then
         verify(stringRedisTemplate).unlink("recentlyView:member:%s:posts".formatted(MEMBER_BASIC_USER_UUID));
-        verify(eventPublisher, never()).publishEvent(any(ImagesRemoveEvent.class));
+        verify(eventPublisher, never()).publishEvent(any(ImagesRemoveTask.class));
         verify(eventPublisher, never()).publishEvent(any(RecentlyViewPostRemoveEvent.class));
-        verify(eventPublisher, never()).publishEvent(any(ImageRemoveEvent.class));
+        verify(eventPublisher, never()).publishEvent(any(ImageRemoveTask.class));
         verify(activitySubjectPostJooqRepository, never()).archiveAllByPostUlids(any());
         verify(activitySubjectPostJooqRepository, never()).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
         verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());

@@ -4,9 +4,7 @@ import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.composit
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.framework.outbound.jooq.record.ProposalOrBugReportAdminPageRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
@@ -17,13 +15,11 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbu
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
-import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 
@@ -129,33 +125,9 @@ public class ReportRepositoryAdapter implements ReportRepository {
         String reportId = reportIdVo.getValue();
         List<String> srcList = proposalOrBugReportJooqRepository.getImageFileKeysFromReportId(reportId);
         if (!srcList.isEmpty()) {
-            applicationEventPublisher.publishEvent(ImagesRemoveEvent.create(srcList));
+            applicationEventPublisher.publishEvent(ImagesRemoveTask.create(srcList));
         }
         proposalOrBugReportJooqRepository.archiveByReportId(reportId);
         proposalOrBugReportJpaRepository.deleteByUlid(reportId);
     }
-
-    @Override
-    public ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId) {
-        ProposalOrBugReportEntity proposalOrBugReportEntity = proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow();
-        proposalOrBugReportEntity.check();
-        proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
-        return proposalOrBugReportJooqRepository.getAdminPageReadModel(
-                proposalOrBugReportJooqRepository.getAdminPageRecordByReportId(reportId.getValue()));
-    }
-
-    @Override
-    public List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(
-            ReportPageSize reportPageSize,
-            @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus,
-            @Nullable ReportId lastReportId) {
-
-        String statusResult = proposalOrBugReportStatus != null ? proposalOrBugReportStatus.name() : null;
-        String reportIdResult = lastReportId != null ? lastReportId.getValue() : null;
-        List<ProposalOrBugReportAdminPageRecord> records =
-                proposalOrBugReportJooqRepository.getAdminPageRecordsByPageSizeAndStatus(
-                        reportPageSize.getValue(), statusResult, reportIdResult);
-        return proposalOrBugReportJooqRepository.getProposalOrBugReportAdminPageReadModels(records);
-    }
-
 }

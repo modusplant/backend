@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum AbuseReportStatus {
     UNCHECKED("미확인"),
     DISMISSED("반려함"),
-    BLINDED("가려짐");
+    BLINDED("숨겨짐");
 
     private final String value;
 

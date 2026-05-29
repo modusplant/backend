@@ -1,8 +1,8 @@
 package kr.modusplant.domains.search.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.PrimaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.SecondaryCategoryJpaRepository;
 import org.junit.jupiter.api.DisplayName;

@@ -5,8 +5,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static kr.modusplant.shared.event.common.util.ImageRemoveEventTestUtils.testImageRemoveEvent;
-import static kr.modusplant.shared.event.common.util.ImagesRemoveEventTestUtils.testImagesRemoveEvent;
+import static kr.modusplant.shared.framework.aws.common.util.event.ImageRemoveEventTestUtils.testImageRemoveTask;
+import static kr.modusplant.shared.framework.aws.common.util.event.ImagesRemoveEventTestUtils.testImagesRemoveTask;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -24,10 +24,10 @@ class AwsEventListenerTest {
         willDoNothing().given(amazonS3Service).deleteFiles(anyString());
 
         // when
-        awsEventListener.handleImageRemove(testImageRemoveEvent);
+        awsEventListener.handleImageRemove(testImageRemoveTask);
 
         // then
-        verify(amazonS3Service, times(1)).deleteFiles(testImageRemoveEvent.getImageFileKey());
+        verify(amazonS3Service, times(1)).deleteFiles(testImageRemoveTask.getImageFileKey());
     }
 
     @Test
@@ -37,9 +37,9 @@ class AwsEventListenerTest {
         willDoNothing().given(amazonS3Service).deleteFiles(anyList());
 
         // when
-        awsEventListener.handleImageRemove(testImagesRemoveEvent);
+        awsEventListener.handleImageRemove(testImagesRemoveTask);
 
         // then
-        verify(amazonS3Service, times(1)).deleteFiles(testImagesRemoveEvent.getImageFileKeys());
+        verify(amazonS3Service, times(1)).deleteFiles(testImagesRemoveTask.getImageFileKeys());
     }
 }

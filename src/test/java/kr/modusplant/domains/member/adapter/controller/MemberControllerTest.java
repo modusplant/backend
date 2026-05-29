@@ -1,16 +1,23 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
 import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
@@ -18,10 +25,6 @@ import kr.modusplant.domains.member.framework.outbound.MemberRepositoryAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectCommentRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectPostRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfileRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
@@ -29,15 +32,12 @@ import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.PostAbuseReportEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -289,14 +289,14 @@ class MemberControllerTest implements
         given(activitySubjectPostRepository.isPublished(any())).willReturn(true);
         given(activitySubjectPostRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectPostRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeEvent.class));
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(activitySubjectPostRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -313,7 +313,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectPostRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -603,14 +603,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(activitySubjectCommentRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectCommentRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeEvent.class));
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(activitySubjectCommentRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test
@@ -626,7 +626,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectCommentRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test
