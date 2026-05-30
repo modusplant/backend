@@ -24,6 +24,6 @@ public record DraftPostResponse(
         JsonNode content,
 
         @Schema(description = "게시글이 업데이트된 날짜 및 시간")
-        LocalDateTime updatedAt
+        LocalDateTime editedAt
 ) {
 }
