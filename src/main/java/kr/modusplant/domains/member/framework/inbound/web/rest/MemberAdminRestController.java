@@ -12,6 +12,7 @@ import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
+import kr.modusplant.domains.member.usecase.record.PostAbuseReportApproveRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportDismissRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
@@ -158,7 +159,7 @@ public class MemberAdminRestController {
             description = "게시글 신고를 반려합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}")
+    @PostMapping(value = "/report/post-abuse/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> dismissPostAbuseReport(
             @Parameter(
                     description = "반려할 게시글의 식별자",
@@ -170,6 +171,26 @@ public class MemberAdminRestController {
             String postUlid) {
         PostAbuseReportDashboardReadModel readModel =
                 memberAdminController.dismissPostAbuse(new PostAbuseReportDismissRecord(postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok(readModel));
+    }
+
+    @Operation(
+            summary = "게시글 신고 수리 API",
+            description = "게시글 신고를 수리합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/post-abuse/{postUlid}/approve")
+    public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> approvePostAbuseReport(
+            @Parameter(
+                    description = "수리할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String postUlid) {
+        PostAbuseReportDashboardReadModel readModel =
+                memberAdminController.approvePostAbuse(new PostAbuseReportApproveRecord(postUlid));
         return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
 }

@@ -12,6 +12,7 @@ public enum MemberErrorCode implements ErrorCode {
     EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
 
     EXISTS_POST_ABUSE_REPORT_DISMISSED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_dismissed", "게시글 신고가 이미 반려되었습니다. "),
+    EXISTS_POST_ABUSE_REPORT_BLINDED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_blinded", "게시글 신고가 이미 수리되었습니다. "),
     EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED(HttpStatus.CONFLICT.value(), "exists_proposal_or_bug_report_checked", "건의 및 버그 제보가 이미 확인되었습니다. "),
 
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "empty_member_id", "회원 아이디가 비어 있습니다. "),

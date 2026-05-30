@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
@@ -17,6 +18,7 @@ import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
@@ -26,6 +28,7 @@ import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAb
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportApproveRecordTestUtils.testPostAbuseReportApproveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
@@ -49,8 +52,9 @@ class MemberAdminControllerTest {
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
     private final ReportDashboardRepository reportDashboardRepository = Mockito.mock(ReportDashboardRepository.class);
+    private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
-    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository, reportDashboardRepository);
+    private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository, reportDashboardRepository, applicationEventPublisher);
 
     @Test
     @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 조회")
@@ -234,5 +238,56 @@ class MemberAdminControllerTest {
 
         // then
         assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT_DISMISSED);
+    }
+
+    @Test
+    @DisplayName("수리되지 않은 게시글일 때 approvePostAbuse로 게시글 신고 수리 후 읽기 모델 반환")
+    void testApprovePostAbuse_givenNotApprovedPost_willReturnReadModel() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+        given(reportDashboardRepository.isApprovedInPostAbuseReportDashboard(any())).willReturn(false);
+        given(reportDashboardRepository.approvePostAbuseReport(any())).willReturn(testPostAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostAbuseReportApproveEvent.class));
+
+        // when
+        PostAbuseReportDashboardReadModel readModel = memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).approvePostAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportApproveEvent.class));
+        assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("게시글을 찾을 수 없을 때 approvePostAbuse로 예외 반환")
+    void testApprovePostAbuse_givenNotFoundPost_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId"))
+                .given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
+    }
+
+    @Test
+    @DisplayName("이미 수리된 게시글일 때 approvePostAbuse로 예외 반환")
+    void testApprovePostAbuse_givenAlreadyApprovedPost_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+        given(reportDashboardRepository.isApprovedInPostAbuseReportDashboard(any())).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(
+                ExistsValueException.class,
+                () -> memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT_BLINDED);
+        verify(reportDashboardRepository, never()).approvePostAbuseReport(any());
     }
 }

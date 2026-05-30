@@ -29,6 +29,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUti
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
+import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_POST_ABUSE_REPORT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
@@ -158,5 +159,80 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST_ABUSE_REPORT);
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재할 때 approvePostAbuseReport로 수리 수행 후 읽기 모델 반환")
+    void testApprovePostAbuseReport_givenFoundEntity_willApproveAndReturnReadModel() {
+        // given
+        PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
+        given(postAbuseReportDashboardJpaRepository.save(any())).willReturn(uncheckedEntity);
+        given(postAbuseReportDashboardJooqRepository.getReadModelByPostId(TEST_POST_ULID)).willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        PostAbuseReportDashboardReadModel readModel = reportDashboardRepositoryAdapter.approvePostAbuseReport(testActivitySubjectPostId);
+
+        // then
+        verify(postAbuseReportDashboardJpaRepository, times(1)).save(any());
+        verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelByPostId(TEST_POST_ULID);
+        assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재하지 않을 때 approvePostAbuseReport로 예외 반환")
+    void testApprovePostAbuseReport_givenNotFoundEntity_willThrowException() {
+        // given
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportDashboardRepositoryAdapter.approvePostAbuseReport(testActivitySubjectPostId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST_ABUSE_REPORT);
+    }
+
+    @Test
+    @DisplayName("BLINDED 상태의 엔티티가 존재할 때 isApprovedInPostAbuseReportDashboard로 true 반환")
+    void testIsApprovedInPostAbuseReportDashboard_givenBlindedEntity_willReturnTrue() {
+        // given
+        PostAbuseReportDashboardEntity blindedEntity = createPostAbuseReportDashboardBlindedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(blindedEntity));
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isApprovedInPostAbuseReportDashboard(testActivitySubjectPostId);
+
+        // then
+        verify(postAbuseReportDashboardJpaRepository, times(1)).findById(TEST_POST_ULID);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("UNCHECKED 상태의 엔티티가 존재할 때 isApprovedInPostAbuseReportDashboard로 false 반환")
+    void testIsApprovedInPostAbuseReportDashboard_givenUncheckedEntity_willReturnFalse() {
+        // given
+        PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isApprovedInPostAbuseReportDashboard(testActivitySubjectPostId);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("엔티티가 존재하지 않을 때 isApprovedInPostAbuseReportDashboard로 false 반환")
+    void testIsApprovedInPostAbuseReportDashboard_givenNotFoundEntity_willReturnFalse() {
+        // given
+        given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.empty());
+
+        // when
+        boolean result = reportDashboardRepositoryAdapter.isApprovedInPostAbuseReportDashboard(testActivitySubjectPostId);
+
+        // then
+        assertThat(result).isFalse();
     }
 }

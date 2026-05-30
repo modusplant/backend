@@ -36,5 +36,9 @@ public interface ReportDashboardRepository {
 
     PostAbuseReportDashboardReadModel dismissPostAbuseReport(ActivitySubjectPostId postId);
 
+    PostAbuseReportDashboardReadModel approvePostAbuseReport(ActivitySubjectPostId postId);
+
     boolean isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId postId);
+
+    boolean isApprovedInPostAbuseReportDashboard(ActivitySubjectPostId postId);
 }

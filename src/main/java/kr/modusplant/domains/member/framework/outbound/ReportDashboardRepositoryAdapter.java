@@ -112,9 +112,27 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     }
 
     @Override
+    public PostAbuseReportDashboardReadModel approvePostAbuseReport(ActivitySubjectPostId postId) {
+        PostAbuseReportDashboardEntity entity =
+                postAbuseReportDashboardJpaRepository.findById(postId.getValue())
+                        .orElseThrow(() ->
+                                new NotFoundEntityException(NOT_FOUND_POST_ABUSE_REPORT, "postAbuseReport"));
+        entity.approve();
+        postAbuseReportDashboardJpaRepository.save(entity);
+        return postAbuseReportDashboardJooqRepository.getReadModelByPostId(postId.getValue());
+    }
+
+    @Override
     public boolean isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId postId) {
         return postAbuseReportDashboardJpaRepository.findById(postId.getValue())
                 .map(e -> e.getStatus() == AbuseReportStatus.DISMISSED)
+                .orElse(false);
+    }
+
+    @Override
+    public boolean isApprovedInPostAbuseReportDashboard(ActivitySubjectPostId postId) {
+        return postAbuseReportDashboardJpaRepository.findById(postId.getValue())
+                .map(e -> e.getStatus() == AbuseReportStatus.BLINDED)
                 .orElse(false);
     }
 }

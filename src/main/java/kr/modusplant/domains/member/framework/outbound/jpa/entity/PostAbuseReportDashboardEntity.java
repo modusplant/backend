@@ -63,7 +63,7 @@ public class PostAbuseReportDashboardEntity {
         this.status = AbuseReportStatus.DISMISSED;
     }
 
-    public void blind() {
+    public void approve() {
         this.status = AbuseReportStatus.BLINDED;
     }
 

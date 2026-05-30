@@ -22,6 +22,7 @@ import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAb
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportApproveRecordTestUtils.testPostAbuseReportApproveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
@@ -109,5 +110,22 @@ class MemberAdminRestControllerTest {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModel).toString());
+    }
+
+    @Test
+    @DisplayName("approvePostAbuseReport로 응답 반환")
+    void testApprovePostAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord))
+                .willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> responseEntity =
+                memberAdminRestController.approvePostAbuseReport(TEST_POST_ULID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString())
+                .isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModel).toString());
     }
 }

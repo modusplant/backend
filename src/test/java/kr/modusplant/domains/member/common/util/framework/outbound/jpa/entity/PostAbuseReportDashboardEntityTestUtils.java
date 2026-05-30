@@ -4,8 +4,7 @@ import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_CREATED_AT;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_DISMISSED_AT;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity.PostAbuseReportDashboardEntityBuilder;
 
 public interface PostAbuseReportDashboardEntityTestUtils extends PostEntityTestUtils {
@@ -21,5 +20,12 @@ public interface PostAbuseReportDashboardEntityTestUtils extends PostEntityTestU
                 .status(AbuseReportStatus.DISMISSED)
                 .firstReportedAt(TEST_REPORT_CREATED_AT)
                 .lastReportedAt(TEST_REPORT_DISMISSED_AT);
+    }
+
+    default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardBlindedEntityBuilder() {
+        return PostAbuseReportDashboardEntity.builder()
+                .status(AbuseReportStatus.BLINDED)
+                .firstReportedAt(TEST_REPORT_CREATED_AT)
+                .lastReportedAt(TEST_REPORT_BLINDED_AT);
     }
 }
