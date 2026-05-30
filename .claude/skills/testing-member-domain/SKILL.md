@@ -1,6 +1,7 @@
 ---
 name: testing-member-domain
 description: This file provides strict guidance on creating, managing, and refactoring tests for the member domain except for the enum, exception class, jOOR repository class, and the class that contains only constructors.
+disable-model-invocation: true
 ---
 
 # Test Architecture & Strategy
