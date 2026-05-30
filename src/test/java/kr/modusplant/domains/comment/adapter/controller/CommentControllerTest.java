@@ -23,6 +23,7 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
@@ -228,7 +229,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 () -> controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, Pageable.unpaged()));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER);
+        assertThat(ex.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
         assertThat(ex.getEntityName()).isEqualTo("member");
     }
 

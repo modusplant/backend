@@ -67,10 +67,6 @@ public class PostAbuseReportDashboardEntity {
         this.status = AbuseReportStatus.BLINDED;
     }
 
-    public void updateFirstReportedAt(LocalDateTime firstReportedAt) {
-        this.firstReportedAt = firstReportedAt;
-    }
-
     public void updateLastReportedAt(LocalDateTime lastReportedAt) {
         this.lastReportedAt = lastReportedAt;
     }

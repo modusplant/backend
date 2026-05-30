@@ -1,13 +1,14 @@
 package kr.modusplant.domains.member.usecase.model.read;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 public record ProposalOrBugReportDashboardReadModel(
         String ulid,
         String title,
         String content,
-        List<byte[]> image,
+        JsonNode image,
         LocalDateTime checkedAt,
         LocalDateTime createdAt,
         LocalDateTime displayTimestamp,

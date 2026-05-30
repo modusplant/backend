@@ -2,11 +2,11 @@ package kr.modusplant.domains.member.framework.inbound.web.cache.service;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +39,7 @@ public class MemberCacheValidationService {
             @Nonnull UUID id) {
         Optional<MemberProfileEntity> optionalMemberProfile = memberProfileJpaRepository.findByUuid(id);
         if (optionalMemberProfile.isEmpty()) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER_PROFILE, "memberProfile");
         }
         MemberProfileEntity memberProfileEntity = optionalMemberProfile.orElseThrow();
         String entityTagSource = memberProfileEntity.getETagSource();

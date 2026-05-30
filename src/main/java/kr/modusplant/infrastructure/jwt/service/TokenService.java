@@ -2,6 +2,7 @@ package kr.modusplant.infrastructure.jwt.service;
 
 
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
@@ -13,7 +14,6 @@ import kr.modusplant.infrastructure.jwt.framework.outbound.redis.AccessTokenRedi
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class TokenService {
     public TokenPair issueToken(UUID memberUuid, String nickname, String email, Role role) {
         // memberUuid 검증
         if (memberUuid == null || !memberJpaRepository.existsByUuid(memberUuid)) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER);
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER);
         }
 
         // accessToken , refresh token 생성
@@ -77,7 +77,7 @@ public class TokenService {
 
         // refresh token 조회
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
-        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity,refreshToken).orElseThrow(TokenNotFoundException::new);
 
         // 토큰 삭제

@@ -11,11 +11,11 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
@@ -76,7 +76,7 @@ public class NormalIdentityController {
     @Transactional
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else {
             updateRepository.updateEmail(AccountId.create(memberUuid), Email.create(request.newEmail()));
         }
@@ -85,7 +85,7 @@ public class NormalIdentityController {
     @Transactional
     public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberUuid), Password.create(request.currentPw()))) {
             throw new InvalidValueException(KernelErrorCode.INVALID_PASSWORD_FORMAT, request.currentPw());
         } else {

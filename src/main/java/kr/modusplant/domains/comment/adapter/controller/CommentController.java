@@ -20,6 +20,7 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
@@ -78,7 +79,7 @@ public class CommentController {
     @Transactional
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
         }
         PageImpl<CommentOfAuthorPageModel> result = readRepository.findByAuthor(Author.create(memberUuid), pageable);
 

@@ -31,7 +31,7 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
 import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ActivitySubjectCommentIdRecordTestUtils.testActivitySubjectCommentIdRecord;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -84,7 +84,7 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
                 assertThrows(NotFoundEntityException.class, () -> memberRepositoryAdapter.getById(testMemberId));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test

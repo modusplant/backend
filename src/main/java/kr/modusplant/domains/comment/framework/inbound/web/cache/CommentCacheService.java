@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
@@ -78,7 +79,7 @@ public class CommentCacheService {
             @Nonnull MemberId memberId
     ) {
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
-                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member"));
+                .orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member"));
 
         String ETagSource = memberEntity.getETagSource();
         LocalDateTime lastModifiedAt = memberEntity.getLastModifiedAtAsTruncatedToSeconds();

@@ -24,7 +24,6 @@ import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -309,7 +308,7 @@ public class MemberController {
                     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", activitySubjectPostId.getValue());
         } else if (reportRepository.isMemberAbusePost(memberId, activitySubjectPostId)) {
             throw new ExistsEntityException(
-                    EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
+                    EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
         }
     }
 
@@ -317,7 +316,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
         if (reportRepository.isMemberAbuseComment(memberId, activitySubjectCommentId)) {
-            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
+            throw new ExistsEntityException(EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
         }
     }
 
