@@ -8,6 +8,10 @@ import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
@@ -17,14 +21,9 @@ import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentAbuseReportEvent;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.PostAbuseReportEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -114,7 +113,7 @@ public class MemberController {
         if (activitySubjectPostRepository.isUnliked(memberId, activitySubjectPostId)) {
             activitySubjectPostRepository.like(memberId, activitySubjectPostId);
             applicationEventPublisher.publishEvent(
-                    PostLikeNotificationEvent.create(memberId.getValue(), activitySubjectPostId.getValue()));
+                    PostLikeEvent.create(memberId.getValue(), activitySubjectPostId.getValue()));
         }
     }
 
@@ -158,7 +157,7 @@ public class MemberController {
         if (activitySubjectCommentRepository.isUnliked(memberId, activitySubjectCommentId)) {
             activitySubjectCommentRepository.like(memberId, activitySubjectCommentId);
             applicationEventPublisher.publishEvent(
-                    CommentLikeNotificationEvent.create(
+                    CommentLikeEvent.create(
                             memberId.getValue(),
                             activitySubjectCommentId.getActivitySubjectPostId().getValue(),
                             activitySubjectCommentId.getActivitySubjectCommentPath().getValue()
@@ -309,7 +308,7 @@ public class MemberController {
                     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", activitySubjectPostId.getValue());
         } else if (reportRepository.isMemberAbusePost(memberId, activitySubjectPostId)) {
             throw new ExistsEntityException(
-                    EntityErrorCode.EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
+                    EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
         }
     }
 
@@ -317,7 +316,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
         if (reportRepository.isMemberAbuseComment(memberId, activitySubjectCommentId)) {
-            throw new ExistsEntityException(EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
+            throw new ExistsEntityException(EXISTS_COMMENT_ABUSE_REPORT, "commentAbuseReport");
         }
     }
 

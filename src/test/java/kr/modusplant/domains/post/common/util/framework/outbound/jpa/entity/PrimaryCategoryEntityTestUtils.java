@@ -1,0 +1,22 @@
+package kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity;
+
+import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
+
+import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.*;
+
+public interface PrimaryCategoryEntityTestUtils {
+    default PrimaryCategoryEntity createPrimaryCategoryEntity() {
+        return PrimaryCategoryEntity.builder()
+                .category(TEST_COMM_PRIMARY_CATEGORY_CATEGORY)
+                .order(TEST_COMM_PRIMARY_CATEGORY_ORDER)
+                .build();
+    }
+
+    default PrimaryCategoryEntity createPrimaryCategoryEntityWithId() {
+        return PrimaryCategoryEntity.builder()
+                .id(TEST_COMM_PRIMARY_CATEGORY_ID)
+                .category(TEST_COMM_PRIMARY_CATEGORY_CATEGORY)
+                .order(TEST_COMM_PRIMARY_CATEGORY_ORDER)
+                .build();
+    }
+}

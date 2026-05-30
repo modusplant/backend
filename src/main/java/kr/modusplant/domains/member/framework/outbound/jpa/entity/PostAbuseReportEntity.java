@@ -41,15 +41,12 @@ public class PostAbuseReportEntity {
     @ToString.Exclude
     private PostEntity post;
 
-    @Column(name = CHECKED_AT)
-    private LocalDateTime checkedAt;
-
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
 
     public String getETagSource() {
-        return getMemberId() + "-" + getPost().getUlid() + "-" + getCheckedAt();
+        return getMemberId() + "-" + getPost().getUlid();
     }
 
     @Override
@@ -69,10 +66,9 @@ public class PostAbuseReportEntity {
         return new HashCodeBuilder(17, 37).append(getMember()).append(getPost()).toHashCode();
     }
 
-    private PostAbuseReportEntity(MemberEntity member, PostEntity post, LocalDateTime checkedAt) {
+    private PostAbuseReportEntity(MemberEntity member, PostEntity post) {
         this.member = member;
         this.post = post;
-        this.checkedAt = checkedAt;
     }
 
     public static PostAbuseReportEntityBuilder builder() {
@@ -82,7 +78,6 @@ public class PostAbuseReportEntity {
     public static final class PostAbuseReportEntityBuilder {
         private MemberEntity member;
         private PostEntity post;
-        private LocalDateTime checkedAt;
 
         public PostAbuseReportEntityBuilder member(final MemberEntity member) {
             this.member = member;
@@ -94,20 +89,14 @@ public class PostAbuseReportEntity {
             return this;
         }
 
-        public PostAbuseReportEntityBuilder checkedAt(final LocalDateTime checkedAt) {
-            this.checkedAt = checkedAt;
-            return this;
-        }
-
         public PostAbuseReportEntityBuilder postAbuseReport(final PostAbuseReportEntity postAbuRep) {
             this.member = postAbuRep.getMember();
             this.post = postAbuRep.getPost();
-            this.checkedAt = postAbuRep.getCheckedAt();
             return this;
         }
 
         public PostAbuseReportEntity build() {
-            return new PostAbuseReportEntity(this.member, this.post, this.checkedAt);
+            return new PostAbuseReportEntity(this.member, this.post);
         }
     }
 }

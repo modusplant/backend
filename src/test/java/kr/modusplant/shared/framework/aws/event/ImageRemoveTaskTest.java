@@ -1,0 +1,38 @@
+package kr.modusplant.shared.framework.aws.event;
+
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class ImageRemoveTaskTest {
+    @Nested
+    @DisplayName("create 테스트")
+    class CreateTest {
+        @Test
+        @DisplayName("imageFileKey가 null일 때 오류 발생")
+        void testCreate_givenNullImageFileKey_willThrowException() {
+            // given & when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+                    ImageRemoveTask.create(null));
+
+            // then
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEY);
+        }
+
+        @Test
+        @DisplayName("imageFileKey가 빈 문자열일 때 오류 발생")
+        void testCreate_givenEmptyImageFileKey_willThrowException() {
+            // given & when
+            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+                    ImageRemoveTask.create(" "));
+
+            // then
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEY);
+        }
+    }
+}

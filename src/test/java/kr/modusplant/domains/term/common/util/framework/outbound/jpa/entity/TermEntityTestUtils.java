@@ -1,0 +1,24 @@
+package kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity;
+
+import kr.modusplant.domains.term.framework.outbound.jpa.entity.TermEntity;
+
+import static kr.modusplant.domains.term.common.constant.TermConstant.*;
+
+public interface TermEntityTestUtils {
+    default TermEntity createTermsOfUseEntity() {
+        return TermEntity.builder()
+                .name(TEST_TERMS_OF_USE_NAME)
+                .content(TEST_TERMS_OF_USE_CONTENT)
+                .version(TEST_TERMS_OF_USE_VERSION)
+                .build();
+    }
+
+    default TermEntity createTermsOfUseEntityWithUuid() {
+        return TermEntity.builder()
+                .uuid(TEST_TERMS_OF_USE_UUID)
+                .name(TEST_TERMS_OF_USE_NAME)
+                .content(TEST_TERMS_OF_USE_CONTENT)
+                .version(TEST_TERMS_OF_USE_VERSION)
+                .build();
+    }
+}

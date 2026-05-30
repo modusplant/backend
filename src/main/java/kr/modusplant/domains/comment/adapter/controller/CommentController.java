@@ -3,6 +3,7 @@ package kr.modusplant.domains.comment.adapter.controller;
 import jakarta.transaction.Transactional;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
@@ -19,11 +20,11 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
@@ -78,7 +79,7 @@ public class CommentController {
     @Transactional
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, "member");
+            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
         }
         PageImpl<CommentOfAuthorPageModel> result = readRepository.findByAuthor(Author.create(memberUuid), pageable);
 
@@ -112,7 +113,7 @@ public class CommentController {
         writeRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
-                CommentNotificationEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
+                CommentRegisterEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
         );
     }
 

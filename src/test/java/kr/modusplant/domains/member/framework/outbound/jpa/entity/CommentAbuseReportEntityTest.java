@@ -1,7 +1,8 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 @RepositoryOnlyContext
-class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils {
+class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils, PostEntityTestUtils {
     private final TestEntityManager entityManager;
     private final PrimaryCategoryJpaRepository primaryCategoryJpaRepository;
     private final SecondaryCategoryJpaRepository secondaryCategoryJpaRepository;
@@ -39,7 +40,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils 
         SecondaryCategoryEntity secondaryCategoryEntity = secondaryCategoryJpaRepository.findById(1).orElseThrow();
         MemberEntity memberEntity = entityManager.persist(createMemberBasicUserEntity());
         PostEntity postEntity = entityManager.persist(
-                createPostEntityBuilder()
+                createPublishedPostEntityBuilder()
                         .primaryCategory(primaryCategoryEntity)
                         .secondaryCategory(secondaryCategoryEntity)
                         .authMember(memberEntity)
@@ -60,8 +61,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils 
         assertEquals(commentAbuRepEntity.getETagSource(),
                 commentAbuRepEntity.getMemberId() + "-" +
                         commentAbuRepEntity.getComment().getPost().getUlid() + "-" +
-                        commentAbuRepEntity.getComment().getPath() + "-" +
-                        commentAbuRepEntity.getCheckedAt());
+                        commentAbuRepEntity.getComment().getPath());
     }
 
     @Test
@@ -75,7 +75,7 @@ class CommentAbuseReportEntityTest implements CommentAbuseReportEntityTestUtils 
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(commentAbuRepEntity, testMemberId);
+        assertNotEquals(testMemberId, commentAbuRepEntity);
     }
 
     @Test

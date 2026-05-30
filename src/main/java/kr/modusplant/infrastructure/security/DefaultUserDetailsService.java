@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.security;
 import jakarta.transaction.Transactional;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.repository.MemberAuthJpaRepository;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.security.exception.AccountStateException;
@@ -32,7 +33,7 @@ public class DefaultUserDetailsService implements UserDetailsService {
                         () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH));
         MemberEntity member = memberRepository
                 .findByUuid(auth.getMember().getUuid()).orElseThrow(
-                        () -> new AccountStateException(EntityErrorCode.NOT_FOUND_MEMBER));
+                        () -> new AccountStateException(MemberErrorCode.NOT_FOUND_MEMBER));
 
         return DefaultUserDetails.builder()
                 .email(auth.getEmail())

@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.outbound;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ActivitySubjectCommentIdRecord;
@@ -15,9 +16,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberJ
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
-import kr.modusplant.shared.event.ImageRemoveEvent;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
-import kr.modusplant.shared.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
 
 @Repository
 @RequiredArgsConstructor
@@ -58,7 +58,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
         if (emptyOrMemberEntity.isPresent()) {
             return memberJpaMapper.toMember(emptyOrMemberEntity.orElseThrow());
         } else {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER, "member");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
     }
 
@@ -113,7 +113,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
             }
         }
         if (!fileKeysToDelete.isEmpty()) {
-            eventPublisher.publishEvent(ImagesRemoveEvent.create(fileKeysToDelete));
+            eventPublisher.publishEvent(ImagesRemoveTask.create(fileKeysToDelete));
         }
         if (!ArrayUtils.isEmpty(publishedPostUlids)) {
             eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
@@ -134,7 +134,7 @@ public class MemberRepositoryAdapter implements MemberRepository {
 
         String memberProfileImageFileKey = memberProfileJpaRepository.findByUuid(memberId).orElseThrow().getImagePath();
         if (memberProfileImageFileKey != null) {
-            eventPublisher.publishEvent(ImageRemoveEvent.create(memberProfileImageFileKey));
+            eventPublisher.publishEvent(ImageRemoveTask.create(memberProfileImageFileKey));
         }
         memberWithdrawJpaRepository.save(
                 MemberWithdrawEntity.builder()

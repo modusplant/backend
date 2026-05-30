@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.entity;
 
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PrimaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PrimaryCategoryEntityTestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

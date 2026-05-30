@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.entity;
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ class PostEntityTest implements PostEntityTestUtils {
         MemberEntity member = createMemberBasicUserEntity();
         PrimaryCategoryEntity primaryCategoryEntity = entityManager.merge(createPrimaryCategoryEntity());
         SecondaryCategoryEntity secondaryCategoryEntity = entityManager.merge(createSecondaryCategoryEntityBuilder().primaryCategory(primaryCategoryEntity).build());
-        PostEntity post = createPostEntityBuilder()
+        PostEntity post = createPublishedPostEntityBuilder()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(member)
@@ -58,7 +58,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @ValueSource(booleans = {true, false})
     @DisplayName("발행 여부 전환 테스트")
     void updateIsPublishedTest(Boolean isPublished) {
-        PostEntity post = createPostEntityBuilder().build();
+        PostEntity post = createPublishedPostEntityBuilder().build();
 
         post.updateIsPublished(isPublished);
 
@@ -68,7 +68,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @Test
     @DisplayName("게시글 좋아요 수 증가 테스트")
     void increaseLikeCountTest() {
-        PostEntity post = createPostEntityBuilder()
+        PostEntity post = createPublishedPostEntityBuilder()
                 .likeCount(0)
                 .build();
 
@@ -80,7 +80,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @Test
     @DisplayName("게시글 좋아요 수 감소 테스트")
     void decreaseLikeCountTest() {
-        PostEntity post = createPostEntityBuilder()
+        PostEntity post = createPublishedPostEntityBuilder()
                 .likeCount(1)
                 .build();
 
@@ -95,7 +95,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @DisplayName("발행 날짜 갱신 테스트")
     void updatePublishedAtTest() {
         LocalDateTime localDateTime = LocalDateTime.now();
-        PostEntity post = createPostEntityBuilder().build();
+        PostEntity post = createPublishedPostEntityBuilder().build();
 
         post.updatePublishedAt(localDateTime);
 
@@ -106,7 +106,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @DisplayName("편집 날짜 갱신 테스트")
     void updateEditedAtTest() {
         LocalDateTime localDateTime = LocalDateTime.now();
-        PostEntity post = createPostEntityBuilder().build();
+        PostEntity post = createPublishedPostEntityBuilder().build();
 
         post.updateEditedAt(localDateTime);
 
@@ -117,17 +117,17 @@ class PostEntityTest implements PostEntityTestUtils {
     @DisplayName("getETagSource를 통해 ETag 소스 반환")
     void testGetETagSource_givenNothing_willReturnETagSource() {
         // when
-        PostEntity postEntity = createPostEntityBuilderWithUlid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // then
-        assertEquals(postEntity.getETagSource(), TEST_POST_ULID + "-" + null);
+        assertEquals(TEST_POST_ULID + "-" + null, postEntity.getETagSource());
     }
 
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         // when
-        PostEntity postEntity = createPostEntityBuilderWithUlid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // then
         //noinspection EqualsWithItself
@@ -138,18 +138,18 @@ class PostEntityTest implements PostEntityTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         // when
-        PostEntity postEntity = createPostEntityBuilderWithUlid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // then
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(postEntity, testMemberId);
+        assertNotEquals(testMemberId, postEntity);
     }
 
     @Test
     @DisplayName("같은 타입의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfEqualType_willReturnFalse() {
         // when
-        PostEntity postEntity = createPostEntityBuilderWithUlid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // then
         assertEquals(postEntity, PostEntity.builder().post(postEntity).build());
@@ -159,7 +159,7 @@ class PostEntityTest implements PostEntityTestUtils {
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         // when
-        PostEntity postEntity = createPostEntityBuilderWithUlid().build();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
         // then
         assertEquals(postEntity.hashCode(), postEntity.hashCode());

@@ -1,19 +1,19 @@
 package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.repository;
 
+import kr.modusplant.domains.account.identity.common.util.framework.outbound.jpa.entity.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
-import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.common.util.MemberAuthEntityTestUtils;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.mapper.NormalIdentityAuthJpaMapper;
 import kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.mapper.NormalIdentityJpaMapper;
 import kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.mapper.NormalIdentityProfileJpaMapper;
 import kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.mapper.NormalIdentityTermJpaMapper;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
+import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
-import kr.modusplant.domains.term.framework.outbound.jpa.entity.common.util.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
 import org.junit.jupiter.api.BeforeEach;

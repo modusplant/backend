@@ -1,6 +1,7 @@
 package kr.modusplant.domains.term.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.term.common.util.domain.aggregate.TermTestUtils;
+import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.TermEntityTestUtils;
 import kr.modusplant.domains.term.domain.aggregate.Term;
 import kr.modusplant.domains.term.domain.exception.TermNotFoundException;
 import kr.modusplant.domains.term.domain.exception.enums.TermErrorCode;
@@ -8,7 +9,6 @@ import kr.modusplant.domains.term.domain.vo.TermContent;
 import kr.modusplant.domains.term.domain.vo.TermName;
 import kr.modusplant.domains.term.domain.vo.TermVersion;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.TermEntity;
-import kr.modusplant.domains.term.framework.outbound.jpa.entity.common.util.TermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.mapper.TermJpaMapperImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

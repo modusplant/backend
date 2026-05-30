@@ -9,6 +9,7 @@ public interface PostArchiveEntityTestUtils extends PostTestUtils {
     default PostArchiveEntity createPostArchiveEntity() {
         return PostArchiveEntity.builder()
                 .ulid(testPostId.getValue())
+                .authMemberUuid(testAuthorId.getValue())
                 .primaryCategoryId(testPrimaryCategoryId.getValue())
                 .secondaryCategoryId(testSecondaryCategoryId.getValue())
                 .authMemberUuid(testAuthorId.getValue())

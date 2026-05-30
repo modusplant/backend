@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.framework.inbound.web.listener;
 
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.notification.adapter.controller.NotificationController;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.CommentNotificationEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +33,7 @@ public class NotificationEventListener {
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePostLikeNotification(PostLikeNotificationEvent event) {
+    public void handlePostLikeNotification(PostLikeEvent event) {
         acquireAndProcess(
                 () -> notificationController.createPostLikeNotification(event),
                 "[Notification] 게시글 좋아요 알림 실패 - actorId={}, postUlid={}",
@@ -43,7 +43,7 @@ public class NotificationEventListener {
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleCommentLikeNotification(CommentLikeNotificationEvent event) {
+    public void handleCommentLikeNotification(CommentLikeEvent event) {
         acquireAndProcess(
                 () -> notificationController.createCommentLikeNotification(event),
                 "[Notification] 댓글 좋아요 알림 실패 - actorId={}, postUlid={}, commentPath={}",
@@ -53,7 +53,7 @@ public class NotificationEventListener {
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleCommentNotification(CommentNotificationEvent event) {
+    public void handleCommentNotification(CommentRegisterEvent event) {
         acquireAndProcess(
                 () -> notificationController.createCommentNotification(event),
                 "[Notification] 댓글 추가 알림 실패 - actorId={}, postUlid={}, commentPath={}, action={}",
