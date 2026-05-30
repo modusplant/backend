@@ -12,7 +12,8 @@ public interface PostEntityTestUtils extends MemberEntityTestUtils, PrimaryCateg
                 .viewCount(TEST_POST_VIEW_COUNT)
                 .title(TEST_POST_TITLE)
                 .content(TEST_POST_CONTENT_JSON_NODE)
-                .isPublished(TEST_POST_IS_PUBLISHED);
+                .isPublished(TEST_POST_IS_PUBLISHED)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntity.PostEntityBuilder createPostEntityBuilderWithUlid() {
@@ -22,6 +23,7 @@ public interface PostEntityTestUtils extends MemberEntityTestUtils, PrimaryCateg
                 .viewCount(TEST_POST_VIEW_COUNT)
                 .title(TEST_POST_TITLE)
                 .content(TEST_POST_CONTENT_JSON_NODE)
-                .isPublished(TEST_POST_IS_PUBLISHED);
+                .isPublished(TEST_POST_IS_PUBLISHED)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 }
