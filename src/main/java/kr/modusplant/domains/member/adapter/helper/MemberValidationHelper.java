@@ -25,7 +25,7 @@ public class MemberValidationHelper {
 
     public void validateIfMemberExists(MemberId memberId) {
         if (!memberRepository.isIdExist(memberId)) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER, "member");
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
     }
 
