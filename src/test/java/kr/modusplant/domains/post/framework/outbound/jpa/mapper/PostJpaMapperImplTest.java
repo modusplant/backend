@@ -50,6 +50,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtil
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isTrue();
+        assertThat(result.getPublishedAt()).isEqualTo(result.getEditedAt());
     }
 
     @Test
@@ -82,6 +83,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtil
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isFalse();
+        assertThat(result.getPublishedAt()).isNull();
     }
 
     @Test

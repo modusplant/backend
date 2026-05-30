@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_EDITED_AT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +35,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
                 .publishedAt(TEST_POST_PUBLISHED_AT)
+                .editedAt(TEST_POST_EDITED_AT)
                 .build();
 
         // when
@@ -49,6 +51,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         assertThat(result.getCreatedAt()).isEqualTo(postEntity.getCreatedAt());
         assertThat(result.getUpdatedAt()).isEqualTo(postEntity.getUpdatedAt());
         assertThat(result.getPublishedAt()).isEqualTo(postEntity.getPublishedAt());
+        assertThat(result.getEditedAt()).isEqualTo(postEntity.getEditedAt());
     }
 
     @Test
