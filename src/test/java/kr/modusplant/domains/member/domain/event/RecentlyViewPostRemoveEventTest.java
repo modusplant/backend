@@ -21,7 +21,7 @@ class RecentlyViewPostRemoveEventTest {
                     RecentlyViewPostRemoveEvent.create(null));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST_ID);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST);
         }
 
         @Test
@@ -32,7 +32,7 @@ class RecentlyViewPostRemoveEventTest {
                     RecentlyViewPostRemoveEvent.create(new String[]{}));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST_ID);
+            assertThat(invalidValueException.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST);
         }
     }
 }

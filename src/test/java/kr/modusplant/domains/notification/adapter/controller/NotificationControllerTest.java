@@ -114,7 +114,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
             NotificationPreview preview = new NotificationPreview(TEST_NOTIFICATION_RECIPIENT_ID, "게시글 제목");
 
             given(postInfoRepository.getNotificationPreviewByPostId(any())).willReturn(preview);
-            given(memberInfoRepository.getNicknameByUuid(testPostLikeEvent.getActorId())).willReturn("ActorNickname");
+            given(memberInfoRepository.getNicknameByUuid(testPostLikeEvent.getMemberId())).willReturn("ActorNickname");
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
@@ -129,7 +129,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("작성자 본인이 좋아요를 누르면 알림을 생성하지 않는다")
         void createPostLikeNotification_SelfAction_NoNotification() {
             // given
-            NotificationPreview preview = new NotificationPreview(testPostLikeEvent.getActorId(), "내 게시글 제목");
+            NotificationPreview preview = new NotificationPreview(testPostLikeEvent.getMemberId(), "내 게시글 제목");
 
             given(postInfoRepository.getNotificationPreviewByPostId(any())).willReturn(preview);
 
@@ -164,7 +164,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
             NotificationPreview preview = new NotificationPreview(TEST_NOTIFICATION_RECIPIENT_ID, "댓글 내용 프리뷰");
 
             given(commentInfoRepository.getNotificationPreviewByPostIdAndCommentPath(any(), any())).willReturn(preview);
-            given(memberInfoRepository.getNicknameByUuid(testCommentLikeEvent.getActorId())).willReturn("ActorNickname");
+            given(memberInfoRepository.getNicknameByUuid(testCommentLikeEvent.getMemberId())).willReturn("ActorNickname");
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
 
             // when
@@ -179,7 +179,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("본인의 댓글에 좋아요를 누르면 알림을 생성하지 않는다")
         void createCommentLikeNotification_SelfAction_NoNotification() {
             // given
-            NotificationPreview preview = new NotificationPreview(testCommentLikeEvent.getActorId(), "내 댓글 내용");
+            NotificationPreview preview = new NotificationPreview(testCommentLikeEvent.getMemberId(), "내 댓글 내용");
 
             given(commentInfoRepository.getNotificationPreviewByPostIdAndCommentPath(any(), any())).willReturn(preview);
 
@@ -210,7 +210,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("일반 댓글 추가 시 게시글 작성자에게 알림이 전송된다")
         void createCommentNotification_NormalComment() {
             // given
-            given(memberInfoRepository.getNicknameByUuid(testCommentRegisterEvent.getActorId())).willReturn("ActorName");
+            given(memberInfoRepository.getNicknameByUuid(testCommentRegisterEvent.getAuthorId())).willReturn("ActorName");
             given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
 
@@ -226,7 +226,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("본인 게시글에 본인이 댓글을 달면 알림이 생성되지 않는다")
         void createCommentNotification_SelfComment_NoNotification() {
             // given
-            UUID sameMember = testCommentRegisterEvent.getActorId();
+            UUID sameMember = testCommentRegisterEvent.getAuthorId();
 
             given(memberInfoRepository.getNicknameByUuid(sameMember)).willReturn("MyNickname");
             given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(sameMember);
@@ -247,7 +247,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
             UUID postAuthorId = UUID.randomUUID();
             UUID parentCommentAuthorId = UUID.randomUUID();
 
-            given(memberInfoRepository.getNicknameByUuid(testCommentReplyNotificationEvent.getActorId())).willReturn("ActorName");
+            given(memberInfoRepository.getNicknameByUuid(testCommentReplyNotificationEvent.getAuthorId())).willReturn("ActorName");
             given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(postAuthorId);
             given(commentInfoRepository.getAuthorIdByPostIdAndCommentPath(any(), any())).willReturn(parentCommentAuthorId);
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
@@ -267,7 +267,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
             UUID postAuthorId = TEST_NOTIFICATION_RECIPIENT_ID;
             UUID parentCommentAuthorId = TEST_NOTIFICATION_RECIPIENT_ID; // 게시글 작성자 == 댓글 작성자
 
-            given(memberInfoRepository.getNicknameByUuid(testCommentReplyNotificationEvent.getActorId())).willReturn("ActorName");
+            given(memberInfoRepository.getNicknameByUuid(testCommentReplyNotificationEvent.getAuthorId())).willReturn("ActorName");
             given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(postAuthorId);
             given(commentInfoRepository.getAuthorIdByPostIdAndCommentPath(any(), any())).willReturn(parentCommentAuthorId);
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
@@ -284,7 +284,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("본인 댓글에 본인이 대댓글을 달면 상위 댓글 작성자 알림이 생성되지 않는다")
         void createCommentNotification_SelfReply_NoNotification() {
             // given
-            UUID sameMember = testCommentReplyNotificationEvent.getActorId();
+            UUID sameMember = testCommentReplyNotificationEvent.getAuthorId();
 
             given(memberInfoRepository.getNicknameByUuid(sameMember)).willReturn("MyNickname");
             given(commentInfoRepository.getAuthorIdByPostIdAndCommentPath(any(), any())).willReturn(sameMember);

@@ -15,6 +15,7 @@ import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.Pr
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
@@ -86,8 +87,6 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -931,13 +930,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(reportRepository.isMemberAbuseComment(any(), any())).willReturn(false);
-        willDoNothing().given(reportRepository).reportCommentAbuse(any(), any());
+        given(reportRepository.reportCommentAbuse(any(), any())).willReturn(testReportTime);
 
         // when
         memberController.reportCommentAbuse(testCommentAbuseReportRecord);
 
         // then
         verify(reportRepository, times(1)).reportCommentAbuse(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportEvent.class));
     }
 
     @Test

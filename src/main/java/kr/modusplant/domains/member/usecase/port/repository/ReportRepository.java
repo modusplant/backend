@@ -23,7 +23,7 @@ public interface ReportRepository {
 
     ReportTime reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
-    void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
+    ReportTime reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
     void removeProposalOrBugReport(ReportId reportId);
 }

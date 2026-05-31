@@ -14,7 +14,7 @@ public class RecentlyViewPostRemoveEvent {
 
     public static RecentlyViewPostRemoveEvent create(String[] postIds) {
         if (ArrayUtils.isEmpty(postIds)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST_ID, "postIds");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postIds");
         } else {
             return new RecentlyViewPostRemoveEvent(postIds);
         }
