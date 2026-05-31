@@ -34,7 +34,7 @@ public class PostMapperImpl implements PostMapper {
                 content,
                 postDetailReadModel.isPublished(),
                 postDetailReadModel.publishedAt(),
-                postDetailReadModel.updatedAt(),
+                postDetailReadModel.editedAt(),
                 postDetailReadModel.isLiked(),
                 postDetailReadModel.isBookmarked()
         );
@@ -55,7 +55,7 @@ public class PostMapperImpl implements PostMapper {
                 thumbnailFilename,
                 postDetailDataReadModel.isPublished(),
                 postDetailDataReadModel.publishedAt(),
-                postDetailDataReadModel.updatedAt()
+                postDetailDataReadModel.editedAt()
         );
     }
 
@@ -84,7 +84,7 @@ public class PostMapperImpl implements PostMapper {
                 draftPostReadModel.secondaryCategory(),
                 draftPostReadModel.title(),
                 content,
-                draftPostReadModel.updatedAt()
+                draftPostReadModel.editedAt()
         );
     }
 }

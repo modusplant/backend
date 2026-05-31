@@ -11,6 +11,6 @@ public record DraftPostReadModel(
         String title,
         JsonNode content,
         String thumbnailPath,
-        LocalDateTime updatedAt
+        LocalDateTime editedAt
 ) {
 }

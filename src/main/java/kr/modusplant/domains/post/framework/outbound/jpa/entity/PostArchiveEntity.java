@@ -58,6 +58,9 @@ public class PostArchiveEntity {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    @Column(name = "edited_at", nullable = false)
+    private LocalDateTime editedAt;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -70,7 +73,7 @@ public class PostArchiveEntity {
         return new HashCodeBuilder(17,37).append(getUlid()).toHashCode();
     }
 
-    private PostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, String contentText, LocalDateTime createdAt, LocalDateTime archivedAt, LocalDateTime updatedAt, LocalDateTime publishedAt) {
+    private PostArchiveEntity(String ulid, Integer primaryCategoryId, Integer secondaryCategoryId, UUID authMemberUuid, String title, String contentText, LocalDateTime createdAt, LocalDateTime archivedAt, LocalDateTime updatedAt, LocalDateTime publishedAt, LocalDateTime editedAt) {
         this.ulid = ulid;
         this.primaryCategoryId = primaryCategoryId;
         this.secondaryCategoryId = secondaryCategoryId;
@@ -81,6 +84,7 @@ public class PostArchiveEntity {
         this.archivedAt = archivedAt;
         this.updatedAt = updatedAt;
         this.publishedAt = publishedAt;
+        this.editedAt = editedAt;
     }
 
     public static PostArchiveEntityBuilder builder() {
@@ -98,6 +102,7 @@ public class PostArchiveEntity {
         private LocalDateTime archivedAt;
         private LocalDateTime updatedAt;
         private LocalDateTime publishedAt;
+        private LocalDateTime editedAt;
 
         public PostArchiveEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
@@ -149,6 +154,11 @@ public class PostArchiveEntity {
             return this;
         }
 
+        public PostArchiveEntityBuilder editedAt(LocalDateTime editedAt) {
+            this.editedAt = editedAt;
+            return this;
+        }
+
         public PostArchiveEntityBuilder postArchive(final PostArchiveEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategoryId = postEntity.primaryCategoryId;
@@ -160,11 +170,12 @@ public class PostArchiveEntity {
             this.archivedAt = postEntity.archivedAt;
             this.updatedAt = postEntity.updatedAt;
             this.publishedAt = postEntity.publishedAt;
+            this.editedAt = postEntity.editedAt;
             return this;
         }
 
         public PostArchiveEntity build() {
-            return new PostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.contentText, this.createdAt, this.archivedAt, this.updatedAt, this.publishedAt);
+            return new PostArchiveEntity(this.ulid, this.primaryCategoryId, this.secondaryCategoryId, this.authMemberUuid, this.title, this.contentText, this.createdAt, this.archivedAt, this.updatedAt, this.publishedAt, this.editedAt);
         }
 
     }

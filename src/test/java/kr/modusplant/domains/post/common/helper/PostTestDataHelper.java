@@ -84,6 +84,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.THUMBNAIL_PATH, thumbnailPath)
                 .set(COMM_POST.IS_PUBLISHED, true)
                 .set(COMM_POST.PUBLISHED_AT, dateTime)
+                .set(COMM_POST.EDITED_AT, dateTime)
                 .set(COMM_POST.CREATED_AT, dateTime)
                 .set(COMM_POST.UPDATED_AT, dateTime)
                 .set(COMM_POST.VER, 1)
@@ -108,6 +109,7 @@ public class PostTestDataHelper {
                 .set(COMM_POST.IS_PUBLISHED,false)
                 .set(COMM_POST.CREATED_AT,dateTime)
                 .set(COMM_POST.UPDATED_AT,dateTime)
+                .set(COMM_POST.EDITED_AT, dateTime)
                 .set(COMM_POST.VER,1)
                 .returning()
                 .fetchOneInto(CommPostRecord.class);

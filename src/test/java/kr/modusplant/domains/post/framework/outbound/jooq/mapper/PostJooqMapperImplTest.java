@@ -5,6 +5,7 @@ import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.Post
 import kr.modusplant.domains.post.framework.outbound.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
+import kr.modusplant.domains.post.usecase.record.PostDetailDataReadModel;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
 import org.jooq.Record;
@@ -133,8 +134,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
-        LocalDateTime publishedAt = LocalDateTime.now();
-        LocalDateTime updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         Boolean isLiked = true;
         Boolean isBookmarked = false;
         PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
@@ -151,8 +151,8 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.IS_PUBLISHED)).willReturn(postEntity.getIsPublished());
-        given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(publishedAt);
-        given(record.get(COMM_POST.UPDATED_AT)).willReturn(updatedAt);
+        given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(now);
+        given(record.get(COMM_POST.EDITED_AT)).willReturn(now);
         given(record.get("isLiked", Boolean.class)).willReturn(isLiked);
         given(record.get("isBookmarked", Boolean.class)).willReturn(isBookmarked);
 
@@ -172,8 +172,8 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("isPublished", postEntity.getIsPublished())
-                .hasFieldOrPropertyWithValue("publishedAt", publishedAt)
-                .hasFieldOrPropertyWithValue("updatedAt", updatedAt)
+                .hasFieldOrPropertyWithValue("publishedAt", now)
+                .hasFieldOrPropertyWithValue("editedAt", now)
                 .hasFieldOrPropertyWithValue("isLiked", isLiked)
                 .hasFieldOrPropertyWithValue("isBookmarked", isBookmarked);
     }
@@ -189,7 +189,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
         UUID authorUuid = MEMBER_BASIC_USER_UUID;
         String nickname = MEMBER_BASIC_USER_NICKNAME;
-        LocalDateTime updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         Boolean isLiked = false;
         Boolean isBookmarked = false;
         PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
@@ -207,7 +207,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(COMM_POST.LIKE_COUNT)).willReturn(postEntity.getLikeCount());
         given(record.get(COMM_POST.IS_PUBLISHED)).willReturn(false);
         given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(null);
-        given(record.get(COMM_POST.UPDATED_AT)).willReturn(updatedAt);
+        given(record.get(COMM_POST.EDITED_AT)).willReturn(now);
         given(record.get("isLiked", Boolean.class)).willReturn(isLiked);
         given(record.get("isBookmarked", Boolean.class)).willReturn(isBookmarked);
 
@@ -228,12 +228,104 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("likeCount", postEntity.getLikeCount())
                 .hasFieldOrPropertyWithValue("isPublished", false)
                 .hasFieldOrPropertyWithValue("publishedAt", null)
-                .hasFieldOrPropertyWithValue("updatedAt", updatedAt)
+                .hasFieldOrPropertyWithValue("editedAt", now)
                 .hasFieldOrPropertyWithValue("isLiked", isLiked)
                 .hasFieldOrPropertyWithValue("isBookmarked", isBookmarked);
     }
 
+    @Test
+    @DisplayName("toPostDetailDataReadModel로 PostDetailDataReadModel로 반환하기")
+    void testToPostDetailDataReadModel_givenRecord_willReturnPostDetailDataReadModel() {
+        // given
+        Record record = mock(Record.class);
+        Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
+        String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
+        String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+        UUID authorUuid = MEMBER_BASIC_USER_UUID;
+        String nickname = MEMBER_BASIC_USER_NICKNAME;
+        LocalDateTime now = LocalDateTime.now();
+        PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
 
+        // when
+        given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
+        given(record.get("primaryCategoryId", Integer.class)).willReturn(primaryCategoryId);
+        given(record.get("primaryCategory", String.class)).willReturn(primaryCategory);
+        given(record.get("secondaryCategoryId", Integer.class)).willReturn(secondaryCategoryId);
+        given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
+        given(record.get("authorUuid", UUID.class)).willReturn(authorUuid);
+        given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
+        given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
+        given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.IS_PUBLISHED)).willReturn(postEntity.getIsPublished());
+        given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(now);
+        given(record.get(COMM_POST.EDITED_AT)).willReturn(now);
+
+        PostDetailDataReadModel result = postJooqMapper.toPostDetailDataReadModel(record);
+
+        // then
+        assertThat(result)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("ulid", postEntity.getUlid())
+                .hasFieldOrPropertyWithValue("primaryCategoryId", primaryCategoryId)
+                .hasFieldOrPropertyWithValue("primaryCategory", primaryCategory)
+                .hasFieldOrPropertyWithValue("secondaryCategoryId", secondaryCategoryId)
+                .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
+                .hasFieldOrPropertyWithValue("authorUuid", authorUuid)
+                .hasFieldOrPropertyWithValue("nickname", nickname)
+                .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
+                .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("isPublished", postEntity.getIsPublished())
+                .hasFieldOrPropertyWithValue("publishedAt", now)
+                .hasFieldOrPropertyWithValue("editedAt", now);
+    }
+
+    @Test
+    @DisplayName("toPostDetailDataReadModel로 PostDetailDataReadModel 반환하기 (publishedAt이 null인 경우)")
+    void testToPostDetailDataReadModel_givenRecordWithNullPublishedAt_willReturnPostDetailDataReadModel() {
+        // given
+        Record record = mock(Record.class);
+        Integer primaryCategoryId = TEST_COMM_PRIMARY_CATEGORY_ID;
+        String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
+        Integer secondaryCategoryId = TEST_COMM_SECONDARY_CATEGORY_ID_1;
+        String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
+        UUID authorUuid = MEMBER_BASIC_USER_UUID;
+        String nickname = MEMBER_BASIC_USER_NICKNAME;
+        LocalDateTime now = LocalDateTime.now();
+        PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
+
+        // when
+        given(record.get(COMM_POST.ULID)).willReturn(postEntity.getUlid());
+        given(record.get("primaryCategoryId", Integer.class)).willReturn(primaryCategoryId);
+        given(record.get("primaryCategory", String.class)).willReturn(primaryCategory);
+        given(record.get("secondaryCategoryId", Integer.class)).willReturn(secondaryCategoryId);
+        given(record.get("secondaryCategory", String.class)).willReturn(secondaryCategory);
+        given(record.get("authorUuid", UUID.class)).willReturn(authorUuid);
+        given(record.get(SITE_MEMBER.NICKNAME)).willReturn(nickname);
+        given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
+        given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
+        given(record.get(COMM_POST.IS_PUBLISHED)).willReturn(false);
+        given(record.get(COMM_POST.PUBLISHED_AT)).willReturn(null);
+        given(record.get(COMM_POST.EDITED_AT)).willReturn(now);
+
+        PostDetailDataReadModel result = postJooqMapper.toPostDetailDataReadModel(record);
+
+        // then
+        assertThat(result)
+                .isNotNull()
+                .hasFieldOrPropertyWithValue("ulid", postEntity.getUlid())
+                .hasFieldOrPropertyWithValue("primaryCategoryId", primaryCategoryId)
+                .hasFieldOrPropertyWithValue("primaryCategory", primaryCategory)
+                .hasFieldOrPropertyWithValue("secondaryCategoryId", secondaryCategoryId)
+                .hasFieldOrPropertyWithValue("secondaryCategory", secondaryCategory)
+                .hasFieldOrPropertyWithValue("authorUuid", authorUuid)
+                .hasFieldOrPropertyWithValue("nickname", nickname)
+                .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
+                .hasFieldOrPropertyWithValue("content", postEntity.getContent())
+                .hasFieldOrPropertyWithValue("isPublished", false)
+                .hasFieldOrPropertyWithValue("publishedAt", null)
+                .hasFieldOrPropertyWithValue("editedAt", now);
+    }
 
 
     @Test
@@ -243,7 +335,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         Record record = mock(Record.class);
         String primaryCategory = TEST_COMM_PRIMARY_CATEGORY_CATEGORY;
         String secondaryCategory = TEST_COMM_SECONDARY_CATEGORY_CATEGORY;
-        LocalDateTime updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         PostEntity postEntity = createDraftPostEntityBuilderWithUuid().build();
 
         // when
@@ -253,7 +345,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
         given(record.get(COMM_POST.TITLE)).willReturn(postEntity.getTitle());
         given(record.get("content", JsonNode.class)).willReturn(postEntity.getContent());
         given(record.get(COMM_POST.THUMBNAIL_PATH)).willReturn(postEntity.getThumbnailPath());
-        given(record.get(COMM_POST.UPDATED_AT)).willReturn(updatedAt);
+        given(record.get(COMM_POST.EDITED_AT)).willReturn(now);
 
         DraftPostReadModel result = postJooqMapper.toDraftPostReadModel(record);
 
@@ -266,7 +358,7 @@ class PostJooqMapperImplTest implements PostEntityTestUtils {
                 .hasFieldOrPropertyWithValue("title", postEntity.getTitle())
                 .hasFieldOrPropertyWithValue("content", postEntity.getContent())
                 .hasFieldOrPropertyWithValue("thumbnailPath", postEntity.getThumbnailPath())
-                .hasFieldOrPropertyWithValue("updatedAt", updatedAt);
+                .hasFieldOrPropertyWithValue("editedAt", now);
     }
 
 }

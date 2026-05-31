@@ -41,7 +41,7 @@ class PostMapperImplTest implements PostReadModelTestUtils {
         assertEquals(result.content(),TEST_POST_CONTENT);
         assertEquals(result.isPublished(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.isPublished());
         assertEquals(result.publishedAt(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.publishedAt());
-        assertEquals(result.updatedAt(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.updatedAt());
+        assertEquals(result.editedAt(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.editedAt());
         assertEquals(result.isLiked(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.isLiked());
         assertEquals(result.isBookmarked(), TEST_PUBLISHED_POST_DETAIL_READ_MODEL.isBookmarked());
     }
@@ -65,7 +65,7 @@ class PostMapperImplTest implements PostReadModelTestUtils {
         assertEquals(result.thumbnailFilename(), TEST_POST_CONTENT_THUMBNAIL_FILENAME);
         assertEquals(result.isPublished(), TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL.isPublished());
         assertEquals(result.publishedAt(), TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL.publishedAt());
-        assertEquals(result.updatedAt(), TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL.updatedAt());
+        assertEquals(result.editedAt(), TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL.editedAt());
     }
 
 
@@ -98,7 +98,7 @@ class PostMapperImplTest implements PostReadModelTestUtils {
         assertEquals(result.secondaryCategory(),TEST_DRAFT_POST_READ_MODEL.secondaryCategory());
         assertEquals(result.title(),TEST_DRAFT_POST_READ_MODEL.title());
         assertEquals(result.content(),TEST_POST_CONTENT);
-        assertEquals(result.updatedAt(), TEST_DRAFT_POST_READ_MODEL.updatedAt());
+        assertEquals(result.editedAt(), TEST_DRAFT_POST_READ_MODEL.editedAt());
     }
 
 

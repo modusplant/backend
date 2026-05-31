@@ -92,7 +92,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_POST.LIKE_COUNT,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
-                        COMM_POST.UPDATED_AT,
+                        COMM_POST.EDITED_AT,
                         exists(
                                 selectOne().from(COMM_POST_LIKE)
                                         .where(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
@@ -129,7 +129,7 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                         COMM_POST.THUMBNAIL_PATH,
                         COMM_POST.IS_PUBLISHED,
                         COMM_POST.PUBLISHED_AT,
-                        COMM_POST.UPDATED_AT
+                        COMM_POST.EDITED_AT
                 ).from(COMM_POST)
                 .leftJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .leftJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))

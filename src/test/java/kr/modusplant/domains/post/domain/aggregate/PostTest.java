@@ -409,7 +409,7 @@ class PostTest implements PostTestUtils {
         void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
             assertNotEquals(
                     createPublishedPost(),
-                    Post.create(PostId.generate(),testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())
+                    Post.create(testPostId2,testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())
             );
         }
 
