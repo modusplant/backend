@@ -3,7 +3,9 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
@@ -28,6 +30,11 @@ import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAb
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportApproveRecordTestUtils.testCommentAbuseReportApproveRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportDismissRecordTestUtils.testCommentAbuseReportDismissRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportGetRecordTestUtils.testCommentAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportApproveRecordTestUtils.testPostAbuseReportApproveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
@@ -289,5 +296,118 @@ class MemberAdminControllerTest {
         // then
         assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_POST_ABUSE_REPORT_BLINDED);
         verify(reportDashboardRepository, never()).approvePostAbuseReport(any());
+    }
+
+    @Test
+    @DisplayName("getCommentAbuseReport로 댓글 신고 현황 목록 반환")
+    void testGetCommentAbuseReport_givenAnyRecord_willReturnReadModelList() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
+
+        // when
+        List<CommentAbuseReportDashboardReadModel> readModels = memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any(), any());
+        assertThat(readModels).isEqualTo(testCommentAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("반려되지 않은 댓글일 때 dismissCommentAbuse로 댓글 신고 반려 후 읽기 모델 반환")
+    void testDismissCommentAbuse_givenNotDismissedComment_willReturnReadModel() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+        given(reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(any())).willReturn(false);
+        given(reportDashboardRepository.dismissCommentAbuseReport(any())).willReturn(testCommentAbuseReportDashboardReadModel);
+
+        // when
+        CommentAbuseReportDashboardReadModel readModel = memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).dismissCommentAbuseReport(any());
+        assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("댓글을 찾을 수 없을 때 dismissCommentAbuse로 예외 반환")
+    void testDismissCommentAbuse_givenNotFoundComment_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID, "activitySubjectCommentId"))
+                .given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
+    }
+
+    @Test
+    @DisplayName("이미 반려된 댓글일 때 dismissCommentAbuse로 예외 반환")
+    void testDismissCommentAbuse_givenAlreadyDismissedComment_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+        given(reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(any())).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(
+                ExistsValueException.class,
+                () -> memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_COMMENT_ABUSE_REPORT_DISMISSED);
+    }
+
+    @Test
+    @DisplayName("수리되지 않은 댓글일 때 approveCommentAbuse로 댓글 신고 수리 후 읽기 모델 반환")
+    void testApproveCommentAbuse_givenNotApprovedComment_willReturnReadModel() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+        given(reportDashboardRepository.isApprovedInCommentAbuseReportDashboard(any())).willReturn(false);
+        given(reportDashboardRepository.approveCommentAbuseReport(any())).willReturn(testCommentAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentAbuseReportApproveEvent.class));
+
+        // when
+        CommentAbuseReportDashboardReadModel readModel = memberAdminController.approveCommentAbuse(testCommentAbuseReportApproveRecord);
+
+        // then
+        verify(reportDashboardRepository, times(1)).approveCommentAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportApproveEvent.class));
+        assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
+    }
+
+    @Test
+    @DisplayName("댓글을 찾을 수 없을 때 approveCommentAbuse로 예외 반환")
+    void testApproveCommentAbuse_givenNotFoundComment_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID, "activitySubjectCommentId"))
+                .given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.approveCommentAbuse(testCommentAbuseReportApproveRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
+    }
+
+    @Test
+    @DisplayName("이미 수리된 댓글일 때 approveCommentAbuse로 예외 반환")
+    void testApproveCommentAbuse_givenAlreadyApprovedComment_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+        given(reportDashboardRepository.isApprovedInCommentAbuseReportDashboard(any())).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(
+                ExistsValueException.class,
+                () -> memberAdminController.approveCommentAbuse(testCommentAbuseReportApproveRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(EXISTS_COMMENT_ABUSE_REPORT_BLINDED);
+        verify(reportDashboardRepository, never()).approveCommentAbuseReport(any());
     }
 }

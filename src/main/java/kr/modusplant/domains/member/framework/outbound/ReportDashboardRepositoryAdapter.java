@@ -2,16 +2,22 @@ package kr.modusplant.domains.member.framework.outbound;
 
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.framework.outbound.jooq.repository.CommentAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.compositekey.CommentAbuseReportDashboardCompositeKey;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportDashboardEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
@@ -34,9 +40,11 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     private final PostJpaRepository postJpaRepository;
     private final ProposalOrBugReportJpaRepository proposalOrBugReportJpaRepository;
     private final PostAbuseReportDashboardJpaRepository postAbuseReportDashboardJpaRepository;
+    private final CommentAbuseReportDashboardJpaRepository commentAbuseReportDashboardJpaRepository;
 
     private final ProposalOrBugReportDashboardJooqRepository proposalOrBugReportDashboardJooqRepository;
     private final PostAbuseReportDashboardJooqRepository postAbuseReportDashboardJooqRepository;
+    private final CommentAbuseReportDashboardJooqRepository commentAbuseReportDashboardJooqRepository;
 
     @Override
     public List<ProposalOrBugReportDashboardReadModel> getProposalOrBugReports(
@@ -132,6 +140,98 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     @Override
     public boolean isApprovedInPostAbuseReportDashboard(ActivitySubjectPostId postId) {
         return postAbuseReportDashboardJpaRepository.findById(postId.getValue())
+                .map(e -> e.getStatus() == AbuseReportStatus.BLINDED)
+                .orElse(false);
+    }
+
+    @Override
+    public List<CommentAbuseReportDashboardReadModel> getCommentAbuseReports(
+            ReportPageSize reportPageSize,
+            @Nullable AbuseReportStatus status,
+            @Nullable String lastPostUlid,
+            @Nullable String lastPath) {
+
+        String statusResult = status != null ? status.name() : null;
+        return commentAbuseReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndCursor(
+                reportPageSize.getValue(), statusResult, lastPostUlid, lastPath);
+    }
+
+    @Override
+    public void reflectCommentAbuseReport(ActivitySubjectCommentId commentId, ReportTime reportTimeVO) {
+        String postUlid = commentId.getActivitySubjectPostId().getValue();
+        String path = commentId.getActivitySubjectCommentPath().getValue();
+        LocalDateTime reportTime = reportTimeVO.getValue();
+        CommentAbuseReportDashboardCompositeKey compositeKey =
+                new CommentAbuseReportDashboardCompositeKey(postUlid, path);
+        Optional<CommentAbuseReportDashboardEntity> optionalDashboardEntity =
+                commentAbuseReportDashboardJpaRepository.findById(compositeKey);
+        if (optionalDashboardEntity.isEmpty()) {
+            commentAbuseReportDashboardJpaRepository.save(
+                    CommentAbuseReportDashboardEntity.builder()
+                            .postUlid(postUlid)
+                            .path(path)
+                            .firstReportedAt(reportTime)
+                            .lastReportedAt(reportTime)
+                            .build()
+            );
+        } else {
+            CommentAbuseReportDashboardEntity dashboardEntity =
+                    commentAbuseReportDashboardJpaRepository.findById(compositeKey)
+                            .orElseThrow(() ->
+                                    new NotFoundEntityException(
+                                            NOT_FOUND_COMMENT_ABUSE_REPORT_DASHBOARD, "commentAbuseReportDashboard"));
+            dashboardEntity.increaseReportCount();
+            dashboardEntity.updateLastReportedAt(reportTime);
+            commentAbuseReportDashboardJpaRepository.save(dashboardEntity);
+        }
+    }
+
+    @Override
+    public CommentAbuseReportDashboardReadModel dismissCommentAbuseReport(ActivitySubjectCommentId commentId) {
+        String postUlid = commentId.getActivitySubjectPostId().getValue();
+        String path = commentId.getActivitySubjectCommentPath().getValue();
+        CommentAbuseReportDashboardCompositeKey compositeKey =
+                new CommentAbuseReportDashboardCompositeKey(postUlid, path);
+        CommentAbuseReportDashboardEntity dashboardEntity =
+                commentAbuseReportDashboardJpaRepository.findById(compositeKey)
+                        .orElseThrow(() ->
+                                new NotFoundEntityException(NOT_FOUND_COMMENT_ABUSE_REPORT, "commentAbuseReport"));
+        dashboardEntity.dismiss();
+        commentAbuseReportDashboardJpaRepository.save(dashboardEntity);
+        return commentAbuseReportDashboardJooqRepository.getReadModelByPostUlidAndPath(postUlid, path);
+    }
+
+    @Override
+    public CommentAbuseReportDashboardReadModel approveCommentAbuseReport(ActivitySubjectCommentId commentId) {
+        String postUlid = commentId.getActivitySubjectPostId().getValue();
+        String path = commentId.getActivitySubjectCommentPath().getValue();
+        CommentAbuseReportDashboardCompositeKey compositeKey =
+                new CommentAbuseReportDashboardCompositeKey(postUlid, path);
+        CommentAbuseReportDashboardEntity dashboardEntity =
+                commentAbuseReportDashboardJpaRepository.findById(compositeKey)
+                        .orElseThrow(() ->
+                                new NotFoundEntityException(NOT_FOUND_COMMENT_ABUSE_REPORT, "commentAbuseReport"));
+        dashboardEntity.approve();
+        commentAbuseReportDashboardJpaRepository.save(dashboardEntity);
+        return commentAbuseReportDashboardJooqRepository.getReadModelByPostUlidAndPath(postUlid, path);
+    }
+
+    @Override
+    public boolean isDismissedInCommentAbuseReportDashboard(ActivitySubjectCommentId commentId) {
+        String postUlid = commentId.getActivitySubjectPostId().getValue();
+        String path = commentId.getActivitySubjectCommentPath().getValue();
+        return commentAbuseReportDashboardJpaRepository
+                .findById(new CommentAbuseReportDashboardCompositeKey(postUlid, path))
+                .map(e -> e.getStatus() == AbuseReportStatus.DISMISSED)
+                .orElse(false);
+    }
+
+    @Override
+    public boolean isApprovedInCommentAbuseReportDashboard(ActivitySubjectCommentId commentId) {
+        String postUlid = commentId.getActivitySubjectPostId().getValue();
+        String path = commentId.getActivitySubjectCommentPath().getValue();
+        return commentAbuseReportDashboardJpaRepository
+                .findById(new CommentAbuseReportDashboardCompositeKey(postUlid, path))
                 .map(e -> e.getStatus() == AbuseReportStatus.BLINDED)
                 .orElse(false);
     }

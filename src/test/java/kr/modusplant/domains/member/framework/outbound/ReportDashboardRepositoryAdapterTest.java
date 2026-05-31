@@ -9,8 +9,10 @@ import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportDashboardEntity;
 import kr.modusplant.domains.member.domain.vo.ReportPageSize;
+import kr.modusplant.domains.member.framework.outbound.jooq.repository.CommentAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.PostAbuseReportDashboardJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportDashboardJooqRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
@@ -48,12 +50,15 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final ProposalOrBugReportJpaRepository proposalOrBugReportJpaRepository = Mockito.mock(ProposalOrBugReportJpaRepository.class);
     private final PostAbuseReportDashboardJpaRepository postAbuseReportDashboardJpaRepository = Mockito.mock(PostAbuseReportDashboardJpaRepository.class);
+    private final CommentAbuseReportDashboardJpaRepository commentAbuseReportDashboardJpaRepository = Mockito.mock(CommentAbuseReportDashboardJpaRepository.class);
 
     private final ProposalOrBugReportDashboardJooqRepository proposalOrBugReportDashboardJooqRepository = Mockito.mock(ProposalOrBugReportDashboardJooqRepository.class);
     private final PostAbuseReportDashboardJooqRepository postAbuseReportDashboardJooqRepository = Mockito.mock(PostAbuseReportDashboardJooqRepository.class);
+    private final CommentAbuseReportDashboardJooqRepository commentAbuseReportDashboardJooqRepository = Mockito.mock(CommentAbuseReportDashboardJooqRepository.class);
 
     private final ReportDashboardRepositoryAdapter reportDashboardRepositoryAdapter = new ReportDashboardRepositoryAdapter(
-            postJpaRepository, proposalOrBugReportJpaRepository, postAbuseReportDashboardJpaRepository, proposalOrBugReportDashboardJooqRepository, postAbuseReportDashboardJooqRepository);
+            postJpaRepository, proposalOrBugReportJpaRepository, postAbuseReportDashboardJpaRepository, commentAbuseReportDashboardJpaRepository,
+            proposalOrBugReportDashboardJooqRepository, postAbuseReportDashboardJooqRepository, commentAbuseReportDashboardJooqRepository);
 
     @Test
     @DisplayName("유효한 파라미터로 getPostAbuseReports 호출 시 readModel 목록 반환")
