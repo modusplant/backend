@@ -69,7 +69,7 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
 
         // when
         List<PostAbuseReportDashboardReadModel> readModels = reportDashboardRepositoryAdapter.getPostAbuseReports(
-                ReportPageSize.create(TEST_REPORT_SIZE), AbuseReportStatus.UNCHECKED, TEST_POST_ULID);
+                ReportPageSize.create(TEST_REPORT_SIZE), AbuseReportStatus.UNCHECKED, testActivitySubjectPostId);
 
         // then
         verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelsByPageSizeAndStatusAndPostUlid(any(), any(), any());

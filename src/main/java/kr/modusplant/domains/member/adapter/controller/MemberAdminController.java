@@ -3,11 +3,7 @@ package kr.modusplant.domains.member.adapter.controller;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentPath;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
-import kr.modusplant.domains.member.domain.vo.ReportPageSize;
+import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
@@ -67,7 +63,7 @@ public class MemberAdminController {
             ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.lastPostUlid());
             memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
             return reportDashboardRepository.getPostAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), record.lastPostUlid());
+                    ReportPageSize.create(record.size()), record.status(), activitySubjectPostId);
         } else {
             return reportDashboardRepository.getPostAbuseReports(
                     ReportPageSize.create(record.size()), record.status(), null);
@@ -94,8 +90,18 @@ public class MemberAdminController {
     }
 
     public List<CommentAbuseReportDashboardReadModel> getCommentAbuseReport(CommentAbuseReportGetRecord record) {
-        return reportDashboardRepository.getCommentAbuseReports(
-                ReportPageSize.create(record.size()), record.status(), record.lastPostUlid(), record.lastPath());
+        if (!(record.lastPostUlid() == null && record.lastPath() == null)) {
+            ActivitySubjectCommentId activitySubjectCommentId =
+                    ActivitySubjectCommentId.create(
+                            ActivitySubjectPostId.create(record.lastPostUlid()),
+                            ActivitySubjectCommentPath.create(record.lastPath()));
+            memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
+            return reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), activitySubjectCommentId);
+        } else {
+            return reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), null);
+        }
     }
 
     public CommentAbuseReportDashboardReadModel dismissCommentAbuse(CommentAbuseReportDismissRecord record) {

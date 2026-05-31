@@ -73,11 +73,12 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     public List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
             ReportPageSize reportPageSize,
             @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid) {
+            @Nullable ActivitySubjectPostId lastPostId) {
 
         String statusResult = status != null ? status.name() : null;
+        String lastPostIdResult = lastPostId != null ? lastPostId.getValue() : null;
         return postAbuseReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndPostUlid(
-                        reportPageSize.getValue(), statusResult, lastPostUlid);
+                        reportPageSize.getValue(), statusResult, lastPostIdResult);
     }
 
     @Override
@@ -148,12 +149,12 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
     public List<CommentAbuseReportDashboardReadModel> getCommentAbuseReports(
             ReportPageSize reportPageSize,
             @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid,
-            @Nullable String lastPath) {
-
+            @Nullable ActivitySubjectCommentId lastCommentId) {
         String statusResult = status != null ? status.name() : null;
+        String lastPostIdResult = lastCommentId != null ? lastCommentId.getActivitySubjectPostId().getValue() : null;
+        String lastCommentPathResult = lastCommentId != null ? lastCommentId.getActivitySubjectCommentPath().getValue() : null;
         return commentAbuseReportDashboardJooqRepository.getReadModelsByPageSizeAndStatusAndCursor(
-                reportPageSize.getValue(), statusResult, lastPostUlid, lastPath);
+                reportPageSize.getValue(), statusResult, lastPostIdResult, lastCommentPathResult);
     }
 
     @Override

@@ -28,7 +28,7 @@ public interface ReportDashboardRepository {
     List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
             ReportPageSize reportPageSize,
             @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid);
+            @Nullable ActivitySubjectPostId lastPostId);
 
     void reflectPostAbuseReport(ActivitySubjectPostId postId, ReportTime reportTime);
 
@@ -43,8 +43,7 @@ public interface ReportDashboardRepository {
     List<CommentAbuseReportDashboardReadModel> getCommentAbuseReports(
             ReportPageSize reportPageSize,
             @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid,
-            @Nullable String lastPath);
+            @Nullable ActivitySubjectCommentId lastCommentId);
 
     void reflectCommentAbuseReport(ActivitySubjectCommentId commentId, ReportTime reportTime);
 

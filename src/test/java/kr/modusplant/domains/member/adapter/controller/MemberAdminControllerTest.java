@@ -10,6 +10,7 @@ import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardR
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
+import kr.modusplant.domains.member.usecase.record.CommentAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -26,12 +27,12 @@ import java.util.List;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportApproveRecordTestUtils.testCommentAbuseReportApproveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportDismissRecordTestUtils.testCommentAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportGetRecordTestUtils.testCommentAbuseReportGetRecord;
@@ -299,17 +300,48 @@ class MemberAdminControllerTest {
     }
 
     @Test
-    @DisplayName("getCommentAbuseReport로 댓글 신고 현황 목록 반환")
-    void testGetCommentAbuseReport_givenAnyRecord_willReturnReadModelList() {
+    @DisplayName("lastPostUlid와 lastPath 모두 존재하고 유효할 때 getCommentAbuseReport로 댓글 신고 현황 목록 반환")
+    void testGetCommentAbuseReport_givenValidLastPostUlidAndLastPath_willReturnReadModelList() {
         // given
-        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
 
         // when
         List<CommentAbuseReportDashboardReadModel> readModels = memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord);
 
         // then
-        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any(), any());
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
         assertThat(readModels).isEqualTo(testCommentAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("lastPostUlid와 lastPath 모두 null일 때 getCommentAbuseReport로 게시글 신고 현황 목록 반환")
+    void testGetCommentAbuseReport_givenNullLastPostUlidAndPath_willReturnReadModelList() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
+
+        // when
+        List<CommentAbuseReportDashboardReadModel> readModels =
+                memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
+        assertThat(readModels).isEqualTo(testCommentAbuseReportDashboardReadModelList);
+    }
+
+    @Test
+    @DisplayName("lastPostUlid와 lastPath 쌍이 존재하지 않을 때 getCommentAbuseReport로 예외 반환")
+    void testGetCommentAbuseReport_givenNotFoundLastPostUlidAndLastPath_willThrowException() {
+        // given
+        willThrow(new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID, "activitySubjectCommentId"))
+                .given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
     }
 
     @Test
