@@ -10,6 +10,7 @@ disable-model-invocation: true
     - @src/main/java/kr/modusplant/domains/member/framework/outbound/jpa/entity (If it is absolutely necessary to save data directly during testing)
     - @src/main/java/kr/modusplant/domains/member/framework/outbound/jpa/repository (Essentially, necessary to verify interactions with the database)
 - **Mocking Strategy:** All dependent classes, except for the explicit instance containing the method under test, must be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks` annotations.
+- **REST Controller Unit Test:**: Covers unit tests that verify method calls, return values, and exceptions by injecting mock dependency into the controller instance, without using MockMvc.
 
 # Test Method Naming & Scope Convention
 
