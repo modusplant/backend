@@ -75,6 +75,9 @@ public class PostEntity {
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
 
+    @Column(name = "edited_at", nullable = false)
+    private LocalDateTime editedAt;
+
     @Column(name = CREATED_AT, nullable = false, updatable = false)
     @CreatedDate
     private LocalDateTime createdAt;
@@ -128,6 +131,10 @@ public class PostEntity {
         this.publishedAt = publishedAt;
     }
 
+    public void updateEditedAt(LocalDateTime editedAt) {
+        this.editedAt = editedAt;
+    }
+
     public String getETagSource() {
         return getUlid() + "-" + getVer();
     }
@@ -161,7 +168,7 @@ public class PostEntity {
         }
     }
 
-    private PostEntity(String ulid, PrimaryCategoryEntity primaryCategory, SecondaryCategoryEntity secondaryCategory, MemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, String thumbnailPath, Boolean isPublished, LocalDateTime publishedAt) {
+    private PostEntity(String ulid, PrimaryCategoryEntity primaryCategory, SecondaryCategoryEntity secondaryCategory, MemberEntity authMember, Integer likeCount, Long viewCount, String title, JsonNode content, String thumbnailPath, Boolean isPublished, LocalDateTime publishedAt, LocalDateTime editedAt) {
         this.ulid = ulid;
         this.primaryCategory = primaryCategory;
         this.secondaryCategory = secondaryCategory;
@@ -173,6 +180,7 @@ public class PostEntity {
         this.thumbnailPath = thumbnailPath;
         this.isPublished = isPublished;
         this.publishedAt = publishedAt;
+        this.editedAt = editedAt;
     }
 
     public static PostEntityBuilder builder() {
@@ -191,6 +199,7 @@ public class PostEntity {
         private String thumbnailPath;
         private Boolean isPublished;
         private LocalDateTime publishedAt;
+        private LocalDateTime editedAt;
 
         public PostEntityBuilder ulid(final String ulid) {
             this.ulid = ulid;
@@ -247,6 +256,11 @@ public class PostEntity {
             return this;
         }
 
+        public PostEntityBuilder editedAt(final LocalDateTime editedAt) {
+            this.editedAt = editedAt;
+            return this;
+        }
+
         public PostEntityBuilder post(final PostEntity postEntity) {
             this.ulid = postEntity.ulid;
             this.primaryCategory = postEntity.primaryCategory;
@@ -259,11 +273,12 @@ public class PostEntity {
             this.thumbnailPath = postEntity.thumbnailPath;
             this.isPublished = postEntity.isPublished;
             this.publishedAt = postEntity.publishedAt;
+            this.editedAt = postEntity.editedAt;
             return this;
         }
 
         public PostEntity build() {
-            return new PostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.likeCount, this.viewCount, this.title, this.content, this.thumbnailPath, this.isPublished, this.publishedAt);
+            return new PostEntity(this.ulid, this.primaryCategory, this.secondaryCategory, this.authMember, this.likeCount, this.viewCount, this.title, this.content, this.thumbnailPath, this.isPublished, this.publishedAt, this.editedAt);
         }
 
     }

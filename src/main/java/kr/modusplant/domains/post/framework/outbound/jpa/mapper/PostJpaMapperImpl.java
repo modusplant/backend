@@ -19,7 +19,8 @@ public class PostJpaMapperImpl implements PostJpaMapper {
 
     @Override
     public PostEntity toPostEntity(Post post, MemberEntity authorEntity, PrimaryCategoryEntity primaryCategoryEntity, SecondaryCategoryEntity secondaryCategoryEntity, Long viewCount) {
-        LocalDateTime publishedAt = post.getStatus().isPublished() ? LocalDateTime.now() : null;
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime publishedAt = post.getStatus().isPublished() ?  now : null;
         PostEntityBuilder postEntityBuilder = PostEntity.builder();
         if (post.getPostId() != null) {
             postEntityBuilder.ulid(post.getPostId().getValue());
@@ -35,6 +36,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
                 .thumbnailPath(post.getPostContent().getThumbnailPath())
                 .isPublished(post.getStatus().isPublished())
                 .publishedAt(publishedAt)
+                .editedAt(now)
                 .build();
     }
 

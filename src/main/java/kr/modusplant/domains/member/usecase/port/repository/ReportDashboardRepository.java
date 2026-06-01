@@ -3,10 +3,8 @@ package kr.modusplant.domains.member.usecase.port.repository;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
-import kr.modusplant.domains.member.domain.vo.ReportPageSize;
-import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 
@@ -30,11 +28,30 @@ public interface ReportDashboardRepository {
     List<PostAbuseReportDashboardReadModel> getPostAbuseReports(
             ReportPageSize reportPageSize,
             @Nullable AbuseReportStatus status,
-            @Nullable String lastPostUlid);
+            @Nullable ActivitySubjectPostId lastPostId);
 
     void reflectPostAbuseReport(ActivitySubjectPostId postId, ReportTime reportTime);
 
     PostAbuseReportDashboardReadModel dismissPostAbuseReport(ActivitySubjectPostId postId);
 
+    PostAbuseReportDashboardReadModel approvePostAbuseReport(ActivitySubjectPostId postId);
+
     boolean isDismissedInPostAbuseReportDashboard(ActivitySubjectPostId postId);
+
+    boolean isApprovedInPostAbuseReportDashboard(ActivitySubjectPostId postId);
+
+    List<CommentAbuseReportDashboardReadModel> getCommentAbuseReports(
+            ReportPageSize reportPageSize,
+            @Nullable AbuseReportStatus status,
+            @Nullable ActivitySubjectCommentId lastCommentId);
+
+    void reflectCommentAbuseReport(ActivitySubjectCommentId commentId, ReportTime reportTime);
+
+    CommentAbuseReportDashboardReadModel dismissCommentAbuseReport(ActivitySubjectCommentId commentId);
+
+    CommentAbuseReportDashboardReadModel approveCommentAbuseReport(ActivitySubjectCommentId commentId);
+
+    boolean isDismissedInCommentAbuseReportDashboard(ActivitySubjectCommentId commentId);
+
+    boolean isApprovedInCommentAbuseReportDashboard(ActivitySubjectCommentId commentId);
 }

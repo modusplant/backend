@@ -65,12 +65,12 @@ public class NotificationController {
     @Transactional
     public void createPostLikeNotification(PostLikeEvent event) {
         NotificationPreview notificationPreview = postInfoRepository.getNotificationPreviewByPostId(PostId.create(event.getPostUlid()));
-        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getActorId())) {
+        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getMemberId())) {
             return ;
         }
         Notification notification = notificationMapper.toPostNotification(
                 RecipientId.fromUuid(notificationPreview.authorUuid()),
-                Actor.fromUuidWithNickname(event.getActorId(), memberInfoRepository.getNicknameByUuid(event.getActorId())),
+                Actor.fromUuidWithNickname(event.getMemberId(), memberInfoRepository.getNicknameByUuid(event.getMemberId())),
                 NotificationAction.create(NotificationActionType.POST_LIKED),
                 PostId.create(event.getPostUlid()),
                 ContentPreview.create(notificationPreview.contentPreview())
@@ -84,12 +84,12 @@ public class NotificationController {
         NotificationPreview notificationPreview = commentInfoRepository.getNotificationPreviewByPostIdAndCommentPath(
                 PostId.create(event.getPostUlid()), CommentPath.create(event.getCommentPath())
         );
-        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getActorId())) {
+        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getMemberId())) {
             return ;
         }
         Notification notification = notificationMapper.toCommentNotification(
                 RecipientId.fromUuid(notificationPreview.authorUuid()),
-                Actor.fromUuidWithNickname(event.getActorId(), memberInfoRepository.getNicknameByUuid(event.getActorId())),
+                Actor.fromUuidWithNickname(event.getMemberId(), memberInfoRepository.getNicknameByUuid(event.getMemberId())),
                 NotificationAction.create(NotificationActionType.COMMENT_LIKED),
                 PostId.create(event.getPostUlid()),
                 CommentPath.create(event.getCommentPath()),
@@ -101,8 +101,8 @@ public class NotificationController {
 
     @Transactional
     public void createCommentNotification(CommentRegisterEvent event) {
-        String nickname = memberInfoRepository.getNicknameByUuid(event.getActorId());
-        Actor actor = Actor.fromUuidWithNickname(event.getActorId(), nickname);
+        String nickname = memberInfoRepository.getNicknameByUuid(event.getAuthorId());
+        Actor actor = Actor.fromUuidWithNickname(event.getAuthorId(), nickname);
         PostId postId = PostId.create(event.getPostUlid());
         CommentPath commentPath = CommentPath.create(event.getCommentPath());
         ContentPreview contentPreview = ContentPreview.create(event.getContentPreview());

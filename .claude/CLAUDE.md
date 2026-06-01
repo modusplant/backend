@@ -20,6 +20,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```
 
 ### Database & Code Generation
+
 The build chain requires a live DB: `processResources` → `flywayMigrate` → `jooqCodegen` → `compileJava`
 
 ```bash
@@ -54,6 +55,7 @@ The project follows **DDD + Clean Architecture**. The `src/main/java/kr/moduspla
 | `shared`         | Global objects: kernel VOs (`Email`, `Nickname`, `Password`), constants, Spring events, exceptions, ULID generator |
 
 ### Domain Internal Structure
+
 Every domain under `domains/` follows this four-layer layout — dependency flows inward only:
 
 ```
@@ -88,20 +90,3 @@ Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comm
 - Schema DDL: `src/main/resources/db/migration/schema/` (prefix `V`)
 - Seed data: `src/main/resources/db/migration/data/seed/` (prefix `V`)
 - Java-based migrations: `src/main/java/db/migration/` (prefix `V`)
-
-## Commit Convention
-
-Format: `MP-{ticket} :{gitmoji}: {Type}: {description in Korean}`
-
-| Gitmoji              | Type     |
-|----------------------|----------|
-| `:sparkles:`         | Feat     |
-| `:bug:`              | Fix      |
-| `:recycle:`          | Refactor |
-| `:white_check_mark:` | Test     |
-| `:memo:`             | Docs     |
-| `:wrench:`           | Chore    |
-| `:fire:`             | Remove   |
-| `:ambulance:`        | HOTFIX!  |
-
-Example: `MP-289 :bug: Fix: 게시글 여러 번 수정 시 발생하는 낙관적 락 에러 해결`

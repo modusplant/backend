@@ -10,8 +10,13 @@ import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
+import kr.modusplant.domains.member.usecase.record.CommentAbuseReportApproveRecord;
+import kr.modusplant.domains.member.usecase.record.CommentAbuseReportDismissRecord;
+import kr.modusplant.domains.member.usecase.record.CommentAbuseReportGetRecord;
+import kr.modusplant.domains.member.usecase.record.PostAbuseReportApproveRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportDismissRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
@@ -30,6 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
 @Tag(name = "회원 API(관리자 전용)", description = "회원의 생성과 갱신(상태 제외), 회원 활동을 관리하는 API 입니다.")
@@ -158,7 +164,7 @@ public class MemberAdminRestController {
             description = "게시글 신고를 반려합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}")
+    @PostMapping(value = "/report/post-abuse/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> dismissPostAbuseReport(
             @Parameter(
                     description = "반려할 게시글의 식별자",
@@ -170,6 +176,129 @@ public class MemberAdminRestController {
             String postUlid) {
         PostAbuseReportDashboardReadModel readModel =
                 memberAdminController.dismissPostAbuse(new PostAbuseReportDismissRecord(postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok(readModel));
+    }
+
+    @Operation(
+            summary = "게시글 신고 수리 API",
+            description = "게시글 신고를 수리합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/post-abuse/{postUlid}/approve")
+    public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> approvePostAbuseReport(
+            @Parameter(
+                    description = "수리할 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String postUlid) {
+        PostAbuseReportDashboardReadModel readModel =
+                memberAdminController.approvePostAbuse(new PostAbuseReportApproveRecord(postUlid));
+        return ResponseEntity.ok().body(DataResponse.ok(readModel));
+    }
+
+    @Operation(
+            summary = "댓글 신고 현황 조회 API (무한 스크롤)",
+            description = "댓글 신고 현황을 조회합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @GetMapping(value = "/report/comment-abuse")
+    public ResponseEntity<DataResponse<List<CommentAbuseReportDashboardReadModel>>> getCommentAbuseReport(
+            @Parameter(
+                    description = "필터링용 보고서 상태",
+                    example = "UNCHECKED"
+            )
+            @RequestParam(name = "status", required = false)
+            AbuseReportStatus status,
+
+            @Parameter(
+                    description = "마지막 게시글 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @RequestParam(name = "lastPostUlid", required = false)
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String lastPostUlid,
+
+            @Parameter(
+                    description = "마지막 댓글 경로",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @RequestParam(name = "lastPath", required = false)
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
+            String lastPath,
+
+            @Parameter(
+                    description = "페이지 크기",
+                    schema = @Schema(example = "10", minimum = "1", maximum = "50"))
+            @RequestParam
+            @Range(min = 1, max = 50)
+            Integer size) {
+
+        List<CommentAbuseReportDashboardReadModel> readModels =
+                memberAdminController.getCommentAbuseReport(
+                        new CommentAbuseReportGetRecord(status, lastPostUlid, lastPath, size));
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(readModels));
+    }
+
+    @Operation(
+            summary = "댓글 신고 반려 API",
+            description = "댓글 신고를 반려합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/comment-abuse/{postUlid}/dismiss")
+    public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> dismissCommentAbuseReport(
+            @Parameter(
+                    description = "반려할 댓글이 속한 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String postUlid,
+
+            @Parameter(
+                    description = "반려할 댓글의 경로",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @RequestParam
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
+            String path) {
+        CommentAbuseReportDashboardReadModel readModel =
+                memberAdminController.dismissCommentAbuse(new CommentAbuseReportDismissRecord(postUlid, path));
+        return ResponseEntity.ok().body(DataResponse.ok(readModel));
+    }
+
+    @Operation(
+            summary = "댓글 신고 수리 API",
+            description = "댓글 신고를 수리합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/report/comment-abuse/{postUlid}/approve")
+    public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> approveCommentAbuseReport(
+            @Parameter(
+                    description = "수리할 댓글이 속한 게시글의 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
+            String postUlid,
+
+            @Parameter(
+                    description = "수리할 댓글의 경로",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @RequestParam
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
+            String path) {
+        CommentAbuseReportDashboardReadModel readModel =
+                memberAdminController.approveCommentAbuse(new CommentAbuseReportApproveRecord(postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
 }

@@ -1,28 +1,25 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
-import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
-import kr.modusplant.domains.member.domain.vo.ReportId;
-import kr.modusplant.domains.member.domain.vo.ReportPageSize;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.vo.*;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportDismissRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
+import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.shared.exception.ExistsValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_POST_ABUSE_REPORT_DISMISSED;
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -33,6 +30,7 @@ public class MemberAdminController {
     private final MemberValidationHelper memberValidationHelper;
     private final ReportRepository reportRepository;
     private final ReportDashboardRepository reportDashboardRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public List<ProposalOrBugReportDashboardReadModel> getProposalOrBug(ProposalOrBugReportGetRecord record) {
         if (record.lastReportUlid() != null) {
@@ -65,7 +63,7 @@ public class MemberAdminController {
             ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.lastPostUlid());
             memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
             return reportDashboardRepository.getPostAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), record.lastPostUlid());
+                    ReportPageSize.create(record.size()), record.status(), activitySubjectPostId);
         } else {
             return reportDashboardRepository.getPostAbuseReports(
                     ReportPageSize.create(record.size()), record.status(), null);
@@ -79,5 +77,53 @@ public class MemberAdminController {
             throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_DISMISSED, "status");
         }
         return reportDashboardRepository.dismissPostAbuseReport(postId);
+    }
+
+    public PostAbuseReportDashboardReadModel approvePostAbuse(PostAbuseReportApproveRecord record) {
+        ActivitySubjectPostId postId = ActivitySubjectPostId.create(record.postUlid());
+        memberValidationHelper.validateIfActivitySubjectPostExists(postId);
+        if (reportDashboardRepository.isApprovedInPostAbuseReportDashboard(postId)) {
+            throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_BLINDED, "status");
+        }
+        applicationEventPublisher.publishEvent(PostAbuseReportApproveEvent.create(postId.getValue()));
+        return reportDashboardRepository.approvePostAbuseReport(postId);
+    }
+
+    public List<CommentAbuseReportDashboardReadModel> getCommentAbuseReport(CommentAbuseReportGetRecord record) {
+        if (!(record.lastPostUlid() == null && record.lastPath() == null)) {
+            ActivitySubjectCommentId activitySubjectCommentId =
+                    ActivitySubjectCommentId.create(
+                            ActivitySubjectPostId.create(record.lastPostUlid()),
+                            ActivitySubjectCommentPath.create(record.lastPath()));
+            memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
+            return reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), activitySubjectCommentId);
+        } else {
+            return reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(record.size()), record.status(), null);
+        }
+    }
+
+    public CommentAbuseReportDashboardReadModel dismissCommentAbuse(CommentAbuseReportDismissRecord record) {
+        ActivitySubjectPostId postId = ActivitySubjectPostId.create(record.postUlid());
+        ActivitySubjectCommentPath commentPath = ActivitySubjectCommentPath.create(record.path());
+        ActivitySubjectCommentId commentId = ActivitySubjectCommentId.create(postId, commentPath);
+        memberValidationHelper.validateIfActivitySubjectCommentExists(commentId);
+        if (reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(commentId)) {
+            throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_DISMISSED, "status");
+        }
+        return reportDashboardRepository.dismissCommentAbuseReport(commentId);
+    }
+
+    public CommentAbuseReportDashboardReadModel approveCommentAbuse(CommentAbuseReportApproveRecord record) {
+        ActivitySubjectPostId postId = ActivitySubjectPostId.create(record.postUlid());
+        ActivitySubjectCommentPath commentPath = ActivitySubjectCommentPath.create(record.path());
+        ActivitySubjectCommentId commentId = ActivitySubjectCommentId.create(postId, commentPath);
+        memberValidationHelper.validateIfActivitySubjectCommentExists(commentId);
+        if (reportDashboardRepository.isApprovedInCommentAbuseReportDashboard(commentId)) {
+            throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_BLINDED, "status");
+        }
+        applicationEventPublisher.publishEvent(CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue()));
+        return reportDashboardRepository.approveCommentAbuseReport(commentId);
     }
 }

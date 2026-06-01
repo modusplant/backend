@@ -35,25 +35,25 @@ public class CommentCompositeKey implements Serializable {
                 .toHashCode();
     }
 
-    public static CommCommCommentIdBuilder builder() {
-        return new CommCommCommentIdBuilder();
+    public static CommentCompositeKeyBuilder builder() {
+        return new CommentCompositeKeyBuilder();
     }
 
-    public static final class CommCommCommentIdBuilder {
+    public static final class CommentCompositeKeyBuilder {
         private String post;
         private String path;
 
-        public CommCommCommentIdBuilder post(final String post) {
+        public CommentCompositeKeyBuilder post(final String post) {
             this.post = post;
             return this;
         }
 
-        public CommCommCommentIdBuilder path(final String path) {
+        public CommentCompositeKeyBuilder path(final String path) {
             this.path = path;
             return this;
         }
 
-        public CommCommCommentIdBuilder commCommCommentId(final CommentCompositeKey compositeKey) {
+        public CommentCompositeKeyBuilder commentCompositeKey(final CommentCompositeKey compositeKey) {
             this.post = compositeKey.getPost();
             this.path = compositeKey.getPath();
             return this;

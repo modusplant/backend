@@ -25,7 +25,7 @@ class CommentRegisterEventTest {
 
             // then
             assertEquals(NotificationActionType.COMMENT_ADDED.name(), event.getAction());
-            assertEquals(TEST_NOTIFICATION_ACTOR_ID, event.getActorId());
+            assertEquals(TEST_NOTIFICATION_ACTOR_ID, event.getAuthorId());
             assertEquals(TEST_NOTIFICATION_POST_ULID, event.getPostUlid());
             assertEquals(TEST_NOTIFICATION_COMMENT_PATH_DEPTH1, event.getCommentPath());
             assertEquals(TEST_NOTIFICATION_COMMENT_PREVIEW, event.getContentPreview());
@@ -39,7 +39,7 @@ class CommentRegisterEventTest {
 
             // then
             assertEquals(NotificationActionType.COMMENT_REPLY_ADDED.name(), event.getAction());
-            assertEquals(TEST_NOTIFICATION_ACTOR_ID, event.getActorId());
+            assertEquals(TEST_NOTIFICATION_ACTOR_ID, event.getAuthorId());
             assertEquals(TEST_NOTIFICATION_POST_ULID, event.getPostUlid());
             assertEquals(TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, event.getCommentPath());
             assertEquals(TEST_NOTIFICATION_COMMENT_PREVIEW, event.getContentPreview());

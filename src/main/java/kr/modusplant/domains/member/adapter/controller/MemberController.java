@@ -232,11 +232,12 @@ public class MemberController {
                 ActivitySubjectPostId.create(record.postUlid()), ActivitySubjectCommentPath.create(record.path()));
         validateBeforeReportCommentAbuse(memberId, activitySubjectCommentId);
 
-        reportRepository.reportCommentAbuse(memberId, activitySubjectCommentId);
+        ReportTime reportTime = reportRepository.reportCommentAbuse(memberId, activitySubjectCommentId);
         applicationEventPublisher.publishEvent(
                 CommentAbuseReportEvent.create(
                         activitySubjectCommentId.getActivitySubjectPostId().getValue(),
-                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()));
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue(),
+                        reportTime.getValue()));
     }
 
     public void withdraw(MemberWithdrawalRecord record) {

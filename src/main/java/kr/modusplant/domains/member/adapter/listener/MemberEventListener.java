@@ -1,7 +1,10 @@
 package kr.modusplant.domains.member.adapter.listener;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
+import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentPath;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
@@ -26,7 +29,7 @@ public class MemberEventListener {
     @Value("${app.semaphore.datasource.bulkhead.admin.timeout-ms}")
     private long timeoutMs;
 
-    public MemberEventListener(@Qualifier("adminSemaphore")Semaphore adminSemaphore,
+    public MemberEventListener(@Qualifier("adminSemaphore") Semaphore adminSemaphore,
                                MemberValidationHelper memberValidationHelper,
                                ReportDashboardRepository reportDashboardRepository) {
         this.adminSemaphore = adminSemaphore;
@@ -45,8 +48,27 @@ public class MemberEventListener {
 
                     reportDashboardRepository.reflectPostAbuseReport(postId, reportTime);
                 },
-                "[Member Domain] 게시글 신고 대시보드 삽입 또는 갱신 실패 - postUlid = {}",
-                event.getPostUlid()
+                "[Member Domain] 게시글 신고 대시보드 삽입 또는 갱신 실패 - postUlid = {}, createdAt = {}",
+                event.getPostUlid(), event.getCreatedAt()
+        );
+    }
+
+    @Async("memberDomainExecutor")
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void reflectReportDashboard(CommentAbuseReportEvent event) {
+        acquireAndProcess(
+                () -> {
+                    ActivitySubjectCommentId commentId =
+                            ActivitySubjectCommentId.create(
+                                    ActivitySubjectPostId.create(event.getPostUlid()),
+                                    ActivitySubjectCommentPath.create(event.getPath()));
+                    ReportTime reportTime = ReportTime.create(event.getCreatedAt());
+                    memberValidationHelper.validateIfActivitySubjectCommentExists(commentId);
+
+                    reportDashboardRepository.reflectCommentAbuseReport(commentId, reportTime);
+                },
+                "[Member Domain] 댓글 신고 대시보드 삽입 또는 갱신 실패 - postUlid = {}, path = {}, createdAt = {}",
+                event.getPostUlid(), event.getPath(), event.getCreatedAt()
         );
     }
 

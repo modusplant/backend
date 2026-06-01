@@ -37,7 +37,7 @@ public class NotificationEventListener {
         acquireAndProcess(
                 () -> notificationController.createPostLikeNotification(event),
                 "[Notification] 게시글 좋아요 알림 실패 - actorId={}, postUlid={}",
-                event.getActorId(), event.getPostUlid()
+                event.getMemberId(), event.getPostUlid()
         );
     }
 
@@ -47,7 +47,7 @@ public class NotificationEventListener {
         acquireAndProcess(
                 () -> notificationController.createCommentLikeNotification(event),
                 "[Notification] 댓글 좋아요 알림 실패 - actorId={}, postUlid={}, commentPath={}",
-                event.getActorId(), event.getPostUlid(), event.getCommentPath()
+                event.getMemberId(), event.getPostUlid(), event.getCommentPath()
         );
     }
 
@@ -57,7 +57,7 @@ public class NotificationEventListener {
         acquireAndProcess(
                 () -> notificationController.createCommentNotification(event),
                 "[Notification] 댓글 추가 알림 실패 - actorId={}, postUlid={}, commentPath={}, action={}",
-                event.getActorId(), event.getPostUlid(), event.getCommentPath(), event.getAction()
+                event.getAuthorId(), event.getPostUlid(), event.getCommentPath(), event.getAction()
         );
     }
 

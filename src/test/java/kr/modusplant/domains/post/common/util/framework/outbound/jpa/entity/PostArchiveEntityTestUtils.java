@@ -19,6 +19,7 @@ public interface PostArchiveEntityTestUtils extends PostTestUtils {
                 .archivedAt(TEST_POST_ARCHIVED_AT)
                 .updatedAt(TEST_POST_UPDATED_AT)
                 .publishedAt(TEST_POST_PUBLISHED_AT)
+                .editedAt(TEST_POST_EDITED_AT)
                 .build();
     }
 }

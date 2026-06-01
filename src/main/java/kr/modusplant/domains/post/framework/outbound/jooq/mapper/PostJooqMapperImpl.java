@@ -50,7 +50,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get(COMM_POST.LIKE_COUNT),
                 record.get(COMM_POST.IS_PUBLISHED),
                 record.get(COMM_POST.PUBLISHED_AT),
-                record.get(COMM_POST.UPDATED_AT),
+                record.get(COMM_POST.EDITED_AT),
                 record.get("isLiked", Boolean.class),
                 record.get("isBookmarked", Boolean.class)
         );
@@ -71,7 +71,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get(COMM_POST.THUMBNAIL_PATH),
                 record.get(COMM_POST.IS_PUBLISHED),
                 record.get(COMM_POST.PUBLISHED_AT),
-                record.get(COMM_POST.UPDATED_AT)
+                record.get(COMM_POST.EDITED_AT)
         );
     }
 
@@ -84,7 +84,7 @@ public class PostJooqMapperImpl implements PostJooqMapper {
                 record.get(COMM_POST.TITLE),
                 record.get("content", JsonNode.class),
                 record.get(COMM_POST.THUMBNAIL_PATH),
-                record.get(COMM_POST.UPDATED_AT)
+                record.get(COMM_POST.EDITED_AT)
         );
     }
 }

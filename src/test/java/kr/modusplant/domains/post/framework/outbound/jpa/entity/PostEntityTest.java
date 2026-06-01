@@ -103,6 +103,17 @@ class PostEntityTest implements PostEntityTestUtils {
     }
 
     @Test
+    @DisplayName("편집 날짜 갱신 테스트")
+    void updateEditedAtTest() {
+        LocalDateTime localDateTime = LocalDateTime.now();
+        PostEntity post = createPublishedPostEntityBuilder().build();
+
+        post.updateEditedAt(localDateTime);
+
+        assertThat(post.getEditedAt()).isEqualTo(localDateTime);
+    }
+
+    @Test
     @DisplayName("getETagSource를 통해 ETag 소스 반환")
     void testGetETagSource_givenNothing_willReturnETagSource() {
         // when

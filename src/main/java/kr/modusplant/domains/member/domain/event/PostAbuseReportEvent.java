@@ -19,7 +19,7 @@ public class PostAbuseReportEvent {
         if (StringUtils.isBlank(postUlid)) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
         } else if (createdAt == null) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
+            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "createdAt");
         }
         return new PostAbuseReportEvent(postUlid, createdAt);
     }

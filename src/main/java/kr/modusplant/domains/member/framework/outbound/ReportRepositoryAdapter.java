@@ -108,7 +108,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
-    public void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
+    public ReportTime reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
         CommentEntity commentEntity = commentJpaRepository.findById(
                 CommentCompositeKey.builder()
@@ -116,8 +116,13 @@ public class ReportRepositoryAdapter implements ReportRepository {
                         .path(activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
                         .build()
         ).orElseThrow();
-        commentAbuseReportJpaRepository.save(
-                CommentAbuseReportEntity.builder().member(memberEntity).comment(commentEntity).build());
+        return ReportTime.create(
+                commentAbuseReportJpaRepository.save(
+                                CommentAbuseReportEntity.builder()
+                                        .member(memberEntity)
+                                        .comment(commentEntity)
+                                        .build())
+                        .getCreatedAt());
     }
 
     @Override

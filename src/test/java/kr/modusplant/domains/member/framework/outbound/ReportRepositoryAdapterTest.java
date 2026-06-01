@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugRe
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
+import kr.modusplant.domains.member.domain.vo.ReportTime;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
@@ -225,14 +226,18 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
         CommentEntity commentEntity = mock(CommentEntity.class);
+        CommentAbuseReportEntity commentAbuseEntity = mock(CommentAbuseReportEntity.class);
 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.of(commentEntity));
+        given(commentAbuseReportJpaRepository.save(any())).willReturn(commentAbuseEntity);
+        given(commentAbuseEntity.getCreatedAt()).willReturn(TEST_POST_CREATED_AT);
 
         // when
-        reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
+        ReportTime reportTime = reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
 
         // then
+        assertThat(reportTime.getValue()).isEqualTo(TEST_POST_CREATED_AT);
         verify(commentAbuseReportJpaRepository, times(1)).save(any(CommentAbuseReportEntity.class));
     }
 

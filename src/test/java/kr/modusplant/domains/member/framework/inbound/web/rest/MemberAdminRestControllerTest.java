@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.inbound.web.rest;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
+import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
@@ -22,6 +23,13 @@ import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAb
 import static kr.modusplant.domains.member.common.util.usecase.model.read.PostAbuseReportDashboardReadModelTestUtils.testPostAbuseReportDashboardReadModelList;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModel;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportDashboardReadModelTestUtils.testProposalOrBugReportDashboardCheckedReadModelList;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
+import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModelList;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportApproveRecordTestUtils.testCommentAbuseReportApproveRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportDismissRecordTestUtils.testCommentAbuseReportDismissRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportGetRecordTestUtils.testCommentAbuseReportGetRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportApproveRecordTestUtils.testPostAbuseReportApproveRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportDismissRecordTestUtils.testPostAbuseReportDismissRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportGetRecordTestUtils.testPostAbuseReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
@@ -109,5 +117,73 @@ class MemberAdminRestControllerTest {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModel).toString());
+    }
+
+    @Test
+    @DisplayName("approvePostAbuseReport로 응답 반환")
+    void testApprovePostAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord))
+                .willReturn(testPostAbuseReportDashboardReadModel);
+
+        // when
+        ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> responseEntity =
+                memberAdminRestController.approvePostAbuseReport(TEST_POST_ULID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString())
+                .isEqualTo(DataResponse.ok(testPostAbuseReportDashboardReadModel).toString());
+    }
+
+    @Test
+    @DisplayName("getCommentAbuseReport로 응답 반환")
+    void testGetCommentAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord))
+                .willReturn(testCommentAbuseReportDashboardReadModelList);
+
+        // when
+        ResponseEntity<DataResponse<List<CommentAbuseReportDashboardReadModel>>> responseEntity =
+                memberAdminRestController.getCommentAbuseReport(AbuseReportStatus.UNCHECKED, TEST_POST_ULID, TEST_COMM_COMMENT_PATH, TEST_REPORT_SIZE);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString())
+                .isEqualTo(DataResponse.ok(testCommentAbuseReportDashboardReadModelList).toString());
+    }
+
+    @Test
+    @DisplayName("dismissCommentAbuseReport로 응답 반환")
+    void testDismissCommentAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord))
+                .willReturn(testCommentAbuseReportDashboardReadModel);
+
+        // when
+        ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> responseEntity =
+                memberAdminRestController.dismissCommentAbuseReport(TEST_POST_ULID, TEST_COMM_COMMENT_PATH);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString())
+                .isEqualTo(DataResponse.ok(testCommentAbuseReportDashboardReadModel).toString());
+    }
+
+    @Test
+    @DisplayName("approveCommentAbuseReport로 응답 반환")
+    void testApproveCommentAbuseReport_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberAdminController.approveCommentAbuse(testCommentAbuseReportApproveRecord))
+                .willReturn(testCommentAbuseReportDashboardReadModel);
+
+        // when
+        ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> responseEntity =
+                memberAdminRestController.approveCommentAbuseReport(TEST_POST_ULID, TEST_COMM_COMMENT_PATH);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString())
+                .isEqualTo(DataResponse.ok(testCommentAbuseReportDashboardReadModel).toString());
     }
 }

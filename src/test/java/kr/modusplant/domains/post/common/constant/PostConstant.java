@@ -33,6 +33,7 @@ public final class PostConstant {
     public static final LocalDateTime TEST_POST_ARCHIVED_AT = LocalDateTime.of(2026, 4, 4, 0, 0);
     public static final LocalDateTime TEST_POST_UPDATED_AT = LocalDateTime.of(2026, 4, 3, 12, 0);
     public static final LocalDateTime TEST_POST_PUBLISHED_AT = LocalDateTime.of(2026, 4, 3, 0, 0);
+    public static final LocalDateTime TEST_POST_EDITED_AT = LocalDateTime.of(2026, 4, 3, 5, 0);
     public static final JsonNode TEST_POST_CONTENT_JSON_NODE = createSampleContentAsJsonNode();
     public static final String TEST_POST_CONTENT = """
             [
