@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +33,7 @@ public class CommentLikeEntityTest implements CommentLikeEntityTestUtils {
     void setUp() {
         // given
         postId = TEST_POST_ULID;
-        path = TEST_COMM_COMMENT_PATH;
+        path = TEST_COMMENT_PATH;
         memberId = createMemberBasicUserEntityWithUuid().getUuid();
 
         CommentLikeEntity commentLikeEntity = CommentLikeEntity.of(postId, path, memberId);

@@ -13,15 +13,10 @@ import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportApproveRecord;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportDismissRecord;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportApproveRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportDismissRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
+import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.CommentAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.PostAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportDashboardResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,8 +27,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
@@ -54,7 +47,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/report/proposal-or-bug")
-    public ResponseEntity<DataResponse<List<ProposalOrBugReportDashboardReadModel>>> getProposalOrBugReport(
+    public ResponseEntity<DataResponse<ProposalOrBugReportDashboardResponse>> getProposalOrBugReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -77,11 +70,11 @@ public class MemberAdminRestController {
             @Range(min = 1, max = 50)
             Integer size) {
 
-        List<ProposalOrBugReportDashboardReadModel> readModels =
+        ProposalOrBugReportDashboardResponse response =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(status, lastReportUlid, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(
@@ -129,7 +122,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/report/post-abuse")
-    public ResponseEntity<DataResponse<List<PostAbuseReportDashboardReadModel>>> getPostAbuseReport(
+    public ResponseEntity<DataResponse<PostAbuseReportDashboardResponse>> getPostAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -152,11 +145,11 @@ public class MemberAdminRestController {
             @Range(min = 1, max = 50)
             Integer size) {
 
-        List<PostAbuseReportDashboardReadModel> readModels =
+        PostAbuseReportDashboardResponse response =
                 memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(status, lastPostUlid, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(
@@ -205,7 +198,7 @@ public class MemberAdminRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/report/comment-abuse")
-    public ResponseEntity<DataResponse<List<CommentAbuseReportDashboardReadModel>>> getCommentAbuseReport(
+    public ResponseEntity<DataResponse<CommentAbuseReportDashboardResponse>> getCommentAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -236,12 +229,12 @@ public class MemberAdminRestController {
             @Range(min = 1, max = 50)
             Integer size) {
 
-        List<CommentAbuseReportDashboardReadModel> readModels =
+        CommentAbuseReportDashboardResponse response =
                 memberAdminController.getCommentAbuseReport(
                         new CommentAbuseReportGetRecord(status, lastPostUlid, lastPath, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(

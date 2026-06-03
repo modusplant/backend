@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
@@ -30,7 +30,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isIdExist로 true 반환")
     void testIsIdExist_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMM_COMMENT_PATH)).willReturn(true);
+        given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(true);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isIdExist(testActivitySubjectCommentId)).isEqualTo(true);
@@ -40,7 +40,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isIdExist로 false 반환")
     void testIsIdExist_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMM_COMMENT_PATH)).willReturn(false);
+        given(commentJpaRepository.existsByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(false);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isIdExist(testActivitySubjectCommentId)).isEqualTo(false);
@@ -50,7 +50,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isLiked로 true 반환")
     void testIsLiked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
+        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectCommentId)).isEqualTo(true);
@@ -60,7 +60,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isLiked로 false 반환")
     void testIsLiked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
+        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isLiked(testMemberId, testActivitySubjectCommentId)).isEqualTo(false);
@@ -70,7 +70,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isUnliked로 true 반환")
     void testIsUnliked_givenIdThatExists_willReturnTrue() {
         // given & when
-        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
+        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMMENT_PATH, testMemberId.getValue())).willReturn(false);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectCommentId)).isEqualTo(true);
@@ -80,7 +80,7 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     @DisplayName("isUnliked로 false 반환")
     void testIsUnliked_givenIdThatIsNotExist_willReturnFalse() {
         // given & when
-        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMM_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
+        given(commentLikeJpaRepository.existsByPostIdAndPathAndMemberId(TEST_POST_ULID, TEST_COMMENT_PATH, testMemberId.getValue())).willReturn(true);
 
         // when & then
         assertThat(activitySubjectCommentRepositoryJpaAdapter.isUnliked(testMemberId, testActivitySubjectCommentId)).isEqualTo(false);

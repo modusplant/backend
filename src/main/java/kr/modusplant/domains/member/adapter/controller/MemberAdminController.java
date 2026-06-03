@@ -10,6 +10,9 @@ import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashbo
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.CommentAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.PostAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportDashboardResponse;
 import kr.modusplant.shared.exception.ExistsValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,13 +35,27 @@ public class MemberAdminController {
     private final ReportDashboardRepository reportDashboardRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public List<ProposalOrBugReportDashboardReadModel> getProposalOrBug(ProposalOrBugReportGetRecord record) {
-        if (record.lastReportUlid() != null) {
+    public ProposalOrBugReportDashboardResponse getProposalOrBug(ProposalOrBugReportGetRecord record) {
+        int reportPageSize = record.size() + 1;
+        List<ProposalOrBugReportDashboardReadModel> readModels;
+        if (record.lastReportUlid() != null) { // 특정 lastReportId 이후부터 조회
             ReportId reportId = ReportId.create(record.lastReportUlid());
             memberValidationHelper.validateIfReportExists(reportId);
-            return reportDashboardRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), record.status(), reportId);
-        } else {
-            return reportDashboardRepository.getProposalOrBugReports(ReportPageSize.create(record.size()), record.status(), null);
+            readModels = reportDashboardRepository.getProposalOrBugReports(
+                    ReportPageSize.create(reportPageSize), record.status(), reportId);
+        } else { // 첫 보고서 데이터부터 조회
+            readModels = reportDashboardRepository.getProposalOrBugReports(
+                    ReportPageSize.create(reportPageSize), record.status(), null);
+        }
+
+        if (readModels.size() == reportPageSize) { // hasNext == true
+            List<ProposalOrBugReportDashboardReadModel> returnedReadModels =
+                    readModels.subList(0, reportPageSize - 1);
+            return ProposalOrBugReportDashboardResponse.of(
+                    returnedReadModels, returnedReadModels.getLast().ulid(), true);
+        } else { // hasNext == false
+            return ProposalOrBugReportDashboardResponse.of(
+                    readModels, readModels.getLast().ulid(), false);
         }
     }
 
@@ -58,15 +75,27 @@ public class MemberAdminController {
         }
     }
 
-    public List<PostAbuseReportDashboardReadModel> getPostAbuseReport(PostAbuseReportGetRecord record) {
+    public PostAbuseReportDashboardResponse getPostAbuseReport(PostAbuseReportGetRecord record) {
+        int reportPageSize = record.size() + 1;
+        List<PostAbuseReportDashboardReadModel> readModels;
         if (record.lastPostUlid() != null) {
             ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.lastPostUlid());
             memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
-            return reportDashboardRepository.getPostAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), activitySubjectPostId);
+            readModels = reportDashboardRepository.getPostAbuseReports(
+                    ReportPageSize.create(reportPageSize), record.status(), activitySubjectPostId);
         } else {
-            return reportDashboardRepository.getPostAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), null);
+            readModels = reportDashboardRepository.getPostAbuseReports(
+                    ReportPageSize.create(reportPageSize), record.status(), null);
+        }
+
+        if (readModels.size() == reportPageSize) { // hasNext == true
+            List<PostAbuseReportDashboardReadModel> returnedReadModels =
+                    readModels.subList(0, reportPageSize - 1);
+            return PostAbuseReportDashboardResponse.of(
+                    returnedReadModels, returnedReadModels.getLast().ulid(), true);
+        } else { // hasNext == false
+            return PostAbuseReportDashboardResponse.of(
+                    readModels, readModels.getLast().ulid(), false);
         }
     }
 
@@ -89,18 +118,36 @@ public class MemberAdminController {
         return reportDashboardRepository.approvePostAbuseReport(postId);
     }
 
-    public List<CommentAbuseReportDashboardReadModel> getCommentAbuseReport(CommentAbuseReportGetRecord record) {
+    public CommentAbuseReportDashboardResponse getCommentAbuseReport(CommentAbuseReportGetRecord record) {
+        int reportPageSize = record.size() + 1;
+        List<CommentAbuseReportDashboardReadModel> readModels;
         if (!(record.lastPostUlid() == null && record.lastPath() == null)) {
             ActivitySubjectCommentId activitySubjectCommentId =
                     ActivitySubjectCommentId.create(
                             ActivitySubjectPostId.create(record.lastPostUlid()),
                             ActivitySubjectCommentPath.create(record.lastPath()));
             memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
-            return reportDashboardRepository.getCommentAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), activitySubjectCommentId);
+            readModels = reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(reportPageSize), record.status(), activitySubjectCommentId);
         } else {
-            return reportDashboardRepository.getCommentAbuseReports(
-                    ReportPageSize.create(record.size()), record.status(), null);
+            readModels = reportDashboardRepository.getCommentAbuseReports(
+                    ReportPageSize.create(reportPageSize), record.status(), null);
+        }
+
+        if (readModels.size() == reportPageSize) { // hasNext == true
+            List<CommentAbuseReportDashboardReadModel> returnedReadModels =
+                    readModels.subList(0, reportPageSize - 1);
+            return CommentAbuseReportDashboardResponse.of(
+                    returnedReadModels,
+                    returnedReadModels.getLast().postUlid(),
+                    returnedReadModels.getLast().path(),
+                    true);
+        } else { // hasNext == false
+            return CommentAbuseReportDashboardResponse.of(
+                    readModels,
+                    readModels.getLast().postUlid(),
+                    readModels.getLast().path(),
+                    false);
         }
     }
 

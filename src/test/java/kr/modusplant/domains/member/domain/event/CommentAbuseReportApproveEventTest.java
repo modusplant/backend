@@ -5,7 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,12 +21,12 @@ class CommentAbuseReportApproveEventTest {
         void testCreate_givenValidParameters_willReturnEvent() {
             // when
             CommentAbuseReportApproveEvent event =
-                    CommentAbuseReportApproveEvent.create(TEST_POST_ULID, TEST_COMM_COMMENT_PATH);
+                    CommentAbuseReportApproveEvent.create(TEST_POST_ULID, TEST_COMMENT_PATH);
 
             // then
             assertNotNull(event);
             assertEquals(TEST_POST_ULID, event.getPostUlid());
-            assertEquals(TEST_COMM_COMMENT_PATH, event.getPath());
+            assertEquals(TEST_COMMENT_PATH, event.getPath());
         }
 
         @Test
@@ -34,7 +34,7 @@ class CommentAbuseReportApproveEventTest {
         void testCreate_givenBlankPostUlid_willThrowException() {
             // given & when
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-                    CommentAbuseReportApproveEvent.create("", TEST_COMM_COMMENT_PATH));
+                    CommentAbuseReportApproveEvent.create("", TEST_COMMENT_PATH));
 
             // then
             assertThat(exception.getMessage()).contains("NOT_FOUND_COMMENT");
