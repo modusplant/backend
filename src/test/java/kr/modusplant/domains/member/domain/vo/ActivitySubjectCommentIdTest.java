@@ -5,7 +5,7 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentPathTestUtils.testActivitySubjectCommentPath;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
@@ -54,7 +54,7 @@ class ActivitySubjectCommentIdTest {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testActivitySubjectCommentId, ActivitySubjectCommentId.create(testActivitySubjectPostId, ActivitySubjectCommentPath.create(TEST_COMM_COMMENT_PATH + "1")));
+        assertNotEquals(testActivitySubjectCommentId, ActivitySubjectCommentId.create(testActivitySubjectPostId, ActivitySubjectCommentPath.create(TEST_COMMENT_PATH + "1")));
     }
 
     @Test

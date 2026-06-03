@@ -6,7 +6,7 @@ import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_CREATED_AT;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_CREATED_AT;
 
 public interface CommentResponseTestUtils extends
         PostIdTestUtils, CommentPathTestUtils,
@@ -14,6 +14,6 @@ public interface CommentResponseTestUtils extends
 
     CommentResponse testCommentResponse = new CommentResponse(
             testPostId.getId(), testCommentPath.getPath(), testNormalUserNickname.getValue(),
-            testCommentContent.getContent(), false, TEST_COMM_COMMENT_CREATED_AT.toString()
+            testCommentContent.getContent(), false, TEST_COMMENT_CREATED_AT.toString()
     );
 }
