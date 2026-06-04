@@ -27,7 +27,7 @@ public class PostAbuseReportDashboardEntity {
     @Id
     private String postUlid;
 
-    @MapsId("postUlid")
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = POST_ULID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
