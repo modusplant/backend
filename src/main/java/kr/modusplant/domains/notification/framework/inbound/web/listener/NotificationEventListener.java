@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -78,7 +79,9 @@ public class NotificationEventListener {
             }
             task.run();
         } catch (Exception e) {
-            log.error(errorMsg, args, e);
+            Object[] newArgs = Arrays.copyOf(args, args.length + 1);
+            newArgs[args.length] = e;
+            log.error(errorMsg, newArgs);
         } finally {
             if (acquired) {
                 notificationSemaphore.release();
