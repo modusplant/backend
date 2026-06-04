@@ -171,6 +171,7 @@ class MemberAdminControllerTest {
     void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
         // given
         given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
+        given(reportRepository.isUncheckedInProposalOrBugReport(testReportId)).willReturn(false);
         willDoNothing().given(reportRepository).removeProposalOrBugReport(any());
 
         // when
@@ -191,6 +192,20 @@ class MemberAdminControllerTest {
 
         // then
         verify(reportRepository, never()).removeProposalOrBugReport(any());
+    }
+
+    @Test
+    @DisplayName("보고서가 존재하고 확인되지 않았을 때 removeProposalOrBug로 건의 및 버그 제보 제거")
+    void testRemoveProposalOrBug_givenNotCheckedReportId_willThrowException() {
+        // given
+        given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
+        given(reportRepository.isUncheckedInProposalOrBugReport(testReportId)).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(ExistsValueException.class, () -> memberAdminController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(NOT_FOUND_PROPOSAL_OR_BUG_REPORT_CHECKED);
     }
 
     @Test

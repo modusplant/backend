@@ -139,14 +139,14 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
         // given
         PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
         given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
-        given(postAbuseReportDashboardJpaRepository.save(any())).willReturn(uncheckedEntity);
+        given(postAbuseReportDashboardJpaRepository.saveAndFlush(any())).willReturn(uncheckedEntity);
         given(postAbuseReportDashboardJooqRepository.getReadModelByPostId(TEST_POST_ULID)).willReturn(testPostAbuseReportDashboardReadModel);
 
         // when
         PostAbuseReportDashboardReadModel readModel = reportDashboardRepositoryAdapter.dismissPostAbuseReport(ActivitySubjectPostId.create(TEST_POST_ULID));
 
         // then
-        verify(postAbuseReportDashboardJpaRepository, times(1)).save(any());
+        verify(postAbuseReportDashboardJpaRepository, times(1)).saveAndFlush(any());
         verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelByPostId(TEST_POST_ULID);
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }
@@ -172,14 +172,14 @@ class ReportDashboardRepositoryAdapterTest implements PostAbuseReportEntityTestU
         // given
         PostAbuseReportDashboardEntity uncheckedEntity = createPostAbuseReportDashboardUncheckedEntityBuilder().build();
         given(postAbuseReportDashboardJpaRepository.findById(TEST_POST_ULID)).willReturn(Optional.of(uncheckedEntity));
-        given(postAbuseReportDashboardJpaRepository.save(any())).willReturn(uncheckedEntity);
+        given(postAbuseReportDashboardJpaRepository.saveAndFlush(any())).willReturn(uncheckedEntity);
         given(postAbuseReportDashboardJooqRepository.getReadModelByPostId(TEST_POST_ULID)).willReturn(testPostAbuseReportDashboardReadModel);
 
         // when
         PostAbuseReportDashboardReadModel readModel = reportDashboardRepositoryAdapter.approvePostAbuseReport(testActivitySubjectPostId);
 
         // then
-        verify(postAbuseReportDashboardJpaRepository, times(1)).save(any());
+        verify(postAbuseReportDashboardJpaRepository, times(1)).saveAndFlush(any());
         verify(postAbuseReportDashboardJooqRepository, times(1)).getReadModelByPostId(TEST_POST_ULID);
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }

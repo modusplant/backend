@@ -13,6 +13,8 @@ import kr.modusplant.domains.member.domain.vo.*;
 public interface ReportRepository {
     boolean isIdExistInProposalOrBugReport(ReportId reportId);
 
+    boolean isUncheckedInProposalOrBugReport(ReportId reportId);
+
     boolean isCheckedInProposalOrBugReport(ReportId reportId);
 
     boolean isMemberAbusePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
