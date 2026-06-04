@@ -104,6 +104,21 @@ class MemberAdminControllerTest {
     }
 
     @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getProposalOrBug로 건의 및 버그 제보 현황 응답 반환")
+    void testGetProposalOrBug_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        ProposalOrBugReportDashboardResponse response =
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(response).isEqualTo(ProposalOrBugReportDashboardResponse.of(List.of(), null, false));
+    }
+
+    @Test
     @DisplayName("페이지 크기보다 더 많은 데이터가 있을 때 getProposalOrBug로 hasNext가 true인 응답 반환")
     void testGetProposalOrBug_givenMoreItemsThanPageSize_willReturnResponseWithTrueHasNext() {
         // given
@@ -206,6 +221,21 @@ class MemberAdminControllerTest {
         // then
         verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
         assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithFalseHasNext);
+    }
+
+    @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getPostAbuseReport로 게시글 신고 현황 응답 반환")
+    void testGetPostAbuseReport_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        PostAbuseReportDashboardResponse response =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(PostAbuseReportDashboardResponse.of(List.of(), null, false));
     }
 
     @Test
@@ -366,6 +396,21 @@ class MemberAdminControllerTest {
         // then
         verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
         assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithFalseHasNext);
+    }
+
+    @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getCommentAbuseReport로 댓글 신고 현황 응답 반환")
+    void testGetCommentAbuseReport_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        CommentAbuseReportDashboardResponse response =
+                memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(CommentAbuseReportDashboardResponse.of(List.of(), null, null, false));
     }
 
     @Test

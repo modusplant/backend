@@ -54,8 +54,13 @@ public class MemberAdminController {
             return ProposalOrBugReportDashboardResponse.of(
                     returnedReadModels, returnedReadModels.getLast().ulid(), true);
         } else { // hasNext == false
-            return ProposalOrBugReportDashboardResponse.of(
-                    readModels, readModels.getLast().ulid(), false);
+            if (!readModels.isEmpty()) {
+                return ProposalOrBugReportDashboardResponse.of(
+                        readModels, readModels.getLast().ulid(), false);
+            } else {
+                return ProposalOrBugReportDashboardResponse.of(
+                        readModels, null, false);
+            }
         }
     }
 
@@ -94,8 +99,13 @@ public class MemberAdminController {
             return PostAbuseReportDashboardResponse.of(
                     returnedReadModels, returnedReadModels.getLast().ulid(), true);
         } else { // hasNext == false
-            return PostAbuseReportDashboardResponse.of(
-                    readModels, readModels.getLast().ulid(), false);
+            if (!readModels.isEmpty()) {
+                return PostAbuseReportDashboardResponse.of(
+                        readModels, readModels.getLast().ulid(), false);
+            } else {
+                return PostAbuseReportDashboardResponse.of(
+                        readModels, null, false);
+            }
         }
     }
 
@@ -143,11 +153,13 @@ public class MemberAdminController {
                     returnedReadModels.getLast().path(),
                     true);
         } else { // hasNext == false
-            return CommentAbuseReportDashboardResponse.of(
-                    readModels,
-                    readModels.getLast().postUlid(),
-                    readModels.getLast().path(),
-                    false);
+            if (!readModels.isEmpty()) {
+                return CommentAbuseReportDashboardResponse.of(
+                        readModels, readModels.getLast().postUlid(), readModels.getLast().path(), false);
+            } else {
+                return CommentAbuseReportDashboardResponse.of(
+                        readModels, null, null, false);
+            }
         }
     }
 
