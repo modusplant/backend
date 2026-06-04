@@ -46,6 +46,11 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
+    public boolean isUncheckedInProposalOrBugReport(ReportId reportId) {
+        return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow().getCheckedAt() == null;
+    }
+
+    @Override
     public boolean isCheckedInProposalOrBugReport(ReportId reportId) {
         return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow().getCheckedAt() != null;
     }

@@ -76,6 +76,9 @@ public class MemberAdminController {
     public void removeProposalOrBug(ProposalOrBugReportRemoveRecord record) {
         ReportId reportId = ReportId.create(record.reportUlid());
         if (reportRepository.isIdExistInProposalOrBugReport(reportId)) {
+            if (reportRepository.isUncheckedInProposalOrBugReport(reportId)) {
+                throw new ExistsValueException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT_CHECKED, "checkedAt");
+            }
             reportRepository.removeProposalOrBugReport(reportId);
         }
     }
