@@ -121,7 +121,7 @@ public class MemberAdminRestController {
             description = "게시글 신고 현황을 조회합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/report/post-abuse")
+    @GetMapping(value = "/report/abuse/post")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardResponse>> getPostAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
@@ -157,7 +157,7 @@ public class MemberAdminRestController {
             description = "게시글 신고를 반려합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}/dismiss")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> dismissPostAbuseReport(
             @Parameter(
                     description = "반려할 게시글의 식별자",
@@ -177,7 +177,7 @@ public class MemberAdminRestController {
             description = "게시글 신고를 수리합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}/approve")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/approve")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> approvePostAbuseReport(
             @Parameter(
                     description = "수리할 게시글의 식별자",
@@ -197,7 +197,7 @@ public class MemberAdminRestController {
             description = "댓글 신고 현황을 조회합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/report/comment-abuse")
+    @GetMapping(value = "/report/abuse/comment")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardResponse>> getCommentAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
@@ -242,7 +242,7 @@ public class MemberAdminRestController {
             description = "댓글 신고를 반려합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/comment-abuse/{postUlid}/dismiss")
+    @PostMapping(value = "/report/abuse/comment/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> dismissCommentAbuseReport(
             @Parameter(
                     description = "반려할 댓글이 속한 게시글의 식별자",
@@ -271,7 +271,7 @@ public class MemberAdminRestController {
             description = "댓글 신고를 수리합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/comment-abuse/{postUlid}/approve")
+    @PostMapping(value = "/report/abuse/comment/{postUlid}/approve")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> approveCommentAbuseReport(
             @Parameter(
                     description = "수리할 댓글이 속한 게시글의 식별자",
