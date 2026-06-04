@@ -61,7 +61,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                         .orElseThrow(() ->
                                 new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"));
         proposalOrBugReportEntity.check();
-        proposalOrBugReportJpaRepository.save(proposalOrBugReportEntity);
+        proposalOrBugReportJpaRepository.saveAndFlush(proposalOrBugReportEntity);
         return proposalOrBugReportDashboardJooqRepository.getReadModelByReportId(reportId.getValue());
     }
 
@@ -112,7 +112,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                         .orElseThrow(() ->
                                 new NotFoundEntityException(NOT_FOUND_POST_ABUSE_REPORT, "postAbuseReport"));
         entity.dismiss();
-        postAbuseReportDashboardJpaRepository.save(entity);
+        postAbuseReportDashboardJpaRepository.saveAndFlush(entity);
         return postAbuseReportDashboardJooqRepository.getReadModelByPostId(postId.getValue());
     }
 
@@ -123,7 +123,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                         .orElseThrow(() ->
                                 new NotFoundEntityException(NOT_FOUND_POST_ABUSE_REPORT, "postAbuseReport"));
         entity.approve();
-        postAbuseReportDashboardJpaRepository.save(entity);
+        postAbuseReportDashboardJpaRepository.saveAndFlush(entity);
         return postAbuseReportDashboardJooqRepository.getReadModelByPostId(postId.getValue());
     }
 
@@ -194,7 +194,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                         .orElseThrow(() ->
                                 new NotFoundEntityException(NOT_FOUND_COMMENT_ABUSE_REPORT, "commentAbuseReport"));
         dashboardEntity.dismiss();
-        commentAbuseReportDashboardJpaRepository.save(dashboardEntity);
+        commentAbuseReportDashboardJpaRepository.saveAndFlush(dashboardEntity);
         return commentAbuseReportDashboardJooqRepository.getReadModelByPostUlidAndPath(postUlid, path);
     }
 
@@ -209,7 +209,7 @@ public class ReportDashboardRepositoryAdapter implements ReportDashboardReposito
                         .orElseThrow(() ->
                                 new NotFoundEntityException(NOT_FOUND_COMMENT_ABUSE_REPORT, "commentAbuseReport"));
         dashboardEntity.approve();
-        commentAbuseReportDashboardJpaRepository.save(dashboardEntity);
+        commentAbuseReportDashboardJpaRepository.saveAndFlush(dashboardEntity);
         return commentAbuseReportDashboardJooqRepository.getReadModelByPostUlidAndPath(postUlid, path);
     }
 
