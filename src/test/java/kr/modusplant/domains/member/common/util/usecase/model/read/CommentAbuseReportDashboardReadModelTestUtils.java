@@ -20,6 +20,7 @@ public interface CommentAbuseReportDashboardReadModelTestUtils {
                     TEST_COMMENT_CONTENT,
                     TEST_REPORT_SIZE,
                     AbuseReportStatus.UNCHECKED.name(),
+                    AbuseReportStatus.UNCHECKED.getValue(),
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CREATED_AT,

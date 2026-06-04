@@ -13,5 +13,6 @@ public record ProposalOrBugReportDashboardReadModel(
         LocalDateTime createdAt,
         LocalDateTime displayTimestamp,
         String nickname,
-        String status) {
+        String status,
+        String statusValue) {
 }

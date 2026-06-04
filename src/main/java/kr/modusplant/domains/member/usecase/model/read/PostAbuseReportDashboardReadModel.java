@@ -10,6 +10,7 @@ public record PostAbuseReportDashboardReadModel(
         JsonNode content,
         Integer reportCount,
         String status,
+        String statusValue,
         LocalDateTime firstReportedAt,
         LocalDateTime lastReportedAt,
         LocalDateTime displayTimestamp,
