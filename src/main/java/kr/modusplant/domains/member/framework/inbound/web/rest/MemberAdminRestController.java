@@ -67,7 +67,7 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
         ProposalOrBugReportDashboardResponse response =
@@ -142,7 +142,7 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
         PostAbuseReportDashboardResponse response =
@@ -226,7 +226,7 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
         CommentAbuseReportDashboardResponse response =
