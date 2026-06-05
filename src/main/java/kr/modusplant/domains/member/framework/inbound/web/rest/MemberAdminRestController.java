@@ -38,13 +38,13 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @Validated
 @Slf4j
 @PreAuthorize("hasAuthority('ADMIN')")
+@SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
 public class MemberAdminRestController {
     private final MemberAdminController memberAdminController;
 
     @Operation(
             summary = "건의 및 버그 제보 현황 조회 API (무한 스크롤)",
-            description = "건의 사항 또는 버그 제보 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보 현황을 조회합니다."
     )
     @GetMapping(value = "/report/proposal-or-bug")
     public ResponseEntity<DataResponse<ProposalOrBugReportDashboardResponse>> getProposalOrBugReport(
@@ -79,8 +79,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "건의 및 버그 제보 확인 API",
-            description = "건의 사항 또는 버그 제보를 확인합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보를 확인합니다."
     )
     @PostMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<ProposalOrBugReportDashboardReadModel>> checkProposalOrBugReport(
@@ -99,8 +98,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "건의 및 버그 제보 제거 API",
-            description = "건의 사항 또는 버그 제보를 제거합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보를 제거합니다."
     )
     @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
@@ -118,8 +116,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "게시글 신고 현황 조회 API (무한 스크롤)",
-            description = "게시글 신고 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고 현황을 조회합니다."
     )
     @GetMapping(value = "/report/abuse/post")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardResponse>> getPostAbuseReport(
@@ -154,8 +151,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "게시글 신고 반려 API",
-            description = "게시글 신고를 반려합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고를 반려합니다."
     )
     @PostMapping(value = "/report/abuse/post/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> dismissPostAbuseReport(
@@ -174,8 +170,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "게시글 신고 수리 API",
-            description = "게시글 신고를 수리합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고를 수리합니다."
     )
     @PostMapping(value = "/report/abuse/post/{postUlid}/approve")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> approvePostAbuseReport(
@@ -194,8 +189,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "댓글 신고 현황 조회 API (무한 스크롤)",
-            description = "댓글 신고 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고 현황을 조회합니다."
     )
     @GetMapping(value = "/report/abuse/comment")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardResponse>> getCommentAbuseReport(
@@ -239,8 +233,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "댓글 신고 반려 API",
-            description = "댓글 신고를 반려합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고를 반려합니다."
     )
     @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/dismiss")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> dismissCommentAbuseReport(
@@ -268,8 +261,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "댓글 신고 수리 API",
-            description = "댓글 신고를 수리합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고를 수리합니다."
     )
     @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/approve")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> approveCommentAbuseReport(
