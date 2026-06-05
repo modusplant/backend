@@ -19,7 +19,8 @@ public interface ProposalOrBugReportDashboardReadModelTestUtils {
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CHECKED_AT,
                     MEMBER_BASIC_USER_NICKNAME,
-                    ProposalOrBugReportStatus.CHECKED.name());
+                    ProposalOrBugReportStatus.CHECKED.name(),
+                    ProposalOrBugReportStatus.CHECKED.getValue());
     List<ProposalOrBugReportDashboardReadModel> testProposalOrBugReportDashboardCheckedReadModelList =
             List.of(testProposalOrBugReportDashboardCheckedReadModel);
 }

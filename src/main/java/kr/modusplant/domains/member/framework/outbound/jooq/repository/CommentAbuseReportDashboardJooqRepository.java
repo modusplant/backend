@@ -2,11 +2,13 @@ package kr.modusplant.domains.member.framework.outbound.jooq.repository;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ import java.util.List;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_COMMENT_ABUSE_REPORT;
 import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.val;
 
 @Repository
 @RequiredArgsConstructor
@@ -71,6 +74,7 @@ public class CommentAbuseReportDashboardJooqRepository {
                 COMM_COMMENT.CONTENT,
                 COMM_COMMENT_ABUSE_REPORT_DASHBOARD.REPORT_COUNT,
                 COMM_COMMENT_ABUSE_REPORT_DASHBOARD.STATUS,
+                getStatusValueFieldFromCommCommentAbuseReportDashboard(),
                 COMM_COMMENT_ABUSE_REPORT_DASHBOARD.FIRST_REPORTED_AT,
                 COMM_COMMENT_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT,
                 getDisplayTimestampField(),
@@ -85,6 +89,7 @@ public class CommentAbuseReportDashboardJooqRepository {
                 record.get(COMM_COMMENT.CONTENT),
                 record.get(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.REPORT_COUNT),
                 record.get(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.STATUS),
+                record.get(getStatusValueFieldFromCommCommentAbuseReportDashboard()),
                 record.get(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.FIRST_REPORTED_AT),
                 record.get(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT),
                 record.get(getDisplayTimestampField()),
@@ -94,5 +99,13 @@ public class CommentAbuseReportDashboardJooqRepository {
 
     private @Nonnull Field<LocalDateTime> getDisplayTimestampField() {
         return COMM_COMMENT_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT.as("displayTimestamp");
+    }
+
+    private @Nonnull Field<String> getStatusValueFieldFromCommCommentAbuseReportDashboard() {
+        return DSL.case_(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.STATUS)
+                .when(AbuseReportStatus.UNCHECKED.name(), val(AbuseReportStatus.UNCHECKED.getValue()))
+                .when(AbuseReportStatus.DISMISSED.name(), val(AbuseReportStatus.DISMISSED.getValue()))
+                .otherwise(val(AbuseReportStatus.BLINDED.getValue()))
+                .as("statusValue");
     }
 }

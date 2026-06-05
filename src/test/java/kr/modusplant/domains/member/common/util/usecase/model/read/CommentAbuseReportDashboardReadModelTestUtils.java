@@ -5,8 +5,8 @@ import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboa
 
 import java.util.List;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_CONTENT;
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_CONTENT;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_CREATED_AT;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
@@ -16,10 +16,11 @@ public interface CommentAbuseReportDashboardReadModelTestUtils {
     CommentAbuseReportDashboardReadModel testCommentAbuseReportDashboardReadModel =
             new CommentAbuseReportDashboardReadModel(
                     TEST_POST_ULID,
-                    TEST_COMM_COMMENT_PATH,
-                    TEST_COMM_COMMENT_CONTENT,
+                    TEST_COMMENT_PATH,
+                    TEST_COMMENT_CONTENT,
                     TEST_REPORT_SIZE,
                     AbuseReportStatus.UNCHECKED.name(),
+                    AbuseReportStatus.UNCHECKED.getValue(),
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CREATED_AT,
                     TEST_REPORT_CREATED_AT,

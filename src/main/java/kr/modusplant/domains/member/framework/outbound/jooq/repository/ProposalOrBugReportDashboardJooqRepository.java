@@ -42,8 +42,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
             String proposalOrBugReportStatus,
             @Nullable String lastReportId) {
         Field<String> statusName = when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.name()))
-                .otherwise(val(ProposalOrBugReportStatus.CHECKED.name()))
-                .as("status");
+                .otherwise(val(ProposalOrBugReportStatus.CHECKED.name()));
         Condition ulidCondition = lastReportId != null ?
                 PROP_BUG_REP.ULID.lt(lastReportId) : noCondition();
         Condition statusCondition = proposalOrBugReportStatus != null ?
@@ -70,7 +69,8 @@ public class ProposalOrBugReportDashboardJooqRepository {
                 PROP_BUG_REP.CREATED_AT,
                 getDisplayTimeFieldFromPropBugRep(),
                 SITE_MEMBER.NICKNAME,
-                getStatusFieldFromPropBugRep()
+                getStatusFieldFromPropBugRep(),
+                getStatusValueFieldFromPropBugRep()
         };
     }
 
@@ -84,7 +84,8 @@ public class ProposalOrBugReportDashboardJooqRepository {
                 record.get(PROP_BUG_REP.CREATED_AT),
                 record.get(getDisplayTimeFieldFromPropBugRep()),
                 record.get(SITE_MEMBER.NICKNAME),
-                record.get(getStatusFieldFromPropBugRep())
+                record.get(getStatusFieldFromPropBugRep()),
+                record.get(getStatusValueFieldFromPropBugRep())
         );
     }
 
@@ -97,8 +98,14 @@ public class ProposalOrBugReportDashboardJooqRepository {
     }
 
     private @Nonnull Field<String> getStatusFieldFromPropBugRep() {
+        return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.name()))
+                .otherwise(val(ProposalOrBugReportStatus.CHECKED.name()))
+                .as("status");
+    }
+
+    private @Nonnull Field<String> getStatusValueFieldFromPropBugRep() {
         return when(PROP_BUG_REP.CHECKED_AT.isNull(), val(ProposalOrBugReportStatus.UNCHECKED.getValue()))
                 .otherwise(val(ProposalOrBugReportStatus.CHECKED.getValue()))
-                .as("status");
+                .as("statusValue");
     }
 }

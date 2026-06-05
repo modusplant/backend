@@ -13,15 +13,10 @@ import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportApproveRecord;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportDismissRecord;
-import kr.modusplant.domains.member.usecase.record.CommentAbuseReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportApproveRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportDismissRecord;
-import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportCheckRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRemoveRecord;
+import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.CommentAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.PostAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportDashboardResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +28,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 
@@ -45,16 +38,16 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @Validated
 @Slf4j
 @PreAuthorize("hasAuthority('ADMIN')")
+@SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
 public class MemberAdminRestController {
     private final MemberAdminController memberAdminController;
 
     @Operation(
             summary = "건의 및 버그 제보 현황 조회 API (무한 스크롤)",
-            description = "건의 사항 또는 버그 제보 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보 현황을 조회합니다."
     )
     @GetMapping(value = "/report/proposal-or-bug")
-    public ResponseEntity<DataResponse<List<ProposalOrBugReportDashboardReadModel>>> getProposalOrBugReport(
+    public ResponseEntity<DataResponse<ProposalOrBugReportDashboardResponse>> getProposalOrBugReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -74,20 +67,19 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
-        List<ProposalOrBugReportDashboardReadModel> readModels =
+        ProposalOrBugReportDashboardResponse response =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(status, lastReportUlid, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(
             summary = "건의 및 버그 제보 확인 API",
-            description = "건의 사항 또는 버그 제보를 확인합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보를 확인합니다."
     )
     @PostMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<ProposalOrBugReportDashboardReadModel>> checkProposalOrBugReport(
@@ -106,8 +98,7 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "건의 및 버그 제보 제거 API",
-            description = "건의 사항 또는 버그 제보를 제거합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "건의 사항 또는 버그 제보를 제거합니다."
     )
     @DeleteMapping(value = "/report/proposal-or-bug/{reportUlid}")
     public ResponseEntity<DataResponse<Void>> removeProposalOrBugReport(
@@ -125,11 +116,10 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "게시글 신고 현황 조회 API (무한 스크롤)",
-            description = "게시글 신고 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고 현황을 조회합니다."
     )
-    @GetMapping(value = "/report/post-abuse")
-    public ResponseEntity<DataResponse<List<PostAbuseReportDashboardReadModel>>> getPostAbuseReport(
+    @GetMapping(value = "/report/abuse/post")
+    public ResponseEntity<DataResponse<PostAbuseReportDashboardResponse>> getPostAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -149,22 +139,21 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
-        List<PostAbuseReportDashboardReadModel> readModels =
+        PostAbuseReportDashboardResponse response =
                 memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(status, lastPostUlid, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(
             summary = "게시글 신고 반려 API",
-            description = "게시글 신고를 반려합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고를 반려합니다."
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}/dismiss")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/dismiss")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> dismissPostAbuseReport(
             @Parameter(
                     description = "반려할 게시글의 식별자",
@@ -181,10 +170,9 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "게시글 신고 수리 API",
-            description = "게시글 신고를 수리합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "게시글 신고를 수리합니다."
     )
-    @PostMapping(value = "/report/post-abuse/{postUlid}/approve")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/approve")
     public ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> approvePostAbuseReport(
             @Parameter(
                     description = "수리할 게시글의 식별자",
@@ -201,11 +189,10 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "댓글 신고 현황 조회 API (무한 스크롤)",
-            description = "댓글 신고 현황을 조회합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고 현황을 조회합니다."
     )
-    @GetMapping(value = "/report/comment-abuse")
-    public ResponseEntity<DataResponse<List<CommentAbuseReportDashboardReadModel>>> getCommentAbuseReport(
+    @GetMapping(value = "/report/abuse/comment")
+    public ResponseEntity<DataResponse<CommentAbuseReportDashboardResponse>> getCommentAbuseReport(
             @Parameter(
                     description = "필터링용 보고서 상태",
                     example = "UNCHECKED"
@@ -233,23 +220,22 @@ public class MemberAdminRestController {
                     description = "페이지 크기",
                     schema = @Schema(example = "10", minimum = "1", maximum = "50"))
             @RequestParam
-            @Range(min = 1, max = 50)
+            @Range(min = 1, max = 50, message = "페이지 크기가 범위를 벗어났습니다. ")
             Integer size) {
 
-        List<CommentAbuseReportDashboardReadModel> readModels =
+        CommentAbuseReportDashboardResponse response =
                 memberAdminController.getCommentAbuseReport(
                         new CommentAbuseReportGetRecord(status, lastPostUlid, lastPath, size));
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(readModels));
+                .body(DataResponse.ok(response));
     }
 
     @Operation(
             summary = "댓글 신고 반려 API",
-            description = "댓글 신고를 반려합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고를 반려합니다."
     )
-    @PostMapping(value = "/report/comment-abuse/{postUlid}/dismiss")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/dismiss")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> dismissCommentAbuseReport(
             @Parameter(
                     description = "반려할 댓글이 속한 게시글의 식별자",
@@ -264,7 +250,7 @@ public class MemberAdminRestController {
                     description = "반려할 댓글의 경로",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
-            @RequestParam
+            @PathVariable
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
             String path) {
@@ -275,10 +261,9 @@ public class MemberAdminRestController {
 
     @Operation(
             summary = "댓글 신고 수리 API",
-            description = "댓글 신고를 수리합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+            description = "댓글 신고를 수리합니다."
     )
-    @PostMapping(value = "/report/comment-abuse/{postUlid}/approve")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/approve")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> approveCommentAbuseReport(
             @Parameter(
                     description = "수리할 댓글이 속한 게시글의 식별자",
@@ -293,7 +278,7 @@ public class MemberAdminRestController {
                     description = "수리할 댓글의 경로",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
-            @RequestParam
+            @PathVariable
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
             String path) {

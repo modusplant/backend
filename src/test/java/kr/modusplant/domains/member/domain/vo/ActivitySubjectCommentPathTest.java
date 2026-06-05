@@ -6,7 +6,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMM_COMMENT_PATH;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentPathTestUtils.testActivitySubjectCommentPath;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTestUtils.testMemberActiveStatus;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_ACTIVITY_SUBJECT_COMMENT_PATH;
@@ -17,7 +17,7 @@ class ActivitySubjectCommentPathTest {
     @Test
     @DisplayName("create으로 대상 댓글 아이디 반환")
     void testCreate_givenValidValue_willReturnActivitySubjectCommentPath() {
-        assertNotNull(ActivitySubjectCommentPath.create(TEST_COMM_COMMENT_PATH).getValue());
+        assertNotNull(ActivitySubjectCommentPath.create(TEST_COMMENT_PATH).getValue());
     }
 
     @Test

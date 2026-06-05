@@ -17,6 +17,7 @@ public interface PostAbuseReportDashboardReadModelTestUtils {
                     TEST_POST_CONTENT_JSON_NODE,
                     TEST_REPORT_SIZE,
                     AbuseReportStatus.UNCHECKED.name(),
+                    AbuseReportStatus.UNCHECKED.getValue(),
                     TEST_POST_CREATED_AT,
                     TEST_POST_UPDATED_AT,
                     TEST_POST_UPDATED_AT,

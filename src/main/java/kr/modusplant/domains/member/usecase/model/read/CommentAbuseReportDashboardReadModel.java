@@ -8,6 +8,7 @@ public record CommentAbuseReportDashboardReadModel(
         String content,
         Integer reportCount,
         String status,
+        String statusValue,
         LocalDateTime firstReportedAt,
         LocalDateTime lastReportedAt,
         LocalDateTime displayTimestamp,

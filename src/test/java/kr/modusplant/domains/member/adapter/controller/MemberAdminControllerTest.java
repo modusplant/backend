@@ -4,7 +4,9 @@ import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportDismissEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportDismissEvent;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
@@ -13,6 +15,9 @@ import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.member.usecase.record.CommentAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.PostAbuseReportGetRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportGetRecord;
+import kr.modusplant.domains.member.usecase.response.CommentAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.PostAbuseReportDashboardResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportDashboardResponse;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
@@ -42,6 +47,12 @@ import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseR
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportCheckRecordTestUtils.testProposalOrBugReportCheckRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordGetTestUtils.testProposalOrBugReportGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRemoveRecordTestUtils.testProposalOrBugReportRemoveRecord;
+import static kr.modusplant.domains.member.common.util.usecase.response.CommentAbuseDashboardResponseTestUtils.testCommentAbuseReportDashboardResponseWithFalseHasNext;
+import static kr.modusplant.domains.member.common.util.usecase.response.CommentAbuseDashboardResponseTestUtils.testCommentAbuseReportDashboardResponseWithTrueHasNext;
+import static kr.modusplant.domains.member.common.util.usecase.response.PostAbuseDashboardResponseTestUtils.testPostAbuseReportDashboardResponseWithFalseHasNext;
+import static kr.modusplant.domains.member.common.util.usecase.response.PostAbuseDashboardResponseTestUtils.testPostAbuseReportDashboardResponseWithTrueHasNext;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportDashboardResponseTestUtils.testProposalOrBugReportDashboardResponseWithFalseHasNext;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportDashboardResponseTestUtils.testProposalOrBugReportDashboardResponseWithTrueHasNext;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,33 +76,64 @@ class MemberAdminControllerTest {
     private final MemberAdminController memberAdminController = new MemberAdminController(memberValidationHelper, reportRepository, reportDashboardRepository, applicationEventPublisher);
 
     @Test
-    @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 조회")
-    void testGetProposalOrBug_givenValidLastReportUlid_willGetProposalOrBugReport() {
+    @DisplayName("lastReportUlid가 null이 아닐 때 getProposalOrBug로 건의 및 버그 제보 현황 응답 반환")
+    void testGetProposalOrBug_givenValidLastReportUlid_willReturnResponse() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfReportExists(any());
         given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportDashboardCheckedReadModelList);
 
         // when
-        List<ProposalOrBugReportDashboardReadModel> readModels = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
+        ProposalOrBugReportDashboardResponse response = memberAdminController.getProposalOrBug(testProposalOrBugReportGetRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testProposalOrBugReportDashboardCheckedReadModelList);
+        assertThat(response).isEqualTo(testProposalOrBugReportDashboardResponseWithFalseHasNext);
     }
 
     @Test
-    @DisplayName("lastReportUlid가 null일 때 getProposalOrBug로 건의 및 버그 제보 조회")
-    void testGetProposalOrBug_givenNullLastReportUlid_willGetProposalOrBugReport() {
+    @DisplayName("lastReportUlid가 null일 때 getProposalOrBug로 건의 및 버그 제보 현황 응답 반환")
+    void testGetProposalOrBug_givenNullLastReportUlid_willReturnResponse() {
         // given
         given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportDashboardCheckedReadModelList);
 
         // when
-        List<ProposalOrBugReportDashboardReadModel> readModels =
+        ProposalOrBugReportDashboardResponse response =
                 memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
 
         // then
         verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testProposalOrBugReportDashboardCheckedReadModelList);
+        assertThat(response).isEqualTo(testProposalOrBugReportDashboardResponseWithFalseHasNext);
+    }
+
+    @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getProposalOrBug로 건의 및 버그 제보 현황 응답 반환")
+    void testGetProposalOrBug_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        ProposalOrBugReportDashboardResponse response =
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(response).isEqualTo(ProposalOrBugReportDashboardResponse.of(List.of(), null, false));
+    }
+
+    @Test
+    @DisplayName("페이지 크기보다 더 많은 데이터가 있을 때 getProposalOrBug로 hasNext가 true인 응답 반환")
+    void testGetProposalOrBug_givenMoreItemsThanPageSize_willReturnResponseWithTrueHasNext() {
+        // given
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any()))
+                .willReturn(List.of(testProposalOrBugReportDashboardCheckedReadModel, testProposalOrBugReportDashboardCheckedReadModel));
+
+        // when
+        ProposalOrBugReportDashboardResponse response =
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, 1));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
+        assertThat(response).isEqualTo(testProposalOrBugReportDashboardResponseWithTrueHasNext);
     }
 
     @Test
@@ -131,6 +173,7 @@ class MemberAdminControllerTest {
     void testRemoveProposalOrBug_givenValidRecord_willRemoveProposalOrBugReport() {
         // given
         given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
+        given(reportRepository.isUncheckedInProposalOrBugReport(testReportId)).willReturn(false);
         willDoNothing().given(reportRepository).removeProposalOrBugReport(any());
 
         // when
@@ -154,35 +197,79 @@ class MemberAdminControllerTest {
     }
 
     @Test
-    @DisplayName("lastPostUlid가 존재하고 유효할 때 getPostAbuseReport로 게시글 신고 현황 목록 반환")
-    void testGetPostAbuseReport_givenValidLastPostUlid_willReturnReadModelList() {
+    @DisplayName("보고서가 존재하고 확인되지 않았을 때 removeProposalOrBug로 건의 및 버그 제보 제거")
+    void testRemoveProposalOrBug_givenNotCheckedReportId_willThrowException() {
+        // given
+        given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
+        given(reportRepository.isUncheckedInProposalOrBugReport(testReportId)).willReturn(true);
+
+        // when
+        ExistsValueException existsValueException = assertThrows(ExistsValueException.class, () -> memberAdminController.removeProposalOrBug(testProposalOrBugReportRemoveRecord));
+
+        // then
+        assertThat(existsValueException.getErrorCode()).isEqualTo(NOT_FOUND_PROPOSAL_OR_BUG_REPORT_CHECKED);
+    }
+
+    @Test
+    @DisplayName("lastPostUlid가 존재하고 유효할 때 getPostAbuseReport로 게시글 신고 현황 응답 반환")
+    void testGetPostAbuseReport_givenValidLastPostUlid_willReturnResponse() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
         given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
 
         // when
-        List<PostAbuseReportDashboardReadModel> readModels = memberAdminController.getPostAbuseReport(testPostAbuseReportGetRecord);
+        PostAbuseReportDashboardResponse response = memberAdminController.getPostAbuseReport(testPostAbuseReportGetRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
+        assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithFalseHasNext);
     }
 
     @Test
-    @DisplayName("lastPostUlid가 null일 때 getPostAbuseReport로 게시글 신고 현황 목록 반환")
-    void testGetPostAbuseReport_givenNullLastPostUlid_willReturnReadModelList() {
+    @DisplayName("lastPostUlid가 null일 때 getPostAbuseReport로 게시글 신고 현황 응답 반환")
+    void testGetPostAbuseReport_givenNullLastPostUlid_willReturnResponse() {
         // given
         given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
 
         // when
-        List<PostAbuseReportDashboardReadModel> readModels =
+        PostAbuseReportDashboardResponse response =
                 memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, TEST_REPORT_SIZE));
 
         // then
         verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testPostAbuseReportDashboardReadModelList);
+        assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithFalseHasNext);
     }
 
+    @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getPostAbuseReport로 게시글 신고 현황 응답 반환")
+    void testGetPostAbuseReport_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        PostAbuseReportDashboardResponse response =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(PostAbuseReportDashboardResponse.of(List.of(), null, false));
+    }
+
+    @Test
+    @DisplayName("페이지 크기보다 더 많은 데이터가 있을 때 getPostAbuseReport로 hasNext가 true인 응답 반환")
+    void testGetPostAbuseReport_givenMoreItemsThanPageSize_willReturnResponseWithTrueHasNext() {
+        // given
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any()))
+                .willReturn(List.of(testPostAbuseReportDashboardReadModel, testPostAbuseReportDashboardReadModel));
+
+        // when
+        PostAbuseReportDashboardResponse response =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, 1));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithTrueHasNext);
+    }
 
     @Test
     @DisplayName("lastPostUlid가 존재하지 않을 때 getPostAbuseReport로 예외 반환")
@@ -207,12 +294,14 @@ class MemberAdminControllerTest {
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
         given(reportDashboardRepository.isDismissedInPostAbuseReportDashboard(any())).willReturn(false);
         given(reportDashboardRepository.dismissPostAbuseReport(any())).willReturn(testPostAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostAbuseReportDismissEvent.class));
 
         // when
         PostAbuseReportDashboardReadModel readModel = memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).dismissPostAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }
 
@@ -300,32 +389,63 @@ class MemberAdminControllerTest {
     }
 
     @Test
-    @DisplayName("lastPostUlid와 lastPath 모두 존재하고 유효할 때 getCommentAbuseReport로 댓글 신고 현황 목록 반환")
-    void testGetCommentAbuseReport_givenValidLastPostUlidAndLastPath_willReturnReadModelList() {
+    @DisplayName("lastPostUlid와 lastPath 모두 존재하고 유효할 때 getCommentAbuseReport로 댓글 신고 현황 응답 반환")
+    void testGetCommentAbuseReport_givenValidLastPostUlidAndLastPath_willReturnResponse() {
         // given
         given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
 
         // when
-        List<CommentAbuseReportDashboardReadModel> readModels = memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord);
+        CommentAbuseReportDashboardResponse response = memberAdminController.getCommentAbuseReport(testCommentAbuseReportGetRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testCommentAbuseReportDashboardReadModelList);
+        assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithFalseHasNext);
     }
 
     @Test
-    @DisplayName("lastPostUlid와 lastPath 모두 null일 때 getCommentAbuseReport로 게시글 신고 현황 목록 반환")
-    void testGetCommentAbuseReport_givenNullLastPostUlidAndPath_willReturnReadModelList() {
+    @DisplayName("lastPostUlid와 lastPath 모두 null일 때 getCommentAbuseReport로 댓글 신고 현황 응답 반환")
+    void testGetCommentAbuseReport_givenNullLastPostUlidAndPath_willReturnResponse() {
         // given
         given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
 
         // when
-        List<CommentAbuseReportDashboardReadModel> readModels =
+        CommentAbuseReportDashboardResponse response =
                 memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, TEST_REPORT_SIZE));
 
         // then
         verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
-        assertThat(readModels).isEqualTo(testCommentAbuseReportDashboardReadModelList);
+        assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithFalseHasNext);
+    }
+
+    @Test
+    @DisplayName("조회된 읽기 모델이 비어 있을 때 getCommentAbuseReport로 댓글 신고 현황 응답 반환")
+    void testGetCommentAbuseReport_givenEmptyReadModel_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(List.of());
+
+        // when
+        CommentAbuseReportDashboardResponse response =
+                memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, TEST_REPORT_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(CommentAbuseReportDashboardResponse.of(List.of(), null, null, false));
+    }
+
+    @Test
+    @DisplayName("페이지 크기보다 더 많은 데이터가 있을 때 getCommentAbuseReport로 hasNext가 true인 응답 반환")
+    void testGetCommentAbuseReport_givenMoreItemsThanPageSize_willReturnResponseWithTrueHasNext() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any()))
+                .willReturn(List.of(testCommentAbuseReportDashboardReadModel, testCommentAbuseReportDashboardReadModel));
+
+        // when
+        CommentAbuseReportDashboardResponse response =
+                memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, 1));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
+        assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithTrueHasNext);
     }
 
     @Test
@@ -351,12 +471,14 @@ class MemberAdminControllerTest {
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(any())).willReturn(false);
         given(reportDashboardRepository.dismissCommentAbuseReport(any())).willReturn(testCommentAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentAbuseReportDismissEvent.class));
 
         // when
         CommentAbuseReportDashboardReadModel readModel = memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).dismissCommentAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
     }
 

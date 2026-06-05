@@ -3,12 +3,14 @@ package kr.modusplant.domains.member.framework.outbound.jooq.repository;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.jooq.*;
 import org.jooq.Record;
+import org.jooq.impl.DSL;
 import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,7 @@ import java.util.List;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_POST_ABUSE_REPORT;
 import static kr.modusplant.jooq.Tables.*;
 import static org.jooq.impl.DSL.noCondition;
+import static org.jooq.impl.DSL.val;
 
 @Repository
 @RequiredArgsConstructor
@@ -67,6 +70,7 @@ public class PostAbuseReportDashboardJooqRepository {
                 getConvertedContentFieldFromCommPost(),
                 COMM_POST_ABUSE_REPORT_DASHBOARD.REPORT_COUNT,
                 COMM_POST_ABUSE_REPORT_DASHBOARD.STATUS,
+                getStatusValueFieldFromCommPostAbuseReportDashboard(),
                 COMM_POST_ABUSE_REPORT_DASHBOARD.FIRST_REPORTED_AT,
                 COMM_POST_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT,
                 getDisplayTimestampFieldFromCommPostAbuseReportDashboard(),
@@ -81,6 +85,7 @@ public class PostAbuseReportDashboardJooqRepository {
                 record.get(getConvertedContentFieldFromCommPost()),
                 record.get(COMM_POST_ABUSE_REPORT_DASHBOARD.REPORT_COUNT),
                 record.get(COMM_POST_ABUSE_REPORT_DASHBOARD.STATUS),
+                record.get(getStatusValueFieldFromCommPostAbuseReportDashboard()),
                 record.get(COMM_POST_ABUSE_REPORT_DASHBOARD.FIRST_REPORTED_AT),
                 record.get(COMM_POST_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT),
                 record.get(getDisplayTimestampFieldFromCommPostAbuseReportDashboard()),
@@ -95,4 +100,12 @@ public class PostAbuseReportDashboardJooqRepository {
     private @Nonnull Field<LocalDateTime> getDisplayTimestampFieldFromCommPostAbuseReportDashboard() {
         return COMM_POST_ABUSE_REPORT_DASHBOARD.LAST_REPORTED_AT.as("displayTimestamp");
     }
+
+    private @Nonnull Field<String> getStatusValueFieldFromCommPostAbuseReportDashboard() {
+        return DSL.case_(COMM_POST_ABUSE_REPORT_DASHBOARD.STATUS)
+                .when(AbuseReportStatus.UNCHECKED.name(), val(AbuseReportStatus.UNCHECKED.getValue()))
+                .when(AbuseReportStatus.DISMISSED.name(), val(AbuseReportStatus.DISMISSED.getValue()))
+                .otherwise(val(AbuseReportStatus.BLINDED.getValue()))
+                .as("statusValue");
+        }
 }

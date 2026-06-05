@@ -13,9 +13,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
-import static kr.modusplant.shared.persistence.constant.TableColumnName.PATH;
-import static kr.modusplant.shared.persistence.constant.TableColumnName.POST_ULID;
-import static kr.modusplant.shared.persistence.constant.TableColumnName.VER_NUM;
+import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_ABUSE_REPORT_DASHBOARD;
 
 @Entity

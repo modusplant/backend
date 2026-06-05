@@ -66,6 +66,7 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_FOUND_POST_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_post_abuse_report", "게시글 신고를 찾을 수 없습니다. "),
     NOT_FOUND_POST_ABUSE_REPORT_DASHBOARD(HttpStatus.NOT_FOUND.value(), "not_found_post_abuse_report_dashboard", "게시글 신고 대시보드를 찾을 수 없습니다. "),
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_proposal_or_bug_report", "건의 및 버그 제보를 찾을 수 없습니다. "),
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT_CHECKED(HttpStatus.NOT_FOUND.value(), "not_found_proposal_or_bug_report_checked", "확인된 건의 및 버그 제보를 찾을 수 없습니다. "),
     NOT_FOUND_REPORT_ID(HttpStatus.NOT_FOUND.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
 
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),

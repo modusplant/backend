@@ -3,6 +3,7 @@ package kr.modusplant.domains.comment.framework.inbound.web.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -142,7 +143,8 @@ public class CommentRestController {
 
     @Operation(
             summary = "컨텐츠 댓글 삽입 API",
-            description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 컨텐츠 항목을 삽입합니다."
+            description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 컨텐츠 항목을 삽입합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping
     public ResponseEntity<DataResponse<Void>> register(
@@ -157,7 +159,8 @@ public class CommentRestController {
 
     @Operation(
             summary = "컨텐츠 댓글 수정 API",
-            description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글을 갱신합니다."
+            description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글을 갱신합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/update")
     public ResponseEntity<DataResponse<Void>> update(
@@ -169,7 +172,8 @@ public class CommentRestController {
 
     @Operation(
             summary = "식별자로 컨텐츠 댓글 제거 API",
-            description = "식별자로 컨텐츠 댓글을 제거합니다."
+            description = "식별자로 컨텐츠 댓글을 제거합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> delete(

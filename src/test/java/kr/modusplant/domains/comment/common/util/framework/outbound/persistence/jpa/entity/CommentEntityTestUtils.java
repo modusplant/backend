@@ -9,8 +9,8 @@ import static kr.modusplant.domains.comment.framework.outbound.persistence.jpa.e
 public interface CommentEntityTestUtils extends PostEntityTestUtils {
     default CommentEntityBuilder createCommentEntityBuilder() {
         return builder()
-                .path(TEST_COMM_COMMENT_PATH)
-                .likeCount(TEST_COMM_COMMENT_LIKE_COUNT)
-                .content(TEST_COMM_COMMENT_CONTENT);
+                .path(TEST_COMMENT_PATH)
+                .likeCount(TEST_COMMENT_LIKE_COUNT)
+                .content(TEST_COMMENT_CONTENT);
     }
 }
