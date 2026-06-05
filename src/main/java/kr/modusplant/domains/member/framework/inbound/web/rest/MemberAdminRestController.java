@@ -242,7 +242,7 @@ public class MemberAdminRestController {
             description = "댓글 신고를 반려합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/comment/{postUlid}/dismiss")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/dismiss")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> dismissCommentAbuseReport(
             @Parameter(
                     description = "반려할 댓글이 속한 게시글의 식별자",
@@ -257,7 +257,7 @@ public class MemberAdminRestController {
                     description = "반려할 댓글의 경로",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
-            @RequestParam
+            @PathVariable
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
             String path) {
@@ -271,7 +271,7 @@ public class MemberAdminRestController {
             description = "댓글 신고를 수리합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/comment/{postUlid}/approve")
+    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}/approve")
     public ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> approveCommentAbuseReport(
             @Parameter(
                     description = "수리할 댓글이 속한 게시글의 식별자",
@@ -286,7 +286,7 @@ public class MemberAdminRestController {
                     description = "수리할 댓글의 경로",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
-            @RequestParam
+            @PathVariable
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
             String path) {
