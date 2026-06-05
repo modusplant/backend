@@ -2,7 +2,9 @@ package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportDismissEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportDismissEvent;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
@@ -118,6 +120,7 @@ public class MemberAdminController {
         if (reportDashboardRepository.isDismissedInPostAbuseReportDashboard(postId)) {
             throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_DISMISSED, "status");
         }
+        applicationEventPublisher.publishEvent(PostAbuseReportDismissEvent.create(postId.getValue()));
         return reportDashboardRepository.dismissPostAbuseReport(postId);
     }
 
@@ -174,6 +177,8 @@ public class MemberAdminController {
         if (reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(commentId)) {
             throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_DISMISSED, "status");
         }
+        applicationEventPublisher.publishEvent(
+                CommentAbuseReportDismissEvent.create(postId.getValue(), commentPath.getValue()));
         return reportDashboardRepository.dismissCommentAbuseReport(commentId);
     }
 
@@ -185,7 +190,8 @@ public class MemberAdminController {
         if (reportDashboardRepository.isApprovedInCommentAbuseReportDashboard(commentId)) {
             throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_BLINDED, "status");
         }
-        applicationEventPublisher.publishEvent(CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue()));
+        applicationEventPublisher.publishEvent(
+                CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue()));
         return reportDashboardRepository.approveCommentAbuseReport(commentId);
     }
 }

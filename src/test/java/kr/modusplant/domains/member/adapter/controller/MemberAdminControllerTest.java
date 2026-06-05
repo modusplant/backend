@@ -4,7 +4,9 @@ import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
 import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportDismissEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportDismissEvent;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
@@ -292,12 +294,14 @@ class MemberAdminControllerTest {
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
         given(reportDashboardRepository.isDismissedInPostAbuseReportDashboard(any())).willReturn(false);
         given(reportDashboardRepository.dismissPostAbuseReport(any())).willReturn(testPostAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostAbuseReportDismissEvent.class));
 
         // when
         PostAbuseReportDashboardReadModel readModel = memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).dismissPostAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }
 
@@ -467,12 +471,14 @@ class MemberAdminControllerTest {
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(any())).willReturn(false);
         given(reportDashboardRepository.dismissCommentAbuseReport(any())).willReturn(testCommentAbuseReportDashboardReadModel);
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentAbuseReportDismissEvent.class));
 
         // when
         CommentAbuseReportDashboardReadModel readModel = memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord);
 
         // then
         verify(reportDashboardRepository, times(1)).dismissCommentAbuseReport(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
     }
 
