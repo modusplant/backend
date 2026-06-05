@@ -96,8 +96,8 @@ public class SearchRestController {
     }
 
     @Operation(
-            summary = "검색 기록 목록 조회 API",
-            description = "키워드를 통한 게시글 목록 검색 시에 입력한 검색 기록 목록을 조회합니다. "
+            summary = "게시글 검색 기록 목록 조회 API",
+            description = "키워드를 통한 게시글 목록 검색 시에 입력한 게시글 검색 기록 목록을 조회합니다. "
     )
     @GetMapping("/posts/history")
     public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
@@ -115,8 +115,8 @@ public class SearchRestController {
     }
 
     @Operation(
-            summary = "검색 기록 단건 삭제 API",
-            description = "검색 기록 목록에서 검색 기록을 단건 삭제합니다."
+            summary = "게시글 검색 기록 단건 삭제 API",
+            description = "게시글 검색 기록 목록에서 검색 기록을 단건 삭제합니다."
     )
     @DeleteMapping("/posts/history/{keyword}")
     public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
@@ -134,8 +134,8 @@ public class SearchRestController {
     }
 
     @Operation(
-            summary = "검색 기록 전체 삭제 API",
-            description = "검색 기록 목록에서 모든 검색 기록을 삭제합니다."
+            summary = "게시글 검색 기록 전체 삭제 API",
+            description = "게시글 검색 기록 목록에서 모든 검색 기록을 삭제합니다."
     )
     @DeleteMapping("/posts/history")
     public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
