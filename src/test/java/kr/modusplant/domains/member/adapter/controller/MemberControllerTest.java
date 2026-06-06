@@ -1,16 +1,24 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
 import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
@@ -18,10 +26,6 @@ import kr.modusplant.domains.member.framework.outbound.MemberRepositoryAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectCommentRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectPostRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfileRepositoryJpaAdapter;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberProfileEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
@@ -29,15 +33,12 @@ import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.PostAbuseReportEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -86,8 +87,6 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
-import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_COMMENT_ABUSE_REPORT;
-import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.EXISTS_POST_ABUSE_REPORT;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -126,7 +125,7 @@ class MemberControllerTest implements
 
     private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
 
-    private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER, "memberId");
+    private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectComment = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID, "activitySubjectCommentId");
 
@@ -250,7 +249,7 @@ class MemberControllerTest implements
         // when & then
         NotFoundEntityException alreadyExistedNicknameException = assertThrows(
                 NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
-        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -289,14 +288,14 @@ class MemberControllerTest implements
         given(activitySubjectPostRepository.isPublished(any())).willReturn(true);
         given(activitySubjectPostRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectPostRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(PostLikeEvent.class));
 
         // when
         memberController.likePost(testMemberPostLikeRecord);
 
         // then
         verify(activitySubjectPostRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -313,7 +312,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectPostRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(PostLikeEvent.class));
     }
 
     @Test
@@ -327,7 +326,7 @@ class MemberControllerTest implements
                 () -> memberController.likePost(testMemberPostLikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -405,7 +404,7 @@ class MemberControllerTest implements
                 () -> memberController.unlikePost(testMemberPostUnlikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -483,7 +482,7 @@ class MemberControllerTest implements
                 () -> memberController.bookmarkPost(testMemberPostBookmarkRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -561,7 +560,7 @@ class MemberControllerTest implements
                 () -> memberController.cancelPostBookmark(testMemberPostBookmarkCancelRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -603,14 +602,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(activitySubjectCommentRepository.isUnliked(any(), any())).willReturn(true);
         willDoNothing().given(activitySubjectCommentRepository).like(any(), any());
-        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeNotificationEvent.class));
+        willDoNothing().given(applicationEventPublisher).publishEvent(any(CommentLikeEvent.class));
 
         // when
         memberController.likeComment(testMemberCommentLikeRecord);
 
         // then
         verify(activitySubjectCommentRepository, times(1)).like(any(), any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test
@@ -626,7 +625,7 @@ class MemberControllerTest implements
 
         // then
         verify(activitySubjectCommentRepository, times(0)).like(any(), any());
-        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeNotificationEvent.class));
+        verify(applicationEventPublisher, times(0)).publishEvent(any(CommentLikeEvent.class));
     }
 
     @Test
@@ -640,7 +639,7 @@ class MemberControllerTest implements
                 () -> memberController.likeComment(testMemberCommentLikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -700,7 +699,7 @@ class MemberControllerTest implements
                 () -> memberController.unlikeComment(testMemberCommentUnlikeRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -765,7 +764,7 @@ class MemberControllerTest implements
                 () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -869,7 +868,7 @@ class MemberControllerTest implements
                 () -> memberController.reportPostAbuse(testPostAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -931,13 +930,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
         given(reportRepository.isMemberAbuseComment(any(), any())).willReturn(false);
-        willDoNothing().given(reportRepository).reportCommentAbuse(any(), any());
+        given(reportRepository.reportCommentAbuse(any(), any())).willReturn(testReportTime);
 
         // when
         memberController.reportCommentAbuse(testCommentAbuseReportRecord);
 
         // then
         verify(reportRepository, times(1)).reportCommentAbuse(any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportEvent.class));
     }
 
     @Test
@@ -952,7 +952,7 @@ class MemberControllerTest implements
                 () -> memberController.reportCommentAbuse(testCommentAbuseReportRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
@@ -1019,7 +1019,7 @@ class MemberControllerTest implements
                 () -> memberController.withdraw(testKakaoMemberWithdrawalRecord));
 
         // then
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER);
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Nested

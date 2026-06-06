@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

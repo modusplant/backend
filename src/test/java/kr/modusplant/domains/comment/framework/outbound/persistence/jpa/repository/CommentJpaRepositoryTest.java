@@ -1,16 +1,16 @@
 package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository;
 
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.common.util.CommentEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PrimaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PostEntityTestUtils;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PrimaryCategoryEntityTestUtils;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.PrimaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.SecondaryCategoryJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
@@ -53,7 +53,7 @@ public class CommentJpaRepositoryTest implements
         MemberEntity member = createMemberBasicUserEntity();
         PrimaryCategoryEntity primaryCategory = primaryCategoryRepository.save(createPrimaryCategoryEntity());
         SecondaryCategoryEntity secondaryCategory = secondaryCategoryRepository.save(createSecondaryCategoryEntityBuilder().primaryCategory(primaryCategory).build());
-        PostEntity postEntity = createPostEntityBuilder()
+        PostEntity postEntity = createPublishedPostEntityBuilder()
                 .primaryCategory(primaryCategory)
                 .secondaryCategory(secondaryCategory)
                 .authMember(member)

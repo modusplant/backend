@@ -1,29 +1,35 @@
 package kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity.PostEntityBuilder;
 
-public interface PostEntityTestUtils extends PostTestUtils {
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_EDITED_AT;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_VIEW_COUNT;
+
+public interface PostEntityTestUtils extends PostTestUtils, MemberEntityTestUtils, PrimaryCategoryEntityTestUtils, SecondaryCategoryEntityTestUtils {
     default PostEntityBuilder createPublishedPostEntityBuilder() {
         return PostEntity.builder()
                 .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
-                .isPublished(true);
+                .isPublished(true)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntityBuilder createPublishedPostEntityBuilderWithUuid() {
         return PostEntity.builder()
                 .ulid(testPostId.getValue())
                 .likeCount(testLikeCount.getValue())
-                .viewCount(5L)
+                .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
-                .isPublished(true);
+                .isPublished(true)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntityBuilder createDraftPostEntityBuilder() {
@@ -33,7 +39,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
-                .isPublished(false);
+                .isPublished(false)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntityBuilder createDraftPostEntityBuilderWithUuid() {
@@ -44,7 +51,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
                 .thumbnailPath(testPostContent.getThumbnailPath())
-                .isPublished(false);
+                .isPublished(false)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntityBuilder createDraftPostEntityBuilderWithoutContent() {
@@ -52,7 +60,8 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .likeCount(0)
                 .viewCount(0L)
                 .title(testPostContent.getTitle())
-                .isPublished(false);
+                .isPublished(false)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 
     default PostEntityBuilder createDraftPostEntityBuilderWithoutContentWithUuid() {
@@ -61,6 +70,7 @@ public interface PostEntityTestUtils extends PostTestUtils {
                 .likeCount(0)
                 .viewCount(0L)
                 .title(testPostContent.getTitle())
-                .isPublished(false);
+                .isPublished(false)
+                .editedAt(TEST_POST_EDITED_AT);
     }
 }

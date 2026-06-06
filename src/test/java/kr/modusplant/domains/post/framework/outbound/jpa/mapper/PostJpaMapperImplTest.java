@@ -1,14 +1,14 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.mapper;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PrimaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PrimaryCategoryEntityTestUtils;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.supers.PostJpaMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,6 +50,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtil
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isTrue();
+        assertThat(result.getPublishedAt()).isEqualTo(result.getEditedAt());
     }
 
     @Test
@@ -82,6 +83,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtil
         assertThat(result.getLikeCount()).isEqualTo(post.getLikeCount().getValue());
         assertThat(result.getViewCount()).isEqualTo(viewCount);
         assertThat(result.getIsPublished()).isFalse();
+        assertThat(result.getPublishedAt()).isNull();
     }
 
     @Test

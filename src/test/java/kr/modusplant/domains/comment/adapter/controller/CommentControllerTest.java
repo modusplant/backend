@@ -3,6 +3,7 @@ package kr.modusplant.domains.comment.adapter.controller;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.compositekey.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
@@ -14,7 +15,6 @@ import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheSer
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.common.util.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
@@ -23,6 +23,7 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
@@ -228,7 +229,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 () -> controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, Pageable.unpaged()));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_MEMBER);
+        assertThat(ex.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
         assertThat(ex.getEntityName()).isEqualTo("member");
     }
 

@@ -19,7 +19,7 @@ public record PostDetailReadModel(
         int likeCount,
         boolean isPublished,
         LocalDateTime publishedAt,
-        LocalDateTime updatedAt,
+        LocalDateTime editedAt,
         boolean isLiked,
         boolean isBookmarked
 ) {

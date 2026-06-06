@@ -1,21 +1,22 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.mapper;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.MemberEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostArchiveEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PrimaryCategoryEntityTestUtils;
+import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostArchiveEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.SecondaryCategoryEntity;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.PrimaryCategoryEntityTestUtils;
-import kr.modusplant.domains.post.framework.outbound.jpa.entity.common.util.SecondaryCategoryEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.mapper.supers.PostArchiveJpaMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_EDITED_AT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_PUBLISHED_AT;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,6 +35,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(memberEntity)
                 .publishedAt(TEST_POST_PUBLISHED_AT)
+                .editedAt(TEST_POST_EDITED_AT)
                 .build();
 
         // when
@@ -49,6 +51,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
         assertThat(result.getCreatedAt()).isEqualTo(postEntity.getCreatedAt());
         assertThat(result.getUpdatedAt()).isEqualTo(postEntity.getUpdatedAt());
         assertThat(result.getPublishedAt()).isEqualTo(postEntity.getPublishedAt());
+        assertThat(result.getEditedAt()).isEqualTo(postEntity.getEditedAt());
     }
 
     @Test

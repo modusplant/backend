@@ -8,7 +8,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
-    EXISTS_REPORT_CHECKED_AT(HttpStatus.BAD_REQUEST.value(), "exists_report_checked_at", "보고서가 이미 확인되었습니다. "),
+    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
+    EXISTS_COMMENT_ABUSE_REPORT_BLINDED(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report_blinded", "댓글 신고가 이미 수리되었습니다. "),
+    EXISTS_COMMENT_ABUSE_REPORT_DISMISSED(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report_dismissed", "댓글 신고가 이미 반려되었습니다. "),
+    EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
+    EXISTS_POST_ABUSE_REPORT_BLINDED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_blinded", "게시글 신고가 이미 수리되었습니다. "),
+    EXISTS_POST_ABUSE_REPORT_DISMISSED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_dismissed", "게시글 신고가 이미 반려되었습니다. "),
+    EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED(HttpStatus.CONFLICT.value(), "exists_proposal_or_bug_report_checked", "건의 및 버그 제보가 이미 확인되었습니다. "),
 
     EMPTY_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "empty_member_id", "회원 아이디가 비어 있습니다. "),
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_member_status", "회원 상태가 비어 있습니다. "),
@@ -50,12 +56,18 @@ public enum MemberErrorCode implements ErrorCode {
     NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
 
-    NOT_FOUND_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "not_found_activity_subject_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_activity_subject_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_MEMBER(HttpStatus.BAD_REQUEST.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
-    NOT_FOUND_MEMBER_PROFILE(HttpStatus.BAD_REQUEST.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
-    NOT_FOUND_PROPOSAL_OR_BUG_REPORT(HttpStatus.BAD_REQUEST.value(), "not_found_proposal_or_bug_report", "건의 및 버그 제보를 찾을 수 없습니다. "),
-    NOT_FOUND_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
+    NOT_FOUND_ACTIVITY_SUBJECT_POST_ID(HttpStatus.NOT_FOUND.value(), "not_found_activity_subject_post_id", "대상 게시글 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID(HttpStatus.NOT_FOUND.value(), "not_found_activity_subject_comment_id", "대상 댓글 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND.value(), "not_found_member", "회원을 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_ID(HttpStatus.NOT_FOUND.value(), "not_found_member_id", "회원 아이디를 찾을 수 없습니다. "),
+    NOT_FOUND_MEMBER_PROFILE(HttpStatus.NOT_FOUND.value(), "not_found_member_profile", "회원 프로필을 찾을 수 없습니다. "),
+    NOT_FOUND_COMMENT_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_comment_abuse_report", "댓글 신고를 찾을 수 없습니다. "),
+    NOT_FOUND_COMMENT_ABUSE_REPORT_DASHBOARD(HttpStatus.NOT_FOUND.value(), "not_found_comment_abuse_report_dashboard", "댓글 신고 대시보드를 찾을 수 없습니다. "),
+    NOT_FOUND_POST_ABUSE_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_post_abuse_report", "게시글 신고를 찾을 수 없습니다. "),
+    NOT_FOUND_POST_ABUSE_REPORT_DASHBOARD(HttpStatus.NOT_FOUND.value(), "not_found_post_abuse_report_dashboard", "게시글 신고 대시보드를 찾을 수 없습니다. "),
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT(HttpStatus.NOT_FOUND.value(), "not_found_proposal_or_bug_report", "건의 및 버그 제보를 찾을 수 없습니다. "),
+    NOT_FOUND_PROPOSAL_OR_BUG_REPORT_CHECKED(HttpStatus.NOT_FOUND.value(), "not_found_proposal_or_bug_report_checked", "확인된 건의 및 버그 제보를 찾을 수 없습니다. "),
+    NOT_FOUND_REPORT_ID(HttpStatus.NOT_FOUND.value(), "not_found_report_id", "보고서 식별자를 찾을 수 없습니다. "),
 
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),
 

@@ -1,0 +1,24 @@
+package kr.modusplant.shared.framework.aws.event;
+
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public class ImagesRemoveTask {
+    private final List<String> imageFileKeys;
+
+    public static ImagesRemoveTask create(List<String> imageFileKeys) {
+        if (CollectionUtils.isEmpty(imageFileKeys)) {
+            throw new InvalidValueException(AWSErrorCode.NOT_FOUND_IMAGE_FILE_KEYS, "imageFileKeys");
+        } else {
+            return new ImagesRemoveTask(imageFileKeys);
+        }
+    }
+}

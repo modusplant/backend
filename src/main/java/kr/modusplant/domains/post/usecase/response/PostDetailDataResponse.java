@@ -47,6 +47,6 @@ public record PostDetailDataResponse(
         LocalDateTime publishedAt,
 
         @Schema(description = "게시글이 마지막으로 수정된 날짜 및 시간")
-        LocalDateTime updatedAt
+        LocalDateTime editedAt
 ) {
 }

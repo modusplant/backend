@@ -9,6 +9,7 @@ import kr.modusplant.domains.account.social.domain.vo.SocialCredentials;
 import kr.modusplant.domains.account.social.domain.vo.SocialMemberProfile;
 import kr.modusplant.domains.account.social.framework.outbound.jpa.mapper.supers.SocialIdentityJpaMapper;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
@@ -77,7 +78,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
         memberAuthEntity = memberAuthJpaRepository.save(memberAuthEntity);
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberAuthEntity.getUuid())
-                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
+                .orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
         memberEntity.updateLoggedInAt(LocalDateTime.now());
         memberEntity = memberJpaRepository.save(memberEntity);
         return socialIdentityJpaMapper.toSocialMemberProfile(memberEntity, memberAuthEntity);

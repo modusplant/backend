@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "defaultMode": "plan",
+    "allow": [
+      "Bash(./gradlew build*)",
+      "Bash(./gradlew bootRun*)",
+      "Bash(./gradlew test*)",
+      "Bash(./gradlew --version)",
+      "Bash(./gradlew compileJava*)",
+      "Bash(rm -rf build/test-results/*)"
+    ],
+    "deny": [
+      "Bash(rm -rf src/*)",
+      "Bash(git push origin main*)",
+      "Bash(git push origin develop*)",
+      "Read(**/.gradle/**)",
+      "Read(**/.settings/**)",
+      "Read(./bin/**)"
+    ]
+  },
+  "env": {
+    "API_TIMEOUT_MS": "1200000",
+    "BASH_DEFAULT_TIMEOUT_MS": "300000"
+  }
+}

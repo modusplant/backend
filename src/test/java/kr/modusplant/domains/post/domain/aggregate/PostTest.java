@@ -5,7 +5,6 @@ import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
 import kr.modusplant.domains.post.domain.vo.LikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
-import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.domain.vo.PostStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -409,7 +408,7 @@ class PostTest implements PostTestUtils {
         void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
             assertNotEquals(
                     createPublishedPost(),
-                    Post.create(PostId.generate(),testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())
+                    Post.create(testPostId2,testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())
             );
         }
 

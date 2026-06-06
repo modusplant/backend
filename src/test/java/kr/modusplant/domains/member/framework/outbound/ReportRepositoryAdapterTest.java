@@ -4,21 +4,22 @@ import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.composit
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugReportTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostAbuseReportEntityTestUtils;
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.ProposalBugReportEntityTestUtils;
+import kr.modusplant.domains.member.domain.vo.ReportTime;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ProposalOrBugReportJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostAbuseReportEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.ProposalOrBugReportEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.CommentAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostAbuseReportEntityTestUtils;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.ProposalBugReportEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.event.ImagesRemoveEvent;
+import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,8 +35,6 @@ import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubject
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
-import static kr.modusplant.domains.member.common.util.framework.outbound.jooq.record.ProposalOrBugReportAdminPageRecordTestUtils.testProposalOrBugReportAdminPageCheckedRecord;
-import static kr.modusplant.domains.member.common.util.usecase.model.read.ProposalOrBugReportAdminPageReadModelTestUtils.testProposalOrBugReportAdminPageCheckedReadModel;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,7 +91,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("신고가 존재할 때 isMemberAbusePost로 게시글 신고 여부 반환")
     void testIsMemberAbusePost_givenExistedAbuse_willReturnResponse() {
         // given
-        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPublishedPostEntityBuilder().build()));
         given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.of(createPostAbuseReportEntityBuilder().build()));
 
         // when
@@ -106,7 +105,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @DisplayName("신고가 존재하지 않을 때 isMemberAbusePost로 게시글 신고 여부 반환")
     void testIsMemberAbusePost_givenNotFoundAbuse_willReturnResponse() {
         // given
-        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPostEntityBuilder().build()));
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.of(createPublishedPostEntityBuilder().build()));
         given(postAbuseReportJpaRepository.findByMemberIdAndPost(any(), any())).willReturn(Optional.empty());
 
         // when
@@ -227,14 +226,18 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
         CommentEntity commentEntity = mock(CommentEntity.class);
+        CommentAbuseReportEntity commentAbuseEntity = mock(CommentAbuseReportEntity.class);
 
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.of(commentEntity));
+        given(commentAbuseReportJpaRepository.save(any())).willReturn(commentAbuseEntity);
+        given(commentAbuseEntity.getCreatedAt()).willReturn(TEST_POST_CREATED_AT);
 
         // when
-        reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
+        ReportTime reportTime = reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId);
 
         // then
+        assertThat(reportTime.getValue()).isEqualTo(TEST_POST_CREATED_AT);
         verify(commentAbuseReportJpaRepository, times(1)).save(any(CommentAbuseReportEntity.class));
     }
 
@@ -267,23 +270,6 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     }
 
     @Test
-    @DisplayName("checkProposalOrBugReport 실행 시 확인 수행")
-    void testCheckProposalOrBugReport_givenValidReportId_willCheckProposalOrBugReport() {
-        // given
-        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.of(createProposalBugReportEntityBuilder().member(createMemberBasicUserEntity()).build()));
-        given(proposalOrBugReportJpaRepository.save(any())).willReturn(createProposalBugReportEntityBuilder().build());
-        given(proposalOrBugReportJooqRepository.getAdminPageRecordByReportId(any())).willReturn(testProposalOrBugReportAdminPageCheckedRecord);
-        given(proposalOrBugReportJooqRepository.getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord)).willReturn(testProposalOrBugReportAdminPageCheckedReadModel);
-
-        // when
-        reportRepositoryAdapter.checkProposalOrBugReport(testReportId);
-
-        // then
-        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageRecordByReportId(any());
-        verify(proposalOrBugReportJooqRepository, times(1)).getAdminPageReadModel(testProposalOrBugReportAdminPageCheckedRecord);
-    }
-
-    @Test
     @DisplayName("이미지가 존재하는 리포트에 대해 removeProposalOrBugReport 실행 시 S3 삭제 및 아카이빙 수행")
     void testRemoveProposalOrBugReport_givenImagesExist_willDeleteS3AndProcessArchive() {
         // given
@@ -293,7 +279,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         reportRepositoryAdapter.removeProposalOrBugReport(testReportId);
 
         // then
-        verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(ImagesRemoveTask.class));
     }
 
     @Test

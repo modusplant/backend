@@ -1,5 +1,8 @@
 package kr.modusplant.domains.notification.adapter.controller;
 
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.notification.domain.aggregate.Notification;
 import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.domains.notification.domain.enums.NotificationStatusType;
@@ -11,9 +14,6 @@ import kr.modusplant.domains.notification.usecase.record.NotificationPreview;
 import kr.modusplant.domains.notification.usecase.record.NotificationReadModel;
 import kr.modusplant.domains.notification.usecase.response.CursorPageResponse;
 import kr.modusplant.domains.notification.usecase.response.NotificationResponse;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.CommentNotificationEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,14 +63,14 @@ public class NotificationController {
 
     /* ======= 알림 생성 로직 ======= */
     @Transactional
-    public void createPostLikeNotification(PostLikeNotificationEvent event) {
+    public void createPostLikeNotification(PostLikeEvent event) {
         NotificationPreview notificationPreview = postInfoRepository.getNotificationPreviewByPostId(PostId.create(event.getPostUlid()));
-        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getActorId())) {
+        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getMemberId())) {
             return ;
         }
         Notification notification = notificationMapper.toPostNotification(
                 RecipientId.fromUuid(notificationPreview.authorUuid()),
-                Actor.fromUuidWithNickname(event.getActorId(), memberInfoRepository.getNicknameByUuid(event.getActorId())),
+                Actor.fromUuidWithNickname(event.getMemberId(), memberInfoRepository.getNicknameByUuid(event.getMemberId())),
                 NotificationAction.create(NotificationActionType.POST_LIKED),
                 PostId.create(event.getPostUlid()),
                 ContentPreview.create(notificationPreview.contentPreview())
@@ -80,16 +80,16 @@ public class NotificationController {
     }
 
     @Transactional
-    public void createCommentLikeNotification(CommentLikeNotificationEvent event) {
+    public void createCommentLikeNotification(CommentLikeEvent event) {
         NotificationPreview notificationPreview = commentInfoRepository.getNotificationPreviewByPostIdAndCommentPath(
                 PostId.create(event.getPostUlid()), CommentPath.create(event.getCommentPath())
         );
-        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getActorId())) {
+        if (notificationPreview.authorUuid() == null || notificationPreview.authorUuid().equals(event.getMemberId())) {
             return ;
         }
         Notification notification = notificationMapper.toCommentNotification(
                 RecipientId.fromUuid(notificationPreview.authorUuid()),
-                Actor.fromUuidWithNickname(event.getActorId(), memberInfoRepository.getNicknameByUuid(event.getActorId())),
+                Actor.fromUuidWithNickname(event.getMemberId(), memberInfoRepository.getNicknameByUuid(event.getMemberId())),
                 NotificationAction.create(NotificationActionType.COMMENT_LIKED),
                 PostId.create(event.getPostUlid()),
                 CommentPath.create(event.getCommentPath()),
@@ -100,9 +100,9 @@ public class NotificationController {
     }
 
     @Transactional
-    public void createCommentNotification(CommentNotificationEvent event) {
-        String nickname = memberInfoRepository.getNicknameByUuid(event.getActorId());
-        Actor actor = Actor.fromUuidWithNickname(event.getActorId(), nickname);
+    public void createCommentNotification(CommentRegisterEvent event) {
+        String nickname = memberInfoRepository.getNicknameByUuid(event.getAuthorId());
+        Actor actor = Actor.fromUuidWithNickname(event.getAuthorId(), nickname);
         PostId postId = PostId.create(event.getPostUlid());
         CommentPath commentPath = CommentPath.create(event.getCommentPath());
         ContentPreview contentPreview = ContentPreview.create(event.getContentPreview());

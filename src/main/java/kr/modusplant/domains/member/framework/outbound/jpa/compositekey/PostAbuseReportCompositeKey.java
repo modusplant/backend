@@ -14,5 +14,5 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class PostAbuseReportCompositeKey implements Serializable {
     private UUID memberId;
-    private String post;
+    private String postId;
 }

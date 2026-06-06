@@ -26,6 +26,8 @@ public final class ReportConstant {
     public static final String TEST_REPORT_CONTENT = "보고서 컨텐츠";
     public static final Integer TEST_REPORT_IMAGE_NUMBER_3 = 3;
     public static final Integer TEST_REPORT_SIZE = 2;
+    public static final LocalDateTime TEST_REPORT_DISMISSED_AT = LocalDateTime.of(2026, 5, 1, 6, 0);
+    public static final LocalDateTime TEST_REPORT_BLINDED_AT = LocalDateTime.of(2026, 5, 1, 12, 0);
     public static final LocalDateTime TEST_REPORT_CHECKED_AT = LocalDateTime.of(2026, 5, 1, 0, 0);
     public static final LocalDateTime TEST_REPORT_CREATED_AT = LocalDateTime.of(2026, 4, 30, 0, 0);
     public static final String TEST_REPORT_IMAGE_FILE_NAME_1 = "image_0.png";

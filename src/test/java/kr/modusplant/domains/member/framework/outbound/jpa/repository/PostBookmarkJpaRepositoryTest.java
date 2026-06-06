@@ -1,8 +1,8 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.PostBookmarkEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.compositekey.PostBookmarkCompositeKey;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostBookmarkEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.entity.common.util.PostBookmarkEntityTestUtils;
 import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

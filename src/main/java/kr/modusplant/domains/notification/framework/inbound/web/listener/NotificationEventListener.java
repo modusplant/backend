@@ -1,9 +1,9 @@
 package kr.modusplant.domains.notification.framework.inbound.web.listener;
 
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
+import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
+import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.notification.adapter.controller.NotificationController;
-import kr.modusplant.shared.event.CommentLikeNotificationEvent;
-import kr.modusplant.shared.event.CommentNotificationEvent;
-import kr.modusplant.shared.event.PostLikeNotificationEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
@@ -33,31 +34,31 @@ public class NotificationEventListener {
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handlePostLikeNotification(PostLikeNotificationEvent event) {
+    public void handlePostLikeNotification(PostLikeEvent event) {
         acquireAndProcess(
                 () -> notificationController.createPostLikeNotification(event),
                 "[Notification] 게시글 좋아요 알림 실패 - actorId={}, postUlid={}",
-                event.getActorId(), event.getPostUlid()
+                event.getMemberId(), event.getPostUlid()
         );
     }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleCommentLikeNotification(CommentLikeNotificationEvent event) {
+    public void handleCommentLikeNotification(CommentLikeEvent event) {
         acquireAndProcess(
                 () -> notificationController.createCommentLikeNotification(event),
                 "[Notification] 댓글 좋아요 알림 실패 - actorId={}, postUlid={}, commentPath={}",
-                event.getActorId(), event.getPostUlid(), event.getCommentPath()
+                event.getMemberId(), event.getPostUlid(), event.getCommentPath()
         );
     }
 
     @Async("notificationExecutor")
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleCommentNotification(CommentNotificationEvent event) {
+    public void handleCommentNotification(CommentRegisterEvent event) {
         acquireAndProcess(
                 () -> notificationController.createCommentNotification(event),
                 "[Notification] 댓글 추가 알림 실패 - actorId={}, postUlid={}, commentPath={}, action={}",
-                event.getActorId(), event.getPostUlid(), event.getCommentPath(), event.getAction()
+                event.getAuthorId(), event.getPostUlid(), event.getCommentPath(), event.getAction()
         );
     }
 
@@ -78,7 +79,9 @@ public class NotificationEventListener {
             }
             task.run();
         } catch (Exception e) {
-            log.error(errorMsg, args, e);
+            Object[] newArgs = Arrays.copyOf(args, args.length + 1);
+            newArgs[args.length] = e;
+            log.error(errorMsg, newArgs);
         } finally {
             if (acquired) {
                 notificationSemaphore.release();

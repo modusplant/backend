@@ -1,15 +1,19 @@
 package kr.modusplant.domains.member.usecase.port.repository;
 
-import jakarta.annotation.Nullable;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
-import kr.modusplant.domains.member.domain.enums.ProposalOrBugReportStatus;
 import kr.modusplant.domains.member.domain.vo.*;
-import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportAdminPageReadModel;
 
-import java.util.List;
-
+/**
+ * {@code ReportRepository}는 유저로부터 온 보고를 다루는 인터페이스입니다.
+ *
+ * <p>대시보드에서의 보고 관리 활동과 무관한, 보고에 관한 단순한 기능을 다룬다고 할 수도 있습니다.</p>
+ *
+ * @author Jun Hyeok
+ */
 public interface ReportRepository {
     boolean isIdExistInProposalOrBugReport(ReportId reportId);
+
+    boolean isUncheckedInProposalOrBugReport(ReportId reportId);
 
     boolean isCheckedInProposalOrBugReport(ReportId reportId);
 
@@ -21,11 +25,7 @@ public interface ReportRepository {
 
     ReportTime reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
-    void reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
+    ReportTime reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
     void removeProposalOrBugReport(ReportId reportId);
-
-    ProposalOrBugReportAdminPageReadModel checkProposalOrBugReport(ReportId reportId);
-
-    List<ProposalOrBugReportAdminPageReadModel> getProposalOrBugReports(ReportPageSize reportPageSize, @Nullable ProposalOrBugReportStatus proposalOrBugReportStatus, @Nullable ReportId lastReportId);
 }

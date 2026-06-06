@@ -27,7 +27,7 @@ public class PostAbuseReportDashboardEntity {
     @Id
     private String postUlid;
 
-    @MapsId("postUlid")
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}, optional = false)
     @JoinColumn(name = POST_ULID, foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ToString.Exclude
@@ -63,12 +63,8 @@ public class PostAbuseReportDashboardEntity {
         this.status = AbuseReportStatus.DISMISSED;
     }
 
-    public void blind() {
+    public void approve() {
         this.status = AbuseReportStatus.BLINDED;
-    }
-
-    public void updateFirstReportedAt(LocalDateTime firstReportedAt) {
-        this.firstReportedAt = firstReportedAt;
     }
 
     public void updateLastReportedAt(LocalDateTime lastReportedAt) {

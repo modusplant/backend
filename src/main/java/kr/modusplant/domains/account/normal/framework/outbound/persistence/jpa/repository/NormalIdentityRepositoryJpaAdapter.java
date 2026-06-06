@@ -10,6 +10,7 @@ import kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.m
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityUpdateRepository;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
@@ -66,7 +67,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
     @Override
     public void updateEmail(AccountId accountId, Email email) {
         MemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
-                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
+                .orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
 
         MemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));
@@ -78,7 +79,7 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
     @Override
     public void updatePassword(AccountId accountId, Password pw) {
         MemberEntity savedMember = memberJpaRepository.findByUuid(accountId.getValue())
-                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
+                .orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER,TableName.SITE_MEMBER));
 
         MemberAuthEntity savedAuth = authJpaRepository.findByMember(savedMember)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH,TableName.SITE_MEMBER_AUTH));

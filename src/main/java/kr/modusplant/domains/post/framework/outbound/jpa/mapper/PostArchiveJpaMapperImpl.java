@@ -22,6 +22,7 @@ public class PostArchiveJpaMapperImpl implements PostArchiveJpaMapper {
                 .archivedAt(LocalDateTime.now())
                 .updatedAt(postEntity.getUpdatedAt())
                 .publishedAt(postEntity.getPublishedAt())
+                .editedAt(postEntity.getEditedAt())
                 .build();
     }
 }

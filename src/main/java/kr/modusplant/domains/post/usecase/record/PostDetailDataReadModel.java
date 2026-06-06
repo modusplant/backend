@@ -18,6 +18,6 @@ public record PostDetailDataReadModel(
         String thumbnailPath,
         boolean isPublished,
         LocalDateTime publishedAt,
-        LocalDateTime updatedAt
+        LocalDateTime editedAt
 ) {
 }
