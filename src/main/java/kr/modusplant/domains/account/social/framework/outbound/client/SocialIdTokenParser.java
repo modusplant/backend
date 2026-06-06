@@ -1,10 +1,10 @@
 package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +33,7 @@ public class SocialIdTokenParser {
             String decoded = new String(Base64.getUrlDecoder().decode(payload));
             return objectMapper.readValue(decoded, Map.class);
         } catch (Exception e) {
-            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_SOCIAL_ID_TOKEN);
+            throw new InvalidValueException(SocialIdentityErrorCode.INVALID_SOCIAL_ID_TOKEN, "socialIdToken");
         }
     }
 

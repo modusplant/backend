@@ -2,9 +2,9 @@ package kr.modusplant.domains.account.social.framework.outbound.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.account.social.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.client.dto.IdTokenInfo;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

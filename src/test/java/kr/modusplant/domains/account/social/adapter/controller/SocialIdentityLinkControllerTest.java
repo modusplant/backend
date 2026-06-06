@@ -166,7 +166,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
             // when & then
             assertThatThrownBy(() -> socialIdentityLinkController.unlinkSocialAccount(
                     testNormalMemberId.getValue(), SocialProvider.KAKAO, mismatchUserInfo)
-            ).isInstanceOf(SocialAccountConflictException.class);
+            ).isInstanceOf(ConflictStateException.class);
         }
 
         @Test
