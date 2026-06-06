@@ -96,11 +96,8 @@ public class MemberController {
                 MemberProfileImageBytes.create(newImageBytes)
         );
 
-        String introduction = record.introduction();
-        if (!(introduction == null)) {
-            introduction = swearService.filterSwear(introduction);
-        }
-        MemberProfileIntroduction memberProfileIntroduction = MemberProfileIntroduction.create(introduction);
+        MemberProfileIntroduction memberProfileIntroduction =
+                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
     }
@@ -191,13 +188,17 @@ public class MemberController {
         if (imageNumber == null) {
             proposalOrBugReportImages = List.of();
         } else {
+            List<ProposalOrBugReportImageFileName> proposalOrBugReportImageFileNames =
+                    images.stream()
+                            .map(element ->
+                                    ProposalOrBugReportImageFileName.create(
+                                            element.getOriginalFilename()))
+                            .toList();
+
             List<ReportImagePath> reportImagePaths =
                     memberImageIOHelper.uploadImage(memberId, reportId, images)
                             .stream()
                             .map(ReportImagePath::create).toList();
-
-            List<ProposalOrBugReportImageFileName> proposalOrBugReportImageFileNames =
-                    images.stream().map(element -> ProposalOrBugReportImageFileName.create(element.getOriginalFilename())).toList();
 
             proposalOrBugReportImages = new ArrayList<>();
             for (int i = 0; i < imageNumber; i++){
