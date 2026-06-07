@@ -48,6 +48,8 @@ jobs:
             /config/modusplant_dev/WASABI_ACCESS_KEY      = WASABI_ACCESS_KEY,
             /config/modusplant_dev/WASABI_SECRET_KEY      = WASABI_SECRET_KEY,
             /config/modusplant_dev/WASABI_BUCKET          = WASABI_BUCKET,
+            /config/modusplant_dev/ADMIN_ID               = ADMIN_ID,
+            /config/modusplant_dev/ADMIN_PW               = ADMIN_PW,
             /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT,
             /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
@@ -79,6 +81,10 @@ jobs:
           WASABI_ACCESS_KEY: ${{ env.WASABI_ACCESS_KEY }}
           WASABI_SECRET_KEY: ${{ env.WASABI_SECRET_KEY }}
           WASABI_BUCKET: ${{ env.WASABI_BUCKET }}
+
+          ADMIN_ID: ${{ env.ADMIN_UD }}
+          ADMIN_PW: ${{ env.ADMIN_PW }}
+
           DEV_PUBLIC_ENDPOINT: ${{ env.DEV_PUBLIC_ENDPOINT }}
           FIREBASE_CREDENTIALS_JSON: ${{ env.FIREBASE_CREDENTIALS_JSON }}
 
@@ -272,6 +278,10 @@ jobs:
           WASABI_SECRET_KEY=$(aws ssm get-parameter --name "/config/modusplant_prod/WASABI_SECRET_KEY"  --with-decryption --query "Parameter.Value" --output text)
           WASABI_BUCKET=$(aws ssm get-parameter     --name "/config/modusplant_prod/WASABI_BUCKET"      --with-decryption --query "Parameter.Value" --output text)
           
+          # === Admin Access Control (application.yml: ADMIN_* ) ===
+          ADMIN_ID=$(aws ssm get-parameter          --name "/config/modusplant_prod/ADMIN_ID"           --with-decryption --query "Parameter.Value" --output text)
+          ADMIN_PW=$(aws ssm get-parameter          --name "/config/modusplant_prod/ADMIN_PW"           --with-decryption --query "Parameter.Value" --output text)
+          
           # === Kakao Login ===
           KAKAO_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/KAKAO_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
           KAKAO_REDIRECT_URI=$(aws ssm get-parameter --name "/config/modusplant_prod/KAKAO_REDIRECT_URI"       --with-decryption --query "Parameter.Value" --output text)
@@ -311,6 +321,9 @@ jobs:
           WASABI_ACCESS_KEY=${WASABI_ACCESS_KEY}
           WASABI_SECRET_KEY=${WASABI_SECRET_KEY}
           WASABI_BUCKET=${WASABI_BUCKET}
+          
+          ADMIN_ID=${ADMIN_ID}
+          ADMIN_PW=${ADMIN_PW}
           
           KAKAO_API_KEY=${KAKAO_API_KEY}
           KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
