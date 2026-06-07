@@ -43,13 +43,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
 
-class SearchControllerTest {
+class SearchPostControllerTest {
     private final SearchPostTranslator searchPostTranslator = Mockito.mock(SearchPostTranslator.class);
     private final SearchPostRepository searchPostRepository = Mockito.mock(SearchPostRepository.class);
     private final SearchPostConditionRepository searchPostConditionRepository = Mockito.mock(SearchPostConditionRepository.class);
     private final SearchPostHistoryRepository searchPostHistoryRepository = Mockito.mock(SearchPostHistoryRepository.class);
     private final SearchMapper searchMapper = new SearchMapperImpl();
-    private final SearchController searchController = new SearchController(searchPostTranslator, searchMapper, searchPostRepository, searchPostConditionRepository, searchPostHistoryRepository);
+    private final SearchPostController searchPostController = new SearchPostController(searchPostTranslator, searchMapper, searchPostRepository, searchPostConditionRepository, searchPostHistoryRepository);
 
     @Test
     @DisplayName("키워드로 발행된 게시글을 최신순으로 조회")
@@ -68,7 +68,7 @@ class SearchControllerTest {
 
         // when
         SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
-                searchController.searchByKeyword(testSearchPostRecordRelevance);
+                searchPostController.searchByKeyword(testSearchPostRecordRelevance);
 
         // then
         assertThat(result).isNotNull();
@@ -100,7 +100,7 @@ class SearchControllerTest {
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-                searchController.searchByKeyword(record));
+                searchPostController.searchByKeyword(record));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID);
@@ -119,7 +119,7 @@ class SearchControllerTest {
 
         // when
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class, () ->
-                searchController.searchByKeyword(record));
+                searchPostController.searchByKeyword(record));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_PRIMARY_CATEGORY);
@@ -142,7 +142,7 @@ class SearchControllerTest {
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-                searchController.searchByKeyword(record));
+                searchPostController.searchByKeyword(record));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID);

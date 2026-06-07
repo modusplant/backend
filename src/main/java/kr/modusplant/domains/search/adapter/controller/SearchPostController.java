@@ -28,14 +28,14 @@ import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class SearchController {
+public class SearchPostController {
     private final SearchPostTranslator searchPostTranslator;
     private final SearchMapper searchMapper;
     private final SearchPostRepository searchPostRepository;
     private final SearchPostConditionRepository searchPostConditionRepository;
     private final SearchPostHistoryRepository searchPostHistoryRepository;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public SearchPostRelevanceSortedPageResponse<SearchPostResponse> searchByKeyword(
             SearchPostRecord record) {
         Integer primaryCategoryId = record.primaryCategoryId();
@@ -119,6 +119,7 @@ public class SearchController {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<String> getSearchHistory(UUID memberId, int size) {
         return searchPostHistoryRepository.getSearchHistory(memberId, size);
     }
