@@ -1,6 +1,6 @@
 package kr.modusplant.domains.search.framework.inbound.web.rest;
 
-import kr.modusplant.domains.search.adapter.controller.SearchController;
+import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
@@ -37,14 +37,14 @@ import static org.mockito.BDDMockito.willDoNothing;
 class SearchRestControllerTest {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
-    private final SearchController searchController = Mockito.mock(SearchController.class);
-    private final SearchRestController searchRestController = new SearchRestController(searchController);
+    private final SearchPostController searchPostController = Mockito.mock(SearchPostController.class);
+    private final SearchRestController searchRestController = new SearchRestController(searchPostController);
 
     @Test
     @DisplayName("searchPostsByKeyword로 응답 반환")
     void testSearchPostsByKeyword_givenValidRequest_willReturnResponse() {
         // given
-        given(searchController.searchByKeyword(any())).willReturn(testSearchPostRelevanceSortedPageResponse);
+        given(searchPostController.searchByKeyword(any())).willReturn(testSearchPostRelevanceSortedPageResponse);
 
         // when
         ResponseEntity<DataResponse<SearchPostRelevanceSortedPageResponse<SearchPostResponse>>> responseEntity =
@@ -70,7 +70,7 @@ class SearchRestControllerTest {
     @DisplayName("getSearchHistory로 응답 반환")
     void testGetSearchHistory_givenValidRequest_willReturnResponse() {
         // given
-        given(searchController.getSearchHistory(any(), anyInt())).willReturn(List.of(TEST_SEARCH_KEYWORD));
+        given(searchPostController.getSearchHistory(any(), anyInt())).willReturn(List.of(TEST_SEARCH_KEYWORD));
 
         // when
         ResponseEntity<DataResponse<List<String>>> responseEntity =
@@ -86,7 +86,7 @@ class SearchRestControllerTest {
     @DisplayName("removeSearchKeyword로 응답 반환")
     void testRemoveSearchKeyword_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(searchController).deleteSearchKeyword(any(), any());
+        willDoNothing().given(searchPostController).deleteSearchKeyword(any(), any());
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
@@ -101,7 +101,7 @@ class SearchRestControllerTest {
     @DisplayName("removeAllSearchHistory로 응답 반환")
     void testRemoveAllSearchHistory_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(searchController).deleteAllSearchHistory(any());
+        willDoNothing().given(searchPostController).deleteAllSearchHistory(any());
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
