@@ -10,6 +10,7 @@ import kr.modusplant.domains.search.adapter.controller.SearchPlantController;
 import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
+import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
 import kr.modusplant.domains.search.usecase.record.SearchPlantKoreanNameRecord;
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
@@ -107,7 +108,7 @@ public class SearchRestController {
             @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
             @RequestParam
             @Min(value = 1, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
-            @Max(value = 50, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
+            @Max(value = 20, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
             int size,
 
             @Parameter(hidden = true)
@@ -155,7 +156,7 @@ public class SearchRestController {
             description = "키워드와 가장 유사한 국명부터 순서대로 조회합니다. "
     )
     @GetMapping("/plant/korean-name")
-    public ResponseEntity<DataResponse<Void>> searchPlantKoreanNameByKeyword(
+    public ResponseEntity<DataResponse<List<SearchPlantKoreanNameReadModel>>> searchPlantKoreanNameByKeyword(
             @Parameter(schema = @Schema(description = "키워드", example = "민들레"))
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
@@ -165,8 +166,8 @@ public class SearchRestController {
             @RequestParam
             @Min(value = 1, message = "조회할 국명의 수가 허용된 값을 벗어났습니다. ")
             @Max(value = 50, message = "조회할 국명의 수가 허용된 값을 벗어났습니다. ")
-            Integer count) {
-//        searchPlantController.searchKoreanNameByKeyword(new SearchPlantKoreanNameRecord(keyword, count));
-        return ResponseEntity.ok().body(DataResponse.ok());
+            Integer size) {
+        return ResponseEntity.ok().body(DataResponse.ok(
+                searchPlantController.searchKoreanNameByKeyword(new SearchPlantKoreanNameRecord(keyword, size))));
     }
 }

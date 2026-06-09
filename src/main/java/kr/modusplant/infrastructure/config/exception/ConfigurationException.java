@@ -13,6 +13,11 @@ public class ConfigurationException extends BusinessException {
 
     private final String[] valueNames;
 
+    public ConfigurationException(ErrorCode errorCode, String valueName) {
+        super(errorCode);
+        this.valueNames = new String[]{valueName};
+    }
+
     public ConfigurationException(ErrorCode errorCode, String[] valueNames) {
         super(errorCode);
         this.valueNames = valueNames;
