@@ -15,27 +15,27 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.CACHE_NOT_IN
 
 @Component
 public class SearchPlantCaffeineCache implements SearchPlantCache {
-    private LoadingCache<String, List<String>> plantKoreanNamesCache;
+    private LoadingCache<String, List<String>> transliteratedPlantKoreanNamesCache;
     private final CacheManager cacheManager;
     private final String KOREAN_NAMES_CACHE_NAME = "KOREAN_NAMES";
 
-    public SearchPlantCaffeineCache(@Qualifier("caffeineCacheManager") CacheManager cacheManager) {
+    public SearchPlantCaffeineCache(@Qualifier("plantKoreanNameCaffeineCacheManager") CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
     @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
     @PostConstruct
     public void initializeLoadingCache() {
-        Cache springCache = cacheManager.getCache("plantKoreanNameCache");
-        if (springCache == null) {
-            throw new NotFoundValueException(CACHE_NOT_INITIALIZED, "plantKoreanNameCache");
+        Cache transliteratedCache = cacheManager.getCache("transliteratedPlantKoreanNamesCache");
+        if (transliteratedCache == null) {
+            throw new NotFoundValueException(CACHE_NOT_INITIALIZED, "transliteratedPlantKoreanNamesCache");
         }
-        plantKoreanNamesCache = (LoadingCache<String, List<String>>) springCache.getNativeCache();
-        plantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
+        transliteratedPlantKoreanNamesCache = (LoadingCache<String, List<String>>) transliteratedCache.getNativeCache();
+        transliteratedPlantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
     }
 
     @Override
-    public List<String> getKoreanNames() {
-        return plantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
+    public List<String> getTransliteratedKoreanNames() {
+        return transliteratedPlantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
     }
 }

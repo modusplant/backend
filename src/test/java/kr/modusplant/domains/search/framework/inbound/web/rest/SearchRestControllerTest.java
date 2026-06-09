@@ -1,5 +1,6 @@
 package kr.modusplant.domains.search.framework.inbound.web.rest;
 
+import kr.modusplant.domains.search.adapter.controller.SearchPlantController;
 import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
@@ -38,7 +39,8 @@ class SearchRestControllerTest {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final SearchPostController searchPostController = Mockito.mock(SearchPostController.class);
-    private final SearchRestController searchRestController = new SearchRestController(searchPostController);
+    private final SearchPlantController searchPlantController = Mockito.mock(SearchPlantController.class);
+    private final SearchRestController searchRestController = new SearchRestController(searchPostController, searchPlantController);
 
     @Test
     @DisplayName("searchPostsByKeyword로 응답 반환")
