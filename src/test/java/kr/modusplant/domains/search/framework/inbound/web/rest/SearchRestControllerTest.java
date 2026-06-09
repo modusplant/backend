@@ -5,6 +5,7 @@ import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
+import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
@@ -24,8 +25,11 @@ import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_
 import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
+import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_PLANT_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
+import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_PLANT_KOREAN_NAME;
+import static kr.modusplant.domains.search.common.util.usecase.model.read.SearchPlantKoreanNameReadModelTestUtils.testSearchPlantKoreanNameReadModelList;
 import static kr.modusplant.domains.search.common.util.usecase.response.SearchPostRelevanceSortedPageResponseTestUtils.testSearchPostRelevanceSortedPageResponse;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils.testDefaultMemberUserDetailsBuilder;
@@ -112,5 +116,21 @@ class SearchRestControllerTest {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("searchPlantKoreanNameByKeyword로 응답 반환")
+    void testSearchPlantKoreanNameByKeyword_givenValidRequest_willReturnResponse() {
+        // given
+        given(searchPlantController.searchKoreanNameByKeyword(any())).willReturn(testSearchPlantKoreanNameReadModelList);
+
+        // when
+        ResponseEntity<DataResponse<List<SearchPlantKoreanNameReadModel>>> responseEntity =
+                searchRestController.searchPlantKoreanNameByKeyword(TEST_SEARCH_KEYWORD, TEST_SEARCH_PLANT_SIZE);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).getData()).hasSize(1);
+        assertThat(responseEntity.getBody().getData().getFirst().koreanName()).isEqualTo(TEST_SEARCH_PLANT_KOREAN_NAME);
     }
 }
