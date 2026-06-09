@@ -1,9 +1,11 @@
 package kr.modusplant.domains.search.framework.inbound.web.rest;
 
-import kr.modusplant.domains.search.adapter.controller.SearchController;
+import kr.modusplant.domains.search.adapter.controller.SearchPlantController;
+import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
 import kr.modusplant.domains.search.domain.vo.SearchPostImportance;
+import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
@@ -23,8 +25,11 @@ import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_
 import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORIES_ID;
 import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
+import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_PLANT_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchIntegerConstant.TEST_SEARCH_POST_SIZE;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_KEYWORD;
+import static kr.modusplant.domains.search.common.constant.SearchStringConstant.TEST_SEARCH_PLANT_KOREAN_NAME;
+import static kr.modusplant.domains.search.common.util.usecase.model.read.SearchPlantKoreanNameReadModelTestUtils.testSearchPlantKoreanNameReadModelList;
 import static kr.modusplant.domains.search.common.util.usecase.response.SearchPostRelevanceSortedPageResponseTestUtils.testSearchPostRelevanceSortedPageResponse;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils.testDefaultMemberUserDetailsBuilder;
@@ -37,14 +42,15 @@ import static org.mockito.BDDMockito.willDoNothing;
 class SearchRestControllerTest {
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
-    private final SearchController searchController = Mockito.mock(SearchController.class);
-    private final SearchRestController searchRestController = new SearchRestController(searchController);
+    private final SearchPostController searchPostController = Mockito.mock(SearchPostController.class);
+    private final SearchPlantController searchPlantController = Mockito.mock(SearchPlantController.class);
+    private final SearchRestController searchRestController = new SearchRestController(searchPostController, searchPlantController);
 
     @Test
     @DisplayName("searchPostsByKeyword로 응답 반환")
     void testSearchPostsByKeyword_givenValidRequest_willReturnResponse() {
         // given
-        given(searchController.searchByKeyword(any())).willReturn(testSearchPostRelevanceSortedPageResponse);
+        given(searchPostController.searchByKeyword(any())).willReturn(testSearchPostRelevanceSortedPageResponse);
 
         // when
         ResponseEntity<DataResponse<SearchPostRelevanceSortedPageResponse<SearchPostResponse>>> responseEntity =
@@ -70,7 +76,7 @@ class SearchRestControllerTest {
     @DisplayName("getSearchHistory로 응답 반환")
     void testGetSearchHistory_givenValidRequest_willReturnResponse() {
         // given
-        given(searchController.getSearchHistory(any(), anyInt())).willReturn(List.of(TEST_SEARCH_KEYWORD));
+        given(searchPostController.getSearchHistory(any(), anyInt())).willReturn(List.of(TEST_SEARCH_KEYWORD));
 
         // when
         ResponseEntity<DataResponse<List<String>>> responseEntity =
@@ -86,7 +92,7 @@ class SearchRestControllerTest {
     @DisplayName("removeSearchKeyword로 응답 반환")
     void testRemoveSearchKeyword_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(searchController).deleteSearchKeyword(any(), any());
+        willDoNothing().given(searchPostController).deleteSearchKeyword(any(), any());
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
@@ -101,7 +107,7 @@ class SearchRestControllerTest {
     @DisplayName("removeAllSearchHistory로 응답 반환")
     void testRemoveAllSearchHistory_givenValidRequest_willReturnResponse() {
         // given
-        willDoNothing().given(searchController).deleteAllSearchHistory(any());
+        willDoNothing().given(searchPostController).deleteAllSearchHistory(any());
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
@@ -110,5 +116,21 @@ class SearchRestControllerTest {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("searchPlantKoreanNameByKeyword로 응답 반환")
+    void testSearchPlantKoreanNameByKeyword_givenValidRequest_willReturnResponse() {
+        // given
+        given(searchPlantController.searchKoreanNameByKeyword(any())).willReturn(testSearchPlantKoreanNameReadModelList);
+
+        // when
+        ResponseEntity<DataResponse<List<SearchPlantKoreanNameReadModel>>> responseEntity =
+                searchRestController.searchPlantKoreanNameByKeyword(TEST_SEARCH_KEYWORD, TEST_SEARCH_PLANT_SIZE);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).getData()).hasSize(1);
+        assertThat(responseEntity.getBody().getData().getFirst().koreanName()).isEqualTo(TEST_SEARCH_PLANT_KOREAN_NAME);
     }
 }

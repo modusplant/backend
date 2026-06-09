@@ -28,7 +28,9 @@ public enum SearchErrorCode implements ErrorCode {
     SEARCH_POST_PUBLISHED_AT_AFTER_NOW(HttpStatus.BAD_REQUEST.value(), "search_post_published_at_after_now", "게시글 발행 시점이 현재 이후의 시간입니다. "),
 
     SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_keyword_similarity_out_of_range", "검색 키워드 유사도가 올바른 값의 범위를 벗어났습니다. "),
-    SEARCH_POST_IMPORTANCE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_post_importance_out_of_range", "검색 게시글 중요도가 올바른 값의 범위를 벗어났습니다. ");
+    SEARCH_POST_IMPORTANCE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_post_importance_out_of_range", "검색 게시글 중요도가 올바른 값의 범위를 벗어났습니다. "),
+    SEARCH_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_size_out_of_range", "검색 크기가 올바른 값의 범위를 벗어났습니다. "),
+    ;
 
     private final int httpStatus;
     private final String code;

@@ -49,6 +49,8 @@ spring:
           batch_versioned_data: true
         order_inserts: true
         default_schema: ${DB_SCHEMA}
+  lifecycle:
+    timeout-per-shutdown-phase: 10s
   servlet:
     multipart:
       enabled: true
@@ -106,6 +108,7 @@ redis:
 
 # Tomcat
 server:
+  shutdown: graceful
   tomcat:
     max-swallow-size: 20MB
     mbeanregistry:

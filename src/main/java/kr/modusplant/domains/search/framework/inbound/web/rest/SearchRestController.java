@@ -6,9 +6,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
-import kr.modusplant.domains.search.adapter.controller.SearchController;
+import kr.modusplant.domains.search.adapter.controller.SearchPlantController;
+import kr.modusplant.domains.search.adapter.controller.SearchPostController;
 import kr.modusplant.domains.search.domain.enums.SearchPostSortCondition;
 import kr.modusplant.domains.search.domain.enums.SearchPostTarget;
+import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
+import kr.modusplant.domains.search.usecase.record.SearchPlantKoreanNameRecord;
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
@@ -33,7 +36,8 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @Validated
 @SecurityRequirement(name = "Authorization")
 public class SearchRestController {
-    private final SearchController searchController;
+    private final SearchPostController searchPostController;
+    private final SearchPlantController searchPlantController;
 
     @Operation(
             summary = "키워드를 통한 게시글 목록 검색 API (무한스크롤)",
@@ -41,7 +45,7 @@ public class SearchRestController {
     )
     @GetMapping("/posts")
     public ResponseEntity<DataResponse<SearchPostRelevanceSortedPageResponse<SearchPostResponse>>> searchPostsByKeyword(
-            @Parameter(schema = @Schema(description = "검색어 키워드", example = "벌레"))
+            @Parameter(schema = @Schema(description = "키워드", example = "벌레"))
             @RequestParam
             @NotBlank(message = "키워드가 비어 있습니다.")
             String keyword,
@@ -90,33 +94,33 @@ public class SearchRestController {
             DefaultUserDetails userDetails
     ) {
         UUID memberId = (userDetails != null) ? userDetails.getUuid() : null;
-        return ResponseEntity.ok().body(DataResponse.ok(searchController.searchByKeyword(
+        return ResponseEntity.ok().body(DataResponse.ok(searchPostController.searchByKeyword(
                 new SearchPostRecord(keyword, searchPostTarget, searchPostSortCondition, primaryCategoryId, secondaryCategoryIds,
                 lastPostUlid, lastPostPublishedAt, lastPostImportance, lastPostSimilarity, size, memberId))));
     }
 
     @Operation(
-            summary = "검색 기록 목록 조회 API",
-            description = "키워드를 통한 게시글 목록 검색 시에 입력한 검색 기록 목록을 조회합니다. "
+            summary = "게시글 검색 기록 목록 조회 API",
+            description = "키워드를 통한 게시글 목록 검색 시에 입력한 게시글 검색 기록 목록을 조회합니다. "
     )
     @GetMapping("/posts/history")
     public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
             @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
             @RequestParam
             @Min(value = 1, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
-            @Max(value = 50, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
+            @Max(value = 20, message = "검색 기록 개수가 허용된 값을 벗어났습니다. ")
             int size,
 
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
-        return ResponseEntity.ok().body(DataResponse.ok(searchController.getSearchHistory(memberId, size)));
+        return ResponseEntity.ok().body(DataResponse.ok(searchPostController.getSearchHistory(memberId, size)));
     }
 
     @Operation(
-            summary = "검색 기록 단건 삭제 API",
-            description = "검색 기록 목록에서 검색 기록을 단건 삭제합니다."
+            summary = "게시글 검색 기록 단건 삭제 API",
+            description = "게시글 검색 기록 목록에서 검색 기록을 단건 삭제합니다."
     )
     @DeleteMapping("/posts/history/{keyword}")
     public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
@@ -129,13 +133,13 @@ public class SearchRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
-        searchController.deleteSearchKeyword(keyword, memberId);
+        searchPostController.deleteSearchKeyword(keyword, memberId);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
     @Operation(
-            summary = "검색 기록 전체 삭제 API",
-            description = "검색 기록 목록에서 모든 검색 기록을 삭제합니다."
+            summary = "게시글 검색 기록 전체 삭제 API",
+            description = "게시글 검색 기록 목록에서 모든 검색 기록을 삭제합니다."
     )
     @DeleteMapping("/posts/history")
     public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
@@ -143,7 +147,27 @@ public class SearchRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
-        searchController.deleteAllSearchHistory(memberId);
+        searchPostController.deleteAllSearchHistory(memberId);
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "키워드를 통한 식물 국명 목록 검색 API",
+            description = "키워드와 가장 유사한 국명부터 순서대로 조회합니다. "
+    )
+    @GetMapping("/plant/korean-name")
+    public ResponseEntity<DataResponse<List<SearchPlantKoreanNameReadModel>>> searchPlantKoreanNameByKeyword(
+            @Parameter(schema = @Schema(description = "키워드", example = "민들레"))
+            @RequestParam
+            @NotBlank(message = "키워드가 비어 있습니다.")
+            String keyword,
+
+            @Parameter(schema = @Schema(description = "조회할 국명의 수", example = "5", minimum = "1", maximum = "50"))
+            @RequestParam
+            @Min(value = 1, message = "조회할 국명의 수가 허용된 값을 벗어났습니다. ")
+            @Max(value = 50, message = "조회할 국명의 수가 허용된 값을 벗어났습니다. ")
+            Integer size) {
+        return ResponseEntity.ok().body(DataResponse.ok(
+                searchPlantController.searchKoreanNameByKeyword(new SearchPlantKoreanNameRecord(keyword, size))));
     }
 }

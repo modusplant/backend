@@ -2,11 +2,11 @@ package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
-import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
+import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileImageBytes;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
@@ -37,17 +37,14 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
                 memberProfileJpaRepository.findByUuid(memberId.getValue());
         if (profileEntityOrEmpty.isPresent()) {
             MemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
-            MemberProfileImage profileImage;
-            if (profileEntity.getImagePath() == null) {
-                profileImage = EmptyMemberProfileImage.create();
-            } else {
-                profileImage = MemberProfileImage.create(
-                        MemberProfileImagePath.create(profileEntity.getImagePath()),
-                        MemberProfileImageBytes.create(amazonS3Service.downloadFile(profileEntity.getImagePath())));
-            }
+            MemberProfileImagePath profileImagePath = MemberProfileImagePath.create(profileEntity.getImagePath());
+            MemberProfileImageBytes profileImageBytes = profileImagePath.getValue() != null ?
+                    MemberProfileImageBytes.create(amazonS3Service.downloadFile(profileImagePath.getValue())) :
+                    EmptyMemberProfileImageBytes.create();
+
             return MemberProfile.create(
                     memberId,
-                    profileImage,
+                    MemberProfileImage.create(profileImagePath, profileImageBytes),
                     MemberProfileIntroduction.create(profileEntity.getIntroduction()),
                     Nickname.create(profileEntity.getMember().getNickname()));
         } else {

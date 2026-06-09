@@ -14,7 +14,7 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReportPageSize {
-    private final Integer value;
+    private final int value;
 
     public static ReportPageSize create(Integer value) {
         if (value == null) {
