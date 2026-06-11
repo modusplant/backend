@@ -1,0 +1,1 @@
+ALTER TABLE public.plant RENAME kor_name TO korean_name;
