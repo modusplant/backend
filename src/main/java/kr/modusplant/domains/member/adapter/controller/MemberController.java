@@ -28,6 +28,7 @@ import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -248,7 +249,7 @@ public class MemberController {
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
         validateBeforeWithdraw(memberId, authCode, authProvider);
 
-        if (authCode != null && authProvider != null) {
+        if (!StringUtils.isBlank(authCode) && !StringUtils.isBlank(authProvider)) {
             memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
                     memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
                     authProvider,
