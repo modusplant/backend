@@ -46,6 +46,11 @@ public class GoogleAuthClient implements SocialAuthClient {
     private String GOOGLE_LOCAL_REDIRECT_URI;
 
     @Override
+    public SocialProvider getProvider() {
+        return SocialProvider.GOOGLE;
+    }
+
+    @Override
     public SocialUserInfo getToken(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://oauth2.googleapis.com")
