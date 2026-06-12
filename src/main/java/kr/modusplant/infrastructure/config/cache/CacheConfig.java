@@ -62,9 +62,9 @@ public class CacheConfig {
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
         Transliterator transliterator = Icu4jUtils.getAnyNFDTransliterator();
-        return dslContext.select(PLANT.KOR_NAME)
+        return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
-                .where(PLANT.KOR_NAME.isNotNull())
+                .where(PLANT.KOREAN_NAME.isNotNull())
                 .fetchInto(String.class)
                 .stream()
                 .map(transliterator::transliterate)
