@@ -15,8 +15,7 @@ import org.mockito.Mockito;
 import java.util.Collections;
 import java.util.List;
 
-import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_0_8;
-import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.TEST_SEARCH_KEYWORD_SIMILARITY_1;
+import static kr.modusplant.domains.search.common.constant.SearchDoubleConstant.*;
 import static kr.modusplant.domains.search.common.constant.SearchStringConstant.*;
 import static kr.modusplant.domains.search.common.util.usecase.record.SearchPlantKoreanNameRecordTestUtils.testSearchPlantKoreanNameRecord;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -109,6 +108,25 @@ class SearchPlantControllerTest {
         assertThat(result).hasSize(2);
         assertThat(result.get(0).similarity()).isEqualTo(TEST_SEARCH_KEYWORD_SIMILARITY_1);
         assertThat(result.get(1).similarity()).isEqualTo(TEST_SEARCH_KEYWORD_SIMILARITY_0_8);
+    }
+
+    @Test
+    @DisplayName("searchKoreanNameByKeyword 호출 시 유사도가 0.8보다 작은 결과는 무시하도록 목록 반환")
+    void testSearchKoreanNameByKeyword_givenSimilarityLowerThan0_8_willReturnListIgnoringThatResult() {
+        // given
+        SearchPlantKoreanNameRecord record = new SearchPlantKoreanNameRecord(TEST_SEARCH_KEYWORD, 2);
+        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(searchPlantCache.getTransliteratedKoreanNames()).willReturn(List.of(TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME));
+        given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_1);
+        given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_0_6);
+        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_KOREAN_NAME);
+
+        // when
+        List<SearchPlantKoreanNameReadModel> result = searchPlantController.searchKoreanNameByKeyword(record);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().similarity()).isEqualTo(TEST_SEARCH_KEYWORD_SIMILARITY_1);
     }
 
     @Test

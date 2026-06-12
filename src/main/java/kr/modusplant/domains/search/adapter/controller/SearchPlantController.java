@@ -37,17 +37,19 @@ public class SearchPlantController {
         PriorityQueue<SearchPlantKoreanNameReadModel> similarityPriorityQueue = new PriorityQueue<>();
         for (String koreanName : searchPlantCache.getTransliteratedKoreanNames()) {
             double similarity = jaroWinklerSimilarity.apply(keywordValue, koreanName);
-            if (similarityPriorityQueue.size() < maxSize) {
-                similarityPriorityQueue.offer(
-                        new SearchPlantKoreanNameReadModel(
-                                searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
-            } else if (similarityPriorityQueue.peek() == null) {
-                throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "maxSize");
-            } else if (similarity > similarityPriorityQueue.peek().similarity()) {
-                similarityPriorityQueue.poll();
-                similarityPriorityQueue.offer(
-                        new SearchPlantKoreanNameReadModel(
-                                searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
+            if (similarity >= 0.8) {
+                if (similarityPriorityQueue.size() < maxSize) {
+                    similarityPriorityQueue.offer(
+                            new SearchPlantKoreanNameReadModel(
+                                    searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
+                } else if (similarityPriorityQueue.peek() == null) {
+                    throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "maxSize");
+                } else if (similarity > similarityPriorityQueue.peek().similarity()) {
+                    similarityPriorityQueue.poll();
+                    similarityPriorityQueue.offer(
+                            new SearchPlantKoreanNameReadModel(
+                                    searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
+                }
             }
         }
 
