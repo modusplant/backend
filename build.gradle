@@ -76,6 +76,9 @@ dependencies {
 	jooqCodegen 'org.postgresql:postgresql:42.7.2' // Tool dependency
 	runtimeOnly 'org.postgresql:postgresql' // Version managed by Spring Boot BOM
 
+	// Jackson Extension Module
+	implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-csv'
+
 	// JJWT
 	def jjwtVersion = '0.12.6'
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
@@ -125,14 +128,16 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 	implementation 'com.google.firebase:firebase-admin:9.8.0'
 
+	// Other Monitoring Dependencies
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-otel'
     implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
+	// Other Logging Dependencies
+	implementation 'org.codehaus.janino:janino'
+	implementation 'org.codehaus.janino:commons-compiler'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
-    implementation 'org.codehaus.janino:janino'
-    implementation 'org.codehaus.janino:commons-compiler'
 
 	// Other Test Dependencies (Versions required) ---
 	testImplementation 'io.github.hakky54:logcaptor:2.11.0'
