@@ -86,7 +86,7 @@ class GoogleAuthClientTest {
         given(idTokenParser.parse(expectedIdToken, SocialProvider.GOOGLE)).willReturn(mockIdTokenInfo);
 
         // When
-        SocialUserInfo userInfo = googleAuthClient.getToken(code, false);
+        SocialUserInfo userInfo = googleAuthClient.getTokenInfo(code, false);
 
         // Then
         assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
@@ -98,7 +98,7 @@ class GoogleAuthClientTest {
 
     @Test
     @DisplayName("구글 access token 발급 실패 시 예외 발생 테스트")
-    void testGetToken_givenInvalidCode_willThrowException() {
+    void testGetTokenInfo_givenInvalidCode_willThrowException() {
         // Given
         String authCode = "fake-auth-code";
         String errorBody = "{\"error\":\"invalid_grant\", \"error_description\":\"Bad Request\"}";
@@ -109,7 +109,7 @@ class GoogleAuthClientTest {
                         .body(errorBody));
 
         // When & Then
-        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getToken(authCode, false));
+        assertThrows(OAuthRequestFailException.class, () -> googleAuthClient.getTokenInfo(authCode, false));
     }
 
     @Test

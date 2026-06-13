@@ -49,7 +49,7 @@ public class KakaoAuthClient implements SocialAuthClient {
     }
 
     @Override
-    public SocialUserInfo getToken(String code, boolean isLocal) {
+    public SocialUserInfo getTokenInfo(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)

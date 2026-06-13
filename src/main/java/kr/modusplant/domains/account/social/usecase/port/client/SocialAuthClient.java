@@ -6,6 +6,6 @@ import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 
 public interface SocialAuthClient {
     SocialProvider getProvider();
-    SocialUserInfo getToken(String code, boolean isLocal);
+    SocialUserInfo getTokenInfo(String code, boolean isLocal);
     void revokeAccess(String accessToken);
 }

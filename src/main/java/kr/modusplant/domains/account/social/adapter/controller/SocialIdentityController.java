@@ -36,7 +36,7 @@ public class SocialIdentityController {
     public SocialLoginResult handleSocialLogin(SocialProvider provider, String code, boolean isLocal) {
         SocialAuthClient authClient = clientFactory.getClient(provider);
         // 소셜 토큰 및 사용자 정보 가져오기 - getToken 메서드를 getTokenInfo 같은걸로 변경
-        SocialUserInfo socialUserInfo = authClient.getToken(code, isLocal);
+        SocialUserInfo socialUserInfo = authClient.getTokenInfo(code, isLocal);
         // 사용자 생성 및 조회
         return classifyMember(socialIdentityMapper.toSocialProfile(provider,socialUserInfo), socialUserInfo.socialAccessToken());
     }
