@@ -28,7 +28,7 @@ public class SocialIdentityLinkController {
     private final SocialIdentityMapper socialIdentityMapper;
 
     public SocialUserInfo issueSocialToken(SocialProvider provider, String code, boolean isLocal) {
-        return clientFactory.getClient(provider).getToken(code, isLocal);
+        return clientFactory.getClient(provider).getTokenInfo(code, isLocal);
     }
 
     @Transactional

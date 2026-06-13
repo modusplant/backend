@@ -55,7 +55,7 @@ class KakaoAuthClientTest {
 
     @Test
     @DisplayName("카카오 access token 발급 성공 테스트")
-    void testGetToken_givenCode_willReturnToken() {
+    void testGetTokenInfo_givenCode_willReturnTokenInfo() {
         // given
         String code = "test-auth-code";
         String expectedAccessToken = "test-access-token";
@@ -83,7 +83,7 @@ class KakaoAuthClientTest {
         given(idTokenParser.parse(expectedIdToken, SocialProvider.KAKAO)).willReturn(mockIdTokenInfo);
 
         // when
-        SocialUserInfo userInfo = kakaoAuthClient.getToken(code, false);
+        SocialUserInfo userInfo = kakaoAuthClient.getTokenInfo(code, false);
 
         // then
         assertThat(userInfo.socialAccessToken()).isEqualTo(expectedAccessToken);
@@ -94,7 +94,7 @@ class KakaoAuthClientTest {
 
     @Test
     @DisplayName("카카오 access token 발급 실패 시 예외 발생 테스트")
-    void testGetToken_givenInvalidCode_willThrowException() {
+    void testGetTokenInfo_givenInvalidCode_willThrowException() {
         // given
         String authCode = "fake-auth-code";
         String errorResponseBody = "{\"error\":\"invalid_grant\", \"error_description\":\"authorization code not found\"}";
@@ -105,7 +105,7 @@ class KakaoAuthClientTest {
                         .body(errorResponseBody));
 
         // when & then
-        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getToken(authCode, false));
+        assertThrows(OAuthRequestFailException.class, () -> kakaoAuthClient.getTokenInfo(authCode, false));
     }
 
     @Test

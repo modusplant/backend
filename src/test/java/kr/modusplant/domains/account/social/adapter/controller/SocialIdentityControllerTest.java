@@ -54,7 +54,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(authClient.getTokenInfo(code,false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail())).willReturn(Optional.empty());
@@ -66,7 +66,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         assertEquals(result,createKakaoNeedSignupResult());
         assertThat(result).isInstanceOf(NeedSignupResult.class);
         verify(clientFactory).getClient(SocialProvider.KAKAO);
-        verify(authClient).getToken(code, false);
+        verify(authClient).getTokenInfo(code, false);
         verify(userInfo).socialAccessToken();
         verify(socialIdentityMapper).toSocialProfile(SocialProvider.KAKAO,userInfo);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail());
@@ -81,7 +81,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getToken(code, false)).willReturn(userInfo);
+        given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail()))
@@ -94,7 +94,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         assertEquals(result,createKakaoNeedLinkResult());
         assertThat(result).isInstanceOf(NeedLinkResult.class);
         verify(clientFactory).getClient(SocialProvider.KAKAO);
-        verify(authClient).getToken(code, false);
+        verify(authClient).getTokenInfo(code, false);
         verify(userInfo).socialAccessToken();
         verify(socialIdentityMapper).toSocialProfile(SocialProvider.KAKAO,userInfo);
         verify(socialIdentityRepository).getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail());
@@ -110,7 +110,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
 
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getToken(code, false)).willReturn(userInfo);
+        given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfileWithBasicEmail));
@@ -132,7 +132,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
 
         given(clientFactory.getClient(SocialProvider.GOOGLE)).willReturn(authClient);
-        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(authClient.getTokenInfo(code,false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_GOOGLE_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.GOOGLE, userInfo)).willReturn(testGoogleSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testGoogleSocialProfile.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfile));
@@ -165,7 +165,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
                 Role.USER
         );
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
-        given(authClient.getToken(code,false)).willReturn(userInfo);
+        given(authClient.getTokenInfo(code,false)).willReturn(userInfo);
         given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO, userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(any())).willReturn(Optional.of(differentProviderIdProfile));
