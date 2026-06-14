@@ -157,7 +157,7 @@ flyway {
 	user = jdbcUsername
 	password = jdbcPassword
 	cleanDisabled = flywayCleanDisabled
-	ignoreMigrationPatterns = ['*:missing', '*:future', '*:ignored']
+	ignoreMigrationPatterns = ['*:missing', '*:future', '*:pending']
 	outOfOrder = false
 	locations = ['classpath:db/migration/data/seed', 'classpath:db/migration/schema'] // java.main에 있는 마이그레이션 클래스 제외
 	encoding = 'UTF-8'
