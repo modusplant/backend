@@ -34,7 +34,8 @@ public class ActivitySubjectPostJooqRepository {
                         COMM_POST_ARCHIVE.CREATED_AT,
                         COMM_POST_ARCHIVE.ARCHIVED_AT,
                         COMM_POST_ARCHIVE.UPDATED_AT,
-                        COMM_POST_ARCHIVE.PUBLISHED_AT
+                        COMM_POST_ARCHIVE.PUBLISHED_AT,
+                        COMM_POST_ARCHIVE.EDITED_AT
                 )
                 .select(
                         select(
@@ -47,7 +48,8 @@ public class ActivitySubjectPostJooqRepository {
                                 COMM_POST.CREATED_AT,
                                 val(LocalDateTime.now()),
                                 COMM_POST.UPDATED_AT,
-                                COMM_POST.PUBLISHED_AT
+                                COMM_POST.PUBLISHED_AT,
+                                COMM_POST.EDITED_AT
                         )
                                 .from(COMM_POST)
                                 .where(COMM_POST.ULID.in(publishedPostUlids))
