@@ -43,9 +43,13 @@ public class KakaoAuthClient implements SocialAuthClient {
     @Value("${kakao.local-redirect-uri:#{null}}")
     private String KAKAO_LOCAL_REDIRECT_URI;
 
+    @Override
+    public SocialProvider getProvider() {
+        return SocialProvider.KAKAO;
+    }
 
     @Override
-    public SocialUserInfo getToken(String code, boolean isLocal) {
+    public SocialUserInfo getTokenInfo(String code, boolean isLocal) {
         RestClient restClient = restClientBuilder
                 .baseUrl("https://kauth.kakao.com")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
