@@ -28,6 +28,9 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
     @Value("${mail-api.secret-key}")
     private String API_SECRET_KEY;
 
+    @Value("${mail-api.reset-password-base-url}")
+    private String resetPasswordBaseUrl;
+
     @Override
     public MailjetResponse execute(String email, String varValue, EmailType type) {
         int templateId;
@@ -110,7 +113,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
                                                         .put(Emailv31.Message.SUBJECT, subject)
                                                         .put(Emailv31.Message.VARS, new JSONObject()
                                                                 .put("emailAddress", email)
-                                                                .put("resetUrl", String.format("https://www.modusplant.kr/reset-password?uuid=%s", varValue))
+                                                                .put("resetUrl", String.format("%s/reset-password?uuid=%s", resetPasswordBaseUrl, varValue))
                                                                 .put("expiredTime", expiredTime.format(formatter))
                                                         )
                                         )

@@ -101,6 +101,7 @@ jobs:
           MAIL_API_KEY: DUMMY_MAILJET_KEY_ABC123
           MAIL_API_SECRET_KEY: DUMMY_MAILJET_SECRET_ABC123
           MAIL_API_JWT_SECRET_KEY: DUMMY_JWT_SECRET_KEY_ABC1234567890
+          MAIL_API_RESET_PASSWORD_BASE_URL: DUMMY_MAIL_API_RESET_PASSWORD_BASE_URL
 
           # ---- dummy ----
           KEYSTORE_PASSWORD: keystore_dummy_password
@@ -295,6 +296,7 @@ jobs:
           MAIL_API_KEY=$(aws ssm get-parameter            --name "/config/modusplant_prod/MAIL_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
           MAIL_API_SECRET_KEY=$(aws ssm get-parameter     --name "/config/modusplant_prod/MAIL_API_SECRET_KEY"     --with-decryption --query "Parameter.Value" --output text)
           MAIL_API_JWT_SECRET_KEY=$(aws ssm get-parameter --name "/config/modusplant_prod/MAIL_API_JWT_SECRET_KEY" --with-decryption --query "Parameter.Value" --output text)
+          MAIL_API_RESET_PASSWORD_BASE_URL=$(aws ssm get-parameter --name "/config/modusplant_prod/MAIL_API_RESET_PASSWORD_BASE_URL" --with-decryption --query "Parameter.Value" --output text)
           
           KEYSTORE_PASSWORD=$(aws ssm get-parameter --name "/config/modusplant_prod/KEYSTORE_PASSWORD"             --with-decryption --query "Parameter.Value" --output text)
           
@@ -335,6 +337,7 @@ jobs:
           MAIL_API_KEY=${MAIL_API_KEY}
           MAIL_API_SECRET_KEY=${MAIL_API_SECRET_KEY}
           MAIL_API_JWT_SECRET_KEY=${MAIL_API_JWT_SECRET_KEY}
+          MAIL_API_RESET_PASSWORD_BASE_URL=${MAIL_API_RESET_PASSWORD_BASE_URL}
           
           # === KEYSTORE_PASSWORD ===
           KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
