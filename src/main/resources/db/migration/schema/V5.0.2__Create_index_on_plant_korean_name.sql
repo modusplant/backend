@@ -1,0 +1,1 @@
+CREATE INDEX idx_plant_korean_name ON public.plant (korean_name);
