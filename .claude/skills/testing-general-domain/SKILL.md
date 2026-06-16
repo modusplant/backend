@@ -1,6 +1,6 @@
 ---
-name: testing-domain
-description: This file provides strict guidance on creating, managing, and refactoring tests except for the enum, exception class, jOOR repository class, and the class that contains only constructors.
+name: testing-general-domain
+description: This file provides strict guidance on creating, managing, and refactoring tests for the general domains except for the enum, exception class, jOOR repository class, and the class that contains only constructors.
 disable-model-invocation: true
 ---
 
