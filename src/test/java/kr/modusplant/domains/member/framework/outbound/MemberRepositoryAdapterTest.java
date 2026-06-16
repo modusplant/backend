@@ -26,6 +26,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import java.util.List;
 import java.util.Optional;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_ROLE;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
@@ -82,6 +83,30 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         // when
         NotFoundEntityException notFoundEntityException =
                 assertThrows(NotFoundEntityException.class, () -> memberRepositoryAdapter.getById(testMemberId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("getRole로 가용한 Role 반환(가용할 때)")
+    void testGetRole_givenAvailableMemberId_willReturnRole() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberBasicUserEntityWithUuid()));
+
+        // when & then
+        assertThat(memberRepositoryAdapter.getRole(testMemberId)).isEqualTo(MEMBER_BASIC_USER_ROLE);
+    }
+
+    @Test
+    @DisplayName("getRole로 예외 반환(가용하지 않을 때)")
+    void testGetRole_givenNotAvailableMemberId_willThrowException() {
+        // given
+        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException =
+                assertThrows(NotFoundEntityException.class, () -> memberRepositoryAdapter.getRole(testMemberId));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
