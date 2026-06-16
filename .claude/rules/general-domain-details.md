@@ -4,6 +4,8 @@ paths:
   - "src/main/java/kr/modusplant/domains/search/**"
 ---
 
+> Supplements CLAUDE.md § Architecture — Domain Internal Structure. Assumes familiarity with the four-layer layout and JPA/jOOQ design decision documented there.
+
 # Domain Conventions
 
 Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.search` and its sub-packages.
@@ -45,8 +47,6 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
      ├─ outbound/jooq/repository/   # DSLContext-based complex queries
      └─ outbound/jooq/record/       # jOOQ composite parameter records
 ```
-
-**Dependency direction:** `framework.inbound` → `adapter` → `usecase` ports → `framework.outbound`; `domain` has no outward dependencies.
 
 ---
 
@@ -101,7 +101,7 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
 
 ## 4. adapter/ Patterns
 
-**Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`; no framework dependencies:
+**Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
 - Member-facing logic: `*Controller`; admin-only logic: `*AdminController`
 - Receives usecase records, converts to domain VOs, calls ports, returns results
 
@@ -142,6 +142,6 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
 **JPA Mapper** (`framework/outbound/jpa/mapper/`) — `@Component`; JPA Entity ↔ Domain Aggregate; may include S3 download
 
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
-- jOOQ for complex cascade deletes and bulk updates; JPA for simple CRUD
+- Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`
