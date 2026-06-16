@@ -162,6 +162,7 @@ public class SecurityConfig {
                                 "/api/v1/notifications/**").authenticated()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/v1/members/profile",
+                                "/api/v1/members/role",
                                 "/api/v1/communication/posts/*/data",
                                 "/api/v1/search/posts/history").authenticated()
                         .requestMatchers(HttpMethod.POST,
