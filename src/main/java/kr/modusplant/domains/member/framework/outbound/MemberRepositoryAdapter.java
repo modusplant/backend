@@ -6,6 +6,7 @@ import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ActivitySubjectCommentIdRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
@@ -60,6 +61,13 @@ public class MemberRepositoryAdapter implements MemberRepository {
         } else {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
         }
+    }
+
+    @Override
+    public Role getRole(MemberId memberId) {
+        return memberJpaRepository.findByUuid(memberId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId"))
+                .getRole();
     }
 
     @Override

@@ -4,12 +4,15 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Nickname;
 
 import java.util.Optional;
 
 public interface MemberRepository {
     Member getById(MemberId memberId);
+
+    Role getRole(MemberId memberId);
 
     Optional<Member> getByNickname(Nickname nickname);
 

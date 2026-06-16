@@ -17,6 +17,8 @@ import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -75,6 +77,15 @@ public class MemberController {
 
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
         return memberProfileMapper.toMemberProfileResponse(memberProfile);
+    }
+
+    @Transactional(readOnly = true)
+    public MemberRoleResponse getRole(MemberRoleGetRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        Role role = memberRepository.getRole(memberId);
+        return new MemberRoleResponse(role.name());
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {

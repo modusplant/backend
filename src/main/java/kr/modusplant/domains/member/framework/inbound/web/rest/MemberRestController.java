@@ -15,6 +15,7 @@ import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCa
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,7 @@ public class MemberRestController {
 
     @Operation(
             summary = "회원 프로필 조회 API",
-            description = "기존 회원 프로필을 조회합니다. ",
+            description = "회원 프로필을 조회합니다. ",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/members/profile")
@@ -116,8 +117,25 @@ public class MemberRestController {
     }
 
     @Operation(
+            summary = "회원 권한 조회 API",
+            description = "회원 권한을 조회합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @GetMapping(value = "/members/role")
+    public ResponseEntity<DataResponse<MemberRoleResponse>> getMemberRole(
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(memberController.getRole(new MemberRoleGetRecord(memberId))));
+    }
+
+    @Operation(
             summary = "회원 프로필 덮어쓰기 API",
-            description = "기존 회원 프로필을 덮어씁니다.",
+            description = "회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping(value = "/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
