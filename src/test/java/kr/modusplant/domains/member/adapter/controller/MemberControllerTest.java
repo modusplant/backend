@@ -47,6 +47,7 @@ import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,10 +82,12 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -163,6 +166,31 @@ class MemberControllerTest implements
 
         // when & then
         assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
+    }
+
+    @Test
+    @DisplayName("기존에 저장된 회원이 있을 때 getRole로 회원 권한 조회")
+    void testGetRole_givenValidGetRecordAndStoredMember_willReturnResponse() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getRole(any())).willReturn(Role.USER);
+
+        // when & then
+        assertThat(memberController.getRole(testMemberRoleGetRecord)).isEqualTo(testMemberRoleResponse);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 getRole로 회원 권한 조회 실패")
+    void testGetRole_givenNotFoundMemberId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.getRole(testMemberRoleGetRecord));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
     @Test
