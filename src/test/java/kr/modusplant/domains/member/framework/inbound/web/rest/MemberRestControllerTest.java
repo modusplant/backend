@@ -6,6 +6,7 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -44,11 +45,13 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -135,6 +138,22 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
         assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);
+    }
+
+    @Test
+    @DisplayName("getMemberRole로 응답 반환")
+    void testGetMemberRole_givenValidRequest_willReturnResponse() {
+        // given
+        given(memberController.getRole(testMemberRoleGetRecord)).willReturn(testMemberRoleResponse);
+
+        // when
+        ResponseEntity<DataResponse<MemberRoleResponse>> memberResponseEntity = memberRestController.getMemberRole(MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
+        assertThat(String.valueOf(memberResponseEntity.getBody())).isEqualTo(String.valueOf(DataResponse.ok(testMemberRoleResponse)));
+        verify(memberController, only()).getRole(testMemberRoleGetRecord);
     }
 
     @Test
