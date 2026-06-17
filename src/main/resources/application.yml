@@ -30,7 +30,7 @@ spring:
   flyway:
     enabled: true
     validate-on-migrate: true
-    out-of-order: true
+    out-of-order: false
     locations:
       - classpath:db/migration
     encoding: UTF-8
