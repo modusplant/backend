@@ -47,12 +47,12 @@ JDBC_PASSWORD       / jdbcPassword
 
 The project follows **DDD + Clean Architecture**. The `src/main/java/kr/modusplant/` root contains four top-level packages:
 
-| Package          | Role                                                                                                               |
-|------------------|--------------------------------------------------------------------------------------------------------------------|
-| `domains`        | Domain modules — each with its own layered sub-structure                                                           |
-| `framework`      | Shared external library wiring (jOOQ, Spring Data, Redis)                                                          |
-| `infrastructure` | Cross-cutting concerns: AOP logging, security, JWT, Swagger, async config                                          |
-| `shared`         | Global objects: kernel VOs (`Email`, `Nickname`, `Password`), constants, Spring events, exceptions, ULID generator |
+| Package            | Role                                                                                                               |
+|--------------------|--------------------------------------------------------------------------------------------------------------------|
+| `domains`          | Domain modules — each with its own layered sub-structure                                                           |
+| `infrastructure`   | Cross-cutting concerns: AOP logging, security, JWT, Swagger, async config                                          |
+| `shared`           | Global objects: kernel VOs (`Email`, `Nickname`, `Password`), constants, Spring events, exceptions, ULID generator |
+| `shared.framework` | Shared external library wiring (jOOQ, Spring Data, Redis)                                                          |
 
 ### Domain Internal Structure
 

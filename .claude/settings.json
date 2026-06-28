@@ -7,15 +7,18 @@
       "Bash(./gradlew test*)",
       "Bash(./gradlew --version)",
       "Bash(./gradlew compileJava*)",
-      "Bash(rm -rf build/test-results/*)"
+      "Bash(rm -rf ./build/test-results/*)",
+
+      "Read(./src/main/resources/application-local.yml)",
+      "Read(./docker-compose.override.yml)"
     ],
     "deny": [
-      "Bash(rm -rf src/*)",
+      "Bash(rm -rf **/src/**)",
       "Bash(git push origin main*)",
       "Bash(git push origin develop*)",
+
       "Read(**/.gradle/**)",
-      "Read(**/.settings/**)",
-      "Read(./bin/**)"
+      "Read(**/.settings/**)"
     ]
   },
   "env": {

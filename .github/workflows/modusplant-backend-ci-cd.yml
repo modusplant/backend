@@ -50,6 +50,7 @@ jobs:
             /config/modusplant_dev/WASABI_BUCKET          = WASABI_BUCKET,
             /config/modusplant_dev/ADMIN_ID               = ADMIN_ID,
             /config/modusplant_dev/ADMIN_PW               = ADMIN_PW,
+            /config/modusplant_dev/ADMIN_PATH             = ADMIN_PATH,
             /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT,
             /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
@@ -84,6 +85,7 @@ jobs:
 
           ADMIN_ID: ${{ env.ADMIN_UD }}
           ADMIN_PW: ${{ env.ADMIN_PW }}
+          ADMIN_PATH: ${{ env.ADMIN_PATH }}
 
           DEV_PUBLIC_ENDPOINT: ${{ env.DEV_PUBLIC_ENDPOINT }}
           FIREBASE_CREDENTIALS_JSON: ${{ env.FIREBASE_CREDENTIALS_JSON }}
@@ -282,6 +284,7 @@ jobs:
           # === Admin Access Control (application.yml: ADMIN_* ) ===
           ADMIN_ID=$(aws ssm get-parameter          --name "/config/modusplant_prod/ADMIN_ID"           --with-decryption --query "Parameter.Value" --output text)
           ADMIN_PW=$(aws ssm get-parameter          --name "/config/modusplant_prod/ADMIN_PW"           --with-decryption --query "Parameter.Value" --output text)
+          ADMIN_PATH=$(aws ssm get-parameter        --name "/config/modusplant_prod/ADMIN_PATH"         --with-decryption --query "Parameter.Value" --output text)
           
           # === Kakao Login ===
           KAKAO_API_KEY=$(aws ssm get-parameter      --name "/config/modusplant_prod/KAKAO_API_KEY"            --with-decryption --query "Parameter.Value" --output text)
@@ -326,6 +329,7 @@ jobs:
           
           ADMIN_ID=${ADMIN_ID}
           ADMIN_PW=${ADMIN_PW}
+          ADMIN_PATH=${ADMIN_PATH}
           
           KAKAO_API_KEY=${KAKAO_API_KEY}
           KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
