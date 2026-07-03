@@ -15,6 +15,8 @@ import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
 import java.net.URI;
@@ -143,5 +145,21 @@ class AmazonS3ServiceTest {
         if (!ReflectionTestUtils.getField(amazonS3Service, "profile").equals("dev")) {
             verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
         }
+    }
+
+    @Test
+    @DisplayName("")
+    void testGeneratePutPresignedUrl_givenFileKeyAndContentType_willReturnPresignedUrl() throws Exception {
+        String fileKey = "test-file-key";
+        String contentType = "image/jpeg";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
+        PresignedPutObjectRequest mockPresignedRequest = mock(PresignedPutObjectRequest.class);
+        given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
+        given(s3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
+
+        String result = amazonS3Service.generatePutPresignedUrl(fileKey,contentType);
+
+        assertThat(result).isEqualTo(expected);
+        verify(s3Presigner, times(1)).presignPutObject(any(PutObjectPresignRequest.class));
     }
 }
