@@ -117,7 +117,7 @@ class AmazonS3ServiceTest {
         String fileKey = "test-file-key";
 
         // when
-        amazonS3Service.deleteFiles(fileKey);
+        amazonS3Service.deleteFile(fileKey);
 
         // then
         ArgumentCaptor<DeleteObjectRequest> requestCaptor = ArgumentCaptor.forClass(DeleteObjectRequest.class);

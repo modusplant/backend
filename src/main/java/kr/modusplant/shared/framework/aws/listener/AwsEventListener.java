@@ -20,7 +20,7 @@ public class AwsEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleImageRemove(ImageRemoveTask event) {
         try {
-            amazonS3Service.deleteFiles(event.getImageFileKey());
+            amazonS3Service.deleteFile(event.getImageFileKey());
         } catch (Exception e) {
             log.error("[AWS] S3 파일 이미지 제거 실패 - imageFileKey = {}", event.getImageFileKey(), e);
         }

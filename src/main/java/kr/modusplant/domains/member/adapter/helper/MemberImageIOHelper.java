@@ -42,7 +42,7 @@ public class MemberImageIOHelper {
     public void deleteImage(MemberProfileImage image) {
         String imagePath = image.getMemberProfileImagePath().getValue();
         if (imagePath != null) {
-            amazonS3Service.deleteFiles(imagePath);
+            amazonS3Service.deleteFile(imagePath);
         }
     }
 }
