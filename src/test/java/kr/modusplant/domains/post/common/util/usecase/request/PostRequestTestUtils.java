@@ -1,181 +1,93 @@
 package kr.modusplant.domains.post.common.util.usecase.request;
 
 import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
+import kr.modusplant.domains.post.usecase.request.PostRequest;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.FileConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_TEXT;
 import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;
 
 public interface PostRequestTestUtils {
-    /* MultipartFile, FileOrder Utils */
-    String textFilename1 = "text_0.txt";
-    String textFilename2 = "text_1.txt";
-    MultipartFile textFile0 = new MockMultipartFile("content", textFilename1, "text/plain", "This is text for test".getBytes());
-    MultipartFile textFile1 = new MockMultipartFile("content", textFilename2, "text/plain", "This is text for test".getBytes());
-    static FileOrder textFileOrder(int num, int order) {
-        return new FileOrder("text_"+num+".txt",order);
+    /* FileOrder */
+    static FileOrder imageJpgFileOrder(int order) {
+        return new FileOrder(order, TEST_IMAGE_JPG_FILENAME, TEST_IMAGE_JPG_FILE_KEY);
+    }
+    static FileOrder imagePngFileOrder(int order) {
+        return new FileOrder(order, TEST_IMAGE_PNG_FILENAME, TEST_IMAGE_PNG_FILE_KEY);
+    }
+    static FileOrder videoMp4FileOrder(int order) {
+        return new FileOrder(order, TEST_VIDEO_MP4_FILENAME, TEST_VIDEO_MP4_FILE_KEY);
+    }
+    static FileOrder videoAviFileOrder(int order) {
+        return new FileOrder(order, TEST_VIDEO_AVI_FILENAME, TEST_VIDEO_AVI_FILE_KEY);
     }
 
-    byte[] jpegData = {
-            (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, (byte) 0xE0,  // JPEG 시그니처
-            0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00, 0x01,
-            0x01, 0x01, 0x00, 0x48, 0x00, 0x48, 0x00, 0x00,
-            (byte) 0xFF, (byte) 0xD9  // JPEG 종료
-    };
-    String imageFilename = "image_0.jpeg";
-    MultipartFile imageFile = new MockMultipartFile("content", imageFilename, "image/jpeg", jpegData);
-    static FileOrder imageFileOrder(int order) {
-        return new FileOrder(imageFilename,order);
-    }
-
-    byte[] mp4Data = {
-            0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70,  // ftyp box
-            0x69, 0x73, 0x6F, 0x6D, 0x00, 0x00, 0x02, 0x00,  // isom major brand
-            0x69, 0x73, 0x6F, 0x6D, 0x69, 0x73, 0x6F, 0x32,  // compatible brands
-            0x61, 0x76, 0x63, 0x31, 0x6D, 0x70, 0x34, 0x31,
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05  // 임의 데이터
-    };
-    String videoFilename = "video_0.mp4";
-    MultipartFile videoFile = new MockMultipartFile("content", videoFilename, "video/mp4", mp4Data);
-    static FileOrder videoFileOrder(int order) {
-        return new FileOrder(videoFilename,order);
-    }
-
-    byte[] wavData = {
-            0x52, 0x49, 0x46, 0x46,  // "RIFF"
-            0x24, 0x00, 0x00, 0x00,  // 파일 크기
-            0x57, 0x41, 0x56, 0x45,  // "WAVE"
-            0x66, 0x6D, 0x74, 0x20,  // "fmt "
-            0x10, 0x00, 0x00, 0x00,  // chunk size
-            0x01, 0x00, 0x01, 0x00,  // format, channels
-            0x44, (byte) 0xAC, 0x00, 0x00,  // sample rate
-            0x00, 0x01, 0x02, 0x03   // 임의 데이터
-    };
-    String audioFilename = "audio_0.wav";
-    MultipartFile audioFile = new MockMultipartFile("content", audioFilename, "audio/wav", wavData);
-    static FileOrder audioFileOrder(int order) {
-        return new FileOrder(audioFilename,order);
-    }
-
-    byte[] pdfData = {
-            0x25, 0x50, 0x44, 0x46, 0x2D, 0x31, 0x2E, 0x34,  // "%PDF-1.4"
-            0x0A, 0x25, (byte) 0xE2, (byte) 0xE3, (byte) 0xCF, (byte) 0xD3, 0x0A,
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05
-    };
-    String applicationFilename = "file_0.pdf";
-    MultipartFile applicationFile = new MockMultipartFile("content",applicationFilename, "application/pdf", pdfData);
-    static FileOrder applicationFileOrder(int order) {
-        return new FileOrder(applicationFilename,order);
-    }
-
-    /* List<MultipartFile>, List<FileOrder> Utils */
-    List<MultipartFile> allMediaFiles = Arrays.asList(textFile0,imageFile,videoFile,audioFile,applicationFile);
-    List<FileOrder> allMediaFilesOrder = Arrays.asList(
-            textFileOrder(0,0),
-            imageFileOrder(1),
-            videoFileOrder(2),
-            audioFileOrder(3),
-            applicationFileOrder(4)
-    );
-
-    List<MultipartFile> textImageFiles = Arrays.asList(textFile0,imageFile);
-    List<FileOrder> textImageFilesOrder = Arrays.asList(textFileOrder(0,0), imageFileOrder(1));
-
-    List<MultipartFile> basicMediaFiles = Arrays.asList(textFile0,imageFile,videoFile);
-    List<FileOrder> basicMediaFilesOrder = Arrays.asList(textFileOrder(0,0), imageFileOrder(1), videoFileOrder(2));
-
-    List<MultipartFile> onlyTextFiles = Arrays.asList(textFile0);
-    List<FileOrder> onlyTextFilesOrder = Arrays.asList(textFileOrder(0,0));
-
-    List<MultipartFile> onlyMediaFiles = Arrays.asList(imageFile,videoFile);
-    List<FileOrder> onlyMediaFilesOrder = Arrays.asList(imageFileOrder(1), videoFileOrder(2));
-
-    List<MultipartFile> onlyImageFile = Arrays.asList(imageFile);
-    List<FileOrder> onlyImageFilesOrder = Arrays.asList(imageFileOrder(1));
-
-    List<MultipartFile> duplicatedTextFiles = Arrays.asList(textFile0,imageFile,textFile1);
-    List<FileOrder> duplicatedTextFilesOrder = Arrays.asList(textFileOrder(0,1),imageFileOrder(2),textFileOrder(1,3));
+    /* List<FileOrder> Utils */
+    List<FileOrder> allMediaFilesOrder = Arrays.asList(imageJpgFileOrder(1), videoMp4FileOrder(2));
+    List<FileOrder> allMediaFilesOrder2 = Arrays.asList(imagePngFileOrder(1), videoAviFileOrder(2));
+    List<FileOrder> onlyImageFilesOrder = Arrays.asList(imageJpgFileOrder(1));
+    List<FileOrder> onlyImageFilesOrder2 = Arrays.asList(imagePngFileOrder(1));
+    List<FileOrder> onlyVideoFileOrder = Arrays.asList(videoMp4FileOrder(1));
+    List<FileOrder> onlyVideoFileOrder2 = Arrays.asList(videoAviFileOrder(1));
+    List<FileOrder> mixedOrder = Arrays.asList(videoMp4FileOrder(2), imageJpgFileOrder(1));
 
 
     /* PostInsertRequest Utils */
-    PostInsertRequest requestAllTypes = new PostInsertRequest(
+    PostRequest requestAllTypes = new PostRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
-            allMediaFiles,
+            TEST_POST_CONTENT_TEXT,
             allMediaFilesOrder,
-            imageFilename,
-            true
+            TEST_IMAGE_JPG_FILENAME
     );
 
-    PostInsertRequest requestAllTypesDraft = new PostInsertRequest(
+    PostRequest requestWithOnlyImageFile = new PostRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
-            allMediaFiles,
+            TEST_POST_CONTENT_TEXT,
+            onlyImageFilesOrder,
+            TEST_IMAGE_JPG_FILENAME
+    );
+
+    PostRequest requestWithOnlyVideoFile = new PostRequest(
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
+            "유용한 컨텐츠 모음",
+            TEST_POST_CONTENT_TEXT,
+            onlyVideoFileOrder,
+            null
+    );
+
+    PostRequest requestAllTypesWithoutContentText = new PostRequest(
+            TEST_COMM_PRIMARY_CATEGORY_ID,
+            TEST_COMM_SECONDARY_CATEGORY_ID_1,
+            "유용한 컨텐츠 모음",
+            null,
             allMediaFilesOrder,
-            imageFilename,
-            false
+            TEST_IMAGE_JPG_FILENAME
     );
 
-    PostInsertRequest requestWithEmptyValueDraft = new PostInsertRequest(
-            TEST_COMM_PRIMARY_CATEGORY_ID,
-            null,
-            "유용한 컨텐츠 모음",
-            null,
-            null,
-            null,
-            false
-    );
-
-    PostInsertRequest requestBasicTypes = new PostInsertRequest(
-            TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID_1,
-            "유용한 식물 기르기 컨텐츠",
-            basicMediaFiles,
-            basicMediaFilesOrder,
-            imageFilename,
-            true
-    );
-
-    /* PostUpdateRequest Utils */
-    PostUpdateRequest updateRequestAllTypes = new PostUpdateRequest(
-            TEST_POST_ULID,
+    PostRequest requestAllTypesWithoutContentFiles = new PostRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
             TEST_COMM_SECONDARY_CATEGORY_ID_1,
             "유용한 컨텐츠 모음",
-            allMediaFiles,
-            allMediaFilesOrder,
-            imageFilename,
-            true
+            TEST_POST_CONTENT_TEXT,
+            null,
+            null
     );
 
-    PostUpdateRequest updateRequestAllTypesDraft = new PostUpdateRequest(
-            TEST_POST_ULID,
-            TEST_COMM_PRIMARY_CATEGORY_ID,
-            TEST_COMM_SECONDARY_CATEGORY_ID_1,
-            "유용한 컨텐츠 모음",
-            allMediaFiles,
-            allMediaFilesOrder,
-            imageFilename,
-            false
-    );
-
-    PostUpdateRequest updateRequestWithEmptyValueDraft = new PostUpdateRequest(
-            TEST_POST_ULID,
+    PostRequest requestWithEmptyValueDraft = new PostRequest(
             TEST_COMM_PRIMARY_CATEGORY_ID,
             null,
             "유용한 컨텐츠 모음",
             null,
             null,
-            null,
-            false
+            null
     );
 }
