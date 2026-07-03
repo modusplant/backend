@@ -6,11 +6,11 @@ import java.util.Set;
 
 @Getter
 public enum PostFileType {
-    TEXT("text",false, Set.of("txt")),
+    TEXT("text",false, Set.of()),
     IMAGE("image",true, Set.of("jpeg", "jpg", "png", "heif", "gif")),
     VIDEO("video",true, Set.of("mp4", "mov", "wmv", "avi")),
-    AUDIO("audio",true, Set.of()),
-    FILE("file",true, Set.of()),
+    AUDIO("audio",false, Set.of()),
+    FILE("file",false, Set.of()),
     UNKNOWN("unknown",false, Set.of());
 
     private final String value;

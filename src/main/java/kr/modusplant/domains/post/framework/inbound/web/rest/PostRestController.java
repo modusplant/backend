@@ -3,7 +3,6 @@ package kr.modusplant.domains.post.framework.inbound.web.rest;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,26 +15,18 @@ import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.post.adapter.controller.PostController;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.domains.post.usecase.request.FileOrder;
-import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
-import kr.modusplant.domains.post.usecase.response.CursorLatestSortedPageResponse;
-import kr.modusplant.domains.post.usecase.response.DraftPostResponse;
-import kr.modusplant.domains.post.usecase.response.OffsetPageResponse;
-import kr.modusplant.domains.post.usecase.response.PostSummaryResponse;
+import kr.modusplant.domains.post.usecase.request.*;
+import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -128,40 +119,28 @@ public class PostRestController {
     }
 
     @Operation(
+            summary = "파일 업로드 URL 생성 API",
+            description = "파일 업로드를 위한 Presigned URL을 생성하고 제공합니다."
+    )
+    @PostMapping("/upload-urls")
+    public ResponseEntity<DataResponse<List<PostFileUploadUrlResponse>>> getUploadUrls(
+            @RequestBody
+            List<@Valid PostFileUploadRequest> fileUploadInfo
+    ) {
+        return ResponseEntity.ok().body(DataResponse.ok(postController.getUploadUrls(fileUploadInfo)));
+    }
+
+
+    @Operation(
             summary = "컨텐츠 게시글 추가 API",
             description = "컨텐츠 게시글을 작성합니다."
     )
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public ResponseEntity<DataResponse<Void>> insertPost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam(required = false)
-            Integer primaryCategoryId,
-
-            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam(required = false)
-            Integer secondaryCategoryId,
-
-            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam(required = false)
-            String title,
-
-            @Parameter(
-                    schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
-                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart(required = false)
-            List<MultipartFile> content,
-
-            @Parameter(
-                    schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart(required = false)
-            List<@Valid FileOrder> orderInfo,
-
-            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
-            @RequestParam(required = false)
-            String thumbnailFilename,
+            @RequestBody
+            PostRequest postRequest,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무"))
             @RequestParam
@@ -169,7 +148,7 @@ public class PostRestController {
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getUuid();
-        postController.createPost(new PostInsertRequest(primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
+        postController.createPost(postRequest, isPublished, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
@@ -177,7 +156,7 @@ public class PostRestController {
             summary = "특정 컨텐츠 게시글 수정 API",
             description = "특정 컨텐츠 게시글을 수정합니다."
     )
-    @PutMapping(value = "/{postId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{postId}")
     public ResponseEntity<DataResponse<Void>> updatePost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -187,33 +166,8 @@ public class PostRestController {
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다.")
             String ulid,
 
-            @Parameter(schema = @Schema(description = "게시글이 포함된 1차 항목의 식별자", example = "1"))
-            @RequestParam(required = false)
-            Integer primaryCategoryId,
-
-            @Parameter(schema = @Schema(description = "게시글이 포함된 2차 항목의 식별자", example = "1"))
-            @RequestParam(required = false)
-            Integer secondaryCategoryId,
-
-            @Parameter(schema = @Schema(description = "게시글의 제목", maximum = "60", example = "이거 과습인가요?"))
-            @RequestParam(required = false)
-            String title,
-
-            @Parameter(
-                    schema = @Schema(description = "게시글 컨텐츠", type = "string", format = "binary"),
-                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart(required = false)
-            List<MultipartFile> content,
-
-            @Parameter(
-                    schema = @Schema(description = "게시글에 속한 파트들의 순서에 대한 정보"),
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart(required = false)
-            List<@Valid FileOrder> orderInfo,
-
-            @Parameter(schema = @Schema(description = "게시글 컨텐츠 대표 사진의 파일명", example = "1"))
-            @RequestParam(required = false)
-            String thumbnailFilename,
+            @RequestBody
+            PostRequest postRequest,
 
             @Parameter(schema = @Schema(description = "게시글 발행 유무", example = "true"))
             @RequestParam
@@ -221,7 +175,7 @@ public class PostRestController {
             Boolean isPublished
     ) throws IOException {
         UUID currentMemberUuid = userDetails.getUuid();
-        postController.updatePost(new PostUpdateRequest(ulid, primaryCategoryId, secondaryCategoryId, title, content, orderInfo, thumbnailFilename, isPublished), currentMemberUuid);
+        postController.updatePost(ulid, postRequest, isPublished, currentMemberUuid);
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
