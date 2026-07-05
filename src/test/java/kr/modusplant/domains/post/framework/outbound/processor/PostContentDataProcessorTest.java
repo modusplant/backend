@@ -29,10 +29,9 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static kr.modusplant.domains.post.common.constant.FileConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostFileConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_TEXT;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;

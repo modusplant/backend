@@ -24,6 +24,7 @@ import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 import kr.modusplant.domains.post.usecase.request.PostRequest;
 import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.post.common.constant.PostFileConstant.TEST_IMAGE_JPG_FILE_KEY;
+import static kr.modusplant.domains.post.common.constant.PostFileConstant.TEST_VIDEO_MP4_FILE_KEY;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.domains.post.common.constant.PostJsonNodeConstant.*;
 import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
@@ -46,6 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.*;
 
 class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostRequestTestUtils, PostResponseTestUtils, PostFileUploadRequestTestUtils, PostFileUploadUrlResponseTestUtils {
@@ -58,7 +62,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     private final PostViewLockRepository postViewLockRepository = Mockito.mock(PostViewLockRepository.class);
     private final PostArchiveRepository postArchiveRepository = Mockito.mock(PostArchiveRepository.class);
     private final PostRecentlyViewRepository postRecentlyViewRepository = Mockito.mock(PostRecentlyViewRepository.class);
-    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, contentDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository);
+    private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
+    private final PostController postController = new PostController(postMapper, postRepository, postQueryRepository, postQueryForMemberRepository, contentDataProcessorPort, postViewCountRepository,postViewLockRepository,postArchiveRepository, postRecentlyViewRepository, pendingFileService);
 
     @BeforeEach
     void setUp() {
@@ -222,7 +227,9 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // given
         List<PostFileUploadRequest> files = List.of(testImageJpgFileUploadRequest, testVideoMp4FileUploadRequest);
         List<PostFileUploadUrlResponse> urls = List.of(testImageJpgFileUploadUrlResponse, testVideoMp4FileUploadUrlResponse);
+        List<String> fileKeys = List.of(TEST_IMAGE_JPG_FILE_KEY,TEST_VIDEO_MP4_FILE_KEY);
         given(contentDataProcessorPort.getMultipleUploadUrls(files)).willReturn(urls);
+        willDoNothing().given(pendingFileService).trackPendingFiles(fileKeys);
 
         // when
         List<PostFileUploadUrlResponse> result = postController.getUploadUrls(files);
@@ -230,6 +237,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isEqualTo(urls);
         verify(contentDataProcessorPort).getMultipleUploadUrls(files);
+        verify(pendingFileService).trackPendingFiles(fileKeys);
     }
 
     @Test
@@ -237,6 +245,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testCreatePost_givenPublishedPostRequest_willCreatePost() throws IOException {
         // given
         given(contentDataProcessorPort.generateContentJson(anyString(),anyList(),any(String.class))).willReturn(new ContentProcessRecord(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY));
+        willDoNothing().given(pendingFileService).untrackPendingFiles(anyList());
 
         // when
         postController.createPost(requestAllTypes, true, MEMBER_BASIC_USER_UUID);
@@ -247,6 +256,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
                 post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         post.getStatus().isPublished()
         ));
+        verify(pendingFileService).untrackPendingFiles(anyList());
     }
 
     @Test
@@ -254,6 +264,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testCreatePost_givenDraftPostRequest_willCreateDraftPost() throws IOException {
         // given
         given(contentDataProcessorPort.generateContentJson(anyString(),anyList(),any(String.class))).willReturn(new ContentProcessRecord(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY));
+        willDoNothing().given(pendingFileService).untrackPendingFiles(anyList());
 
         // when
         postController.createPost(requestAllTypes, false, MEMBER_BASIC_USER_UUID);
@@ -264,6 +275,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
                 post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         !post.getStatus().isPublished()
         ));
+        verify(pendingFileService).untrackPendingFiles(anyList());
     }
 
     @Test
@@ -278,6 +290,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
                 post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         !post.getStatus().isPublished()
         ));
+        verify(pendingFileService).untrackPendingFiles(anyList());
     }
 
     @Test
@@ -300,6 +313,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         given(contentDataProcessorPort.extractFileKeysFromContent(any(JsonNode.class))).willReturn(oldFileKeys);
         given(contentDataProcessorPort.generateContentJson(anyString(),anyList(),any(String.class))).willReturn(new ContentProcessRecord(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY));
+        willDoNothing().given(pendingFileService).untrackPendingFiles(anyList());
         willDoNothing().given(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
 
         // when
@@ -310,6 +324,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(contentDataProcessorPort).extractFileKeysFromContent(any(JsonNode.class));
         verify(contentDataProcessorPort).generateContentJson(anyString(),anyList(),any(String.class));
         verify(postRepository).update(any(Post.class));
+        verify(pendingFileService).untrackPendingFiles(anyList());
         verify(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
     }
 
@@ -322,6 +337,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         given(contentDataProcessorPort.extractFileKeysFromContent(any(JsonNode.class))).willReturn(oldFileKeys);
         given(contentDataProcessorPort.generateContentJson(anyString(),anyList(),any(String.class))).willReturn(new ContentProcessRecord(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY));
+        willDoNothing().given(pendingFileService).untrackPendingFiles(anyList());
         willDoNothing().given(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
 
         // when
@@ -332,6 +348,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(contentDataProcessorPort).extractFileKeysFromContent(any(JsonNode.class));
         verify(contentDataProcessorPort).generateContentJson(anyString(),anyList(),any(String.class));
         verify(postRepository).update(any(Post.class));
+        verify(pendingFileService).untrackPendingFiles(anyList());
         verify(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
     }
 
@@ -344,6 +361,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
         given(contentDataProcessorPort.extractFileKeysFromContent(any(JsonNode.class))).willReturn(oldFileKeys);
         given(contentDataProcessorPort.generateContentJson(anyString(),anyList(),any(String.class))).willReturn(new ContentProcessRecord(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY));
+        willDoNothing().given(pendingFileService).untrackPendingFiles(anyList());
         willDoNothing().given(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
 
         // when
@@ -354,6 +372,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(contentDataProcessorPort).extractFileKeysFromContent(any(JsonNode.class));
         verify(contentDataProcessorPort).generateContentJson(anyString(),anyList(),any(String.class));
         verify(postRepository).update(any(Post.class));
+        verify(pendingFileService).untrackPendingFiles(anyList());
         verify(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
     }
 
@@ -375,6 +394,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(contentDataProcessorPort).extractFileKeysFromContent(any(JsonNode.class));
         verify(contentDataProcessorPort,never()).generateContentJson(anyString(),anyList(),any(String.class));
         verify(postRepository).update(any(Post.class));
+        verify(pendingFileService).untrackPendingFiles(anyList());
         verify(contentDataProcessorPort).deleteFilesWithFileKeys(oldFileKeys);
     }
 

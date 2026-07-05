@@ -6,7 +6,7 @@ import kr.modusplant.domains.post.usecase.request.PostRequest;
 import java.util.Arrays;
 import java.util.List;
 
-import static kr.modusplant.domains.post.common.constant.FileConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostFileConstant.*;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_TEXT;
 import static kr.modusplant.domains.post.common.constant.PrimaryCategoryConstant.TEST_COMM_PRIMARY_CATEGORY_ID;
 import static kr.modusplant.domains.post.common.constant.SecondaryCategoryConstant.TEST_COMM_SECONDARY_CATEGORY_ID_1;

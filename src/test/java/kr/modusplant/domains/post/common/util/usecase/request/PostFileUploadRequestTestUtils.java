@@ -2,7 +2,7 @@ package kr.modusplant.domains.post.common.util.usecase.request;
 
 import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 
-import static kr.modusplant.domains.post.common.constant.FileConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostFileConstant.*;
 
 public interface PostFileUploadRequestTestUtils {
     PostFileUploadRequest testImageJpgFileUploadRequest= new PostFileUploadRequest(TEST_IMAGE_JPG_FILENAME, TEST_IMAGE_JPG_CONTENT_TYPE);
