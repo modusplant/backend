@@ -2,6 +2,7 @@ package kr.modusplant.domains.post.adapter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
@@ -12,6 +13,7 @@ import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 import kr.modusplant.domains.post.usecase.request.PostRequest;
@@ -40,6 +42,7 @@ public class PostController {
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
+    private final PendingFileService pendingFileService;
 
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
@@ -83,7 +86,10 @@ public class PostController {
     }
 
     public List<PostFileUploadUrlResponse> getUploadUrls(List<PostFileUploadRequest> files) {
-        return contentDataProcessorPort.getMultipleUploadUrls(files);
+        List<PostFileUploadUrlResponse> result = contentDataProcessorPort.getMultipleUploadUrls(files);
+        List<String> issuedFileKeys = result.stream().map(PostFileUploadUrlResponse::fileKey).toList();
+        pendingFileService.trackPendingFiles(issuedFileKeys);
+        return result;
     }
 
     @Transactional
@@ -104,6 +110,7 @@ public class PostController {
             post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath()));
         }
         postRepository.save(post);
+        untrackContentFiles(postRequest.contentFiles());
     }
 
     @Transactional
@@ -135,6 +142,7 @@ public class PostController {
             );
         }
         postRepository.update(post);
+        untrackContentFiles(postRequest.contentFiles());
         contentDataProcessorPort.deleteFilesWithFileKeys(oldFileKeys);
     }
 
@@ -238,5 +246,12 @@ public class PostController {
             throw new ContentProcessingException();
         }
         return newContent;
+    }
+
+    private void untrackContentFiles(List<FileOrder> contentFiles) {
+        List<String> fileKeys = contentFiles != null
+                ? contentFiles.stream().map(FileOrder::fileKey).toList()
+                : List.of();
+        pendingFileService.untrackPendingFiles(fileKeys);
     }
 }
