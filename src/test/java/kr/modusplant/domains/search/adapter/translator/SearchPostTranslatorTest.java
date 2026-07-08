@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
-import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
+import kr.modusplant.domains.post.usecase.port.processor.ContentDataProcessorPort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,15 +18,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 class SearchPostTranslatorTest {
-    private final MultipartDataProcessorPort multipartDataProcessorPort = Mockito.mock(MultipartDataProcessorPort.class);
-    private final SearchPostTranslator searchPostTranslator = new SearchPostTranslator(multipartDataProcessorPort);
+    private final ContentDataProcessorPort contentDataProcessorPort = Mockito.mock(ContentDataProcessorPort.class);
+    private final SearchPostTranslator searchPostTranslator = new SearchPostTranslator(contentDataProcessorPort);
 
     @Test
     @DisplayName("유효한 본문으로 getJsonNodeContentPreview으로 본문 미리보기 반환")
     void testGetJsonNodeContentPreview_withValidContent_willReturnContentPreview() throws IOException {
         // given
         ArrayNode expectedContentPreview = Mockito.mock(ArrayNode.class);
-        given(multipartDataProcessorPort.convertToPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY))
+        given(contentDataProcessorPort.convertToPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY))
                 .willReturn(expectedContentPreview);
 
         // when
@@ -50,7 +50,7 @@ class SearchPostTranslatorTest {
     @DisplayName("미디어 데이터 처리 실패로 getJsonNodeContentPreview으로 예외 발생")
     void testGetJsonNodeContentPreview_withIOException_willThrowException() throws IOException {
         // given
-        given(multipartDataProcessorPort.convertToPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY))
+        given(contentDataProcessorPort.convertToPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY))
                 .willThrow(new ContentProcessingException());
 
         // when

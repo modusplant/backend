@@ -21,13 +21,13 @@ class AwsEventListenerTest {
     @DisplayName("단일 이미지 제거 이벤트 수신 시 S3에서 파일을 제거한다")
     void testHandleImageRemove_givenImageFileKey_willRemoveImageFromS3() {
         // given
-        willDoNothing().given(amazonS3Service).deleteFiles(anyString());
+        willDoNothing().given(amazonS3Service).deleteFile(anyString());
 
         // when
         awsEventListener.handleImageRemove(testImageRemoveTask);
 
         // then
-        verify(amazonS3Service, times(1)).deleteFiles(testImageRemoveTask.getImageFileKey());
+        verify(amazonS3Service, times(1)).deleteFile(testImageRemoveTask.getImageFileKey());
     }
 
     @Test

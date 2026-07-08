@@ -27,4 +27,5 @@ public final class TableName {
     public static final String TERM = "term";
     public static final String COMM_NOTIFICATION = "comm_notification";
     public static final String FCM_TOKEN = "fcm_token";
+    public static final String PENDING_FILE = "pending_file";
 }
