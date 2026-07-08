@@ -2,23 +2,22 @@ package kr.modusplant.domains.post.adapter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.aggregate.Post;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
-import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
-import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.*;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
-import kr.modusplant.domains.post.usecase.port.processor.MultipartDataProcessorPort;
+import kr.modusplant.domains.post.usecase.port.processor.ContentDataProcessorPort;
 import kr.modusplant.domains.post.usecase.port.repository.*;
 import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.record.PostDetailReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
+import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
-import kr.modusplant.domains.post.usecase.request.PostInsertRequest;
-import kr.modusplant.domains.post.usecase.request.PostUpdateRequest;
+import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
+import kr.modusplant.domains.post.usecase.request.PostRequest;
 import kr.modusplant.domains.post.usecase.response.*;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;
@@ -38,12 +37,12 @@ public class PostController {
     private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
     private final PostQueryForMemberRepository postQueryForMemberRepository;
-    private final MultipartDataProcessorPort multipartDataProcessorPort;
+    private final ContentDataProcessorPort contentDataProcessorPort;
     private final PostViewCountRepository postViewCountRepository;
     private final PostViewLockRepository postViewLockRepository;
     private final PostArchiveRepository postArchiveRepository;
     private final PostRecentlyViewRepository postRecentlyViewRepository;
-    private final AmazonS3Service amazonS3Service;
+    private final PendingFileService pendingFileService;
 
     @Value("${redis.ttl.view_count}")
     private long ttlMinutes;
@@ -69,7 +68,7 @@ public class PostController {
                     postRecentlyViewRepository.recordViewPost(currentMemberUuid,postId);
                     return postMapper.toPostDetailResponse(
                             postDetail,
-                            (postDetail.imagePath() != null && !postDetail.imagePath().isBlank()) ? amazonS3Service.generateS3SrcUrl(postDetail.imagePath()) : null,
+                            (postDetail.imagePath() != null && !postDetail.imagePath().isBlank()) ? contentDataProcessorPort.getS3SrcUrl(postDetail.imagePath()) : null,
                             getJsonNodeContent(postDetail.content()),
                             readViewCount(ulid)
                     );
@@ -82,67 +81,69 @@ public class PostController {
                 .map(postDetailData -> postMapper.toPostDetailDataResponse(
                         postDetailData,
                         getJsonNodeContent(postDetailData.content()),
-                        multipartDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
+                        contentDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
                 .orElseThrow(PostNotFoundException::new);
     }
 
-    @Transactional
-    public void createPost(PostInsertRequest postInsertRequest, UUID currentMemberUuid) throws IOException {
-        AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
-        Post post;
-        if (postInsertRequest.isPublished()) {
-            PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postInsertRequest.primaryCategoryId());
-            SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId());
-            ContentProcessRecord result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo(), postInsertRequest.thumbnailFilename());
-            post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postInsertRequest.title(), result.content(), result.thumbnailPath()));
-        } else {
-            PrimaryCategoryId primaryCategoryId = postInsertRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postInsertRequest.primaryCategoryId()) : null;
-            SecondaryCategoryId secondaryCategoryId = postInsertRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postInsertRequest.secondaryCategoryId()) : null;
-            ContentProcessRecord result;
-            if (postInsertRequest.content() != null && postInsertRequest.orderInfo() != null) {
-                result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postInsertRequest.content(), postInsertRequest.orderInfo(), postInsertRequest.thumbnailFilename());
-            } else if (postInsertRequest.content() == null && postInsertRequest.orderInfo() == null) {
-                result = new ContentProcessRecord(null,null);
-            } else {
-                throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
-            }
-            post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postInsertRequest.title(), result.content(), result.thumbnailPath()));
-        }
-        postRepository.save(post);
+    public List<PostFileUploadUrlResponse> getUploadUrls(List<PostFileUploadRequest> files) {
+        List<PostFileUploadUrlResponse> result = contentDataProcessorPort.getMultipleUploadUrls(files);
+        List<String> issuedFileKeys = result.stream().map(PostFileUploadUrlResponse::fileKey).toList();
+        pendingFileService.trackPendingFiles(issuedFileKeys);
+        return result;
     }
 
     @Transactional
-    public void updatePost(PostUpdateRequest postUpdateRequest, UUID currentMemberUuid) throws IOException {
-        Post post = postRepository.getPostByUlid(PostId.create(postUpdateRequest.ulid()))
+    public void createPost(PostRequest postRequest, boolean isPublished, UUID currentMemberUuid) throws IOException {
+        AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
+        Post post;
+        if (isPublished) {  // 발행 게시글 생성
+            PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postRequest.primaryCategoryId());
+            SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postRequest.secondaryCategoryId());
+            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+            post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()));
+        } else {            // 임시저장 게시글 생성
+            PrimaryCategoryId primaryCategoryId = postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null;
+            SecondaryCategoryId secondaryCategoryId = postRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postRequest.secondaryCategoryId()) : null;
+            ContentProcessRecord result = (postRequest.contentText() == null && postRequest.contentFiles() == null)
+                    ? new ContentProcessRecord(null,null)
+                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+            post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath()));
+        }
+        postRepository.save(post);
+        untrackContentFiles(postRequest.contentFiles());
+    }
+
+    @Transactional
+    public void updatePost(String ulid, PostRequest postRequest, boolean isPublished, UUID currentMemberUuid) throws IOException {
+        Post post = postRepository.getPostByUlid(PostId.create(ulid))
                 .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
+        // 기존 filekey 목록 미리 추출
+        List<String> oldFileKeys = contentDataProcessorPort.extractFileKeysFromContent(post.getPostContent().getContent());
+
         // 게시글 검증 수행
-        multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
-        if (postUpdateRequest.isPublished()) {
-            ContentProcessRecord result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo(), postUpdateRequest.thumbnailFilename());
+        if (isPublished) {
+            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
             post.update(
                     AuthorId.fromUuid(currentMemberUuid),
-                    PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()),
-                    SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()),
-                    PostContent.create(postUpdateRequest.title(), result.content(), result.thumbnailPath()),
+                    PrimaryCategoryId.create(postRequest.primaryCategoryId()),
+                    SecondaryCategoryId.create(postRequest.secondaryCategoryId()),
+                    PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()),
                     PostStatus.published()
             );
         } else {
-            ContentProcessRecord result;
-            if (postUpdateRequest.content() != null && postUpdateRequest.orderInfo() != null) {
-                result = multipartDataProcessorPort.saveFilesAndGenerateContentJson(postUpdateRequest.content(), postUpdateRequest.orderInfo(), postUpdateRequest.thumbnailFilename());
-            } else if (postUpdateRequest.content() == null && postUpdateRequest.orderInfo() == null) {
-                result = new ContentProcessRecord(null,null);
-            } else {
-                throw new EmptyValueException(PostErrorCode.EMPTY_POST_CONTENT);
-            }
+            ContentProcessRecord result = (postRequest.contentText() == null && postRequest.contentFiles() == null)
+                    ? new ContentProcessRecord(null,null)
+                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
             post.updateDraft(
                     AuthorId.fromUuid(currentMemberUuid),
-                    postUpdateRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postUpdateRequest.primaryCategoryId()) : null,
-                    postUpdateRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postUpdateRequest.secondaryCategoryId()) : null,
-                    PostContent.createDraft(postUpdateRequest.title(), result.content(), result.thumbnailPath())
+                    postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null,
+                    postRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postRequest.secondaryCategoryId()) : null,
+                    PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath())
             );
         }
         postRepository.update(post);
+        untrackContentFiles(postRequest.contentFiles());
+        contentDataProcessorPort.deleteFilesWithFileKeys(oldFileKeys);
     }
 
     @Transactional
@@ -157,7 +158,7 @@ public class PostController {
             postRepository.deletePostBookmarkByPostId(post.getPostId());
             postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
-        multipartDataProcessorPort.deleteFiles(post.getPostContent().getContent());
+        contentDataProcessorPort.deleteFiles(post.getPostContent().getContent());
         postRepository.delete(post);
     }
 
@@ -229,7 +230,7 @@ public class PostController {
         if (content == null) return null;
         JsonNode contentPreview;
         try {
-            contentPreview = multipartDataProcessorPort.convertToPreview(content, thumbnailPath);
+            contentPreview = contentDataProcessorPort.convertToPreview(content, thumbnailPath);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }
@@ -240,10 +241,17 @@ public class PostController {
         if (content == null) return null;
         JsonNode newContent;
         try {
-            newContent = multipartDataProcessorPort.convertFileSrcToFullFileSrc(content);
+            newContent = contentDataProcessorPort.convertFileSrcToFullFileSrc(content);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }
         return newContent;
+    }
+
+    private void untrackContentFiles(List<FileOrder> contentFiles) {
+        List<String> fileKeys = contentFiles != null
+                ? contentFiles.stream().map(FileOrder::fileKey).toList()
+                : List.of();
+        pendingFileService.untrackPendingFiles(fileKeys);
     }
 }

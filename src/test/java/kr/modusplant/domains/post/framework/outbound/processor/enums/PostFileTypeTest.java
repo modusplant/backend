@@ -35,8 +35,6 @@ class PostFileTypeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "txt, TEXT",
-            "TXT, TEXT",
             "jpeg, IMAGE",
             "jpg, IMAGE",
             "png, IMAGE",
@@ -54,7 +52,6 @@ class PostFileTypeTest {
 
     @ParameterizedTest
     @CsvSource({
-            "TEXT, txt, true",
             "TEXT, jpg, false",
             "IMAGE, jpeg, true",
             "IMAGE, mp4, false",

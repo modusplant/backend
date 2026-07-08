@@ -12,14 +12,14 @@ public final class PostJsonNodeConstant {
 
     // JSON 문자열 상수
     private static final String JSON_FULL_CONTENT =
-            "[{\"type\":\"text\",\"filename\":\"text_0.txt\",\"order\":0,\"data\":\"Hello, this is text part 1.\"}," +
+            "[{\"type\":\"text\",\"order\":0,\"data\":\"Hello, this is text part 1.\"}," +
             "{\"type\":\"image\",\"filename\":\"image_0.jpg\",\"order\":1,\"src\":\"/images/16e94f67-5abc-48d2-95a1-9cb4e78c7890.jpg\"}," +
             "{\"type\":\"video\",\"filename\":\"video_0.mp4\",\"order\":2,\"src\":\"/videos/2a7b8c9d-12e3-45f6-789a-bcde0123f456.mp4\"}]";
     private static final String JSON_TEXT_AND_IMAGE =
-            "[{\"type\":\"text\",\"filename\":\"text_0.txt\",\"order\":0,\"data\":\"First text\"}," +
+            "[{\"type\":\"text\",\"order\":0,\"data\":\"First text\"}," +
             "{\"type\":\"image\",\"filename\":\"image_0.jpg\",\"order\":1,\"src\":\"/images/16e94f67-5abc-48d2-95a1-9cb4e78c7890.jpg\"}]";
     private static final String JSON_TEXT_AND_VIDEO =
-            "[{\"type\":\"text\",\"filename\":\"text_0.txt\",\"order\":0,\"data\":\"First text\"}," +
+            "[{\"type\":\"text\",\"order\":0,\"data\":\"First text\"}," +
             "{\"type\":\"video\",\"filename\":\"video_0.mp4\",\"order\":1,\"src\":\"/videos/2a7b8c9d-12e3-45f6-789a-bcde0123f456.mp4\"}]";
 
     private static final String JSON_IMAGE_AND_VIDEO =

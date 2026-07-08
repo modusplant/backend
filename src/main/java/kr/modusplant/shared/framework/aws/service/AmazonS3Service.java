@@ -11,6 +11,8 @@ import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -57,7 +59,7 @@ public class AmazonS3Service {
     }
 
 
-    public void deleteFiles(String fileKey) {
+    public void deleteFile(String fileKey) {
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .bucket(bucket)
                 .key(fileKey)
@@ -103,5 +105,18 @@ public class AmazonS3Service {
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
 
         return presignedRequest.url().toString();
+    }
+
+    public String generatePutPresignedUrl(String fileKey, String contentType) {
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .putObjectRequest(req -> req
+                        .bucket(bucket)
+                        .key(fileKey)
+                        .contentType(contentType))
+                .build();
+
+        PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(presignRequest);
+        return presignedPutObjectRequest.url().toString();
     }
 }

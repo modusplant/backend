@@ -170,6 +170,7 @@ public class SecurityConfig {
                                 "/api/v1/report/abuse/post/*",
                                 "/api/v1/report/abuse/post/*/path/**",
                                 "/api/v1/communication/posts",
+                                "/api/v1/communication/posts/upload-urls",
                                 "/api/v1/members/social/**",
                                 "/api/v1/local/members/social/**").authenticated()
                         .requestMatchers(HttpMethod.PUT,
