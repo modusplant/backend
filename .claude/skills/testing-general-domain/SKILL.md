@@ -1,11 +1,21 @@
 ---
 name: testing-general-domain
-description: This file provides strict guidance on creating, managing, and refactoring tests for the general domains except for the enum, exception class, jOOR repository class, and the class that contains only constructors.
+description: This file provides strict guidance on creating, modifying, and deleting tests for the general domains.
 disable-model-invocation: true
 ---
 
 # Precondition
-- **Domain Name String:** Can be `member` or `search`(written in the format [domainName]), or, if not, must be `Member` or `Search`(written in the format [DomainName])
+- **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from `$0` (the first argument passed to the prompt).
+  - **[domainName]:** lowercase/camelCase form of `$0` (e.g., `$0` = `member` → `member`; `$0` = `search` → `search`).
+  - **[DomainName]:** Capitalized/PascalCase form of `$0` (e.g., `$0` = `member` → `Member`; `$0` = `search` → `Search`).
+- **Target Class Scope:**
+  1. The primary target is any class modified in the previous session.
+  2. If no classes were modified in the previous session, the target falls back to the domain specified by `$0`.
+- **Excluded Classes:** Regardless of the scope above, never generate tests for:
+  - Enum classes
+  - Exception classes
+  - jOOQ repository classes
+  - Classes that contain only constructors
 
 # Test Architecture & Strategy
 
@@ -64,7 +74,7 @@ When a class in `src/main/java/kr/modusplant/domains/[domainName]/[SUB_PATH]/[Cl
   - @src/test/java/kr/modusplant/domains/[domainName]/usecase/response
 - **Rule:** Define as `public static final` fields.
 - **Naming:** `test + [Target Class Name]`
-- *Example:*
+- **Example:**
   ```java
   public interface PostAbuseReportApproveRecordTestUtils {
     PostAbuseReportApproveRecord testPostAbuseReportApproveRecord =
@@ -80,21 +90,25 @@ When a class in `src/main/java/kr/modusplant/domains/[domainName]/[SUB_PATH]/[Cl
 - **Naming:** `create + [Target Class Name]`
   - *Note:* If multiple methods with different parameters are required to return various states, append parameter characteristics to the method name (e.g., `create[DomainName]WithId`, `create[DomainName]WithEmail`).
 - **Example:**
-```java
-public interface PostAbuseReportDashboardEntityTestUtils extends PostEntityTestUtils {
-    default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardUncheckedEntityBuilder() {
-        return PostAbuseReportDashboardEntity.builder()
-                .status(AbuseReportStatus.UNCHECKED)
-                .firstReportedAt(TEST_REPORT_CREATED_AT)
-                .lastReportedAt(TEST_REPORT_CREATED_AT);
-    }
+  ```java
+  public interface PostAbuseReportDashboardEntityTestUtils extends PostEntityTestUtils {
+      default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardUncheckedEntityBuilder() {
+          return PostAbuseReportDashboardEntity.builder()
+                  .status(AbuseReportStatus.UNCHECKED)
+                  .firstReportedAt(TEST_REPORT_CREATED_AT)
+                  .lastReportedAt(TEST_REPORT_CREATED_AT);
+      }
+  
+      default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardDismissedEntityBuilder() {
+          return PostAbuseReportDashboardEntity.builder()
+                  .status(AbuseReportStatus.DISMISSED)
+                  .firstReportedAt(TEST_REPORT_CREATED_AT)
+                  .lastReportedAt(TEST_REPORT_DISMISSED_AT);
+      }
+      
+      // ...
+  }
 
-    default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardDismissedEntityBuilder() {
-        return PostAbuseReportDashboardEntity.builder()
-                .status(AbuseReportStatus.DISMISSED)
-                .firstReportedAt(TEST_REPORT_CREATED_AT)
-                .lastReportedAt(TEST_REPORT_DISMISSED_AT);
-    }
-    
-    // ...
-}
+# Post-Generation Verification
+
+Once test codes are generated, they must be verified and validated by running them.
