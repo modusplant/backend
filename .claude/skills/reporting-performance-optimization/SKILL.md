@@ -12,8 +12,9 @@ disable-model-invocation: true
 - **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from $0.
   - **[domainName]:** lowercase/camelCase form of $0 (e.g., $0 = `member` → `member`; $0 = `search` → `search`).
   - **[DomainName]:** Capitalized/PascalCase form of $0 (e.g., $0 = `member` → `Member`; $0 = `search` → `Search`).
+- **Method Name Resolution:** `[methodName]` is dynamically resolved from $1 (e.g., $1 = `searchPlantKoreanNameByKeyword` → `searchPlantKoreanNameByKeyword`).
 - **Target Controller:** @src/main/java/kr/modusplant/domains/[domainName]/framework/inbound/web/rest/[DomainName]RestController.java
-- **Multiple Method Matches:** If $1 matches multiple methods within the target REST Controller, all matching methods must be targeted for analysis.
+- **Multiple Method Matches:** If [methodName] matches multiple methods within the target REST Controller, all matching methods must be targeted for analysis.
 
 # Report
 
@@ -29,3 +30,8 @@ Produce a report with the following sequential sections:
 
    Score each level High=3/Medium=2/Low=1 and compute `Priority Score = Severity + Feasibility - Complexity`. 
    Rank all missing optimizations by descending Priority Score (ties broken by higher Severity) into a priority matrix, then close with a definitive final conclusion naming the top-priority optimization(s) to implement first.
+
+# Follow-up Actions
+- **Output Location:** Save the result under the @.claude/skills/reporting-performance-optimization/ directory (no need to print it to context).
+- **File Naming:** The filename is set to `report_[domainName]_[methodName].md`.
+- **File Handling:** If the file does not exist, create it. If the file already exists, overwrite it.
