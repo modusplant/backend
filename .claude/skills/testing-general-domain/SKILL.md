@@ -4,13 +4,16 @@ description: This file provides strict guidance on creating, modifying, and dele
 disable-model-invocation: true
 ---
 
+# Argument
+- **$0:** The domain name to target, passed as the first argument to the prompt (e.g., `member`, `search`).
+
 # Precondition
-- **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from `$0` (the first argument passed to the prompt).
-  - **[domainName]:** lowercase/camelCase form of `$0` (e.g., `$0` = `member` → `member`; `$0` = `search` → `search`).
-  - **[DomainName]:** Capitalized/PascalCase form of `$0` (e.g., `$0` = `member` → `Member`; `$0` = `search` → `Search`).
+- **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from $0.
+  - **[domainName]:** lowercase/camelCase form of $0 (e.g., $0 = `member` → `member`; $0 = `search` → `search`).
+  - **[DomainName]:** Capitalized/PascalCase form of $0 (e.g., $0 = `member` → `Member`; $0 = `search` → `Search`).
 - **Target Class Scope:**
   1. The primary target is any class modified in the previous session.
-  2. If no classes were modified in the previous session, the target falls back to the domain specified by `$0`.
+  2. If no classes were modified in the previous session, the target falls back to the domain specified by $0.
 - **Excluded Classes:** Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
