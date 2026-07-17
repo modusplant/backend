@@ -1,8 +1,7 @@
 ### Coding AI Tool ###
 /.claude/CLAUDE.local.md
 /.claude/settings.local.json
-/.claude/skills/reporting-performance-optimization/*.md
-!/.claude/skills/reporting-performance-optimization/SKILL.md
+/.claude/skills/reporting-performance-optimization/result
 
 ### Docker ###
 docker-compose.override.yml
