@@ -157,7 +157,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testGetDataByUlid_givenPublishedPostAndAuthor_willReturnPostDetail() throws IOException {
         // given
         given(postQueryRepository.findPostDetailDataByPostId(any(PostId.class))).willReturn(Optional.of(TEST_PUBLISHED_POST_DETAIL_DATA_READ_MODEL));
-        given(contentDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        given(contentDataProcessorPort.convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
         given(contentDataProcessorPort.extractOriginalFilenameFromFileKey(anyString())).willReturn(TEST_POST_CONTENT_THUMBNAIL_FILENAME);
 
         // when
@@ -166,7 +166,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isNotNull();
         verify(postQueryRepository).findPostDetailDataByPostId(any(PostId.class));
-        verify(contentDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
+        verify(contentDataProcessorPort).convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class));
         verify(contentDataProcessorPort).extractOriginalFilenameFromFileKey(anyString());
     }
 
@@ -175,7 +175,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
     void testGetDataByUlid_givenDraftPostAndAuthor_willReturnPostDetail() throws IOException {
         // given
         given(postQueryRepository.findPostDetailDataByPostId(any(PostId.class))).willReturn(Optional.of(TEST_DRAFT_POST_DETAIL_DATA_READ_MODEL));
-        given(contentDataProcessorPort.convertFileSrcToFullFileSrc(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
+        given(contentDataProcessorPort.convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
         given(contentDataProcessorPort.extractOriginalFilenameFromFileKey(anyString())).willReturn(TEST_POST_CONTENT_THUMBNAIL_FILENAME);
 
         // when
@@ -184,7 +184,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isNotNull();
         verify(postQueryRepository).findPostDetailDataByPostId(any(PostId.class));
-        verify(contentDataProcessorPort).convertFileSrcToFullFileSrc(any(JsonNode.class));
+        verify(contentDataProcessorPort).convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class));
         verify(contentDataProcessorPort).extractOriginalFilenameFromFileKey(anyString());
     }
 
@@ -200,7 +200,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThatThrownBy(() -> postController.getDataByUlid(TEST_POST_ULID, otherMemberUuid))
                 .isInstanceOf(PostNotFoundException.class);
         verify(postQueryRepository).findPostDetailDataByPostId(any(PostId.class));
-        verify(contentDataProcessorPort, never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
+        verify(contentDataProcessorPort, never()).convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class));
         verify(contentDataProcessorPort, never()).extractOriginalFilenameFromFileKey(anyString());
     }
 
@@ -217,7 +217,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         assertThat(result).isNotNull();
         verify(postQueryRepository).findPostDetailDataByPostId(any(PostId.class));
-        verify(contentDataProcessorPort,never()).convertFileSrcToFullFileSrc(any(JsonNode.class));
+        verify(contentDataProcessorPort,never()).convertFileSrcToFullFileSrcWithFileKey(any(JsonNode.class));
         verify(contentDataProcessorPort).extractOriginalFilenameFromFileKey(null);
     }
 
