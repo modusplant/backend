@@ -17,6 +17,8 @@ public interface ContentDataProcessorPort {
 
     ArrayNode convertFileSrcToFullFileSrc(JsonNode content) throws IOException;
 
+    ArrayNode convertFileSrcToFullFileSrcWithFileKey(JsonNode content) throws IOException;
+
     ArrayNode convertToPreview(JsonNode content, String thumbnailPath) throws IOException;
 
     void deleteFiles(JsonNode content);

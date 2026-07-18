@@ -36,6 +36,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
     private final RandomUlidGenerator generator;
     public static final String DATA = "data";
     public static final String FILENAME = "filename";
+    public static final String FILE_KEY = "fileKey";
     public static final String ORDER = "order";
     public static final String SRC = "src";
     public static final String TYPE = "type";
@@ -110,6 +111,14 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
     }
 
     public ArrayNode convertFileSrcToFullFileSrc(JsonNode content) {
+        return convertFileSrcToFullFileSrc(content, false);
+    }
+
+    public ArrayNode convertFileSrcToFullFileSrcWithFileKey(JsonNode content) {
+        return convertFileSrcToFullFileSrc(content, true);
+    }
+
+    private ArrayNode convertFileSrcToFullFileSrc(JsonNode content, boolean includeFileKey) {
         ArrayNode newArray = objectMapper.createArrayNode();
         for (JsonNode node : content) {
             ObjectNode objectNode = node.deepCopy();
@@ -117,6 +126,9 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
                 String fileKey = objectNode.get(SRC).asText();
                 objectNode.remove(SRC);
                 String src = amazonS3Service.generateS3SrcUrl(fileKey);
+                if (includeFileKey) {
+                    objectNode.put(FILE_KEY, fileKey);
+                }
                 objectNode.put(SRC,src);
             }
             newArray.add(objectNode);
