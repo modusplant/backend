@@ -1,5 +1,5 @@
 ---
-name: testing-member-domain
+name: testing-general-domain
 description: This file provides strict guidance on creating, modifying, and deleting tests for the general domain.
 disable-model-invocation: true
 ---
@@ -12,7 +12,7 @@ disable-model-invocation: true
     - **Case 2: Return value exists:** `..._willReturnResponse` or `..._willReturnReadModel` (Specify the concrete return type name)
     - **Case 3: Exception occurs:** `..._willThrowException` (Fixed format)
 
-# Test Method Display Name Convention
+# Test Method Display Name Convention (Exceptionally Allowed to Use Korean Only Within This Sector)
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
     - **Case 1:** `..._willProcessAction` -> `활동 수행`

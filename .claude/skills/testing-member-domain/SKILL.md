@@ -5,6 +5,7 @@ disable-model-invocation: true
 ---
 
 # Precondition
+- **Dependency:** This document strongly depends on @.claude/skills/testing-general-domain/SKILL.md skill, so it must be read first.
 - **Target Class Scope:**
   1. The primary target is any class modified in the previous session, if it belongs to the member domain.
   2. If no member-domain classes were modified in the previous session, the target falls back to the member domain as a whole.
