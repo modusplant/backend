@@ -1,6 +1,7 @@
 package kr.modusplant.domains.search.adapter.controller;
 
 import kr.modusplant.domains.search.domain.vo.SearchKeyword;
+import kr.modusplant.domains.search.domain.vo.SearchResultListSize;
 import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
 import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
 import kr.modusplant.domains.search.usecase.port.transliterator.SearchTransliterator;
@@ -29,18 +30,19 @@ public class SearchPlantController {
         SearchKeyword keyword = SearchKeyword.create(
                 searchTransliterator.separateKoreanIntoConsonantAndVowel(record.keyword()));
         String keywordValue = keyword.getValue();
-        Integer maxSize = record.size();
+        SearchResultListSize searchResultListSize = SearchResultListSize.create(record.size());
+        int resultListSize = searchResultListSize.getValue();
 
         PriorityQueue<SearchPlantKoreanNameReadModel> similarityPriorityQueue = new PriorityQueue<>();
         for (String koreanName : searchPlantCache.getTransliteratedKoreanNames()) {
             double similarity = jaroWinklerSimilarity.apply(keywordValue, koreanName);
             if (similarity >= 0.8) {
-                if (similarityPriorityQueue.size() < maxSize) {
+                if (similarityPriorityQueue.size() < resultListSize) {
                     similarityPriorityQueue.offer(
                             new SearchPlantKoreanNameReadModel(
                                     searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
                 } else if (similarityPriorityQueue.peek() == null) {
-                    throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "maxSize");
+                    throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "searchSize");
                 } else if (similarity > similarityPriorityQueue.peek().similarity()) {
                     similarityPriorityQueue.poll();
                     similarityPriorityQueue.offer(

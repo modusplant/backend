@@ -63,8 +63,10 @@ public class SearchPostController {
                 record.searchPostSortCondition()
         );
 
-        Integer size = record.size();
-        UUID memberId = record.memberId();
+        SearchResultListSize searchResultListSize = SearchResultListSize.create(record.size());
+        SearcherId searcherIdVO = SearcherId.fromUuid(record.memberId());
+        int resultListSize = searchResultListSize.getValue();
+        UUID searcherId = searcherIdVO.getValue();
         List<SearchPostReadModel> readModels;
 
         // 페이지네이션된 읽기 모델 반환
@@ -76,8 +78,8 @@ public class SearchPostController {
                     secondaryCategoryIds,
                     searchPost.getSearchPostOption().getSearchPostId(),
                     searchPost.getSearchPostOption().getSearchPostPublishedAt(),
-                    size,
-                    memberId);
+                    searchResultListSize,
+                    searcherIdVO);
         } else {
             readModels = searchPostRepository.searchByKeywordWithRelevance(
                     searchPost.getSearchKeyword(),
@@ -88,21 +90,21 @@ public class SearchPostController {
                     searchPost.getSearchPostOption().getSearchPostPublishedAt(),
                     searchPost.getSearchPostOption().getSearchPostImportance(),
                     searchPost.getSearchPostOption().getSearchKeywordSimilarity(),
-                    size,
-                    memberId);
+                    searchResultListSize,
+                    searcherIdVO);
         }
-        boolean hasNext = readModels.size() > size;
+        boolean hasNext = readModels.size() > resultListSize;
 
         // 응답으로 매핑
         List<SearchPostResponse> responses =
                 readModels.stream()
-                        .limit(size)
+                        .limit(resultListSize)
                         .map(readModel ->
                                 searchMapper.toSearchPostResponse(readModel,
                                         searchPostTranslator.getJsonNodeContentPreview(
                                                 readModel.content(), readModel.thumbnailPath())))
                         .toList();
-        searchPostHistoryRepository.saveSearchKeyword(searchPost.getSearchKeyword(), memberId);
+        searchPostHistoryRepository.saveSearchKeyword(searchPost.getSearchKeyword(), searcherId);
 
         SearchPostResponse lastResponse = hasNext && !responses.isEmpty() ? responses.getLast() : null;
         if (lastResponse != null) {
