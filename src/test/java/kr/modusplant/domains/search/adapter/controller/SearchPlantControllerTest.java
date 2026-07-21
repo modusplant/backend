@@ -7,6 +7,7 @@ import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
 import kr.modusplant.domains.search.usecase.port.transliterator.SearchTransliterator;
 import kr.modusplant.domains.search.usecase.record.SearchPlantKoreanNameRecord;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,5 +142,35 @@ class SearchPlantControllerTest {
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_KEYWORD);
+    }
+
+    @Test
+    @DisplayName("size가 null인 레코드로 searchKoreanNameByKeyword 호출 시 예외 발생")
+    void testSearchKoreanNameByKeyword_givenNullSize_willThrowException() {
+        // given
+        SearchPlantKoreanNameRecord record = new SearchPlantKoreanNameRecord(TEST_SEARCH_KEYWORD, null);
+        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+
+        // when
+        EmptyValueException exception = assertThrows(EmptyValueException.class,
+                () -> searchPlantController.searchKoreanNameByKeyword(record));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_RESULT_LIST_SIZE);
+    }
+
+    @Test
+    @DisplayName("허용 범위를 벗어난 size로 searchKoreanNameByKeyword 호출 시 예외 발생")
+    void testSearchKoreanNameByKeyword_givenSizeOutOfRange_willThrowException() {
+        // given
+        SearchPlantKoreanNameRecord record = new SearchPlantKoreanNameRecord(TEST_SEARCH_KEYWORD, 51);
+        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> searchPlantController.searchKoreanNameByKeyword(record));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.SEARCH_RESULT_LIST_SIZE_OUT_OF_RANGE);
     }
 }

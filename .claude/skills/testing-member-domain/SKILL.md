@@ -22,15 +22,6 @@ disable-model-invocation: true
 - **Mocking Strategy:** All dependent classes, except for the explicit instance containing the method under test, must be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks` annotations.
 - **REST Controller Unit Test:**: Covers unit tests that verify method calls, return values, and exceptions by injecting mock dependency into the controller instance, without using MockMvc.
 
-# Test Method Naming & Scope Convention
-
-## Naming Format
-- **Format:** `testMethodName_givenCondition_willDoAction`
-- **Will-Clause Rules:**
-    - **Case 1: No return value (Void):** `..._willProcessAction` (e.g., `willReportAbuse`, `willVerifyRequest`)
-    - **Case 2: Return value exists:** `..._willReturnResponse` or `..._willReturnReadModel` (Specify the concrete return type name)
-    - **Case 3: Exception occurs:** `..._willThrowException` (Fixed format)
-
 # Test Body Convention (BDD Style)
 
 Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
