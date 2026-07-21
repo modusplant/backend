@@ -17,9 +17,8 @@ disable-model-invocation: true
 
 - **Pure Unit Test:** Unit tests must maintain a pure POJO state. **Do not use** Spring Context (`@SpringBootTest`, `@WebMvcTest`) or Mockito Extension (`@ExtendWith(MockitoExtension.class)`). But, there are some exceptions:
     - @src/main/java/kr/modusplant/domains/search/framework/outbound/jpa/repository (Essentially, necessary to verify interactions with the database)
-    - @src/main/java/kr/modusplant/domains/search/framework/outbound/redis (Uses `@ExtendWith(MockitoExtension.class)` with `@Mock`/`@InjectMocks` to verify Redis template interactions)
 - **jOOQ Repository Integration Test:** Unlike the other exclusion rules above, classes under @src/main/java/kr/modusplant/domains/search/framework/outbound/jooq/repository are covered by an integration test, not excluded. Use `@SpringBootTest` with a real Spring context and real seeded test data (via a test data helper) — do not mock `DSLContext`. Only genuinely time-dependent behavior (e.g. `LocalDateTime.now()`) should be controlled via `Mockito.mockStatic`.
-- **Mocking Strategy:** All dependent classes, except for the explicit instance containing the method under test, must be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks` annotations. (See the Pure Unit Test exceptions above for the classes where `@Mock`/`@InjectMocks` is used instead.)
+- **Mocking Strategy:** All dependent classes, except for the explicit instance containing the method under test, must be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks` annotations.
 - **REST Controller Unit Test:**: Covers unit tests that verify method calls, return values, and exceptions by injecting mock dependency into the controller instance, without using MockMvc.
 
 # Test Method Naming & Scope Convention
