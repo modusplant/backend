@@ -5,7 +5,7 @@ disable-model-invocation: true
 ---
 
 # Precondition
-- **Dependency:** This document strongly depends on @.claude/skills/testing-general-domain/SKILL.md skill, so it must be read first.
+
 - **Target Class Scope:**
   1. The primary target is any class modified in the previous session, if it belongs to the search domain.
   2. If no search-domain classes were modified in the previous session, the target falls back to the search domain as a whole.
@@ -21,6 +21,23 @@ disable-model-invocation: true
 - **jOOQ Repository Integration Test:** Unlike the other exclusion rules above, classes under @src/main/java/kr/modusplant/domains/search/framework/outbound/jooq/repository are covered by an integration test, not excluded. Use `@SpringBootTest` with a real Spring context and real seeded test data (via a test data helper) — do not mock `DSLContext`. Only genuinely time-dependent behavior (e.g. `LocalDateTime.now()`) should be controlled via `Mockito.mockStatic`.
 - **Mocking Strategy:** All dependent classes, except for the explicit instance containing the method under test, must be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks` annotations.
 - **REST Controller Unit Test:**: Covers unit tests that verify method calls, return values, and exceptions by injecting mock dependency into the controller instance, without using MockMvc.
+
+# Test Method Naming Convention
+
+- **Format:** `testMethodName_givenCondition_willDoAction`
+- **Conciseness:** Should not be overly verbose. Use clear and simple language that gets to the heart of the matter.
+- **Will-Clause Rules:**
+  - **Case 1: No return value (Void):** `..._willProcessAction` (e.g., `willReportAbuse`, `willVerifyRequest`)
+  - **Case 2: Return value exists:** `..._willReturnResponse` or `..._willReturnReadModel` (Specify the concrete return type name)
+  - **Case 3: Exception occurs:** `..._willThrowException` (Fixed format)
+
+# Test Method Display Name Convention (Exceptionally Allowed to Use Korean Only Within This Sector)
+
+- **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
+- **Interpretation Rules For The Will-Clause on Method Names:**
+  - **Case 1:** `..._willProcessAction` -> `활동 수행`
+  - **Case 2:** `..._willReturnResponse` -> `응답 반환`, `..._willReturnReadModel` -> `읽기 모델 반환`
+  - **Case 3:** `..._willThrowException` -> `예외 반환` (Fixed format)
 
 # Test Body Convention (BDD Style)
 
