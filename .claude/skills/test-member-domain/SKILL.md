@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Precondition
 
 - **Target Class Scope:**
-  1. The primary target is any class modified in the previous session, if it belongs to the member domain.
+  1. The primary target is any class modified since the previous session, if it belongs to the member domain.
   2. If no member-domain classes were modified in the previous session, the target falls back to the member domain as a whole.
 - **Excluded Classes:** Regardless of the scope above, never generate tests for:
   - Enum classes
