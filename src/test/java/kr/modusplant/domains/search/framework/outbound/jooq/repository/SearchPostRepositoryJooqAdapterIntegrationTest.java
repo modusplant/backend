@@ -95,7 +95,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         List<SearchPostReadModel> firstPageByKeyword =
                 searchPostRepository.searchByKeywordWithLatest(
                         keyword, TITLE_CONTENT, null, null,
-                        testEmptySearchPostId, testEmptySearchPostPublishedAt, size, testMember2.getUuid());
+                        testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         SearchPostReadModel firstPage = firstPageByKeyword.getFirst();
         SearchPostReadModel lastPage = firstPageByKeyword.getLast();
@@ -109,19 +109,19 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         List<SearchPostReadModel> secondPageByKeyword =
                 searchPostRepository.searchByKeywordWithLatest(
                         keyword, TITLE_CONTENT, null, null,
-                        cursorId, cursorPublishedAt, size, testMember2.getUuid());
+                        cursorId, cursorPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         List<SearchPostReadModel> pageByBackslash = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("\\".repeat(10)), TITLE_CONTENT, null, null,
-                testEmptySearchPostId, testEmptySearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         List<SearchPostReadModel> pageByPercent = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("%".repeat(10)), TITLE_CONTENT, null, null,
-                testEmptySearchPostId, testEmptySearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         List<SearchPostReadModel> pageByUnderscore = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("_".repeat(10)), TITLE_CONTENT, null, null,
-                testEmptySearchPostId, testEmptySearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         // 결과 존재 여부 확인
@@ -151,7 +151,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         int size = 10;
         List<SearchPostReadModel> result = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("title1"), SearchPostTarget.TITLE, null, null,
-                testEmptySearchPostId, testSearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testSearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         assertThat(result).hasSize(1);
@@ -167,11 +167,11 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         int size = 10;
         List<SearchPostReadModel> resultByContent3 = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("content3"), TITLE_CONTENT_COMMENT, null, null,
-                testEmptySearchPostId, testSearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testSearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         List<SearchPostReadModel> resultByContent2 = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("content2"), TITLE_CONTENT_COMMENT, null, null,
-                testEmptySearchPostId, testSearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testSearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         // content3은 is_deleted = false → testPost1에서 검색됨
@@ -189,7 +189,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         int size = 10;
         List<SearchPostReadModel> result = searchPostRepository.searchByKeywordWithLatest(
                 SearchKeyword.create("Hello"), TITLE_CONTENT, testPrimaryCategory1.getId(), List.of(testSecondaryCategory1.getId()),
-                testEmptySearchPostId, testEmptySearchPostPublishedAt, size, testMember2.getUuid());
+                testEmptySearchPostId, testEmptySearchPostPublishedAt, SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         // testPrimaryCategory1 + testSecondaryCategory1에 속한 게시글만 반환
@@ -208,7 +208,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
                 SearchKeyword.create("hello"), TITLE_CONTENT, null, null,
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty(),
-                size, testMember2.getUuid());
+                SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         // 결과가 존재하고 importance 기준으로 정렬되어 있음을 확인
@@ -227,7 +227,7 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
                 keyword, TITLE_CONTENT, null, null,
                 testEmptySearchPostId, testEmptySearchPostPublishedAt,
                 SearchPostImportance.empty(), SearchKeywordSimilarity.createEmpty(),
-                size, testMember2.getUuid());
+                SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         SearchPostReadModel firstPost = firstPage.getFirst();
         SearchPostId cursorId = SearchPostId.create(firstPost.ulid());
@@ -242,12 +242,27 @@ class SearchPostRepositoryJooqAdapterIntegrationTest {
         List<SearchPostReadModel> secondPage = searchPostRepository.searchByKeywordWithRelevance(
                 keyword, TITLE_CONTENT, null, null,
                 cursorId, cursorPublishedAt, cursorImportance, cursorSimilarity,
-                size, testMember2.getUuid());
+                SearchResultListSize.create(size), SearcherId.fromUuid(testMember2.getUuid()));
 
         // then
         // 첫 페이지 마지막 = 두 번째 페이지 첫 번째 (커서 기준 연속성 확인)
         assertThat(firstPage.getLast()).isEqualTo(secondPage.getFirst());
         // 두 페이지에 중복된 ulid 없음
         assertThat(firstPage.getFirst().ulid()).isNotEqualTo(secondPage.getFirst().ulid());
+    }
+
+    @Test
+    @DisplayName("검색자 ID가 없는 익명 사용자로 키워드 검색 시 좋아요/북마크 여부는 항상 false를 반환")
+    void testSearchByKeywordWithLatest_givenAnonymousSearcher_willReturnFalseForIsLikedAndIsBookmarked() {
+        // given & when
+        int size = 10;
+        List<SearchPostReadModel> result = searchPostRepository.searchByKeywordWithLatest(
+                SearchKeyword.create("Hello"), TITLE_CONTENT, null, null,
+                testEmptySearchPostId, testEmptySearchPostPublishedAt,
+                SearchResultListSize.create(size), SearcherId.fromUuid(null));
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result).allMatch(post -> !post.isLiked() && !post.isBookmarked());
     }
 }

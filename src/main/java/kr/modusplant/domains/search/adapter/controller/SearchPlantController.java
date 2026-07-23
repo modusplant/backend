@@ -1,6 +1,7 @@
 package kr.modusplant.domains.search.adapter.controller;
 
 import kr.modusplant.domains.search.domain.vo.SearchKeyword;
+import kr.modusplant.domains.search.domain.vo.SearchResultListSize;
 import kr.modusplant.domains.search.usecase.model.read.SearchPlantKoreanNameReadModel;
 import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
 import kr.modusplant.domains.search.usecase.port.transliterator.SearchTransliterator;
@@ -9,7 +10,6 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,31 +19,30 @@ import java.util.PriorityQueue;
 import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode.SEARCH_SIZE_OUT_OF_RANGE;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class SearchPlantController {
     private final SearchPlantCache searchPlantCache;
     private final SearchTransliterator searchTransliterator;
     private final JaroWinklerSimilarity jaroWinklerSimilarity;
 
-    @Transactional(readOnly = true)
     public List<SearchPlantKoreanNameReadModel> searchKoreanNameByKeyword(
             SearchPlantKoreanNameRecord record) {
         SearchKeyword keyword = SearchKeyword.create(
                 searchTransliterator.separateKoreanIntoConsonantAndVowel(record.keyword()));
         String keywordValue = keyword.getValue();
-        Integer maxSize = record.size();
+        SearchResultListSize searchResultListSize = SearchResultListSize.create(record.size());
+        int resultListSize = searchResultListSize.getValue();
 
         PriorityQueue<SearchPlantKoreanNameReadModel> similarityPriorityQueue = new PriorityQueue<>();
         for (String koreanName : searchPlantCache.getTransliteratedKoreanNames()) {
             double similarity = jaroWinklerSimilarity.apply(keywordValue, koreanName);
             if (similarity >= 0.8) {
-                if (similarityPriorityQueue.size() < maxSize) {
+                if (similarityPriorityQueue.size() < resultListSize) {
                     similarityPriorityQueue.offer(
                             new SearchPlantKoreanNameReadModel(
                                     searchTransliterator.combineKoreanIntoConsonantAndVowel(koreanName), similarity));
                 } else if (similarityPriorityQueue.peek() == null) {
-                    throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "maxSize");
+                    throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "searchSize");
                 } else if (similarity > similarityPriorityQueue.peek().similarity()) {
                     similarityPriorityQueue.poll();
                     similarityPriorityQueue.offer(

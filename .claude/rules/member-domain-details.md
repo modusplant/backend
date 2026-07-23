@@ -1,51 +1,57 @@
 ---
 paths:
   - "src/main/java/kr/modusplant/domains/member/**"
-  - "src/main/java/kr/modusplant/domains/search/**"
 ---
 
 > Supplements CLAUDE.md § Architecture — Domain Internal Structure. Assumes familiarity with the four-layer layout and JPA/jOOQ design decision documented there.
 
-# Domain Conventions
+# Member Domain Conventions
 
-Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.search` and its sub-packages.
+Applies to `kr.modusplant.domains.member` and its sub-packages.
 
 ---
 
 ## 1. Package Structure
 
 ```
-[member]
+member/
  ├─ domain/
- │   ├─ aggregate/          # Aggregates
- │   ├─ entity/             # Entities; nullobject/ for Null Object singletons
- │   ├─ vo/                 # Value Objects; Empty* for optional VOs
- │   ├─ event/              # Domain events
- │   ├─ enums/              # Domain status enums
- │   └─ exception/enums/    # Error code enums
+ │   ├─ aggregate/                 # Aggregates
+ │   ├─ entity/                    # Entities; nullobject/ for Null Object singletons
+ │   ├─ vo/                        # Value Objects; nullobject/ for optional VOs (Empty*)
+ │   ├─ event/                     # Domain events
+ │   ├─ enums/                     # Domain status enums
+ │   └─ exception/enums/           # Error code enums
  ├─ usecase/
- │   ├─ port/repository/    # Repository port interfaces
- │   ├─ port/mapper/        # Domain → DTO mapper interfaces
- │   ├─ record/             # Data-transfer records (REST Controller → adapter)
- │   ├─ request/            # External request DTOs (@Valid + Swagger)
- │   ├─ response/           # Response DTOs (Java records)
- │   └─ model/read/         # Read models for jOOQ query mapping
+ │   ├─ port/repository/           # Repository port interfaces
+ │   ├─ port/mapper/               # Domain → DTO mapper interfaces
+ │   ├─ record/                    # Data-transfer records (REST Controller → adapter)
+ │   ├─ request/                   # External request DTOs (@Valid + Swagger)
+ │   ├─ response/                  # Response DTOs (Java records)
+ │   └─ model/read/                # Read models for jOOQ query mapping
  ├─ adapter/
- │   ├─ controller/         # Business orchestration (*Controller / *AdminController)
- │   ├─ helper/             # Pre-condition checks (*ValidationHelper) and I/O (*IOHelper)
- │   ├─ listener/           # Domain event listeners
- │   ├─ mapper/             # Mapper port implementations
- │   └─ translator/         # External system abstractions
+ │   ├─ controller/                # Business orchestration (*Controller / *AdminController)
+ │   ├─ helper/                    # Pre-condition checks (*ValidationHelper) and I/O (*IOHelper)
+ │   ├─ listener/                  # Domain event listeners
+ │   ├─ mapper/                    # Mapper port implementations
+ │   └─ translator/                # External system abstractions
  └─ framework/
-     ├─ inbound/web/rest/           # @RestController (HTTP entry point)
-     ├─ inbound/web/cache/          # ETag/If-Modified-Since cache validation
-     ├─ outbound/                   # Repository port implementations
-     ├─ outbound/jpa/entity/        # @Entity classes
-     ├─ outbound/jpa/entity/record/ # JPA JSON-column serialization records
-     ├─ outbound/jpa/repository/    # Spring Data JPA interfaces
-     ├─ outbound/jpa/mapper/        # JPA Entity ↔ Domain mapping
-     ├─ outbound/jooq/repository/   # DSLContext-based complex queries
-     └─ outbound/jooq/record/       # jOOQ composite parameter records
+     ├─ inbound/web/rest/          # @RestController (HTTP entry point)
+     ├─ inbound/web/cache/
+     │   ├─ record/                # *CacheValidationResult — ETag/If-Modified-Since result carriers
+     │   └─ service/               # *CacheValidationService — conditional-request evaluation logic
+     ├─ outbound/                  # Repository port implementations (combine JPA + jOOQ)
+     ├─ outbound/jpa/entity/       # @Entity classes
+     │   └─ record/                # JPA JSON-column serialization records
+     ├─ outbound/jpa/repository/   # Spring Data JPA interfaces
+     │   └─ supers/                # Shared base repository interfaces
+     ├─ outbound/jpa/mapper/       # JPA Entity ↔ Domain mapping implementations
+     │   └─ supers/                # Shared base mapper interfaces
+     ├─ outbound/jpa/adapter/      # *RepositoryJpaAdapter — mediates between the outbound port
+     │                             #   implementation and the raw Spring Data JPA repository
+     ├─ outbound/jpa/compositekey/ # Composite PK classes for @IdClass entities (join/report tables)
+     ├─ outbound/jooq/repository/  # DSLContext-based complex queries
+     └─ outbound/jooq/record/      # jOOQ composite parameter records
 ```
 
 ---
@@ -92,7 +98,7 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
 - Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
 
 **Read Models** (`usecase/model/read/`):
-- Java records optimized for specific views; direct targets of jOOQ query mapping
+- Java records optimized for specific views (e.g. abuse-report/proposal dashboards); direct targets of jOOQ query mapping
 
 **Request DTOs** (`usecase/request/`):
 - Carry `@Valid` and Swagger Schema annotations; deserialized directly from external input
@@ -117,7 +123,7 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
 
 **Translator** (`adapter/translator/`) — `@Component`;
 - Used only for controller
-- abstracts calls to external systems
+- Abstracts calls to external systems (e.g. social-login providers)
 
 ---
 
@@ -126,20 +132,29 @@ Applies exclusively to `kr.modusplant.domains.member`, `kr.modusplant.domains.se
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
 - Extracts auth via `@AuthenticationPrincipal`; wraps into usecase record and delegates to adapter Controller
+- Naming mirrors the adapter Controller it delegates to, with a `*RestController` suffix (e.g. `MemberRestController`, `MemberAdminRestController`)
 - Admin endpoints: `@PreAuthorize("hasAuthority('ADMIN')")`
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
 **HTTP Cache** (`framework/inbound/web/cache/`):
-- ETag + If-Modified-Since conditional request handling; returns `*CacheValidationResult` record
+- ETag + If-Modified-Since conditional request handling
+- `record/`: `*CacheValidationResult` carries the outcome of a validation check
+- `service/`: `*CacheValidationService` evaluates request headers against current resource state to produce a result
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor @Getter`:
-- Composite PK: `@IdClass` + separate CompositeKey class
+- Composite PK: `@IdClass` + a dedicated composite-key class under `outbound/jpa/compositekey/`
 - JSON column: `@JdbcTypeCode(SqlTypes.JSON)` + dedicated record in `entity/record/`
 - Auditing: `createdAt`, `lastModifiedAt`; optimistic locking via `versionNumber`
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends shared project base interface
+- `supers/` holds base repository interfaces shared across multiple JPA repositories in this domain
 
 **JPA Mapper** (`framework/outbound/jpa/mapper/`) — `@Component`; JPA Entity ↔ Domain Aggregate; may include S3 download
+- `supers/` holds base mapper interfaces shared across multiple JPA mappers in this domain
+
+**JPA Adapter** (`framework/outbound/jpa/adapter/`) — `@Component`; `*RepositoryJpaAdapter` classes wrap a Spring Data JPA repository to present a narrower, domain-shaped interface to the outbound repository implementation
+
+**Composite Key** (`framework/outbound/jpa/compositekey/`) — plain classes implementing `Serializable`, paired 1:1 with an `@IdClass` entity (e.g. like/abuse-report join tables)
 
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA

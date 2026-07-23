@@ -6,10 +6,11 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmptySearchPostId extends SearchPostId {
+    private static final EmptySearchPostId instance = new EmptySearchPostId();
+
     public static EmptySearchPostId create() {
         return instance;
     }
-    private static final EmptySearchPostId instance = new EmptySearchPostId();
 
     @Override
     public String getValue() {

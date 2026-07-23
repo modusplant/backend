@@ -33,7 +33,10 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
     @Override
     public List<SearchPostReadModel> searchByKeywordWithLatest(
             SearchKeyword searchKeyword, SearchPostTarget target, Integer primaryCategoryId, List<Integer> secondaryCategoryIds,
-            SearchPostId searchPostId, SearchPostPublishedAt searchPostPublishedAt, int size, UUID memberId) {
+            SearchPostId searchPostId, SearchPostPublishedAt searchPostPublishedAt,
+            SearchResultListSize searchResultListSize, SearcherId searcherIdVO) {
+        int resultListSize = searchResultListSize.getValue();
+        UUID searcherId = searcherIdVO.getValue();
         String keyword = searchKeyword.getValue();
         String cursorUlid = searchPostId.getValue();
         LocalDateTime cursorPublishedAt = searchPostPublishedAt.getValue();
@@ -154,8 +157,8 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .asTable("comm_cnt");
 
         // memberId의 null 여부에 따른 쿼리 최적화
-        Condition isLiked = getIsLikedCondition(memberId, eHitsUlid);
-        Condition isBookmarked = getIsBookmarkedCondition(memberId, eHitsUlid);
+        Condition isLiked = getIsLikedCondition(searcherId, eHitsUlid);
+        Condition isBookmarked = getIsBookmarkedCondition(searcherId, eHitsUlid);
 
         //noinspection DataFlowIssue
         return dsl.with(ctes)
@@ -184,7 +187,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                         eHitsPublishedAt.desc(),
                         eHitsUlid.desc()
                 )
-                .limit(size + 1)
+                .limit(resultListSize + 1)
                 .fetch()
                 .map(searchJooqMapper::toSearchPostReadModel);
     }
@@ -194,7 +197,9 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
             SearchKeyword searchKeyword, SearchPostTarget target, Integer primaryCategoryId, List<Integer> secondaryCategoryIds,
             SearchPostId searchPostId, SearchPostPublishedAt searchPostPublishedAt,
             SearchPostImportance searchPostImportance, SearchKeywordSimilarity searchKeywordSimilarity,
-            int size, UUID memberId) {
+            SearchResultListSize searchResultListSize, SearcherId searcherIdVO) {
+        int resultListSize = searchResultListSize.getValue();
+        UUID searcherId = searcherIdVO.getValue();
         String keyword = searchKeyword.getValue();
         String cursorUlid = searchPostId.getValue();
         LocalDateTime cursorPublishedAt = searchPostPublishedAt.getValue();
@@ -401,8 +406,8 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                 .asTable("comm_cnt");
 
         // memberId의 null 여부에 따른 쿼리 최적화
-        Condition isLiked = getIsLikedCondition(memberId, eHitsUlid);
-        Condition isBookmarked = getIsBookmarkedCondition(memberId, eHitsUlid);
+        Condition isLiked = getIsLikedCondition(searcherId, eHitsUlid);
+        Condition isBookmarked = getIsBookmarkedCondition(searcherId, eHitsUlid);
 
         //noinspection DataFlowIssue
         return dsl.with(ctes)  // 💡 리스트로 모아둔 CTE들을 한 번에 등록
@@ -435,7 +440,7 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
                                 .otherwise((Double) null).desc().nullsLast(),
                         eHitsUlid.desc()
                 )
-                .limit(size + 1)
+                .limit(resultListSize + 1)
                 .fetch()
                 .map(searchJooqMapper::toSearchPostReadModel);
     }

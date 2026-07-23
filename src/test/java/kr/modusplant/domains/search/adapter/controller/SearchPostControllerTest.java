@@ -13,6 +13,7 @@ import kr.modusplant.domains.search.usecase.port.repository.SearchPostRepository
 import kr.modusplant.domains.search.usecase.record.SearchPostRecord;
 import kr.modusplant.domains.search.usecase.response.SearchPostRelevanceSortedPageResponse;
 import kr.modusplant.domains.search.usecase.response.SearchPostResponse;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
@@ -34,6 +35,9 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordTe
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostIdTestUtils.testSearchPostId;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostImportanceTestUtils.testSearchPostImportanceTitle;
 import static kr.modusplant.domains.search.common.util.domain.vo.SearchPostPublishedAtTestUtils.testSearchPostPublishedAt;
+import static kr.modusplant.domains.search.common.util.domain.vo.SearchResultListSizeTestUtils.testSearchResultListSize;
+import static kr.modusplant.domains.search.common.util.domain.vo.SearcherIdTestUtils.testSearcherId;
+import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearcherIdTestUtils.testEmptySearcherId;
 import static kr.modusplant.domains.search.common.util.usecase.model.read.SearchPostReadModelTestUtils.testSearchPostReadModelList;
 import static kr.modusplant.domains.search.common.util.usecase.record.SearchPostRecordTestUtils.testSearchPostRecordRelevance;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +65,7 @@ class SearchPostControllerTest {
                 testSearchKeyword, SearchPostTarget.TITLE_CONTENT_COMMENT,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
-                testSearchKeywordSimilarity1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID))
+                testSearchKeywordSimilarity1, testSearchResultListSize, testSearcherId))
                 .willReturn(testSearchPostReadModelList);
         given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_POST_CONTENT_JSON_NODE);
         willDoNothing().given(searchPostHistoryRepository).saveSearchKeyword(testSearchKeyword, MEMBER_BASIC_USER_UUID);
@@ -81,7 +85,7 @@ class SearchPostControllerTest {
                 testSearchKeyword, SearchPostTarget.TITLE_CONTENT_COMMENT,
                 TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
                 testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
-                testSearchKeywordSimilarity1, TEST_SEARCH_POST_SIZE, MEMBER_BASIC_USER_UUID);
+                testSearchKeywordSimilarity1, testSearchResultListSize, testSearcherId);
         verify(searchPostTranslator).getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
     }
 
@@ -146,5 +150,81 @@ class SearchPostControllerTest {
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.INCORRECT_SEARCH_POST_CATEGORY_ID);
+    }
+
+    @Test
+    @DisplayName("size가 null인 레코드로 searchByKeyword 호출 시 예외 발생")
+    void testSearchByKeyword_givenNullSize_willThrowException() {
+        // given
+        SearchPostRecord record = new SearchPostRecord(
+                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
+                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
+                null, MEMBER_BASIC_USER_UUID);
+        given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
+        given(searchPostConditionRepository.isIdsExist(any(), any())).willReturn(true);
+
+        // when
+        EmptyValueException exception = assertThrows(EmptyValueException.class, () ->
+                searchPostController.searchByKeyword(record));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.EMPTY_SEARCH_RESULT_LIST_SIZE);
+    }
+
+    @Test
+    @DisplayName("허용 범위를 벗어난 size로 searchByKeyword 호출 시 예외 발생")
+    void testSearchByKeyword_givenSizeOutOfRange_willThrowException() {
+        // given
+        SearchPostRecord record = new SearchPostRecord(
+                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
+                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
+                51, MEMBER_BASIC_USER_UUID);
+        given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
+        given(searchPostConditionRepository.isIdsExist(any(), any())).willReturn(true);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+                searchPostController.searchByKeyword(record));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(SearchErrorCode.SEARCH_RESULT_LIST_SIZE_OUT_OF_RANGE);
+    }
+
+    @Test
+    @DisplayName("회원 ID가 없는 익명 사용자로 searchByKeyword 호출 시 정상 응답 반환")
+    void testSearchByKeyword_givenNullMemberId_willReturnResponseForAnonymousUser() {
+        // given
+        SearchPostRecord record = new SearchPostRecord(
+                TEST_SEARCH_KEYWORD, SearchPostTarget.TITLE_CONTENT_COMMENT, SearchPostSortCondition.RELEVANCE,
+                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
+                TEST_POST_ULID, TEST_POST_PUBLISHED_AT,
+                SearchPostImportance.title().getValueIfNotEmpty(), TEST_SEARCH_KEYWORD_SIMILARITY_1,
+                TEST_SEARCH_POST_SIZE, null);
+        given(searchPostConditionRepository.isIdExist(any())).willReturn(true);
+        given(searchPostConditionRepository.isIdsExist(any(), any())).willReturn(true);
+        given(searchPostRepository.searchByKeywordWithRelevance(
+                testSearchKeyword, SearchPostTarget.TITLE_CONTENT_COMMENT,
+                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
+                testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
+                testSearchKeywordSimilarity1, testSearchResultListSize, testEmptySearcherId))
+                .willReturn(testSearchPostReadModelList);
+        given(searchPostTranslator.getJsonNodeContentPreview(TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY)).willReturn(TEST_POST_CONTENT_JSON_NODE);
+
+        // when
+        SearchPostRelevanceSortedPageResponse<SearchPostResponse> result =
+                searchPostController.searchByKeyword(record);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(searchPostRepository).searchByKeywordWithRelevance(
+                testSearchKeyword, SearchPostTarget.TITLE_CONTENT_COMMENT,
+                TEST_COMM_PRIMARY_CATEGORY_ID, TEST_COMM_SECONDARY_CATEGORIES_ID,
+                testSearchPostId, testSearchPostPublishedAt, testSearchPostImportanceTitle,
+                testSearchKeywordSimilarity1, testSearchResultListSize, testEmptySearcherId);
+        verify(searchPostHistoryRepository).saveSearchKeyword(testSearchKeyword, null);
     }
 }
