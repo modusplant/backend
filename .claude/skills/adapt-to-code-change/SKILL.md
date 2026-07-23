@@ -11,7 +11,7 @@ disallowed-tools: Write(./src/**) Edit(./src/**)
 
 # Target Classes
 
-- Primary: classes created, modified, or deleted in the previous session.
+- Primary: classes created, modified, or deleted since the previous session.
 - Fallback: if no such classes exist, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and use its output instead.
 - If that also yields nothing, terminate the skill immediately.
 
