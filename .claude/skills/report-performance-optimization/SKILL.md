@@ -1,5 +1,5 @@
 ---
-name: reporting-performance-optimization
+name: report-performance-optimization
 description: Performs a technical analysis of a single REST API method to identify missing optimizations and derive new architectural or code-level optimizations for high-traffic conditions.
 disable-model-invocation: true
 ---
@@ -33,8 +33,8 @@ Produce a report with the following sequential sections:
 5. **Conclusion:** Close with a definitive final conclusion naming the top-priority optimization(s) to implement first, based on the priority matrix from step 4. (Capture this step's output as `$CONCLUSION`.)
 
 # Follow-up Actions
-- **Rendering Target:** The report is delivered as a single static HTML file rendered from @.claude/skills/reporting-performance-optimization/template.html.
-- **Output Location:** Save the rendered result under @.claude/skills/reporting-performance-optimization/result/ (no need to print it to context).
+- **Rendering Target:** The report is delivered as a single static HTML file rendered from @.claude/skills/report-performance-optimization/template.html.
+- **Output Location:** Save the rendered result under @.claude/skills/report-performance-optimization/result/ (no need to print it to context).
 - **File Naming:** The filename is set to `report_[domainName]_[methodName].html`.
 - **File Handling:** If the file does not exist, create it by copying `template.html` into the output location. If it already exists, overwrite it.
 - **Placeholder Substitution:** Fill the copied template by replacing each `{{TOKEN}}` with the corresponding captured variable, rendered as an HTML fragment (table rows, list items, or plain text):
