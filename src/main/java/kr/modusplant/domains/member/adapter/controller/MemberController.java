@@ -16,13 +16,14 @@ import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
-import kr.modusplant.shared.enums.Role;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -76,7 +77,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
-        return memberProfileMapper.toMemberProfileResponse(memberProfile);
+        return memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +89,19 @@ public class MemberController {
         return new MemberRoleResponse(role.name());
     }
 
-    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
+    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        MemberProfileImagePath memberProfileImagePath =
+                MemberProfileImagePath.create(memberId, memberProfileImageFileName);
+        return memberProfileMapper.toMemberProfilePrepareResponse(
+                memberProfileImagePath,
+                memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
+    }
+
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
@@ -111,7 +124,26 @@ public class MemberController {
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 1);
+    }
+
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        Nickname memberNickname = Nickname.create(record.nickname());
+        validateBeforeOverrideProfile(memberId, memberNickname);
+
+        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(record.fileKey()),
+                MemberProfileImageBytes.create(null)
+        );
+
+        MemberProfileIntroduction memberProfileIntroduction =
+                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 2);
     }
 
     public void likePost(MemberPostLikeRecord record) {

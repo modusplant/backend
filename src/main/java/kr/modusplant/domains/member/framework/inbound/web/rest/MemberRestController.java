@@ -14,6 +14,7 @@ import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCac
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
@@ -38,7 +39,7 @@ import static kr.modusplant.shared.constant.Regex.*;
 
 @Tag(name = "회원 API", description = "회원의 생성과 갱신(상태 제외), 회원 활동을 관리하는 API 입니다.")
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -47,7 +48,7 @@ public class MemberRestController {
     private final MemberCacheValidationService memberCacheValidationService;
 
     @Operation(summary = "회원 닉네임 중복 확인 API", description = "이미 등록된 닉네임이 있는지 조회합니다.")
-    @GetMapping(value = "/members/check/nickname/{nickname}")
+    @GetMapping(value = "/v1/members/check/nickname/{nickname}")
     public ResponseEntity<DataResponse<Map<String, Boolean>>> checkExistedMemberNickname(
             @Parameter(
                     description = "중복을 확인하려는 회원의 닉네임",
@@ -77,7 +78,7 @@ public class MemberRestController {
             description = "회원 프로필을 조회합니다. ",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/members/profile")
+    @GetMapping(value = "/v1/members/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
@@ -121,7 +122,7 @@ public class MemberRestController {
             description = "회원 권한을 조회합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @GetMapping(value = "/members/role")
+    @GetMapping(value = "/v1/members/role")
     public ResponseEntity<DataResponse<MemberRoleResponse>> getMemberRole(
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
@@ -134,12 +135,12 @@ public class MemberRestController {
     }
 
     @Operation(
-            summary = "회원 프로필 덮어쓰기 API",
+            summary = "회원 프로필 덮어쓰기 API - v1",
             description = "회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping(value = "/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile(
+    @PutMapping(value = "/v1/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v1(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지",
                     schema = @Schema(type = "string", format = "binary")
@@ -170,7 +171,75 @@ public class MemberRestController {
                 .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
                 .body(DataResponse.ok(
                         memberController.overrideProfile(
-                                new MemberProfileOverrideRecord(memberId, introduction, image, nickname))));
+                                new MemberProfileOverrideRecord_V1(memberId, introduction, image, nickname))));
+    }
+
+    @Operation(
+            summary = "회원 프로필 이미지 준비 API - v2",
+            description = "회원 프로필 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/v2/members/profile/issue-file-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<MemberProfilePrepareResponse>> prepareMemberProfileImage_v2(
+            @Parameter(
+                    description = "갱신할 회원의 프로필 이미지 이름",
+                    example = "image.png"
+            )
+            String filename,
+
+            @Parameter(
+                    description = "갱신할 회원의 프로필 이미지 컨텐츠 타입",
+                    example = "image/png"
+            )
+            String contentType,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(DataResponse.ok(
+                        memberController.prepareMemberProfileImage(
+                                new MemberProfileImagePrepareRecord_V2(memberId, filename, contentType))));
+    }
+
+    @Operation(
+            summary = "회원 프로필 덮어쓰기 API - v2",
+            description = "회원 프로필을 덮어씁니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PutMapping(value = "/v2/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v2(
+            @Parameter(
+                    description = "갱신할 회원의 프로필 이미지 파일 키",
+                    example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
+            )
+            String fileKey,
+
+            @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
+            @RequestParam(required = false)
+            String introduction,
+
+            @Parameter(
+                    description = "갱신할 회원의 닉네임",
+                    example = "NewPlayer",
+                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
+            )
+            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
+            String nickname,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(
+                        memberController.overrideProfile(
+                                new MemberProfileOverrideRecord_V2(memberId, introduction, fileKey, nickname))));
     }
 
     @Operation(
@@ -178,7 +247,7 @@ public class MemberRestController {
             description = "게시글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/like/communication/post/{postUlid}")
+    @PutMapping("/v1/members/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Parameter(
                     description = "좋아요를 누를 게시글의 식별자",
@@ -201,7 +270,7 @@ public class MemberRestController {
             description = "게시글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/like/communication/post/{postUlid}")
+    @DeleteMapping("/v1/members/like/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Parameter(
                     description = "좋아요를 취소할 게시글의 식별자",
@@ -224,7 +293,7 @@ public class MemberRestController {
             description = "게시글에 북마크를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/bookmark/communication/post/{postUlid}")
+    @PutMapping("/v1/members/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
             @Parameter(
                     description = "북마크를 누를 게시글의 식별자",
@@ -247,7 +316,7 @@ public class MemberRestController {
             description = "게시글에 대한 북마크를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/bookmark/communication/post/{postUlid}")
+    @DeleteMapping("/v1/members/bookmark/communication/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
             @Parameter(
                     description = "북마크를 취소할 게시글의 식별자",
@@ -270,7 +339,7 @@ public class MemberRestController {
             description = "댓글에 좋아요를 누릅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/members/like/communication/post/{postUlid}/path/{path}")
+    @PutMapping("/v1/members/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @Parameter(
                     description = "좋아요를 누를 댓글의 게시글 식별자",
@@ -302,7 +371,7 @@ public class MemberRestController {
             description = "댓글에 대한 좋아요를 취소합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/members/like/communication/post/{postUlid}/path/{path}")
+    @DeleteMapping("/v1/members/like/communication/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @Parameter(
                     description = "좋아요를 취소할 댓글의 게시글 식별자",
@@ -334,7 +403,7 @@ public class MemberRestController {
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/v1/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestParam
@@ -371,7 +440,7 @@ public class MemberRestController {
             description = "게시글을 신고합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/post/")
+    @PostMapping(value = "/v1/report/abuse/post/")
     public ResponseEntity<DataResponse<Void>> reportPostAbuse(
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
@@ -385,7 +454,7 @@ public class MemberRestController {
             description = "게시글을 신고합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/post/{postUlid}")
+    @PostMapping(value = "/v1/report/abuse/post/{postUlid}")
     public ResponseEntity<DataResponse<Void>> reportPostAbuse(
             @Parameter(
                     description = "신고할 게시글의 식별자",
@@ -409,7 +478,7 @@ public class MemberRestController {
             description = "댓글을 신고합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/post//path/{path}")
+    @PostMapping(value = "/v1/report/abuse/post//path/{path}")
     public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
             @Parameter(
                     description = "신고할 댓글의 경로",
@@ -432,7 +501,7 @@ public class MemberRestController {
             description = "댓글을 신고합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/report/abuse/post/{postUlid}/path/{path}")
+    @PostMapping(value = "/v1/report/abuse/post/{postUlid}/path/{path}")
     public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
             @Parameter(
                     description = "신고할 댓글이 달린 게시글의 식별자",
@@ -464,7 +533,7 @@ public class MemberRestController {
             description = "회원을 탈퇴합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping("/members")
+    @PostMapping("/v1/members")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
             @RequestBody @Valid
             MemberWithdrawRequest request,

@@ -23,6 +23,9 @@ public class ReportImagePath {
     private static final Pattern PATTERN_REPORT_IMAGE_PATH = Pattern.compile(
             "^member/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/report/.+\\..+$");
 
+    // "member/{member_uuid}/report/proposal-or-bug/{report_ulid}}/{report_file_name}}"
+    public static final String PROPOSAL_OR_BUG_REPORT_IMAGE_PATH_FORMAT = "member/%s/report/proposal-or-bug/%s/%s";
+
     public static ReportImagePath create(String value) {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(EMPTY_REPORT_IMAGE_PATH, "reportImagePath");

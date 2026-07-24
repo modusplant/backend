@@ -29,9 +29,11 @@ import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfile
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V2;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -81,12 +83,16 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
@@ -165,7 +171,7 @@ class MemberControllerTest implements
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
-        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponseV1);
     }
 
     @Test
@@ -194,6 +200,35 @@ class MemberControllerTest implements
     }
 
     @Test
+    @DisplayName("prepareMemberProfileImage로 이미지 준비 응답 반환")
+    void testPrepareMemberProfileImage_givenValidRecord_willReturnResponse() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberImageIOHelper.issueStorageUrl(any(), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+
+        // when
+        MemberProfilePrepareResponse memberProfilePrepareResponse =
+                memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2);
+
+        // then
+        assertThat(memberProfilePrepareResponse).isEqualTo(testMemberProfilePrepareResponse);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 prepareMemberProfileImage로 이미지 준비 실패")
+    void testPrepareMemberProfileImage_givenNotFoundMember_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
     @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given
@@ -203,12 +238,12 @@ class MemberControllerTest implements
         given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
-        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
@@ -232,12 +267,12 @@ class MemberControllerTest implements
                         testNormalUserNickname));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
-        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
@@ -259,7 +294,48 @@ class MemberControllerTest implements
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
-                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+                new MemberProfileOverrideRecord_V1(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("파일 키를 포함해서 존재하는 모든 데이터로 overrideProfile V2로 프로필 덮어쓰기")
+    void testOverrideProfileV2_givenExistedData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV2);
+
+        // then
+        assertThat(memberProfileResponse).isEqualTo(testMemberProfileResponseV2);
+    }
+
+    @Test
+    @DisplayName("파일 키가 없는 데이터로 overrideProfile V2로 프로필 덮어쓰기")
+    void testOverrideProfileV2_givenNullFileKey_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+                new MemberProfileOverrideRecord_V2(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
@@ -276,7 +352,7 @@ class MemberControllerTest implements
 
         // when & then
         NotFoundEntityException alreadyExistedNicknameException = assertThrows(
-                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
@@ -289,7 +365,7 @@ class MemberControllerTest implements
 
         // when & then
         SwearContainedException swearContainedException = assertThrows(
-                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
     }
 
@@ -303,7 +379,7 @@ class MemberControllerTest implements
 
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
-                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 

@@ -19,7 +19,7 @@ disallowed-tools: Write(./src/**) Edit(./src/**)
 
 Classification follows `CLAUDE.md`; determine which section each class belongs to before checking anything.
 
-- Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under @.claude/rules/ relevant to that domain.
+- Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under @.claude/rules/ or @.claude/skills/ relevant to that domain.
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md only.
 
 # Update Strategy

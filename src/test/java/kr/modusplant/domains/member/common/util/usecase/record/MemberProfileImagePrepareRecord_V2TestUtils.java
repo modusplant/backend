@@ -1,0 +1,11 @@
+package kr.modusplant.domains.member.common.util.usecase.record;
+
+import kr.modusplant.domains.member.usecase.record.MemberProfileImagePrepareRecord_V2;
+
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
+
+public interface MemberProfileImagePrepareRecord_V2TestUtils {
+    MemberProfileImagePrepareRecord_V2 testMemberProfileImagePrepareRecordV2 = new MemberProfileImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME, MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE);
+}

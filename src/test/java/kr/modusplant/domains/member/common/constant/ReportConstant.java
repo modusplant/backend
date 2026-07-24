@@ -30,15 +30,16 @@ public final class ReportConstant {
     public static final LocalDateTime TEST_REPORT_BLINDED_AT = LocalDateTime.of(2026, 5, 1, 12, 0);
     public static final LocalDateTime TEST_REPORT_CHECKED_AT = LocalDateTime.of(2026, 5, 1, 0, 0);
     public static final LocalDateTime TEST_REPORT_CREATED_AT = LocalDateTime.of(2026, 4, 30, 0, 0);
-    public static final String TEST_REPORT_IMAGE_FILE_NAME_1 = "image_0.png";
-    public static final String TEST_REPORT_IMAGE_FILE_NAME_2 = "image_1.png";
-    public static final String TEST_REPORT_IMAGE_FILE_NAME_3 = "image_2.png";
+    public static final String TEST_REPORT_IMAGE_FILE_NAME_1_PNG = "image_0.png";
+    public static final String TEST_REPORT_IMAGE_FILE_NAME_1_JPG = "image_0.jpg";
+    public static final String TEST_REPORT_IMAGE_FILE_NAME_2_PNG = "image_1.png";
+    public static final String TEST_REPORT_IMAGE_FILE_NAME_3_PNG = "image_2.png";
     public static final String TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1 =
-            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_1;
+            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_1_PNG;
     public static final String TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_2 =
-            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_2;
+            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_2_PNG;
     public static final String TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_3 =
-            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_3;
+            "member/" + MEMBER_BASIC_USER_UUID + "/report/proposal-or-bug/" + TEST_REPORT_ULID + "/" + TEST_REPORT_IMAGE_FILE_NAME_3_PNG;
     public static final List<String> TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS =
             List.of(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1,
                     TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_2,
@@ -50,11 +51,11 @@ public final class ReportConstant {
             List.of(TEST_REPORT_IMAGE_BYTES_1, TEST_REPORT_IMAGE_BYTES_2, TEST_REPORT_IMAGE_BYTES_3);
     public static final List<MultipartFile> TEST_REPORT_IMAGES =
             List.of(new MockMultipartFile(
-                            "image", TEST_REPORT_IMAGE_FILE_NAME_1, "image/png", TEST_REPORT_IMAGE_BYTES_1),
+                            "image", TEST_REPORT_IMAGE_FILE_NAME_1_PNG, "image/png", TEST_REPORT_IMAGE_BYTES_1),
                     new MockMultipartFile(
-                            "image", TEST_REPORT_IMAGE_FILE_NAME_2, "image/png", TEST_REPORT_IMAGE_BYTES_2),
+                            "image", TEST_REPORT_IMAGE_FILE_NAME_2_PNG, "image/png", TEST_REPORT_IMAGE_BYTES_2),
                     new MockMultipartFile(
-                            "image", TEST_REPORT_IMAGE_FILE_NAME_3, "image/png", TEST_REPORT_IMAGE_BYTES_3));
+                            "image", TEST_REPORT_IMAGE_FILE_NAME_3_PNG, "image/png", TEST_REPORT_IMAGE_BYTES_3));
     public static final String TEST_REPORT_IMAGE_JSON =
             String.format("""
                             [
@@ -72,9 +73,9 @@ public final class ReportConstant {
                                 }
                             ]
                             """,
-                    TEST_REPORT_IMAGE_FILE_NAME_1, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1,
-                    TEST_REPORT_IMAGE_FILE_NAME_2, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_2,
-                    TEST_REPORT_IMAGE_FILE_NAME_3, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_3);
+                    TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1,
+                    TEST_REPORT_IMAGE_FILE_NAME_2_PNG, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_2,
+                    TEST_REPORT_IMAGE_FILE_NAME_3_PNG, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_3);
     public static final JsonNode TEST_REPORT_IMAGE_JSON_NODE;
     public static final JSONB TEST_REPORT_IMAGE_JSONB;
 
