@@ -28,9 +28,9 @@ Both environments are driven by a single GitHub Actions workflow.
 
 ## Environment Comparison
 
-| | Local | Dev | Prod |
-|---|---|---|---|
-| Driven by | Compose files | CI/CD workflow | CI/CD workflow |
-| Image tag | built locally | `:latest` | `:<git-sha>` / `:<git-tag>` |
-| Deploy target | developer's machine | Mac mini home server | AWS EC2 |
-| Trigger | manual | push to `develop` | push of a `v*` tag |
+|               | Local               | Dev                  | Prod                        |
+|---------------|---------------------|----------------------|-----------------------------|
+| Driven by     | Compose files       | CI/CD workflow       | CI/CD workflow              |
+| Image tag     | built locally       | `:latest`            | `:<git-sha>` / `:<git-tag>` |
+| Deploy target | developer's machine | Mac mini home server | AWS EC2                     |
+| Trigger       | manual              | push to `develop`    | push of a `v*` tag          |

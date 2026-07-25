@@ -25,7 +25,8 @@
       "Bash(docker compose config*)",
 
       "Read(./src/main/resources/application-local.yml)",
-      "Read(./docker-compose.override.yml)"
+      "Read(./docker-compose.override.yml)",
+      "Read(./env)"
     ],
     "ask": [
       "Bash(docker exec*)",

@@ -259,7 +259,18 @@ tasks.register('testCoverage', Test) {
 	testClassesDirs = sourceSets.test.output.classesDirs
 	classpath = sourceSets.test.runtimeClasspath
 
-	dependsOn(':test', ':jacocoTestReport')
+	dependsOn(tasks.named('test'), tasks.named('jacocoTestReport'))
 
 	tasks.named('jacocoTestReport').get().mustRunAfter(tasks.named('test'))
+}
+
+tasks.register('assembleDocker', Copy) {
+	group = 'docker'
+	description = 'Copies the bootJar output to build/docker/modusplant-backend.jar so local `docker compose build` can find it'
+
+	dependsOn tasks.named('bootJar')
+
+	from tasks.named('bootJar').flatMap { it.archiveFile }
+	into 'build/docker'
+	rename { 'modusplant-backend.jar' }
 }
