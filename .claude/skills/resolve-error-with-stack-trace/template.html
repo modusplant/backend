@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Error Resolution Report — {{ERROR_TYPE}}</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --border: #dfe3e8;
+    --text: #1f2430;
+    --text-muted: #5c6470;
+    --accent: #2f6fed;
+    --accent-soft: #eaf1ff;
+    --code-bg: #1e2230;
+    --code-text: #e6e9ef;
+    --severity-high: #d64545;
+    --severity-medium: #d68a1c;
+    --severity-low: #2f9e5c;
+    --conclusion-bg: #fff8e6;
+    --conclusion-border: #e8c34d;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161c;
+      --surface: #1b1e27;
+      --border: #2c303c;
+      --text: #e7e9ee;
+      --text-muted: #9aa1ad;
+      --accent: #6c9bff;
+      --accent-soft: #202b45;
+      --code-bg: #0f1117;
+      --code-text: #d8dce4;
+      --severity-high: #ef6a6a;
+      --severity-medium: #e0a542;
+      --severity-low: #4dc37f;
+      --conclusion-bg: #2a2410;
+      --conclusion-border: #6b5a1c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161c; --surface: #1b1e27; --border: #2c303c; --text: #e7e9ee;
+    --text-muted: #9aa1ad; --accent: #6c9bff; --accent-soft: #202b45;
+    --code-bg: #0f1117; --code-text: #d8dce4; --severity-high: #ef6a6a;
+    --severity-medium: #e0a542; --severity-low: #4dc37f;
+    --conclusion-bg: #2a2410; --conclusion-border: #6b5a1c;
+  }
+  :root[data-theme="light"] {
+    --bg: #f5f6f8; --surface: #ffffff; --border: #dfe3e8; --text: #1f2430;
+    --text-muted: #5c6470; --accent: #2f6fed; --accent-soft: #eaf1ff;
+    --code-bg: #1e2230; --code-text: #e6e9ef; --severity-high: #d64545;
+    --severity-medium: #d68a1c; --severity-low: #2f9e5c;
+    --conclusion-bg: #fff8e6; --conclusion-border: #e8c34d;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .report {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+
+  /* Header */
+  .report-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+  }
+  .report-header h1 {
+    margin: 0 0 4px;
+    font-size: 1.5rem;
+  }
+  .report-header .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 18px;
+  }
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+  }
+  .meta-item .meta-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    margin-bottom: 2px;
+  }
+  .meta-item .meta-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .target-description {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    height: 26px;
+    padding: 0 6px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .card-header h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+  .card-body { color: var(--text); }
+  .card-body p:first-child { margin-top: 0; }
+  .card-body p:last-child { margin-bottom: 0; }
+
+  /* Step 1: Stack Trace Summary */
+  .flow-trace {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.85rem;
+    white-space: pre;
+  }
+  .flow-notes {
+    margin-top: 14px;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+
+  /* Step 2: Hypotheses Considered table */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  thead th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 10px 12px;
+    border-top: 1px solid var(--border);
+    vertical-align: top;
+  }
+  tbody tr:hover td { background: var(--accent-soft); }
+
+  /* Step 3: Resolution Process finding-groups */
+  .finding-group { margin-bottom: 18px; }
+  .finding-group:last-child { margin-bottom: 0; }
+  .finding-group-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .finding-list { list-style: none; margin: 0; padding: 0; }
+  .finding-item {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+    border-top: 1px solid var(--border);
+  }
+  .finding-item:first-child { border-top: none; }
+  .finding-id {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 6px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.78rem;
+  }
+  .finding-text { flex: 1 1 auto; }
+
+  /* Pills: classification + outcome */
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #fff;
+  }
+  .pill-code { background: var(--accent); }
+  .pill-env { background: var(--text-muted); }
+  .pill-resolved { background: var(--severity-low); }
+  .pill-rejected { background: var(--severity-high); }
+
+  /* Step 4: Conclusion */
+  .conclusion-box {
+    background: var(--conclusion-bg);
+    border: 1px solid var(--conclusion-border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    font-size: 0.95rem;
+  }
+  .conclusion-box p:first-child { margin-top: 0; }
+  .conclusion-box p:last-child { margin-bottom: 0; }
+  .conclusion-box strong { color: var(--accent); }
+
+  footer.report-footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    margin-top: 28px;
+  }
+
+  @media print {
+    body { background: #fff; }
+    .card, .report-header { border: 1px solid #ccc; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="report">
+
+  <header class="report-header">
+    <h1>Error Resolution Report</h1>
+    <div class="subtitle">Stack-trace-driven root cause diagnosis and resolution</div>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="meta-label">Error Type</div>
+        <div class="meta-value">{{ERROR_TYPE}}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Root Cause Classification</div>
+        <div class="meta-value">{{ROOT_CAUSE_CLASSIFICATION}}</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Report Date</div>
+        <div class="meta-value">{{REPORT_DATE}}</div>
+      </div>
+    </div>
+    <div class="target-description">{{TARGET_DESCRIPTION}}</div>
+  </header>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="step-badge">1</span>
+      <h2>Stack Trace Summary</h2>
+    </div>
+    <div class="card-body">
+      <div class="flow-trace">{{STACK_TRACE_SUMMARY_CONTENT}}</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="step-badge">2</span>
+      <h2>Hypotheses Considered</h2>
+    </div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Hypothesis</th><th>Classification</th><th>Verification</th><th>Outcome</th></tr>
+          </thead>
+          <tbody>
+            {{HYPOTHESES_CONTENT}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="step-badge">3</span>
+      <h2>Resolution Process</h2>
+    </div>
+    <div class="card-body">
+      {{RESOLUTION_PROCESS_CONTENT}}
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-header">
+      <span class="step-badge">4</span>
+      <h2>Conclusion</h2>
+    </div>
+    <div class="card-body">
+      <div class="conclusion-box">
+        {{CONCLUSION_CONTENT}}
+      </div>
+    </div>
+  </section>
+
+  <footer class="report-footer">Generated by the resolve-error-with-stack-trace skill</footer>
+
+</div>
+</body>
+</html>
