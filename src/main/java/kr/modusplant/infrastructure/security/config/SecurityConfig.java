@@ -169,6 +169,7 @@ public class SecurityConfig {
                                 "/api/v1/report/proposal-or-bug",
                                 "/api/v1/report/abuse/post/*",
                                 "/api/v1/report/abuse/post/*/path/**",
+                                "/api/v2/members/profile/issue-file-key",
                                 "/api/v1/communication/posts",
                                 "/api/v1/communication/posts/upload-urls",
                                 "/api/v1/members/social/**",
@@ -176,8 +177,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT,
                                 "/api/v1/members/profile",
                                 "/api/v1/members/like/communication/post/*",
-                                "/api/v1/members/bookmark/communication/post/**",
                                 "/api/v1/members/like/communication/post/*/path/**",
+                                "/api/v1/members/bookmark/communication/post/**",
+                                "/api/v2/members/profile",
                                 "/api/v1/communication/posts/*").authenticated()
                         .requestMatchers(HttpMethod.DELETE,
                                 "/api/v1/members/like/communication/post/*",
