@@ -5,10 +5,12 @@ disable-model-invocation: true
 ---
 
 # Argument
+
 - **$0:** The domain name to target, passed as the first argument to the prompt.
 - **$1:** The REST API method name to target, passed as the second argument to the prompt.
 
 # Precondition
+
 - **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from $0.
   - **[domainName]:** lowercase/camelCase form of $0 (e.g., $0 = `member` → `member`; $0 = `search` → `search`).
   - **[DomainName]:** Capitalized/PascalCase form of $0 (e.g., $0 = `member` → `Member`; $0 = `search` → `Search`).
@@ -33,6 +35,7 @@ Produce a report with the following sequential sections:
 5. **Conclusion:** Close with a definitive final conclusion naming the top-priority optimization(s) to implement first, based on the priority matrix from step 4. (Capture this step's output as `$CONCLUSION`.)
 
 # Follow-up Actions
+
 - **Rendering Target:** The report is delivered as a single static HTML file rendered from @.claude/skills/report-performance-optimization/template.html.
 - **Output Location:** Save the rendered result under @.claude/skills/report-performance-optimization/result/ (no need to print it to context).
 - **File Naming:** The filename is set to `report_[domainName]_[methodName].html`.

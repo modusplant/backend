@@ -8,6 +8,8 @@
       "Bash(./gradlew --version)",
       "Bash(./gradlew compileJava*)",
       "Bash(rm -rf ./build/test-results/*)",
+      "Bash(git status --porcelain*)",
+      "Bash(git worktree*)",
 
       "Read(./src/main/resources/application-local.yml)",
       "Read(./docker-compose.override.yml)"
