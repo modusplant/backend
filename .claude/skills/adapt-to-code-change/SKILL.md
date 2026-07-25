@@ -21,6 +21,8 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 
 - Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under @.claude/rules/ or @.claude/skills/ relevant to that domain.
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md only.
+- Not associated with any domain:
+  - Docker-related (e.g. @docker-compose.yml): @.claude/skills/configure-docker-environment/SKILL.md only.
 
 # Update Strategy
 
