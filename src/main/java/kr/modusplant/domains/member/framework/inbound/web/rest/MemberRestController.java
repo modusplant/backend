@@ -180,7 +180,7 @@ public class MemberRestController {
             description = "회원 프로필 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/v2/members/profile/issue-file-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/v2/members/profile/issue-file-key")
     public ResponseEntity<DataResponse<MemberProfilePrepareResponse>> prepareMemberProfileImage_v2(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지 이름",
@@ -210,7 +210,7 @@ public class MemberRestController {
             description = "회원 프로필을 덮어씁니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping(value = "/v2/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/v2/members/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v2(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지 파일 키",
@@ -441,7 +441,7 @@ public class MemberRestController {
             description = "건의 및 버그 제보 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping(value = "/v2/report/proposal-or-bug/issue-file-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/v2/report/proposal-or-bug/issue-file-key")
     public ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> prepareProposalOrBugReportImage_v2(
             @Parameter(
                     description = "갱신할 건의 및 버그 제보 이미지 이름 목록",
