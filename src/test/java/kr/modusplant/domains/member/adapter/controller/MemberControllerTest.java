@@ -215,9 +215,12 @@ class MemberControllerTest implements
 
     @Test
     @DisplayName("prepareMemberProfileImage로 이미지 준비 응답 반환")
-    void testPrepareMemberProfileImage_givenValidRecord_willReturnResponse() {
+    void testPrepareMemberProfileImage_givenValidRecord_willReturnResponse() throws IOException {
         // given
+        MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
 
         // when
@@ -226,6 +229,26 @@ class MemberControllerTest implements
 
         // then
         assertThat(memberProfilePrepareResponse).isEqualTo(testMemberProfilePrepareResponse);
+        verify(memberImageIOHelper).deleteImage(memberProfile.getMemberProfileImage());
+    }
+
+    @Test
+    @DisplayName("기존 이미지가 없는 회원 프로필로 prepareMemberProfileImage로 이미지 준비 응답 반환")
+    void testPrepareMemberProfileImage_givenExistingProfileWithoutImage_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfileWithoutImage();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+
+        // when
+        MemberProfilePrepareResponse memberProfilePrepareResponse =
+                memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2);
+
+        // then
+        assertThat(memberProfilePrepareResponse).isEqualTo(testMemberProfilePrepareResponse);
+        verify(memberImageIOHelper).deleteImage(memberProfile.getMemberProfileImage());
     }
 
     @Test
@@ -436,9 +459,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
 
         // when
@@ -455,9 +476,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(memberProfileRepository.update(any())).willReturn(memberProfile);
-        willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -507,6 +526,45 @@ class MemberControllerTest implements
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
                 ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 아이디로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateMemberIdAndNicknameBeforeOverrideProfileV2_givenNotFoundId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateThatHasSwearV2_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(true);
+
+        // when & then
+        SwearContainedException swearContainedException = assertThrows(
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateV2_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
+
+        // when & then
+        ExistsEntityException existsEntityException = assertThrows(
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
     @Test

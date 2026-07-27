@@ -185,7 +185,7 @@ class MemberRestControllerTest implements MemberTestUtils {
 
     @Test
     @DisplayName("prepareMemberProfileImage V2로 응답 반환")
-    void testPrepareMemberProfileImageV2_givenValidParameters_willReturnResponse() {
+    void testPrepareMemberProfileImageV2_givenValidParameters_willReturnResponse() throws IOException {
         // given
         given(memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2)).willReturn(testMemberProfilePrepareResponse);
 
