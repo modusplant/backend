@@ -436,7 +436,6 @@ public class MemberRestController {
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
-
     @Operation(
             summary = "건의 및 버그 제보 이미지 준비 API - v2",
             description = "건의 및 버그 제보 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",

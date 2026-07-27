@@ -71,6 +71,7 @@ member/
 - Optional VOs (blank/null input allowed): `create()` returns a corresponding `Empty*VO`
   - `Empty*VO`: singleton, `getValue()` returns `null`, uses `@NoArgsConstructor(AccessLevel.PROTECTED, force = true)`
 - ID VO generation — UUID type: `generate()` · `fromUuid(UUID)` · `fromString(String)`; ULID type: `generate()` · `create(String)`
+- Path-like VOs may expose an additional overloaded `create(...)` factory composing other VOs (e.g. an ID VO + a filename VO), alongside the raw-string `create(String)` factory
 
 **Domain Events** (`domain/event/`):
 - `static create()` factory; delegate side effects (image deletion, count changes, notifications) outside the domain
@@ -89,13 +90,13 @@ member/
 - Parameters and return types use only domain VOs/Aggregates — no JPA entities or jOOQ records
 
 **Records** (`usecase/record/`):
-- Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, MultipartFile)
+- Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
 - Adapter converts raw types to domain VOs; naming: `*GetRecord`, `*OverrideRecord`, `*LikeRecord`, etc.
 - When an operation has multiple coexisting API versions, the record is suffixed accordingly (e.g. `*OverrideRecord_V1`, `*OverrideRecord_V2`) instead of one record serving every version
 - Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON) and `framework/outbound/jooq/record/` (jOOQ params)
 
 **Response DTOs** (`usecase/response/`):
-- Java records; multi-item responses include `of(List, cursor, hasNext)` factory
+- Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
 - Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
 
 **Read Models** (`usecase/model/read/`):
@@ -120,7 +121,7 @@ member/
 **Listener** (`adapter/listener/`) — `@Component`:
 - `@EventListener` / `@TransactionalEventListener`; apply Semaphore bulkhead when concurrency control is needed
 
-**Mapper** (`adapter/mapper/`) — `@Component`; implements mapper port: domain Aggregate → Response DTO (may call S3 URL generation)
+**Mapper** (`adapter/mapper/`) — `@Component`; implements mapper port: domain Aggregate or VO → Response DTO (may call S3 URL generation)
 
 **Translator** (`adapter/translator/`) — `@Component`;
 - Used only for controller
