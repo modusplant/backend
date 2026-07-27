@@ -65,6 +65,7 @@ member/
 **Entity** (`domain/entity/`):
 - `protected` constructor + `static create()` factory
 - Optional entities: Null Object pattern → singleton class under `entity/nullobject/`
+- May expose an additional overloaded `create(...)` factory that derives an omitted field internally from an already-validated field (e.g. parsing a filename VO out of a path VO's value) — mirrors the VO overload pattern above, avoiding duplicated parsing logic across callers
 
 **Value Object** (`domain/vo/`):
 - `@RequiredArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, regex, length, range)
@@ -138,6 +139,7 @@ member/
 - Admin endpoints: `@PreAuthorize("hasAuthority('ADMIN')")`
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 - Multiple API versions of one operation coexist as separate methods on the same controller: the class-level `@RequestMapping` carries no version, each `@GetMapping`/`@PostMapping`/etc. embeds its own `/v{n}/` path segment, and the method name takes a matching `_v{n}` suffix (e.g. `overrideMemberProfile_v1`, `overrideMemberProfile_v2`)
+- `consumes = MediaType.MULTIPART_FORM_DATA_VALUE` is declared only when the method binds an actual `MultipartFile`/`List<MultipartFile>` via `@RequestPart`; endpoints taking only `String`/`List<String>` params use plain `@RequestParam` with no `consumes` override
 
 **HTTP Cache** (`framework/inbound/web/cache/`):
 - ETag + If-Modified-Since conditional request handling
