@@ -118,10 +118,13 @@ public class MemberController {
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 1);
     }
 
-    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) {
+    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
         memberValidationHelper.validateIfMemberExists(memberId);
+
+        MemberProfile existingMemberProfile = memberProfileRepository.getById(memberId);
+        memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
 
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(memberId, memberProfileImageFileName);
@@ -135,17 +138,14 @@ public class MemberController {
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
 
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
-        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
-
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
         );
-
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
-        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+        MemberProfile memberProfile = MemberProfile.create(
+                memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 2);
     }
 

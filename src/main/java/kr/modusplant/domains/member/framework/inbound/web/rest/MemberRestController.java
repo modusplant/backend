@@ -197,7 +197,7 @@ public class MemberRestController {
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) {
+            UUID memberId) throws IOException {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(DataResponse.ok(
@@ -213,7 +213,7 @@ public class MemberRestController {
     @PutMapping(value = "/v2/members/profile")
     public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v2(
             @Parameter(
-                    description = "갱신할 회원의 프로필 이미지 파일 키",
+                    description = "갱신할 회원의 프로필 이미지 파일 키(코드상에서의 이미지 경로)",
                     example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
             )
             @RequestParam(required = false)
@@ -485,7 +485,7 @@ public class MemberRestController {
             String content,
 
             @Parameter(
-                    description = "제보 관련 이미지 파일 키",
+                    description = "제보 관련 이미지 파일 키(코드상에서의 이미지 경로)",
                     example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/report/proposal-or-bug/01ARZ3NDEKTSV4RRFFQ69G5FAV/image_0.png"
             )
             @RequestParam(required = false)
