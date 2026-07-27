@@ -197,21 +197,6 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
-    @DisplayName("prepareProposalOrBugReportImage V2로 응답 반환")
-    void testPrepareProposalOrBugReportImageV2_givenValidParameters_willReturnResponse() {
-        // given
-        given(memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2)).willReturn(testProposalOrBugReportPrepareResponse);
-
-        // when
-        ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> memberResponseEntity =
-                memberRestController.prepareProposalOrBugReportImage_v2(TEST_REPORT_IMAGE_FILE_NAMES, TEST_REPORT_IMAGE_CONTENT_TYPES, MEMBER_BASIC_USER_UUID);
-
-        // then
-        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testProposalOrBugReportPrepareResponse).toString());
-    }
-
-    @Test
     @DisplayName("overrideMemberProfile V2로 응답 반환")
     void testOverrideMemberProfileV2_givenValidParameters_willReturnResponse() throws IOException {
         // given
@@ -311,7 +296,7 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
-    @DisplayName("reportProposalOrBug로 응답 반환")
+    @DisplayName("reportProposalOrBug V1으로 응답 반환")
     void testReportProposalOrBug_v1_givenValidRequest_willReturnResponse() throws IOException {
         // given
         willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord_v1);
@@ -322,6 +307,21 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("prepareProposalOrBugReportImage V2로 응답 반환")
+    void testPrepareProposalOrBugReportImageV2_givenValidParameters_willReturnResponse() {
+        // given
+        given(memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2)).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> memberResponseEntity =
+                memberRestController.prepareProposalOrBugReportImage_v2(TEST_REPORT_IMAGE_FILE_NAMES, TEST_REPORT_IMAGE_CONTENT_TYPES, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testProposalOrBugReportPrepareResponse).toString());
     }
 
     @Test

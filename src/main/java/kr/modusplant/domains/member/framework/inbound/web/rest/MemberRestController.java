@@ -216,6 +216,7 @@ public class MemberRestController {
                     description = "갱신할 회원의 프로필 이미지 파일 키",
                     example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
             )
+            @RequestParam(required = false)
             String fileKey,
 
             @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
