@@ -57,6 +57,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberWith
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
@@ -303,6 +304,21 @@ class MemberRestControllerTest implements MemberTestUtils {
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug_v1(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("reportProposalOrBug V2로 응답 반환")
+    void testReportProposalOrBugV2_givenValidRequest_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord_v2);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity =
+                memberRestController.reportProposalOrBug_v2(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

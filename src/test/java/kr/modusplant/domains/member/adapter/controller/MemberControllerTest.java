@@ -37,6 +37,7 @@ import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportImagePrepareRecord_V2;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V1;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V2;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
@@ -97,6 +98,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberWith
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
@@ -990,6 +992,48 @@ class MemberControllerTest implements
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
                 () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("파일 키를 포함해서 존재하는 모든 데이터로 reportProposalOrBug V2로 건의 및 버그 제보")
+    void testReportProposalOrBugV2_givenExistedFileKeys_willReportProposalOrBug() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+
+        // when
+        memberController.reportProposalOrBug(testProposalOrBugReportRecord_v2);
+
+        // then
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+    }
+
+    @Test
+    @DisplayName("파일 키를 제외한 존재하는 모든 데이터로 reportProposalOrBug V2로 건의 및 버그 제보")
+    void testReportProposalOrBugV2_givenExistedDataExceptOfFileKeys_willReportProposalOrBug() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+
+        // when
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
+
+        // then
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug V2로 건의 및 버그 제보 실패")
+    void testReportProposalOrBugV2_givenNotFoundMemberId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord_v2));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
