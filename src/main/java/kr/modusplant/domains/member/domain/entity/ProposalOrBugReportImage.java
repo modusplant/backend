@@ -7,6 +7,7 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -29,6 +30,17 @@ public class ProposalOrBugReportImage {
         } else if (reportImageBytes == null) {
             throw new EmptyValueException(EMPTY_REPORT_IMAGE_BYTES, "reportImageBytes");
         }
+        return new ProposalOrBugReportImage(reportImagePath, proposalOrBugReportImageFileName, reportImageBytes);
+    }
+
+    public static ProposalOrBugReportImage create(ReportImagePath reportImagePath, ReportImageBytes reportImageBytes) {
+        if (reportImagePath == null) {
+            throw new EmptyValueException(EMPTY_REPORT_IMAGE_PATH, "reportImagePath");
+        } else if (reportImageBytes == null) {
+            throw new EmptyValueException(EMPTY_REPORT_IMAGE_BYTES, "reportImageBytes");
+        }
+        ProposalOrBugReportImageFileName proposalOrBugReportImageFileName =
+                ProposalOrBugReportImageFileName.create(StringUtils.substringAfterLast(reportImagePath.getValue(), "/"));
         return new ProposalOrBugReportImage(reportImagePath, proposalOrBugReportImageFileName, reportImageBytes);
     }
 

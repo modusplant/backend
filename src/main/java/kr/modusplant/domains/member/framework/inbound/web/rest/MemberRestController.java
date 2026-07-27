@@ -469,6 +469,37 @@ public class MemberRestController {
                                 new ProposalOrBugReportImagePrepareRecord_V2(memberId, filenames, contentTypes))));
     }
 
+    @Operation(
+            summary = "건의 및 버그 제보 API - v2",
+            description = "건의 사항 또는 버그를 제보합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/v2/report/proposal-or-bug")
+    public ResponseEntity<DataResponse<Void>> reportProposalOrBug_v2(
+            @Parameter(description = "보고서 제목", example = "제보합니다!")
+            @RequestParam
+            String title,
+
+            @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
+            @RequestParam
+            String content,
+
+            @Parameter(
+                    description = "제보 관련 이미지 파일 키",
+                    example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/report/proposal-or-bug/01ARZ3NDEKTSV4RRFFQ69G5FAV/image_0.png"
+            )
+            @RequestParam(required = false)
+            List<String> fileKeys,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
+        memberController.reportProposalOrBug(
+                new ProposalOrBugReportRecord_V2(memberId, title, content, fileKeys));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
     @Hidden
     @Operation(
             summary = "게시글 신고 API",

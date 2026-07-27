@@ -264,6 +264,31 @@ public class MemberController {
                 ));
     }
 
+    public void reportProposalOrBug(ProposalOrBugReportRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        ReportId reportId = ReportId.generate();
+        ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportContent reportContent = ReportContent.create(record.content());
+        List<String> fileKeys = record.fileKeys();
+
+        List<ProposalOrBugReportImage> proposalOrBugReportImages;
+        if (fileKeys == null) {
+            proposalOrBugReportImages = List.of();
+        } else {
+            proposalOrBugReportImages = fileKeys.stream()
+                    .map(fileKey ->
+                            ProposalOrBugReportImage.create(
+                                    ReportImagePath.create(fileKey), ReportImageBytes.create(null)))
+                    .toList();
+        }
+
+        reportRepository.reportProposalOrBug(
+                memberId,
+                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages));
+    }
+
     public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         List<String> filenames = record.filenames();
