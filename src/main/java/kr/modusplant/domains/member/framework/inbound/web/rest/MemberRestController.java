@@ -400,7 +400,7 @@ public class MemberRestController {
     }
 
     @Operation(
-            summary = "건의 및 버그 제보 API - V1",
+            summary = "건의 및 버그 제보 API - v1",
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
