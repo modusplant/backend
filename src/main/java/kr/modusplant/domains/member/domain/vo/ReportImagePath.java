@@ -35,6 +35,15 @@ public class ReportImagePath {
         return new ReportImagePath(value);
     }
 
+    public static ReportImagePath create(
+            MemberId memberId, ReportId reportId, ProposalOrBugReportImageFileName proposalOrBugReportImageFileName) {
+        return new ReportImagePath(
+                String.format(PROPOSAL_OR_BUG_REPORT_IMAGE_PATH_FORMAT,
+                        memberId.getValue(),
+                        reportId.getValue(),
+                        proposalOrBugReportImageFileName.getFileName()));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

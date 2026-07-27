@@ -2,6 +2,7 @@
 name: test-member-domain
 description: This file provides strict guidance on creating, modifying, and deleting tests for the member domain.
 disable-model-invocation: true
+disallowed-tools: Write(./src/main/**) Edit(./src/main/**)
 ---
 
 # Precondition

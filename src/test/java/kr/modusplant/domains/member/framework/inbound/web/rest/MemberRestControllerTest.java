@@ -8,6 +8,7 @@ import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCa
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -54,12 +55,14 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -194,6 +197,21 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
+    @DisplayName("prepareProposalOrBugReportImage V2로 응답 반환")
+    void testPrepareProposalOrBugReportImageV2_givenValidParameters_willReturnResponse() {
+        // given
+        given(memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2)).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> memberResponseEntity =
+                memberRestController.prepareProposalOrBugReportImage_v2(TEST_REPORT_IMAGE_FILE_NAMES, TEST_REPORT_IMAGE_CONTENT_TYPES, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testProposalOrBugReportPrepareResponse).toString());
+    }
+
+    @Test
     @DisplayName("overrideMemberProfile V2로 응답 반환")
     void testOverrideMemberProfileV2_givenValidParameters_willReturnResponse() throws IOException {
         // given
@@ -294,12 +312,12 @@ class MemberRestControllerTest implements MemberTestUtils {
 
     @Test
     @DisplayName("reportProposalOrBug로 응답 반환")
-    void testReportProposalOrBug_givenValidRequest_willReturnResponse() throws IOException {
+    void testReportProposalOrBug_v1_givenValidRequest_willReturnResponse() throws IOException {
         // given
-        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
+        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord_v1);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug_v1(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

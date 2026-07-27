@@ -76,7 +76,7 @@ public class ProposalOrBugReportImageFileName {
     }
 
     public String getFileName() {
-        return baseName + "." + imageExtension.getValue();
+        return baseName.getValue() + "." + imageExtension.getValue();
     }
 
     @Override

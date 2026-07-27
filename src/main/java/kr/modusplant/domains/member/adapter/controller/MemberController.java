@@ -14,11 +14,13 @@ import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -56,6 +58,7 @@ public class MemberController {
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
     private final MemberProfileMapper memberProfileMapper;
+    private final ProposalOrBugReportMapper proposalOrBugReportMapper;
     private final MemberSocialTranslator memberSocialTranslator;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
@@ -89,18 +92,6 @@ public class MemberController {
         return new MemberRoleResponse(role.name());
     }
 
-    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) {
-        MemberId memberId = MemberId.fromUuid(record.id());
-        MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
-        memberValidationHelper.validateIfMemberExists(memberId);
-
-        MemberProfileImagePath memberProfileImagePath =
-                MemberProfileImagePath.create(memberId, memberProfileImageFileName);
-        return memberProfileMapper.toMemberProfilePrepareResponse(
-                memberProfileImagePath,
-                memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
-    }
-
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
@@ -125,6 +116,18 @@ public class MemberController {
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 1);
+    }
+
+    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        MemberProfileImagePath memberProfileImagePath =
+                MemberProfileImagePath.create(memberId, memberProfileImageFileName);
+        return memberProfileMapper.toMemberProfilePrepareResponse(
+                memberProfileImagePath,
+                memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
     }
 
     public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
@@ -219,7 +222,7 @@ public class MemberController {
         }
     }
 
-    public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
+    public void reportProposalOrBug(ProposalOrBugReportRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         ReportId reportId = ReportId.generate();
         ReportTitle reportTitle = ReportTitle.create(record.title());
@@ -259,6 +262,32 @@ public class MemberController {
                 ProposalOrBugReport.create(
                         reportId, reportTitle, reportContent, proposalOrBugReportImages
                 ));
+    }
+
+    public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        List<String> filenames = record.filenames();
+        List<String> contentTypes = record.contentTypes();
+        validateBeforePrepareProposalOrBugReportImage(memberId, filenames, contentTypes);
+
+        ReportId reportId = ReportId.generate();
+        List<ProposalOrBugReportPrepareResponse.ProposalOrBugReportImagePrepareResponse> results;
+        if (filenames == null) {
+            results = List.of();
+        } else {
+            results = new ArrayList<>();
+            for (int i = 0; i < filenames.size(); i++) {
+                ProposalOrBugReportImageFileName proposalOrBugReportImageFileName =
+                        ProposalOrBugReportImageFileName.create(filenames.get(i));
+                ReportImagePath reportImagePath =
+                        ReportImagePath.create(memberId, reportId, proposalOrBugReportImageFileName);
+                results.add(
+                        proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(
+                                reportImagePath,
+                                memberImageIOHelper.issueStorageUrl(reportImagePath, contentTypes.get(i))));
+            }
+        }
+        return proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(reportId, results);
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
@@ -343,6 +372,18 @@ public class MemberController {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
         } else if (images != null && images.size() != imageNumber) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
+        }
+    }
+
+    private void validateBeforePrepareProposalOrBugReportImage(
+            MemberId memberId, List<String> filenames, List<String> contentTypes) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if ((filenames == null && contentTypes != null) || (filenames != null && contentTypes == null)) {
+            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
+        } else if (filenames != null && (filenames.size() != contentTypes.size())) {
+            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
+        } else if (filenames != null && filenames.size() > 3) {
+            throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "filenames");
         }
     }
 

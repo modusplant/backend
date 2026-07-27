@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,10 @@ public class MemberImageIOHelper {
     private final AmazonS3Service amazonS3Service;
 
     public String issueStorageUrl(MemberProfileImagePath imagePath, String contentType) {
+        return amazonS3Service.generatePutPresignedUrl(imagePath.getValue(), contentType);
+    }
+
+    public String issueStorageUrl(ReportImagePath imagePath, String contentType) {
         return amazonS3Service.generatePutPresignedUrl(imagePath.getValue(), contentType);
     }
 

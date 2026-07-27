@@ -17,6 +17,7 @@ import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -399,12 +400,12 @@ public class MemberRestController {
     }
 
     @Operation(
-            summary = "건의 및 버그 제보 API",
+            summary = "건의 및 버그 제보 API - V1",
             description = "건의 사항 또는 버그를 제보합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v1/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DataResponse<Void>> reportProposalOrBug(
+    public ResponseEntity<DataResponse<Void>> reportProposalOrBug_v1(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestParam
             String title,
@@ -430,8 +431,42 @@ public class MemberRestController {
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(memberId, title, content, images, imageNumber));
+        memberController.reportProposalOrBug(
+                new ProposalOrBugReportRecord_V1(memberId, title, content, images, imageNumber));
         return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+
+    @Operation(
+            summary = "건의 및 버그 제보 이미지 준비 API - v2",
+            description = "건의 및 버그 제보 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PostMapping(value = "/v2/report/proposal-or-bug/issue-file-key", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> prepareProposalOrBugReportImage_v2(
+            @Parameter(
+                    description = "갱신할 건의 및 버그 제보 이미지 이름 목록",
+                    example = "image_0.png"
+            )
+            @RequestParam
+            List<String> filenames,
+
+            @Parameter(
+                    description = "갱신할 건의 및 버그 제보 이미지 컨텐츠 타입 목록",
+                    example = "image/png"
+            )
+            @RequestParam
+            List<String> contentTypes,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(DataResponse.ok(
+                        memberController.prepareProposalOrBugReportImage(
+                                new ProposalOrBugReportImagePrepareRecord_V2(memberId, filenames, contentTypes))));
     }
 
     @Hidden

@@ -50,6 +50,12 @@ class ProposalOrBugReportImageFileNameTest {
     }
 
     @Test
+    @DisplayName("getFileName으로 파일명 반환")
+    void testGetFileName_givenValidData_willReturnFileName() {
+        assertThat(testProposalOrBugReportImageFileName1.getFileName()).isEqualTo(TEST_REPORT_IMAGE_FILE_NAME_1_PNG);
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself

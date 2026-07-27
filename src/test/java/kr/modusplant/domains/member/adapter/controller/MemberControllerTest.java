@@ -20,7 +20,9 @@ import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.outbound.MemberRepositoryAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectCommentRepositoryJpaAdapter;
@@ -28,13 +30,16 @@ import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubje
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfileRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V2;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportImagePrepareRecord_V2;
+import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V1;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
@@ -58,6 +63,7 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
@@ -89,17 +95,22 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -122,6 +133,7 @@ class MemberControllerTest implements
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
+    private final ProposalOrBugReportMapper proposalOrBugReportMapper = Mockito.mock(ProposalOrBugReportMapper.class);
     private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryAdapter.class);
@@ -132,7 +144,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -204,7 +216,7 @@ class MemberControllerTest implements
     void testPrepareMemberProfileImage_givenValidRecord_willReturnResponse() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberImageIOHelper.issueStorageUrl(any(), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+        given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
 
         // when
         MemberProfilePrepareResponse memberProfilePrepareResponse =
@@ -226,6 +238,118 @@ class MemberControllerTest implements
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("이미지가 있는 데이터로 prepareProposalOrBugReportImage로 이미지 준비 응답 반환")
+    void testPrepareProposalOrBugReportImage_givenExistedImage_willReturnResponse() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberImageIOHelper.issueStorageUrl(any(ReportImagePath.class), any())).willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
+        given(proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(any(), any())).willReturn(testProposalOrBugReportImagePrepareResponse1);
+        given(proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(any(), anyList())).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ProposalOrBugReportPrepareResponse response =
+                memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2);
+
+        // then
+        assertThat(response).isEqualTo(testProposalOrBugReportPrepareResponse);
+        verify(memberImageIOHelper, times(3)).issueStorageUrl(any(ReportImagePath.class), any());
+        verify(proposalOrBugReportMapper, times(3)).toProposalOrBugReportImagePrepareResponse(any(), any());
+    }
+
+    @Test
+    @DisplayName("이미지 경로를 제외한 데이터로 prepareProposalOrBugReportImage로 이미지 준비 응답 반환")
+    void testPrepareProposalOrBugReportImage_givenExistedDataExceptOfImage_willReturnResponse() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(any(), eq(List.of()))).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ProposalOrBugReportPrepareResponse response = memberController.prepareProposalOrBugReportImage(
+                new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, null, null));
+
+        // then
+        assertThat(response).isEqualTo(testProposalOrBugReportPrepareResponse);
+        verify(memberImageIOHelper, times(0)).issueStorageUrl(any(ReportImagePath.class), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenNotFoundMember_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("filenames가 null이고 contentTypes가 존재하여 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenNullFilenamesAndNotNullContentTypes_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, null, TEST_REPORT_IMAGE_CONTENT_TYPES)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("filenames가 존재하고 contentTypes가 null이어서 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenNotNullFilenamesAndNullContentTypes_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, null)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("파일명 리스트의 크기와 컨텐츠 타입 리스트의 크기가 달라 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenMismatchedSize_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(
+                                MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, List.of(TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE))));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("최대 개수를 초과하는 파일명 리스트로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenSizeOutOfRange_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        List<String> fourFilenames = List.of(TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_2_PNG, TEST_REPORT_IMAGE_FILE_NAME_3_PNG, TEST_REPORT_IMAGE_FILE_NAME_1_PNG);
+        List<String> fourContentTypes = List.of(TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, fourFilenames, fourContentTypes)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE);
     }
 
     @Test
@@ -835,7 +959,7 @@ class MemberControllerTest implements
         willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
 
         // when
-        memberController.reportProposalOrBug(testProposalOrBugReportRecord);
+        memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1);
 
         // then
         verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
@@ -850,7 +974,7 @@ class MemberControllerTest implements
         willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V1(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
 
         // then
         verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
@@ -865,7 +989,7 @@ class MemberControllerTest implements
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
@@ -878,7 +1002,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
@@ -901,7 +1025,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
@@ -924,7 +1048,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,

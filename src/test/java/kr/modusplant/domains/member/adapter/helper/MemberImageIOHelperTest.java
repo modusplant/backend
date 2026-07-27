@@ -12,10 +12,13 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGES;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_CONTENT_TYPE;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -64,5 +67,18 @@ class MemberImageIOHelperTest {
 
         // then
         assertThat(imagePaths).isEqualTo(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
+    }
+
+    @Test
+    @DisplayName("issueStorageUrl을 통해 보고서 이미지 업로드 URL 발급")
+    void testIssueStorageUrl_givenReportImagePathAndContentType_willReturnStorageUrl() {
+        // given
+        given(amazonS3Service.generatePutPresignedUrl(any(), any())).willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
+
+        // when
+        String storageUrl = memberImageIOHelper.issueStorageUrl(testReportImagePath1, TEST_REPORT_IMAGE_CONTENT_TYPE);
+
+        // then
+        assertThat(storageUrl).isEqualTo(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
     }
 }
