@@ -10,6 +10,7 @@ import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.servers.Server;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT"
 )
 public class SwaggerConfig {
+    @Value("${app.local-server-port}")
+    private String localServerPort;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -49,7 +52,7 @@ public class SwaggerConfig {
                         .description("Dev Server")  // 개발 서버 설명
                 )
                 .addServersItem(new Server() // 테스트 서버 정보 설정
-                        .url("http://localhost:8080")  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
+                        .url("http://localhost:" + localServerPort)  // 테스트 서버 링크(http://localhost:8080/swagger-ui/index.html)
                         .description("Test Local Server")  // 테스트 서버 설명
                 )
                 .components(new Components()
