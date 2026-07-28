@@ -107,12 +107,12 @@ import static kr.modusplant.domains.member.common.util.usecase.response.Proposal
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -285,22 +285,6 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("이미지 경로를 제외한 데이터로 prepareProposalOrBugReportImage로 이미지 준비 응답 반환")
-    void testPrepareProposalOrBugReportImage_givenExistedDataExceptOfImage_willReturnResponse() {
-        // given
-        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(any(), eq(List.of()))).willReturn(testProposalOrBugReportPrepareResponse);
-
-        // when
-        ProposalOrBugReportPrepareResponse response = memberController.prepareProposalOrBugReportImage(
-                new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, null, null));
-
-        // then
-        assertThat(response).isEqualTo(testProposalOrBugReportPrepareResponse);
-        verify(memberImageIOHelper, times(0)).issueStorageUrl(any(ReportImagePath.class), any());
-    }
-
-    @Test
     @DisplayName("존재하지 않는 회원으로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
     void testPrepareProposalOrBugReportImage_givenNotFoundMember_willThrowException() {
         // given
@@ -315,33 +299,33 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("filenames가 null이고 contentTypes가 존재하여 prepareProposalOrBugReportImage로 이미지 준비 실패")
-    void testPrepareProposalOrBugReportImage_givenNullFilenamesAndNotNullContentTypes_willThrowException() {
+    @DisplayName("filenames가 비어 있어 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenEmptyFilenames_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
                 () -> memberController.prepareProposalOrBugReportImage(
-                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, null, TEST_REPORT_IMAGE_CONTENT_TYPES)));
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, List.of(), TEST_REPORT_IMAGE_CONTENT_TYPES)));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
     }
 
     @Test
-    @DisplayName("filenames가 존재하고 contentTypes가 null이어서 prepareProposalOrBugReportImage로 이미지 준비 실패")
-    void testPrepareProposalOrBugReportImage_givenNotNullFilenamesAndNullContentTypes_willThrowException() {
+    @DisplayName("contentTypes가 비어 있어 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenEmptyContentTypes_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
                 () -> memberController.prepareProposalOrBugReportImage(
-                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, null)));
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, List.of())));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
     }
 
     @Test

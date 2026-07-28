@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -264,6 +265,27 @@ public class MemberController {
                 ));
     }
 
+    public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        List<String> filenames = record.filenames();
+        List<String> contentTypes = record.contentTypes();
+        validateBeforePrepareProposalOrBugReportImage(memberId, filenames, contentTypes);
+
+        ReportId reportId = ReportId.generate();
+        List<ProposalOrBugReportPrepareResponse.ProposalOrBugReportImagePrepareResponse> imagePrepareResponse = new ArrayList<>();
+        for (int i = 0; i < filenames.size(); i++) {
+            ProposalOrBugReportImageFileName proposalOrBugReportImageFileName =
+                    ProposalOrBugReportImageFileName.create(filenames.get(i));
+            ReportImagePath reportImagePath =
+                    ReportImagePath.create(memberId, reportId, proposalOrBugReportImageFileName);
+            imagePrepareResponse.add(
+                    proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(
+                            reportImagePath,
+                            memberImageIOHelper.issueStorageUrl(reportImagePath, contentTypes.get(i))));
+        }
+        return proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(reportId, imagePrepareResponse);
+    }
+
     public void reportProposalOrBug(ProposalOrBugReportRecord_V2 record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         memberValidationHelper.validateIfMemberExists(memberId);
@@ -287,32 +309,6 @@ public class MemberController {
         reportRepository.reportProposalOrBug(
                 memberId,
                 ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages));
-    }
-
-    public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
-        MemberId memberId = MemberId.fromUuid(record.memberId());
-        List<String> filenames = record.filenames();
-        List<String> contentTypes = record.contentTypes();
-        validateBeforePrepareProposalOrBugReportImage(memberId, filenames, contentTypes);
-
-        ReportId reportId = ReportId.generate();
-        List<ProposalOrBugReportPrepareResponse.ProposalOrBugReportImagePrepareResponse> results;
-        if (filenames == null) {
-            results = List.of();
-        } else {
-            results = new ArrayList<>();
-            for (int i = 0; i < filenames.size(); i++) {
-                ProposalOrBugReportImageFileName proposalOrBugReportImageFileName =
-                        ProposalOrBugReportImageFileName.create(filenames.get(i));
-                ReportImagePath reportImagePath =
-                        ReportImagePath.create(memberId, reportId, proposalOrBugReportImageFileName);
-                results.add(
-                        proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(
-                                reportImagePath,
-                                memberImageIOHelper.issueStorageUrl(reportImagePath, contentTypes.get(i))));
-            }
-        }
-        return proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(reportId, results);
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
@@ -403,11 +399,13 @@ public class MemberController {
     private void validateBeforePrepareProposalOrBugReportImage(
             MemberId memberId, List<String> filenames, List<String> contentTypes) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        if ((filenames == null && contentTypes != null) || (filenames != null && contentTypes == null)) {
+        if (filenames.isEmpty()) {
+            throw new InvalidValueException(EMPTY_VALUE, "filenames");
+        } else if (contentTypes.isEmpty()) {
+            throw new InvalidValueException(EMPTY_VALUE, "contentTypes");
+        } else if (filenames.size() != contentTypes.size()) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
-        } else if (filenames != null && (filenames.size() != contentTypes.size())) {
-            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
-        } else if (filenames != null && filenames.size() > 3) {
+        } else if (filenames.size() > 3) {
             throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "filenames");
         }
     }
