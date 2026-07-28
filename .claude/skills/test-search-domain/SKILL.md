@@ -5,13 +5,15 @@ disable-model-invocation: true
 disallowed-tools: Write(./src/main/**) Edit(./src/main/**)
 ---
 
-# Precondition
+# Target Classes
 
-- **Target Class Scope:**
-  1. The primary target is any class modified since the previous session, if it belongs to the search domain.
-  2. If no search-domain classes were modified in the previous session, run `git status --porcelain` and find the search-domain classes within them.
-  3. Nevertheless, if any search-domain classes weren't been found, the target falls back to the search domain as a whole.
-- **Excluded Classes:** Regardless of the scope above, never generate tests for:
+- Primary: classes created, modified, or deleted since the previous session, if it belongs to the search domain.
+- Fallback: If no search-domain classes were modified in the previous session, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and find the search-domain classes within its output.
+- If that also yields nothing, terminate the skill immediately.
+
+# Excluded Classes
+
+Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
   - Classes that contain only constructors

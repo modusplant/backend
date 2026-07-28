@@ -5,13 +5,15 @@ disable-model-invocation: true
 disallowed-tools: Write(./src/main/**) Edit(./src/main/**)
 ---
 
-# Precondition
+# Target Classes
 
-- **Target Class Scope:**
-  1. The primary target is any class modified since the previous session, if it belongs to the member domain.
-  2. If no member-domain classes were modified in the previous session, run `git status --porcelain` and find the member-domain classes within them.
-  3. Nevertheless, if any member-domain classes weren't been found, the target falls back to the member domain as a whole.
-- **Excluded Classes:** Regardless of the scope above, never generate tests for:
+- Primary: classes created, modified, or deleted since the previous session, if it belongs to the member domain.
+- Fallback: If no member-domain classes were modified in the previous session, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and find the member-domain classes within its output.
+- If that also yields nothing, terminate the skill immediately.
+
+# Excluded Classes
+
+Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
   - jOOQ repository classes
