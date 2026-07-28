@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.adapter.helper;
 
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,10 +25,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 class MemberImageIOHelperTest {
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
-    private final MemberImageIOHelper memberImageIOHelper = new MemberImageIOHelper(amazonS3Service);
+    private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
+    private final MemberImageIOHelper memberImageIOHelper = new MemberImageIOHelper(amazonS3Service, pendingFileService);
 
     @Test
     @DisplayName("uploadImage를 통해 회원 프로필 이미지 업로드")
@@ -74,11 +78,13 @@ class MemberImageIOHelperTest {
     void testIssueStorageUrl_givenReportImagePathAndContentType_willReturnStorageUrl() {
         // given
         given(amazonS3Service.generatePutPresignedUrl(any(), any())).willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
+        willDoNothing().given(pendingFileService).trackPendingFiles(any());
 
         // when
         String storageUrl = memberImageIOHelper.issueStorageUrl(testReportImagePath1, TEST_REPORT_IMAGE_CONTENT_TYPE);
 
         // then
         assertThat(storageUrl).isEqualTo(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
+        verify(pendingFileService, times(1)).trackPendingFiles(List.of(testReportImagePath1.getValue()));
     }
 }

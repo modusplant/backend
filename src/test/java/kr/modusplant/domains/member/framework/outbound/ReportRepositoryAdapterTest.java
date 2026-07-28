@@ -19,6 +19,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseR
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOrBugReportJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +49,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
 
+    private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
@@ -59,7 +61,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     private final ProposalOrBugReportJooqRepository proposalOrBugReportJooqRepository = Mockito.mock(ProposalOrBugReportJooqRepository.class);
 
     private final ReportRepositoryAdapter reportRepositoryAdapter = new ReportRepositoryAdapter(
-            applicationEventPublisher, memberJpaRepository, proposalOrBugReportJpaRepository, postJpaRepository, postAbuseReportJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, proposalOrBugReportJooqRepository);
+            pendingFileService, applicationEventPublisher, memberJpaRepository, proposalOrBugReportJpaRepository, postJpaRepository, postAbuseReportJpaRepository, commentJpaRepository, commentAbuseReportJpaRepository, proposalOrBugReportJooqRepository);
 
     @Test
     @DisplayName("보고서 식별자가 존재할 때 isIdExist로 보고서 존재 여부 반환")
@@ -147,17 +149,33 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     }
 
     @Test
-    @DisplayName("존재하는 회원에 대해 reportProposalOrBug 실행 시 건의 및 버그 제보 저장 성공")
-    void testReportProposalOrBug_givenValidData_willSaveReport() {
+    @DisplayName("버전 1로 reportProposalOrBug 실행 시 건의 및 버그 제보 저장 성공 및 대기 파일 추적 해제 생략")
+    void testReportProposalOrBug_givenVersion1_willSaveReportWithoutUntrackingFiles() {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
 
         // when
-        reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport());
+        reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport(), 1);
 
         // then
         verify(proposalOrBugReportJpaRepository, times(1)).save(any(ProposalOrBugReportEntity.class));
+        verify(pendingFileService, never()).untrackPendingFiles(any());
+    }
+
+    @Test
+    @DisplayName("버전 2로 reportProposalOrBug 실행 시 건의 및 버그 제보 저장 성공 및 대기 파일 추적 해제")
+    void testReportProposalOrBug_givenVersion2_willSaveReportAndUntrackPendingFiles() {
+        // given
+        MemberEntity memberEntity = createMemberBasicUserEntity();
+        given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
+
+        // when
+        reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport(), 2);
+
+        // then
+        verify(proposalOrBugReportJpaRepository, times(1)).save(any(ProposalOrBugReportEntity.class));
+        verify(pendingFileService, times(1)).untrackPendingFiles(any());
     }
 
     @Test
@@ -167,7 +185,7 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
+        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport(), 1));
 
         // then
         verify(proposalOrBugReportJpaRepository, never()).save(any());

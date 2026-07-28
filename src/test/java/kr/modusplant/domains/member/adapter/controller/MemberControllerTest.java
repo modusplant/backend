@@ -112,7 +112,9 @@ import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNorm
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -1016,13 +1018,13 @@ class MemberControllerTest implements
                 any(ReportId.class),
                 anyList()))
                 .willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
         memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1);
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(1));
     }
 
     @Test
@@ -1031,13 +1033,13 @@ class MemberControllerTest implements
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
         memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V1(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(1));
     }
 
     @Test
@@ -1060,13 +1062,13 @@ class MemberControllerTest implements
     void testReportProposalOrBugV2_givenExistedFileKeys_willReportProposalOrBug() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
         memberController.reportProposalOrBug(testProposalOrBugReportRecord_v2);
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(2));
     }
 
     @Test
@@ -1074,13 +1076,13 @@ class MemberControllerTest implements
     void testReportProposalOrBugV2_givenExistedDataExceptOfFileKeys_willReportProposalOrBug() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
         memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(2));
     }
 
     @Test
