@@ -362,6 +362,22 @@ class MemberControllerTest implements
     }
 
     @Test
+    @DisplayName("중복된 파일명을 가진 파일명 리스트로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenDuplicateFilenames_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        List<String> duplicateFilenames = List.of(TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_2_PNG);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, duplicateFilenames, TEST_REPORT_IMAGE_CONTENT_TYPES)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(DUPLICATED_REPORT_IMAGE_FILE_NAME);
+    }
+
+    @Test
     @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given

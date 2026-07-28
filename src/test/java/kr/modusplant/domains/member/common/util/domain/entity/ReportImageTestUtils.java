@@ -11,8 +11,13 @@ import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePath
 public interface ReportImageTestUtils {
     ProposalOrBugReportImage testProposalOrBugReportImage1 = ProposalOrBugReportImage.create(
             testReportImagePath1, testProposalOrBugReportImageFileName1, testReportImageBytes1);
+
     List<ProposalOrBugReportImage> testProposalOrBugReportImages = List.of(
             ProposalOrBugReportImage.create(testReportImagePath1, testProposalOrBugReportImageFileName1, testReportImageBytes1),
             ProposalOrBugReportImage.create(testReportImagePath2, testProposalOrBugReportImageFileName2, testReportImageBytes2),
             ProposalOrBugReportImage.create(testReportImagePath3, testProposalOrBugReportImageFileName3, testReportImageBytes3));
+
+    List<ProposalOrBugReportImage> testProposalOrBugReportImagesWithDuplicateFileName = List.of(
+            ProposalOrBugReportImage.create(testReportImagePath1, testProposalOrBugReportImageFileName1, testReportImageBytes1),
+            ProposalOrBugReportImage.create(testReportImagePath2, testProposalOrBugReportImageFileName1, testReportImageBytes2));
 }
