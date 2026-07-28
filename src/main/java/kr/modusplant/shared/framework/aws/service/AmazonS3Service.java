@@ -1,7 +1,10 @@
 package kr.modusplant.shared.framework.aws.service;
 
+import kr.modusplant.shared.enums.ImageContentType;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,6 +21,8 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INPUT_OUT_OF_RANGE;
 
 @Service
 @RequiredArgsConstructor
@@ -108,6 +113,11 @@ public class AmazonS3Service {
     }
 
     public String generatePutPresignedUrl(String fileKey, String contentType) {
+        if (!ImageContentType.getImageExtensionValues(contentType)
+                .contains(StringUtils.substringAfterLast(fileKey, "."))) {
+            throw new InvalidValueException(INPUT_OUT_OF_RANGE, List.of("fileKey", "contentType"));
+        }
+
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofMinutes(10))
                 .putObjectRequest(req -> req

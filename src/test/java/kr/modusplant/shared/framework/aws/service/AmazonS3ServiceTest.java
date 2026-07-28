@@ -1,5 +1,6 @@
 package kr.modusplant.shared.framework.aws.service;
 
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,9 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INPUT_OUT_OF_RANGE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -76,7 +79,7 @@ class AmazonS3ServiceTest {
 
     @Test
     @DisplayName("파일 다운로드")
-    void downloadFile_givenValidFile_returnFileContent() throws IOException {
+    void downloadFile_givenValidFile_returnFileContent() {
         // given
         String fileKey = "test-file-key";
         byte[] fileContent = "test-download-content".getBytes();
@@ -104,9 +107,8 @@ class AmazonS3ServiceTest {
         given(s3Client.getObjectAsBytes(any(GetObjectRequest.class))).willThrow(NoSuchKeyException.class);
 
         // when
-        NotFoundFileKeyOnS3Exception exception = assertThrows(NotFoundFileKeyOnS3Exception.class, () -> {
-            amazonS3Service.downloadFile(fileKey);
-        });
+        NotFoundFileKeyOnS3Exception exception = assertThrows(NotFoundFileKeyOnS3Exception.class,
+                () -> amazonS3Service.downloadFile(fileKey));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
@@ -142,15 +144,15 @@ class AmazonS3ServiceTest {
         String result = amazonS3Service.generateS3SrcUrl(fileKey);
 
         assertThat(result).isEqualTo(expected);
-        if (!ReflectionTestUtils.getField(amazonS3Service, "profile").equals("dev")) {
+        if (!Objects.equals(ReflectionTestUtils.getField(amazonS3Service, "profile"), "dev")) {
             verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
         }
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("Presigned URL 만들어내기")
     void testGeneratePutPresignedUrl_givenFileKeyAndContentType_willReturnPresignedUrl() throws Exception {
-        String fileKey = "test-file-key";
+        String fileKey = "test-file-key.jpeg";
         String contentType = "image/jpeg";
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
         PresignedPutObjectRequest mockPresignedRequest = mock(PresignedPutObjectRequest.class);
@@ -161,5 +163,15 @@ class AmazonS3ServiceTest {
 
         assertThat(result).isEqualTo(expected);
         verify(s3Presigner, times(1)).presignPutObject(any(PutObjectPresignRequest.class));
+    }
+
+    @Test
+    @DisplayName("범위를 벗어나는 contentType으로 Presigned URL 만들어낼 시 에러 반환")
+    void testGeneratePutPresignedUrl_givenFileKeyAndContentTypeOutOfRange_willThrowException() {
+        InvalidValueException invalidValueException =
+                assertThrows(InvalidValueException.class,
+                        () -> amazonS3Service.generatePutPresignedUrl("test-file-key.png", "image/jpeg"));
+
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(INPUT_OUT_OF_RANGE);
     }
 }
