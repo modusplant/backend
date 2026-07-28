@@ -170,6 +170,8 @@ public class SecurityConfig {
                                 "/api/v1/report/abuse/post/*",
                                 "/api/v1/report/abuse/post/*/path/**",
                                 "/api/v2/members/profile/issue-file-key",
+                                "/api/v2/report/proposal-or-bug/issue-file-key",
+                                "/api/v2/report/proposal-or-bug",
                                 "/api/v1/communication/posts",
                                 "/api/v1/communication/posts/upload-urls",
                                 "/api/v1/members/social/**",
