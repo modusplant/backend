@@ -89,6 +89,7 @@ member/
 
 **Repository Ports** (`usecase/port/repository/`):
 - Parameters and return types use only domain VOs/Aggregates — no JPA entities or jOOQ records
+- Exception: a method may accept a trailing primitive `int version` parameter to select version-conditional behavior in its adapter implementation (e.g. whether to untrack a pending file after persist)
 
 **Records** (`usecase/record/`):
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
@@ -117,7 +118,7 @@ member/
 **Helper** (`adapter/helper/`) — `@Component`:
 - Used only for controller
 - `*ValidationHelper`: DB-backed pre-condition checks via repository ports
-- `*IOHelper`: external I/O operations (S3 upload/delete, etc.)
+- `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`, so an S3 upload never confirmed by a DB write can later be cleaned up as an orphan
 
 **Listener** (`adapter/listener/`) — `@Component`:
 - `@EventListener` / `@TransactionalEventListener`; apply Semaphore bulkhead when concurrency control is needed
@@ -158,10 +159,12 @@ member/
 - `supers/` holds base mapper interfaces shared across multiple JPA mappers in this domain
 
 **JPA Adapter** (`framework/outbound/jpa/adapter/`) — `@Component`; `*RepositoryJpaAdapter` classes wrap a Spring Data JPA repository to present a narrower, domain-shaped interface to the outbound repository implementation
+- Exception: `MemberProfileRepositoryJpaAdapter` follows the version-conditional pending-file untracking
 
 **Composite Key** (`framework/outbound/jpa/compositekey/`) — plain classes implementing `Serializable`, paired 1:1 with an `@IdClass` entity (e.g. like/abuse-report join tables)
 
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
+- When a port method takes a trailing `int version` param, `version == 2` marks the presigned-URL upload flow: immediately after the save succeeds, call `PendingFileService.untrackPendingFiles(...)` on the affected file key(s) to release the pending registration made when the presigned URL was issued
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`
