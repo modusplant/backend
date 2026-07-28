@@ -38,7 +38,7 @@ public class MemberProfileImagePath {
         return new MemberProfileImagePath(
                 String.format(MEMBER_PROFILE_IMAGE_PATH_FORMAT,
                         memberId.getValue(),
-                        memberProfileImageFileName.getBaseName()));
+                        memberProfileImageFileName.getFileName()));
     }
 
     @Override

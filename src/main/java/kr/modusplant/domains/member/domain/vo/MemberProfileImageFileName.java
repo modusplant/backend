@@ -26,16 +26,16 @@ public class MemberProfileImageFileName {
         if (StringUtils.isBlank(fileNameWithExtension)) {
             throw new EmptyValueException(EMPTY_MEMBER_PROFILE_IMAGE_FILE_NAME, "fileNameWithExtension");
         }
-        String[] split = fileNameWithExtension.split("\\.");
-        if (split.length != 2 || StringUtils.isBlank(split[0])) {
+        String[] separatedFileName = fileNameWithExtension.split("\\.");
+        if (separatedFileName.length != 2 || StringUtils.isBlank(separatedFileName[0])) {
             throw new InvalidValueException(INVALID_MEMBER_PROFILE_IMAGE_FILE_NAME, "fileNameWithExtension");
         }
-        if (!ImageExtension.POSSIBLE_IMAGE_EXTENSIONS.contains(split[1])) {
+        if (!ImageExtension.POSSIBLE_IMAGE_EXTENSIONS.contains(separatedFileName[1])) {
             throw new UnsupportedFileException();
         }
         return new MemberProfileImageFileName(
-                fileNameWithExtension,
-                ImageExtension.EXTENSION_MAP.get(split[1].toUpperCase(Locale.ROOT)));
+                separatedFileName[0],
+                ImageExtension.EXTENSION_MAP.get(separatedFileName[1].toUpperCase(Locale.ROOT)));
     }
 
     public String getFileName() {
