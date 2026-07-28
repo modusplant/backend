@@ -26,7 +26,10 @@ public class MemberImageIOHelper {
     private final PendingFileService pendingFileService;
 
     public String issueStorageUrl(MemberProfileImagePath imagePath, String contentType) {
-        return amazonS3Service.generatePutPresignedUrl(imagePath.getValue(), contentType);
+        String fileKey = imagePath.getValue();
+        String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
+        pendingFileService.trackPendingFiles(List.of(fileKey));
+        return storageUrl;
     }
 
     public String issueStorageUrl(ReportImagePath imagePath, String contentType) {

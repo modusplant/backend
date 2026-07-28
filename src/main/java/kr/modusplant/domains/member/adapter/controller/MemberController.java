@@ -117,7 +117,7 @@ public class MemberController {
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 1);
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
     }
 
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
@@ -148,7 +148,7 @@ public class MemberController {
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile), 2);
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
     }
 
     public void likePost(MemberPostLikeRecord record) {

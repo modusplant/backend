@@ -12,6 +12,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJ
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
@@ -27,6 +29,8 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @RequiredArgsConstructor
 public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepository {
     private final AmazonS3Service amazonS3Service;
+    private final PendingFileService pendingFileService;
+
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
     private final MemberProfileJpaRepository memberProfileJpaRepository;
@@ -66,7 +70,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     }
 
     @Override
-    public MemberProfile update(MemberProfile memberProfile) throws IOException {
+    public MemberProfile update(MemberProfile memberProfile, int version) throws IOException {
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
@@ -75,7 +79,11 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         memberProfileEntity.updateImagePath(imagePath);
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
-        return memberProfileJpaMapper.toMemberProfile(memberProfileJpaRepository.save(memberProfileEntity));
+        MemberProfileEntity savedMemberProfileEntity = memberProfileJpaRepository.save(memberProfileEntity);
+        if (version == 2) {
+            pendingFileService.untrackPendingFiles(List.of(imagePath));
+        }
+        return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity);
     }
 
     @Override
