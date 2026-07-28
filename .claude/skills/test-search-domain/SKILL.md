@@ -9,7 +9,8 @@ disallowed-tools: Write(./src/main/**) Edit(./src/main/**)
 
 - **Target Class Scope:**
   1. The primary target is any class modified since the previous session, if it belongs to the search domain.
-  2. If no search-domain classes were modified in the previous session, the target falls back to the search domain as a whole.
+  2. If no search-domain classes were modified in the previous session, run `git status --porcelain` and find the search-domain classes within them.
+  3. Nevertheless, if any search-domain classes weren't been found, the target falls back to the search domain as a whole.
 - **Excluded Classes:** Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
