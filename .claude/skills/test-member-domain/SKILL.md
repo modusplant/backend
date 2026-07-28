@@ -8,8 +8,9 @@ disallowed-tools: Write(./src/main/**) Edit(./src/main/**)
 # Target Classes
 
 - Primary: classes created, modified, or deleted since the previous session, if it belongs to the member domain.
-- Fallback: If no member-domain classes were modified in the previous session, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and find the member-domain classes within its output.
-- If that also yields nothing, terminate the skill immediately.
+- Fallback - 1: If no member-domain classes were modified in the previous session, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and find the member-domain classes within its output.
+- Fallback - 2: if that also yields nothing, run `git diff --name-only HEAD~1 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and find the member-domain classes within its output.
+- Termination: if no result was found, terminate the skill immediately.
 
 # Excluded Classes
 
