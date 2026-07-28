@@ -38,6 +38,11 @@ public class ProposalOrBugReport {
             throw new EmptyValueException(EMPTY_REPORT_IMAGE, "reportImages");
         } else if (images.size() > 3) {
             throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "reportImages");
+        } else if (images.stream()
+                .map(ProposalOrBugReportImage::getProposalOrBugReportImageFileName)
+                .distinct()
+                .count() != images.size()) {
+            throw new InvalidValueException(DUPLICATED_REPORT_IMAGE_FILE_NAME, "reportImages");
         }
         return new ProposalOrBugReport(id, title, content, images);
     }

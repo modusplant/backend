@@ -41,6 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -407,6 +408,8 @@ public class MemberController {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
         } else if (filenames.size() > 3) {
             throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "filenames");
+        } else if (filenames.size() != new HashSet<>(filenames).size()) {
+            throw new InvalidValueException(DUPLICATED_REPORT_IMAGE_FILE_NAME, "filenames");
         }
     }
 
