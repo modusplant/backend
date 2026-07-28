@@ -32,12 +32,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V2;
-import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportImagePrepareRecord_V2;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V1;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V2;
+import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
@@ -47,6 +42,8 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -55,7 +52,6 @@ import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
-import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -111,10 +107,7 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -307,7 +300,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
         // when
-        InvalidValueException exception = assertThrows(InvalidValueException.class,
+        EmptyValueException exception = assertThrows(EmptyValueException.class,
                 () -> memberController.prepareProposalOrBugReportImage(
                         new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, List.of(), TEST_REPORT_IMAGE_CONTENT_TYPES)));
 
@@ -322,7 +315,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
         // when
-        InvalidValueException exception = assertThrows(InvalidValueException.class,
+        EmptyValueException exception = assertThrows(EmptyValueException.class,
                 () -> memberController.prepareProposalOrBugReportImage(
                         new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, List.of())));
 

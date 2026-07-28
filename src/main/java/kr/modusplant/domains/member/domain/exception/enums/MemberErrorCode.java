@@ -78,7 +78,7 @@ public enum MemberErrorCode implements ErrorCode {
 
     DUPLICATED_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "duplicated_report_image_file_name", "보고서 이미지 파일명이 중복되어 있습니다. "),
 
-    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
 
     REPORT_TIME_ON_FUTURE(HttpStatus.BAD_REQUEST.value(), "report_time_on_future", "보고 시각이 미래입니다. "),
     ;

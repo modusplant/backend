@@ -44,7 +44,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
     @Test
     @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() throws IOException {
+    void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
         given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
@@ -55,7 +55,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
     @Test
     @DisplayName("선택적인 데이터가 모두 없을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() throws IOException {
+    void testGetById_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 

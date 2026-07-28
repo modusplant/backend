@@ -26,6 +26,7 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -403,9 +404,9 @@ public class MemberController {
             MemberId memberId, List<String> filenames, List<String> contentTypes) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (filenames.isEmpty()) {
-            throw new InvalidValueException(EMPTY_VALUE, "filenames");
+            throw new EmptyValueException(EMPTY_VALUE, "filenames");
         } else if (contentTypes.isEmpty()) {
-            throw new InvalidValueException(EMPTY_VALUE, "contentTypes");
+            throw new EmptyValueException(EMPTY_VALUE, "contentTypes");
         } else if (filenames.size() != contentTypes.size()) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
         } else if (filenames.size() > 3) {
