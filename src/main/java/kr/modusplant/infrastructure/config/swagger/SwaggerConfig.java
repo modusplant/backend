@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
         bearerFormat = "JWT"
 )
 public class SwaggerConfig {
-    @Value("${app.local-server-port}")
+    @Value("${app.local-server-port:8080}")
     private String localServerPort;
 
     @Bean
