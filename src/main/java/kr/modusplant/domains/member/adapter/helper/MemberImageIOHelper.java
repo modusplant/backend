@@ -6,6 +6,7 @@ import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -22,13 +23,17 @@ import static kr.modusplant.domains.member.domain.vo.ReportImagePath.PROPOSAL_OR
 @RequiredArgsConstructor
 public class MemberImageIOHelper {
     private final AmazonS3Service amazonS3Service;
+    private final PendingFileService pendingFileService;
 
     public String issueStorageUrl(MemberProfileImagePath imagePath, String contentType) {
         return amazonS3Service.generatePutPresignedUrl(imagePath.getValue(), contentType);
     }
 
     public String issueStorageUrl(ReportImagePath imagePath, String contentType) {
-        return amazonS3Service.generatePutPresignedUrl(imagePath.getValue(), contentType);
+        String fileKey = imagePath.getValue();
+        String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
+        pendingFileService.trackPendingFiles(List.of(fileKey));
+        return storageUrl;
     }
 
     public String uploadImage(MemberId memberId, MemberProfileOverrideRecord_V1 record) throws IOException {

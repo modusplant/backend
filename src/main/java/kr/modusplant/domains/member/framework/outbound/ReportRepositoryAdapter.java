@@ -18,6 +18,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.ProposalOr
 import kr.modusplant.domains.member.usecase.port.repository.ReportRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +30,7 @@ import java.util.List;
 @Repository
 @RequiredArgsConstructor
 public class ReportRepositoryAdapter implements ReportRepository {
+    private final PendingFileService pendingFileService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     private final MemberJpaRepository memberJpaRepository;
@@ -74,7 +76,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
-    public void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport) {
+    public void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport, int version) {
         String reportId = proposalOrBugReport.getReportId().getValue();
         String title = proposalOrBugReport.getReportTitle().getValue();
         String content = proposalOrBugReport.getReportContent().getValue();
@@ -102,6 +104,10 @@ public class ReportRepositoryAdapter implements ReportRepository {
                         .content(content)
                         .image(imageList)
                         .build());
+
+        if (version == 2) {
+            pendingFileService.untrackPendingFiles(imagePaths);
+        }
     }
 
     @Override

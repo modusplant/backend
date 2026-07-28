@@ -263,7 +263,8 @@ public class MemberController {
                 memberId,
                 ProposalOrBugReport.create(
                         reportId, reportTitle, reportContent, proposalOrBugReportImages
-                ));
+                ),
+                1);
     }
 
     public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
@@ -309,7 +310,8 @@ public class MemberController {
 
         reportRepository.reportProposalOrBug(
                 memberId,
-                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages));
+                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages),
+                2);
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
