@@ -51,12 +51,14 @@ class MemberImageIOHelperTest {
     void testIssueStorageUrl_givenImagePathAndContentType_willReturnStorageUrl() {
         // given
         given(amazonS3Service.generatePutPresignedUrl(any(), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+        willDoNothing().given(pendingFileService).trackPendingFiles(any());
 
         // when
         String storageUrl = memberImageIOHelper.issueStorageUrl(testMemberProfileImagePath, MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE);
 
         // then
         assertThat(storageUrl).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+        verify(pendingFileService, times(1)).trackPendingFiles(List.of(testMemberProfileImagePath.getValue()));
     }
 
     @Test

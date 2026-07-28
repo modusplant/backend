@@ -390,7 +390,7 @@ class MemberControllerTest implements
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
@@ -401,6 +401,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
     @Test
@@ -419,7 +420,7 @@ class MemberControllerTest implements
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
@@ -430,6 +431,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
     @Test
@@ -440,7 +442,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(memberProfile);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
         // when
@@ -452,6 +454,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
         assertThat(memberProfileResponse.introduction()).isEqualTo(null);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
     @Test
@@ -462,13 +465,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV2);
 
         // then
         assertThat(memberProfileResponse).isEqualTo(testMemberProfileResponseV2);
+        verify(memberProfileRepository, times(1)).update(any(), eq(2));
     }
 
     @Test
@@ -478,7 +482,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
@@ -489,6 +493,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
         assertThat(memberProfileResponse.introduction()).isEqualTo(null);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(2));
     }
 
     @Test
