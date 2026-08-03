@@ -8,7 +8,7 @@
       "Bash(./gradlew --version)",
       "Bash(./gradlew compileJava*)",
 
-      "Bash(rm -rf ./build/test-results/*)",
+      "Bash(rm -rf ./build/test-results/**)",
 
       "Bash(git status --porcelain*)",
       "Bash(git worktree*)",
