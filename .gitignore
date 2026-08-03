@@ -3,6 +3,7 @@
 /.claude/settings.local.json
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/resolve-error-with-stack-trace/result
+/.claude/skills/write-portfolio/
 
 ### Docker ###
 docker-compose.override.yml
