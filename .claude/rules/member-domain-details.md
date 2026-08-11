@@ -28,6 +28,7 @@ member/
  │   ├─ record/                    # Data-transfer records (REST Controller → adapter)
  │   ├─ request/                   # External request DTOs (@Valid + Swagger)
  │   ├─ response/                  # Response DTOs (Java records)
+ │   │   └─ supers/                # Marker interfaces for multi-version polymorphic responses
  │   └─ model/read/                # Read models for jOOQ query mapping
  ├─ adapter/
  │   ├─ controller/                # Business orchestration (*Controller / *AdminController)
@@ -100,6 +101,7 @@ member/
 **Response DTOs** (`usecase/response/`):
 - Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
 - Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
+- When a mapper method returns a different concrete response record depending on version, the candidate records implement a shared empty marker interface placed under `response/supers/`; the mapper declares that interface as its return type, and each call site casts the result back to the concrete type it expects
 
 **Read Models** (`usecase/model/read/`):
 - Java records optimized for specific views (e.g. abuse-report/proposal dashboards); direct targets of jOOQ query mapping
@@ -165,6 +167,6 @@ member/
 
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
-- When a port method takes a trailing `int version` param, `version == 2` marks the presigned-URL upload flow: immediately after the save succeeds, call `PendingFileService.untrackPendingFiles(...)` on the affected file key(s) to release the pending registration made when the presigned URL was issued
+- When a port method takes a trailing `int version` param, each version that marks a presigned-URL upload flow calls `PendingFileService.untrackPendingFiles(...)` on the affected file key(s) immediately after the save succeeds, to release the pending registration made when the presigned URL was issued
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`

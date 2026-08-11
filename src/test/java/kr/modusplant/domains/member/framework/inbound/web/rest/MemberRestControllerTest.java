@@ -6,7 +6,8 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
@@ -52,6 +53,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberProf
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV2;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV3;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
@@ -60,8 +62,9 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
@@ -113,7 +116,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         )).willReturn(cacheValidationResult);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
@@ -138,17 +141,17 @@ class MemberRestControllerTest implements MemberTestUtils {
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
         )).willReturn(cacheValidationResult);
-        given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponseV1);
+        given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponseWithImageUrlV1);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("W/\"%s\"", entityTag));
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV1).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImageUrlV1).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);
     }
 
@@ -172,15 +175,15 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("overrideMemberProfile V1로 응답 반환")
     void testOverrideMemberProfileV1_givenValidParameters_willReturnResponse() throws IOException {
         // given
-        given(memberController.overrideProfile(testMemberProfileOverrideRecordV1)).willReturn(testMemberProfileResponseV1);
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV1)).willReturn(testMemberProfileResponseWithImageUrlV1);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile_v1(MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> memberResponseEntity = memberRestController.overrideMemberProfile_v1(MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV1).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImageUrlV1).toString());
     }
 
     @Test
@@ -201,15 +204,30 @@ class MemberRestControllerTest implements MemberTestUtils {
     @DisplayName("overrideMemberProfile V2로 응답 반환")
     void testOverrideMemberProfileV2_givenValidParameters_willReturnResponse() throws IOException {
         // given
-        given(memberController.overrideProfile(testMemberProfileOverrideRecordV2)).willReturn(testMemberProfileResponseV2);
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV2)).willReturn(testMemberProfileResponseWithImageUrlV2);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile_v2(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> memberResponseEntity = memberRestController.overrideMemberProfile_v2(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV2).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImageUrlV2).toString());
+    }
+
+    @Test
+    @DisplayName("overrideMemberProfile V3로 응답 반환")
+    void testOverrideMemberProfileV3_givenValidParameters_willReturnResponse() throws IOException {
+        // given
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV3)).willReturn(testMemberProfileResponseWithImagePathV3);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfileResponseWithImagePath>> memberResponseEntity = memberRestController.overrideMemberProfile_v3(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImagePathV3).toString());
     }
 
     @Test
