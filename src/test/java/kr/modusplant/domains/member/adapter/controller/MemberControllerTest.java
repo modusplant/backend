@@ -34,7 +34,7 @@ import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMappe
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -96,8 +96,8 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
@@ -180,7 +180,7 @@ class MemberControllerTest implements
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
-        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponseV1);
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponseWithImageUrlV1);
     }
 
     @Test
@@ -387,13 +387,13 @@ class MemberControllerTest implements
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
-        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
-        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        assertThat(memberProfileResponseWithImageUrl.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
         verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
@@ -417,13 +417,13 @@ class MemberControllerTest implements
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
-        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
-        assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        assertThat(memberProfileResponseWithImageUrl.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
         verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
@@ -439,14 +439,14 @@ class MemberControllerTest implements
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(
                 new MemberProfileOverrideRecord_V1(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
 
         // then
-        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
-        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
-        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        assertThat(memberProfileResponseWithImageUrl.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
         verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
@@ -461,10 +461,10 @@ class MemberControllerTest implements
         given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV2);
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(testMemberProfileOverrideRecordV2);
 
         // then
-        assertThat(memberProfileResponse).isEqualTo(testMemberProfileResponseV2);
+        assertThat(memberProfileResponseWithImageUrl).isEqualTo(testMemberProfileResponseWithImageUrlV2);
         verify(memberProfileRepository, times(1)).update(any(), eq(2));
     }
 
@@ -478,14 +478,14 @@ class MemberControllerTest implements
         given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(
                 new MemberProfileOverrideRecord_V2(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
 
         // then
-        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
-        assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
-        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
-        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        assertThat(memberProfileResponseWithImageUrl.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
         verify(memberProfileRepository, times(1)).update(any(), eq(2));
     }
 

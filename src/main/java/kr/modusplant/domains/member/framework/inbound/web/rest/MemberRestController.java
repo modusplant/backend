@@ -14,10 +14,7 @@ import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCac
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.request.MemberWithdrawRequest;
-import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
-import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
-import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
+import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -80,7 +77,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/v1/members/profile")
-    public ResponseEntity<DataResponse<MemberProfileResponse>> getMemberProfile(
+    public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> getMemberProfile(
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
             String ifNoneMatch,
@@ -141,7 +138,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping(value = "/v1/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v1(
+    public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> overrideMemberProfile_v1(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지",
                     schema = @Schema(type = "string", format = "binary")
@@ -211,7 +208,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping(value = "/v2/members/profile")
-    public ResponseEntity<DataResponse<MemberProfileResponse>> overrideMemberProfile_v2(
+    public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> overrideMemberProfile_v2(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지 파일 키(코드상에서의 이미지 경로)",
                     example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
@@ -242,6 +239,45 @@ public class MemberRestController {
                 .body(DataResponse.ok(
                         memberController.overrideProfile(
                                 new MemberProfileOverrideRecord_V2(memberId, introduction, fileKey, nickname))));
+    }
+
+    @Operation(
+            summary = "회원 프로필 덮어쓰기 API - v3",
+            description = "회원 프로필을 덮어씁니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PutMapping(value = "/v3/members/profile")
+    public ResponseEntity<DataResponse<MemberProfileResponseWithImagePath>> overrideMemberProfile_v3(
+            @Parameter(
+                    description = "갱신할 회원의 프로필 이미지 파일 키(코드상에서의 이미지 경로)",
+                    example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
+            )
+            @RequestParam(required = false)
+            String fileKey,
+
+            @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
+            @RequestParam(required = false)
+            String introduction,
+
+            @Parameter(
+                    description = "갱신할 회원의 닉네임",
+                    example = "NewPlayer",
+                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
+            )
+            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
+            @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
+            String nickname,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) throws IOException {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
+                .body(DataResponse.ok(
+                        memberController.overrideProfile(
+                                new MemberProfileOverrideRecord_V3(memberId, introduction, fileKey, nickname))));
     }
 
     @Operation(
