@@ -18,7 +18,8 @@ import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMappe
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -77,13 +78,13 @@ public class MemberController {
     }
 
     @Transactional(readOnly = true)
-    public MemberProfileResponse getProfile(MemberProfileGetRecord record) throws IOException {
+    public MemberProfileResponseWithImageUrl getProfile(MemberProfileGetRecord record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
-        return memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
+        return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
     }
 
     @Transactional(readOnly = true)
@@ -95,7 +96,7 @@ public class MemberController {
         return new MemberRoleResponse(role.name());
     }
 
-    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
+    public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
@@ -118,7 +119,8 @@ public class MemberController {
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
+        return (MemberProfileResponseWithImageUrl)
+                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
     }
 
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
@@ -136,7 +138,7 @@ public class MemberController {
                 memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
     }
 
-    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
+    public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
@@ -149,7 +151,25 @@ public class MemberController {
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
+        return (MemberProfileResponseWithImageUrl)
+                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
+    }
+
+    public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        Nickname memberNickname = Nickname.create(record.nickname());
+        validateBeforeOverrideProfile(memberId, memberNickname);
+
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(record.fileKey()),
+                MemberProfileImageBytes.create(null)
+        );
+        MemberProfileIntroduction memberProfileIntroduction =
+                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+        MemberProfile memberProfile = MemberProfile.create(
+                memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+        return (MemberProfileResponseWithImagePath)
+                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 3), 3);
     }
 
     public void likePost(MemberPostLikeRecord record) {
