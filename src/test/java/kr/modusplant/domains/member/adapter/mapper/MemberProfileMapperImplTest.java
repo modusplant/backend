@@ -13,8 +13,10 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV2;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithNullImagePath;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithNullImageUrl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,11 +67,28 @@ class MemberProfileMapperImplTest implements MemberProfileTestUtils {
     }
 
     @Test
+    @DisplayName("버전 3과 이미지 경로가 있을 때 toMemberProfileResponse로 응답 반환")
+    void testToMemberProfileResponse_givenVersion3AndImagePath_willReturnResponse() {
+        // when
+        assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfile(), 3)).isEqualTo(testMemberProfileResponseWithImagePathV3);
+
+        // then
+        verify(amazonS3Service, never()).generateS3SrcUrl(any());
+    }
+
+    @Test
+    @DisplayName("버전 3과 이미지 경로가 없을 때 toMemberProfileResponse로 응답 반환")
+    void testToMemberProfileResponse_givenVersion3AndNoImagePath_willReturnResponse() {
+        // when & then
+        assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfileWithoutImage(), 3)).isEqualTo(testMemberProfileResponseWithNullImagePath);
+    }
+
+    @Test
     @DisplayName("올바르지 않은 버전으로 toMemberProfileResponse를 호출하여 오류 발생")
     void testToMemberProfileResponse_givenInvalidVersion_willThrowException() {
         // when
         InvalidValueException exception = assertThrows(
-                InvalidValueException.class, () -> memberProfileMapper.toMemberProfileResponse(createMemberProfile(), 3));
+                InvalidValueException.class, () -> memberProfileMapper.toMemberProfileResponse(createMemberProfile(), 4));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.INVALID_MEMBER_PROFILE_OVERRIDE_VERSION);
