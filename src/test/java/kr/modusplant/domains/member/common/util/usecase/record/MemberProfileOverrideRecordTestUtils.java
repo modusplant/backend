@@ -2,6 +2,7 @@ package kr.modusplant.domains.member.common.util.usecase.record;
 
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V2;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V3;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
@@ -12,4 +13,5 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 public interface MemberProfileOverrideRecordTestUtils {
     MemberProfileOverrideRecord_V1 testMemberProfileOverrideRecordV1 = new MemberProfileOverrideRecord_V1(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_BASIC_USER_NICKNAME);
     MemberProfileOverrideRecord_V2 testMemberProfileOverrideRecordV2 = new MemberProfileOverrideRecord_V2(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_BASIC_USER_NICKNAME);
+    MemberProfileOverrideRecord_V3 testMemberProfileOverrideRecordV3 = new MemberProfileOverrideRecord_V3(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_BASIC_USER_NICKNAME);
 }
