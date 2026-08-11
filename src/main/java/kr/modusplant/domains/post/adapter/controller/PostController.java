@@ -80,7 +80,7 @@ public class PostController {
                 .filter(postDetailData -> postDetailData.isPublished() || postDetailData.authorUuid().equals(currentMemberUuid))
                 .map(postDetailData -> postMapper.toPostDetailDataResponse(
                         postDetailData,
-                        getJsonNodeContent(postDetailData.content()),
+                        getJsonNodeContentWithFileKey(postDetailData.content()),
                         contentDataProcessorPort.extractOriginalFilenameFromFileKey(postDetailData.thumbnailPath())))
                 .orElseThrow(PostNotFoundException::new);
     }
@@ -242,6 +242,17 @@ public class PostController {
         JsonNode newContent;
         try {
             newContent = contentDataProcessorPort.convertFileSrcToFullFileSrc(content);
+        } catch (IOException e) {
+            throw new ContentProcessingException();
+        }
+        return newContent;
+    }
+
+    private JsonNode getJsonNodeContentWithFileKey(JsonNode content) {
+        if (content == null) return null;
+        JsonNode newContent;
+        try {
+            newContent = contentDataProcessorPort.convertFileSrcToFullFileSrcWithFileKey(content);
         } catch (IOException e) {
             throw new ContentProcessingException();
         }

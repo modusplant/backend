@@ -20,7 +20,9 @@ import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportId;
+import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileIntroduction;
 import kr.modusplant.domains.member.framework.outbound.MemberRepositoryAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubjectCommentRepositoryJpaAdapter;
@@ -28,17 +30,20 @@ import kr.modusplant.domains.member.framework.outbound.jpa.adapter.ActivitySubje
 import kr.modusplant.domains.member.framework.outbound.jpa.adapter.MemberProfileRepositoryJpaAdapter;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord;
-import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord;
+import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
@@ -47,7 +52,6 @@ import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
-import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -56,6 +60,7 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;
@@ -81,19 +86,28 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -116,6 +130,7 @@ class MemberControllerTest implements
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
+    private final ProposalOrBugReportMapper proposalOrBugReportMapper = Mockito.mock(ProposalOrBugReportMapper.class);
     private final MemberSocialTranslator memberSocialTranslator = Mockito.mock(MemberSocialTranslator.class);
 
     private final MemberRepository memberRepository = Mockito.mock(MemberRepositoryAdapter.class);
@@ -126,7 +141,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -165,7 +180,7 @@ class MemberControllerTest implements
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
-        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponse);
+        assertThat(memberController.getProfile(testMemberProfileGetRecord)).isEqualTo(testMemberProfileResponseV1);
     }
 
     @Test
@@ -194,6 +209,170 @@ class MemberControllerTest implements
     }
 
     @Test
+    @DisplayName("prepareMemberProfileImage로 이미지 준비 응답 반환")
+    void testPrepareMemberProfileImage_givenValidRecord_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+
+        // when
+        MemberProfilePrepareResponse memberProfilePrepareResponse =
+                memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2);
+
+        // then
+        assertThat(memberProfilePrepareResponse).isEqualTo(testMemberProfilePrepareResponse);
+        verify(memberImageIOHelper).deleteImage(memberProfile.getMemberProfileImage());
+    }
+
+    @Test
+    @DisplayName("기존 이미지가 없는 회원 프로필로 prepareMemberProfileImage로 이미지 준비 응답 반환")
+    void testPrepareMemberProfileImage_givenExistingProfileWithoutImage_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfileWithoutImage();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
+
+        // when
+        MemberProfilePrepareResponse memberProfilePrepareResponse =
+                memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2);
+
+        // then
+        assertThat(memberProfilePrepareResponse).isEqualTo(testMemberProfilePrepareResponse);
+        verify(memberImageIOHelper).deleteImage(memberProfile.getMemberProfileImage());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 prepareMemberProfileImage로 이미지 준비 실패")
+    void testPrepareMemberProfileImage_givenNotFoundMember_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("이미지가 있는 데이터로 prepareProposalOrBugReportImage로 이미지 준비 응답 반환")
+    void testPrepareProposalOrBugReportImage_givenExistedImage_willReturnResponse() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberImageIOHelper.issueStorageUrl(any(ReportImagePath.class), any())).willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
+        given(proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(any(), any())).willReturn(testProposalOrBugReportImagePrepareResponse1);
+        given(proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(any(), anyList())).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ProposalOrBugReportPrepareResponse response =
+                memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2);
+
+        // then
+        assertThat(response).isEqualTo(testProposalOrBugReportPrepareResponse);
+        verify(memberImageIOHelper, times(3)).issueStorageUrl(any(ReportImagePath.class), any());
+        verify(proposalOrBugReportMapper, times(3)).toProposalOrBugReportImagePrepareResponse(any(), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenNotFoundMember_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("filenames가 비어 있어 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenEmptyFilenames_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        EmptyValueException exception = assertThrows(EmptyValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, List.of(), TEST_REPORT_IMAGE_CONTENT_TYPES)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
+    }
+
+    @Test
+    @DisplayName("contentTypes가 비어 있어 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenEmptyContentTypes_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        EmptyValueException exception = assertThrows(EmptyValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, List.of())));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
+    }
+
+    @Test
+    @DisplayName("파일명 리스트의 크기와 컨텐츠 타입 리스트의 크기가 달라 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenMismatchedSize_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(
+                                MEMBER_BASIC_USER_UUID, TEST_REPORT_IMAGE_FILE_NAMES, List.of(TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE))));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MISMATCHED_REPORT_IMAGE_SIZE);
+    }
+
+    @Test
+    @DisplayName("최대 개수를 초과하는 파일명 리스트로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenSizeOutOfRange_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        List<String> fourFilenames = List.of(TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_2_PNG, TEST_REPORT_IMAGE_FILE_NAME_3_PNG, TEST_REPORT_IMAGE_FILE_NAME_1_PNG);
+        List<String> fourContentTypes = List.of(TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_CONTENT_TYPE);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, fourFilenames, fourContentTypes)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE);
+    }
+
+    @Test
+    @DisplayName("중복된 파일명을 가진 파일명 리스트로 인해 prepareProposalOrBugReportImage로 이미지 준비 실패")
+    void testPrepareProposalOrBugReportImage_givenDuplicateFilenames_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        List<String> duplicateFilenames = List.of(TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_FILE_NAME_2_PNG);
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> memberController.prepareProposalOrBugReportImage(
+                        new ProposalOrBugReportImagePrepareRecord_V2(MEMBER_BASIC_USER_UUID, duplicateFilenames, TEST_REPORT_IMAGE_CONTENT_TYPES)));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(DUPLICATED_REPORT_IMAGE_FILE_NAME);
+    }
+
+    @Test
     @DisplayName("이미지 경로를 포함해서 존재하는 모든 데이터로 overrideProfile로 프로필 덮어쓰기")
     void testOverrideProfile_givenExistedData_willReturnResponse() throws IOException {
         // given
@@ -203,18 +382,19 @@ class MemberControllerTest implements
         given(memberProfileRepository.getById(any())).willReturn(memberProfile);
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
-        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
     @Test
@@ -232,18 +412,19 @@ class MemberControllerTest implements
                         testNormalUserNickname));
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
-        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when
-        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecord);
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV1);
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
         assertThat(memberProfileResponse.introduction()).isEqualTo(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
     }
 
     @Test
@@ -254,18 +435,58 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(memberProfileRepository.getById(any())).willReturn(memberProfile);
-        given(memberProfileRepository.update(any())).willReturn(memberProfile);
+        given(memberProfileRepository.update(any(), eq(1))).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
 
         // when
         MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
-                new MemberProfileOverrideRecord(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+                new MemberProfileOverrideRecord_V1(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
 
         // then
         assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
         assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
         assertThat(memberProfileResponse.introduction()).isEqualTo(null);
         assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(1));
+    }
+
+    @Test
+    @DisplayName("파일 키를 포함해서 존재하는 모든 데이터로 overrideProfile V2로 프로필 덮어쓰기")
+    void testOverrideProfileV2_givenExistedData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(testMemberProfileOverrideRecordV2);
+
+        // then
+        assertThat(memberProfileResponse).isEqualTo(testMemberProfileResponseV2);
+        verify(memberProfileRepository, times(1)).update(any(), eq(2));
+    }
+
+    @Test
+    @DisplayName("파일 키가 없는 데이터로 overrideProfile V2로 프로필 덮어쓰기")
+    void testOverrideProfileV2_givenNullFileKey_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.update(any(), eq(2))).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponse memberProfileResponse = memberController.overrideProfile(
+                new MemberProfileOverrideRecord_V2(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+
+        // then
+        assertThat(memberProfileResponse.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponse.imageUrl()).isEqualTo(null);
+        assertThat(memberProfileResponse.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponse.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberProfileRepository, times(1)).update(any(), eq(2));
     }
 
     @Test
@@ -276,7 +497,7 @@ class MemberControllerTest implements
 
         // when & then
         NotFoundEntityException alreadyExistedNicknameException = assertThrows(
-                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
     }
 
@@ -289,7 +510,7 @@ class MemberControllerTest implements
 
         // when & then
         SwearContainedException swearContainedException = assertThrows(
-                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
     }
 
@@ -303,8 +524,47 @@ class MemberControllerTest implements
 
         // when & then
         ExistsEntityException alreadyExistedNicknameException = assertThrows(
-                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecord));
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV1));
         assertThat(alreadyExistedNicknameException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 아이디로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateMemberIdAndNicknameBeforeOverrideProfileV2_givenNotFoundId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateThatHasSwearV2_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(true);
+
+        // when & then
+        SwearContainedException swearContainedException = assertThrows(
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateV2_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
+
+        // when & then
+        ExistsEntityException existsEntityException = assertThrows(
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
     }
 
     @Test
@@ -756,13 +1016,13 @@ class MemberControllerTest implements
                 any(ReportId.class),
                 anyList()))
                 .willReturn(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
-        memberController.reportProposalOrBug(testProposalOrBugReportRecord);
+        memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1);
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(1));
     }
 
     @Test
@@ -771,13 +1031,13 @@ class MemberControllerTest implements
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
 
         // when
-        memberController.reportProposalOrBug(new ProposalOrBugReportRecord(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V1(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null, null));
 
         // then
-        verify(reportRepository, times(1)).reportProposalOrBug(any(), any());
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(1));
     }
 
     @Test
@@ -789,7 +1049,49 @@ class MemberControllerTest implements
 
         // when
         NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
-                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord));
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord_v1));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("파일 키를 포함해서 존재하는 모든 데이터로 reportProposalOrBug V2로 건의 및 버그 제보")
+    void testReportProposalOrBugV2_givenExistedFileKeys_willReportProposalOrBug() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
+
+        // when
+        memberController.reportProposalOrBug(testProposalOrBugReportRecord_v2);
+
+        // then
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(2));
+    }
+
+    @Test
+    @DisplayName("파일 키를 제외한 존재하는 모든 데이터로 reportProposalOrBug V2로 건의 및 버그 제보")
+    void testReportProposalOrBugV2_givenExistedDataExceptOfFileKeys_willReportProposalOrBug() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        willDoNothing().given(reportRepository).reportProposalOrBug(any(), any(), anyInt());
+
+        // when
+        memberController.reportProposalOrBug(new ProposalOrBugReportRecord_V2(MEMBER_BASIC_USER_UUID, TEST_REPORT_TITLE, TEST_REPORT_CONTENT, null));
+
+        // then
+        verify(reportRepository, times(1)).reportProposalOrBug(any(), any(), eq(2));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원으로 인해 reportProposalOrBug V2로 건의 및 버그 제보 실패")
+    void testReportProposalOrBugV2_givenNotFoundMemberId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class,
+                () -> memberController.reportProposalOrBug(testProposalOrBugReportRecord_v2));
 
         // then
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
@@ -802,7 +1104,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
@@ -825,7 +1127,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,
@@ -848,7 +1150,7 @@ class MemberControllerTest implements
         given(jwtTokenProvider.getMemberUuidFromToken(any())).willReturn(MEMBER_BASIC_USER_UUID);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
 
-        ProposalOrBugReportRecord invalidRecord = new ProposalOrBugReportRecord(
+        ProposalOrBugReportRecord_V1 invalidRecord = new ProposalOrBugReportRecord_V1(
                 MEMBER_BASIC_USER_UUID,
                 TEST_REPORT_TITLE,
                 TEST_REPORT_CONTENT,

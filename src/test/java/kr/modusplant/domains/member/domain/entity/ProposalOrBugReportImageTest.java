@@ -48,6 +48,35 @@ class ProposalOrBugReportImageTest {
         assertThat(emptyReportImageBytesException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_BYTES);
     }
 
+    @DisplayName("ReportImagePath와 ReportImageBytes로 create 호출")
+    @Test
+    void testCreate_givenReportImagePathAndReportImageBytes_willReturnProposalOrBugReportImage() {
+        // given & when
+        ProposalOrBugReportImage proposalOrBugReportImage =
+                ProposalOrBugReportImage.create(testReportImagePath1, testReportImageBytes1);
+
+        // then
+        assertThat(proposalOrBugReportImage.getReportImagePath()).isEqualTo(testReportImagePath1);
+        assertThat(proposalOrBugReportImage.getProposalOrBugReportImageFileName()).isEqualTo(testProposalOrBugReportImageFileName1);
+        assertThat(proposalOrBugReportImage.getReportImageBytes()).isEqualTo(testReportImageBytes1);
+    }
+
+    @DisplayName("null 값으로 create(ReportImagePath, ReportImageBytes) 호출")
+    @Test
+    void testCreate_givenNullToOneOfReportImagePathAndReportImageBytes_willThrowException() {
+        // ReportImagePath가 null일 때
+        EmptyValueException emptyReportImagePathException =
+                assertThrows(EmptyValueException.class,
+                        () -> ProposalOrBugReportImage.create(null, testReportImageBytes1));
+        assertThat(emptyReportImagePathException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_PATH);
+
+        // ReportImageBytes가 null일 때
+        EmptyValueException emptyReportImageBytesException =
+                assertThrows(EmptyValueException.class,
+                        () -> ProposalOrBugReportImage.create(testReportImagePath1, null));
+        assertThat(emptyReportImageBytesException.getErrorCode()).isEqualTo(MemberErrorCode.EMPTY_REPORT_IMAGE_BYTES);
+    }
+
     @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {

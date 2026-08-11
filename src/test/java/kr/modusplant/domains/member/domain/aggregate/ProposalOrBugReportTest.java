@@ -4,10 +4,12 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.ProposalOrBugRe
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.entity.ReportImageTestUtils.testProposalOrBugReportImages;
+import static kr.modusplant.domains.member.common.util.domain.entity.ReportImageTestUtils.testProposalOrBugReportImagesWithDuplicateFileName;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportContentTestUtils.testReportContent;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportTitleTestUtils.testReportTitle;
@@ -52,6 +54,17 @@ class ProposalOrBugReportTest implements ProposalOrBugReportTestUtils {
     }
 
     @Test
+    @DisplayName("파일명이 중복된 이미지 목록으로 create 호출")
+    void testCreate_givenImagesWithDuplicateFileName_willThrowException() {
+        // given & when
+        InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+                ProposalOrBugReport.create(testReportId, testReportTitle, testReportContent, testProposalOrBugReportImagesWithDuplicateFileName));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.DUPLICATED_REPORT_IMAGE_FILE_NAME);
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         // given
@@ -66,7 +79,7 @@ class ProposalOrBugReportTest implements ProposalOrBugReportTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(createProposalOrBugReport(), testReportId);
+        assertNotEquals(testReportId, createProposalOrBugReport());
     }
 
     @Test

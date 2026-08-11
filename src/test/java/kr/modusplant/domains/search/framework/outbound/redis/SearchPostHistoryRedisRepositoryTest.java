@@ -2,10 +2,7 @@ package kr.modusplant.domains.search.framework.outbound.redis;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
@@ -24,16 +21,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
 class SearchPostHistoryRedisRepositoryTest {
-    @Mock
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
 
-    @Mock
-    private ZSetOperations<String,String> zSetOperations;
+    @SuppressWarnings("unchecked")
+    private final ZSetOperations<String, String> zSetOperations = Mockito.mock(ZSetOperations.class);
 
-    @InjectMocks
-    private SearchPostHistoryRedisRepository postSearchHistoryRedisRepository;
+    private final SearchPostHistoryRedisRepository postSearchHistoryRedisRepository =
+            new SearchPostHistoryRedisRepository(stringRedisTemplate);
 
     private static final String KEY_FORMAT = "searchHistory:member:%s";
     private static final int MAX_HISTORY = 20;

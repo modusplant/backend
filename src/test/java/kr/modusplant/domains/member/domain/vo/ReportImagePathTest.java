@@ -10,6 +10,8 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testProposalOrBugReportImageFileName1;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,6 +21,13 @@ class ReportImagePathTest {
     @DisplayName("create으로 보고서 이미지 경로 반환")
     void testCreate_givenValidValue_willReturnReportImagePath() {
         assertThat(ReportImagePath.create(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1)).isEqualTo(ReportImagePath.create(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1));
+    }
+
+    @Test
+    @DisplayName("회원 아이디, 보고서 아이디, 파일명으로 create을 호출하여 보고서 이미지 경로 반환")
+    void testCreate_givenMemberIdAndReportIdAndFileName_willReturnReportImagePath() {
+        assertThat(ReportImagePath.create(testMemberId, testReportId, testProposalOrBugReportImageFileName1))
+                .isEqualTo(ReportImagePath.create(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1));
     }
 
     @Test

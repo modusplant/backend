@@ -48,6 +48,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
     private static final String DATA = "data";
     private static final String FILENAME = "filename";
+    private static final String FILE_KEY = "fileKey";
     private static final String ORDER = "order";
     private static final String SRC = "src";
     private static final String TYPE = "type";
@@ -345,8 +346,37 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
             JsonNode imageNode = result.get(0);
             assertThat(imageNode.has(SRC)).isTrue();
             assertThat(imageNode.has(DATA)).isFalse();
+            assertThat(imageNode.has(FILE_KEY)).isFalse();
             assertThat(imageNode.get(TYPE).asText()).isEqualTo(PostFileType.IMAGE.getValue());
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
+        }
+    }
+
+    @Nested
+    @DisplayName("convertFileSrcToFullFileSrcWithFileKey 메서드 테스트")
+    class testConvertFileSrcToFullFileSrcWithFileKey {
+        @Test
+        @DisplayName("저장된 파일 경로를 전체 파일 경로로 변환하면서 fileKey도 함께 반환")
+        void testConvertFileSrcToFullFileSrcWithFileKey_givenJsonContent_willReturnArrayNodeContentWithFileKey() throws IOException {
+            // given
+            JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
+            String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
+            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+
+            // when
+            JsonNode result = postContentDataProcessor.convertFileSrcToFullFileSrcWithFileKey(content);
+
+            // then
+            assertThat(result.isArray()).isTrue();
+            assertThat(result.size()).isEqualTo(1);
+
+            JsonNode imageNode = result.get(0);
+            assertThat(imageNode.has(SRC)).isTrue();
+            assertThat(imageNode.has(DATA)).isFalse();
+            assertThat(imageNode.has(FILE_KEY)).isTrue();
+            assertThat(imageNode.get(TYPE).asText()).isEqualTo(PostFileType.IMAGE.getValue());
+            assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
+            assertThat(imageNode.get(FILE_KEY).asText()).isEqualTo(TEST_IMAGE_JPG_FILE_KEY);
         }
     }
 

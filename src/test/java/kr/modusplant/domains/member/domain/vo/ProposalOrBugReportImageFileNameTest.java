@@ -6,8 +6,9 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_1;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_2;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_1_PNG;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_1_JPG;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_2_PNG;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testProposalOrBugReportImageFileName1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +18,7 @@ class ProposalOrBugReportImageFileNameTest {
     @Test
     @DisplayName("create으로 건의 및 버그 제보 파일명 반환")
     void testCreate_givenValidValue_willReturnProposalOrBugReportImageFileName() {
-        assertThat(ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_1)).isEqualTo(ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_1));
+        assertThat(ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_1_PNG)).isEqualTo(ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_1_PNG));
     }
 
     @Test
@@ -49,6 +50,12 @@ class ProposalOrBugReportImageFileNameTest {
     }
 
     @Test
+    @DisplayName("getFileName으로 파일명 반환")
+    void testGetFileName_givenValidData_willReturnFileName() {
+        assertThat(testProposalOrBugReportImageFileName1.getFileName()).isEqualTo(TEST_REPORT_IMAGE_FILE_NAME_1_PNG);
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 equals 호출")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
@@ -65,7 +72,13 @@ class ProposalOrBugReportImageFileNameTest {
     @Test
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
-        assertNotEquals(testProposalOrBugReportImageFileName1, ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_2));
+        assertNotEquals(testProposalOrBugReportImageFileName1, ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_2_PNG));
+    }
+
+    @Test
+    @DisplayName("같은 기본 파일명이지만 다른 확장자를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectWithSameBaseNameButDifferentExtension_willReturnFalse() {
+        assertNotEquals(testProposalOrBugReportImageFileName1, ProposalOrBugReportImageFileName.create(TEST_REPORT_IMAGE_FILE_NAME_1_JPG));
     }
 
     @Test

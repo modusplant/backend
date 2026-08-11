@@ -22,6 +22,9 @@ public class MemberProfileImagePath {
     private static final Pattern PATTERN_MEMBER_PROFILE_IMAGE_PATH = Pattern.compile(
             "^member/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/profile/.+\\..+$");
 
+    // member/{member_uuid}/profile/{profile_image_file_name}
+    public static final String MEMBER_PROFILE_IMAGE_PATH_FORMAT = "member/%s/profile/%s";
+
     public static MemberProfileImagePath create(String value) {
         if (StringUtils.isBlank(value)) {
             return EmptyMemberProfileImagePath.create();
@@ -29,6 +32,13 @@ public class MemberProfileImagePath {
             throw new InvalidValueException(INVALID_MEMBER_PROFILE_IMAGE_PATH, "memberProfileImagePath");
         }
         return new MemberProfileImagePath(value);
+    }
+
+    public static MemberProfileImagePath create(MemberId memberId, MemberProfileImageFileName memberProfileImageFileName) {
+        return new MemberProfileImagePath(
+                String.format(MEMBER_PROFILE_IMAGE_PATH_FORMAT,
+                        memberId.getValue(),
+                        memberProfileImageFileName.getFileName()));
     }
 
     @Override

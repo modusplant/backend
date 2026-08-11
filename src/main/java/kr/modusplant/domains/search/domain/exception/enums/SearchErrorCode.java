@@ -16,6 +16,7 @@ public enum SearchErrorCode implements ErrorCode {
     EMPTY_SEARCH_POST_PUBLISHED_AT(HttpStatus.BAD_REQUEST.value(), "empty_search_post_published_at", "검색 게시글 발행 시점이 비어 있습니다. "),
     EMPTY_SEARCH_POST_SORT_CONDITION(HttpStatus.BAD_REQUEST.value(), "empty_search_post_sort_condition", "검색 게시글 정렬 조건이 비어 있습니다. "),
     EMPTY_SEARCH_POST_TARGET(HttpStatus.BAD_REQUEST.value(), "empty_search_post_target", "검색 게시글 대상이 비어 있습니다. "),
+    EMPTY_SEARCH_RESULT_LIST_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_search_result_list_size", "검색 결과 목록 크기가 비어 있습니다. "),
 
     INCORRECT_SEARCH_POST_OPTION(HttpStatus.BAD_REQUEST.value(), "incorrect_search_post_option", "검색 게시글 옵션이 올바르지 않습니다. "),
     INCORRECT_SEARCH_POST_CATEGORY_ID(HttpStatus.BAD_REQUEST.value(), "incorrect_search_post_category_id", "검색 게시글 항목 ID가 올바르지 않습니다. "),
@@ -29,6 +30,7 @@ public enum SearchErrorCode implements ErrorCode {
 
     SEARCH_KEYWORD_SIMILARITY_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_keyword_similarity_out_of_range", "검색 키워드 유사도가 올바른 값의 범위를 벗어났습니다. "),
     SEARCH_POST_IMPORTANCE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_post_importance_out_of_range", "검색 게시글 중요도가 올바른 값의 범위를 벗어났습니다. "),
+    SEARCH_RESULT_LIST_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_result_list_size_out_of_range", "검색 결과 목록 크기가 올바른 값의 범위를 벗어났습니다. "),
     SEARCH_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "search_size_out_of_range", "검색 크기가 올바른 값의 범위를 벗어났습니다. "),
     ;
 

@@ -46,6 +46,12 @@ public class S3Config {
     @Value("${cloud.wasabi.s3.connection-acquisition-timeout}")
     private Integer connectionAcquisitionTimeout;
 
+    @Value("${spring.profiles.active:local}")
+    private String profile;
+
+    @Value("${minio.public-endpoint:#{null}}")
+    private String devPublicEndpoint;
+
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey,secretKey);
@@ -63,8 +69,6 @@ public class S3Config {
                         .connectionMaxIdleTime(Duration.ofSeconds(connectionMaxIdleTime))
                         .connectionTimeToLive(Duration.ofSeconds(connectionTimeToLive))
                         .connectionAcquisitionTimeout(Duration.ofSeconds(connectionAcquisitionTimeout)))
-                .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
                 .serviceConfiguration(S3Configuration.builder()
                         .pathStyleAccessEnabled(true)
                         .build())
@@ -74,8 +78,11 @@ public class S3Config {
     @Bean
     public S3Presigner s3Presigner() {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
+        String presignEndpoint = "dev".equals(profile) && devPublicEndpoint != null
+                ? devPublicEndpoint
+                : endpoint;
         return S3Presigner.builder()
-                .endpointOverride(URI.create(endpoint))
+                .endpointOverride(URI.create(presignEndpoint))
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
                 .serviceConfiguration(S3Configuration.builder()

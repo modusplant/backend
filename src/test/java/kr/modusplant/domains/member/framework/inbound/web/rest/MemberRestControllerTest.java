@@ -5,8 +5,10 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +35,9 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
@@ -44,14 +49,21 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostLikeRecordTestUtils.testMemberPostLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberPostUnlikeRecordTestUtils.testMemberPostUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
-import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecordTestUtils.testProposalOrBugReportRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V1TestUtils.testProposalOrBugReportRecord_v1;
+import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -126,7 +138,7 @@ class MemberRestControllerTest implements MemberTestUtils {
                 ifModifiedSince,
                 MEMBER_BASIC_USER_UUID
         )).willReturn(cacheValidationResult);
-        given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponse);
+        given(memberController.getProfile(testMemberProfileGetRecord)).willReturn(testMemberProfileResponseV1);
 
         // when
         ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.getMemberProfile(ifNoneMatch, ifModifiedSince, MEMBER_BASIC_USER_UUID);
@@ -136,7 +148,7 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.maxAge(Duration.ofDays(1)).cachePrivate().getHeaderValue());
         assertThat(memberResponseEntity.getHeaders().getETag()).isEqualTo(String.format("W/\"%s\"", entityTag));
         assertThat(memberResponseEntity.getHeaders().getLastModified()).isEqualTo(now.atZone(ZoneId.of("Asia/Seoul")).toInstant().truncatedTo(ChronoUnit.SECONDS).toEpochMilli());
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV1).toString());
         verify(memberController, only()).getProfile(testMemberProfileGetRecord);
     }
 
@@ -157,18 +169,47 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
-    @DisplayName("overrideMemberProfile로 응답 반환")
-    void testOverrideMemberProfile_givenValidParameters_willReturnResponse() throws IOException {
+    @DisplayName("overrideMemberProfile V1로 응답 반환")
+    void testOverrideMemberProfileV1_givenValidParameters_willReturnResponse() throws IOException {
         // given
-        given(memberController.overrideProfile(testMemberProfileOverrideRecord)).willReturn(testMemberProfileResponse);
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV1)).willReturn(testMemberProfileResponseV1);
 
         // when
-        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile(MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile_v1(MEMBER_PROFILE_BASIC_USER_IMAGE, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
-        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponse).toString());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV1).toString());
+    }
+
+    @Test
+    @DisplayName("prepareMemberProfileImage V2로 응답 반환")
+    void testPrepareMemberProfileImageV2_givenValidParameters_willReturnResponse() throws IOException {
+        // given
+        given(memberController.prepareMemberProfileImage(testMemberProfileImagePrepareRecordV2)).willReturn(testMemberProfilePrepareResponse);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfilePrepareResponse>> memberResponseEntity = memberRestController.prepareMemberProfileImage_v2(MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME, MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfilePrepareResponse).toString());
+    }
+
+    @Test
+    @DisplayName("overrideMemberProfile V2로 응답 반환")
+    void testOverrideMemberProfileV2_givenValidParameters_willReturnResponse() throws IOException {
+        // given
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV2)).willReturn(testMemberProfileResponseV2);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfileResponse>> memberResponseEntity = memberRestController.overrideMemberProfile_v2(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseV2).toString());
     }
 
     @Test
@@ -256,17 +297,47 @@ class MemberRestControllerTest implements MemberTestUtils {
     }
 
     @Test
-    @DisplayName("reportProposalOrBug로 응답 반환")
-    void testReportProposalOrBug_givenValidRequest_willReturnResponse() throws IOException {
+    @DisplayName("reportProposalOrBug V1으로 응답 반환")
+    void testReportProposalOrBug_v1_givenValidRequest_willReturnResponse() throws IOException {
         // given
-        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord);
+        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord_v1);
 
         // when
-        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.reportProposalOrBug_v1(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_IMAGES, TEST_REPORT_IMAGE_NUMBER_3, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("reportProposalOrBug V2로 응답 반환")
+    void testReportProposalOrBugV2_givenValidRequest_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).reportProposalOrBug(testProposalOrBugReportRecord_v2);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity =
+                memberRestController.reportProposalOrBug_v2(TEST_REPORT_TITLE, TEST_REPORT_CONTENT, TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("prepareProposalOrBugReportImage V2로 응답 반환")
+    void testPrepareProposalOrBugReportImageV2_givenValidParameters_willReturnResponse() {
+        // given
+        given(memberController.prepareProposalOrBugReportImage(testProposalOrBugReportImagePrepareRecord_V2)).willReturn(testProposalOrBugReportPrepareResponse);
+
+        // when
+        ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> memberResponseEntity =
+                memberRestController.prepareProposalOrBugReportImage_v2(TEST_REPORT_IMAGE_FILE_NAMES, TEST_REPORT_IMAGE_CONTENT_TYPES, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testProposalOrBugReportPrepareResponse).toString());
     }
 
     @Test

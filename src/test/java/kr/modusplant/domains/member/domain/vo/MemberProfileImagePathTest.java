@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImageFileNameTestUtils.testMemberProfileImageFileName;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.testEmptyMemberProfileImagePath;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,6 +20,12 @@ class MemberProfileImagePathTest {
     @DisplayName("create으로 회원 프로필 이미지 경로 반환")
     void testCreate_givenValidValue_willReturnMemberProfileImagePath() {
         assertThat(MemberProfileImagePath.create(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH)).isEqualTo(MemberProfileImagePath.create(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH));
+    }
+
+    @Test
+    @DisplayName("회원 아이디와 파일명으로 create을 호출하여 회원 프로필 이미지 경로 반환")
+    void testCreate_givenMemberIdAndFileName_willReturnMemberProfileImagePath() {
+        assertThat(MemberProfileImagePath.create(testMemberId, testMemberProfileImageFileName)).isEqualTo(MemberProfileImagePath.create(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH));
     }
 
     @Test

@@ -14,15 +14,19 @@ import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
+import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
+import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponse;
 import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
-import kr.modusplant.shared.enums.Role;
+import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
 import kr.modusplant.infrastructure.swear.service.SwearService;
+import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -38,10 +42,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.*;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 
 @SuppressWarnings("LoggingSimilarMessage")
 @RequiredArgsConstructor
@@ -55,6 +61,7 @@ public class MemberController {
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
     private final MemberProfileMapper memberProfileMapper;
+    private final ProposalOrBugReportMapper proposalOrBugReportMapper;
     private final MemberSocialTranslator memberSocialTranslator;
     private final MemberRepository memberRepository;
     private final MemberProfileRepository memberProfileRepository;
@@ -76,7 +83,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
         MemberProfile memberProfile = memberProfileRepository.getById(memberId);
-        return memberProfileMapper.toMemberProfileResponse(memberProfile);
+        return memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
     }
 
     @Transactional(readOnly = true)
@@ -88,7 +95,7 @@ public class MemberController {
         return new MemberRoleResponse(role.name());
     }
 
-    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord record) throws IOException {
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
@@ -111,7 +118,38 @@ public class MemberController {
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile));
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
+    }
+
+    public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        MemberProfile existingMemberProfile = memberProfileRepository.getById(memberId);
+        memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
+
+        MemberProfileImagePath memberProfileImagePath =
+                MemberProfileImagePath.create(memberId, memberProfileImageFileName);
+        return memberProfileMapper.toMemberProfilePrepareResponse(
+                memberProfileImagePath,
+                memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
+    }
+
+    public MemberProfileResponse overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        Nickname memberNickname = Nickname.create(record.nickname());
+        validateBeforeOverrideProfile(memberId, memberNickname);
+
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(record.fileKey()),
+                MemberProfileImageBytes.create(null)
+        );
+        MemberProfileIntroduction memberProfileIntroduction =
+                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+        MemberProfile memberProfile = MemberProfile.create(
+                memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+        return memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
     }
 
     public void likePost(MemberPostLikeRecord record) {
@@ -187,7 +225,7 @@ public class MemberController {
         }
     }
 
-    public void reportProposalOrBug(ProposalOrBugReportRecord record) throws IOException {
+    public void reportProposalOrBug(ProposalOrBugReportRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         ReportId reportId = ReportId.generate();
         ReportTitle reportTitle = ReportTitle.create(record.title());
@@ -226,7 +264,55 @@ public class MemberController {
                 memberId,
                 ProposalOrBugReport.create(
                         reportId, reportTitle, reportContent, proposalOrBugReportImages
-                ));
+                ),
+                1);
+    }
+
+    public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        List<String> filenames = record.filenames();
+        List<String> contentTypes = record.contentTypes();
+        validateBeforePrepareProposalOrBugReportImage(memberId, filenames, contentTypes);
+
+        ReportId reportId = ReportId.generate();
+        List<ProposalOrBugReportPrepareResponse.ProposalOrBugReportImagePrepareResponse> imagePrepareResponse = new ArrayList<>();
+        for (int i = 0; i < filenames.size(); i++) {
+            ProposalOrBugReportImageFileName proposalOrBugReportImageFileName =
+                    ProposalOrBugReportImageFileName.create(filenames.get(i));
+            ReportImagePath reportImagePath =
+                    ReportImagePath.create(memberId, reportId, proposalOrBugReportImageFileName);
+            imagePrepareResponse.add(
+                    proposalOrBugReportMapper.toProposalOrBugReportImagePrepareResponse(
+                            reportImagePath,
+                            memberImageIOHelper.issueStorageUrl(reportImagePath, contentTypes.get(i))));
+        }
+        return proposalOrBugReportMapper.toProposalOrBugReportPrepareResponse(reportId, imagePrepareResponse);
+    }
+
+    public void reportProposalOrBug(ProposalOrBugReportRecord_V2 record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        memberValidationHelper.validateIfMemberExists(memberId);
+
+        ReportId reportId = ReportId.generate();
+        ReportTitle reportTitle = ReportTitle.create(record.title());
+        ReportContent reportContent = ReportContent.create(record.content());
+        List<String> fileKeys = record.fileKeys();
+
+        List<ProposalOrBugReportImage> proposalOrBugReportImages;
+        if (fileKeys == null) {
+            proposalOrBugReportImages = List.of();
+        } else {
+            proposalOrBugReportImages = fileKeys.stream()
+                    .map(fileKey ->
+                            ProposalOrBugReportImage.create(
+                                    ReportImagePath.create(fileKey), ReportImageBytes.create(null)))
+                    .toList();
+        }
+
+        reportRepository.reportProposalOrBug(
+                memberId,
+                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages),
+                2);
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
@@ -311,6 +397,22 @@ public class MemberController {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
         } else if (images != null && images.size() != imageNumber) {
             throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
+        }
+    }
+
+    private void validateBeforePrepareProposalOrBugReportImage(
+            MemberId memberId, List<String> filenames, List<String> contentTypes) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if (filenames.isEmpty()) {
+            throw new EmptyValueException(EMPTY_VALUE, "filenames");
+        } else if (contentTypes.isEmpty()) {
+            throw new EmptyValueException(EMPTY_VALUE, "contentTypes");
+        } else if (filenames.size() != contentTypes.size()) {
+            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("filenames", "contentTypes"));
+        } else if (filenames.size() > 3) {
+            throw new InvalidValueException(PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE, "filenames");
+        } else if (filenames.size() != new HashSet<>(filenames).size()) {
+            throw new InvalidValueException(DUPLICATED_REPORT_IMAGE_FILE_NAME, "filenames");
         }
     }
 

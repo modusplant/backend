@@ -11,14 +11,19 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberProfileConstant {
     public static final byte[] MEMBER_PROFILE_BASIC_ADMIN_IMAGE_BYTES = "Image for basic admin".getBytes();
-    public static final MultipartFile MEMBER_PROFILE_BASIC_ADMIN_IMAGE = new MockMultipartFile("image", "image.png", "image/png", MEMBER_PROFILE_BASIC_ADMIN_IMAGE_BYTES);
-    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_PATH = "member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/image.png";
-    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_URL = "test-endpoint/test-bucket/member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/image.png";
+    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_FILE_NAME = "image.png";
+    public static final MultipartFile MEMBER_PROFILE_BASIC_ADMIN_IMAGE = new MockMultipartFile("image", MEMBER_PROFILE_BASIC_ADMIN_IMAGE_FILE_NAME, "image/png", MEMBER_PROFILE_BASIC_ADMIN_IMAGE_BYTES);
+    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_PATH = "member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/" + MEMBER_PROFILE_BASIC_ADMIN_IMAGE_FILE_NAME;
+    public static final String MEMBER_PROFILE_BASIC_ADMIN_IMAGE_URL = "test-endpoint/test-bucket/member/" + MEMBER_BASIC_ADMIN_UUID + "/profile/" + MEMBER_PROFILE_BASIC_ADMIN_IMAGE_FILE_NAME;
     public static final String MEMBER_PROFILE_BASIC_ADMIN_INTRODUCTION = "기본 관리자 프로필 소개";
 
     public static final byte[] MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES = "Image for basic user".getBytes();
-    public static final MultipartFile MEMBER_PROFILE_BASIC_USER_IMAGE = new MockMultipartFile("image", "image.png", "image/png", MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_PATH = "member/" + MEMBER_BASIC_USER_UUID + "/profile/image.png";
-    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_URL = "test-endpoint/test-bucket/member/" + MEMBER_BASIC_USER_UUID + "/profile/image.png";
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME = "image.png";
+    public static final MultipartFile MEMBER_PROFILE_BASIC_USER_IMAGE = new MockMultipartFile("image", MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME, "image/png", MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE = "image/png";
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME_2 = "profile.jpg";
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_PATH = "member/" + MEMBER_BASIC_USER_UUID + "/profile/" + MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_URL = "test-endpoint/test-bucket/member/" + MEMBER_BASIC_USER_UUID + "/profile/" + MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
     public static final String MEMBER_PROFILE_BASIC_USER_INTRODUCTION = "기본 유저 프로필 소개";
+    public static final String MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL = "test-presigned-put-url/member/" + MEMBER_BASIC_USER_UUID + "/profile/" + MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
 }

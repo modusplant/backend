@@ -5,6 +5,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
 
-public record ProposalOrBugReportRecord(
+public record ProposalOrBugReportRecord_V1(
         UUID memberId, String title, String content, List<MultipartFile> images, Integer imageNumber) {
 }

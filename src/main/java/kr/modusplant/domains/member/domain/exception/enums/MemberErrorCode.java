@@ -20,6 +20,7 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_MEMBER_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_member_status", "회원 상태가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image", "회원 프로필 이미지가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE_BYTES(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image_bytes", "회원 프로필 이미지 바이트 값이 비어 있습니다. "),
+    EMPTY_MEMBER_PROFILE_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image_file_name", "회원 프로필 이미지 파일명이 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_image_path", "회원 프로필 이미지 경로가 비어 있습니다. "),
     EMPTY_MEMBER_PROFILE_INTRODUCTION(HttpStatus.BAD_REQUEST.value(), "empty_member_profile_introduction", "회원 프로필 소개가 비어 있습니다. "),
     EMPTY_REPORT_CONTENT(HttpStatus.BAD_REQUEST.value(), "empty_report_content", "보고서 컨텐츠가 비어 있습니다. "),
@@ -35,7 +36,9 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_ACTIVITY_SUBJECT_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_comment_path", "대상 댓글 경로가 비어 있습니다. "),
     EMPTY_ACTIVITY_SUBJECT_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_activity_subject_post_id", "대상 게시글 아이디가 비어 있습니다. "),
 
+    INVALID_MEMBER_PROFILE_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_file_name", "회원 프로필 이미지 파일명의 서식이 올바르지 않습니다. "),
     INVALID_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_path", "회원 프로필 이미지 경로의 서식이 올바르지 않습니다. "),
+    INVALID_MEMBER_PROFILE_OVERRIDE_VERSION(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_override_version", "회원 프로필 오버라이드 버전이 올바르지 않습니다. "),
     INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_member_id", "사용자 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_report_id", "보고서 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_report_image_file_name", "보고서 이미지 파일명의 서식이 올바르지 않습니다. "),
@@ -73,7 +76,9 @@ public enum MemberErrorCode implements ErrorCode {
 
     REPORT_PAGE_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "report_page_size_out_of_range", "보고서 페이지 크기가 올바른 값의 범위를 벗어났습니다. "),
 
-    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
+    DUPLICATED_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "duplicated_report_image_file_name", "보고서 이미지 파일명이 중복되어 있습니다. "),
+
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
 
     REPORT_TIME_ON_FUTURE(HttpStatus.BAD_REQUEST.value(), "report_time_on_future", "보고 시각이 미래입니다. "),
     ;

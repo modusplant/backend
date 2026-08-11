@@ -21,7 +21,7 @@ public interface ReportRepository {
 
     boolean isMemberAbuseComment(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
-    void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport);
+    void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport, int version);
 
     ReportTime reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 

@@ -76,20 +76,20 @@ public class ProposalOrBugReportImageFileName {
     }
 
     public String getFileName() {
-        return baseName + "." + imageExtension.getValue();
+        return baseName.getValue() + "." + imageExtension.getValue();
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof ProposalOrBugReportImageFileName reportTitle)) return false;
+        if (!(o instanceof ProposalOrBugReportImageFileName fileName)) return false;
 
-        return new EqualsBuilder().append(getBaseName(), reportTitle.getBaseName()).isEquals();
+        return new EqualsBuilder().append(getFileName(), fileName.getFileName()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getBaseName()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getFileName()).toHashCode();
     }
 }

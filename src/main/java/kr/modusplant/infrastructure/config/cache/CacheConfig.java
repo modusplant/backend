@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.config.cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.ibm.icu.text.Transliterator;
 import kr.modusplant.shared.framework.icu4j.util.Icu4jUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
@@ -25,6 +26,7 @@ import static kr.modusplant.jooq.Tables.PLANT;
 
 @Configuration
 @EnableCaching
+@Slf4j
 public class CacheConfig {
     @Bean
     @Primary
@@ -61,6 +63,7 @@ public class CacheConfig {
     }
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
+        log.info("[PostgreSQL] Loading all the Korean names from the plant table");
         Transliterator transliterator = Icu4jUtils.getAnyNFDTransliterator();
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
