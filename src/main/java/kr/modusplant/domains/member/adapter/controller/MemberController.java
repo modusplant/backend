@@ -120,7 +120,8 @@ public class MemberController {
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, false), 1);
     }
 
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
@@ -130,6 +131,8 @@ public class MemberController {
 
         MemberProfile existingMemberProfile = memberProfileRepository.getById(memberId);
         memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
+        existingMemberProfile.clearImage();
+        memberProfileRepository.update(existingMemberProfile, false);
 
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(memberId, memberProfileImageFileName);
@@ -152,7 +155,8 @@ public class MemberController {
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, true), 2);
     }
 
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
@@ -169,7 +173,8 @@ public class MemberController {
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImagePath)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 3), 3);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, true), 3);
     }
 
     public void likePost(MemberPostLikeRecord record) {

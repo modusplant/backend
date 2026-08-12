@@ -10,7 +10,7 @@ public interface MemberProfileRepository {
 
     MemberProfile add(MemberProfile memberProfile) throws IOException;
 
-    MemberProfile update(MemberProfile memberProfile, int version) throws IOException;
+    MemberProfile update(MemberProfile memberProfile, boolean needsUntracking) throws IOException;
 
     boolean isIdExist(MemberId memberId);
 }

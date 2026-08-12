@@ -13,7 +13,6 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
-import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -24,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_PROFILE_OVERRIDE_VERSION;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
 
 @Repository
@@ -72,10 +70,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     }
 
     @Override
-    public MemberProfile update(MemberProfile memberProfile, int version) throws IOException {
-        if (version != 1 && version != 2 && version != 3) {
-            throw new InvalidValueException(INVALID_MEMBER_PROFILE_OVERRIDE_VERSION, "version");
-        }
+    public MemberProfile update(MemberProfile memberProfile, boolean needsUntracking) throws IOException {
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
@@ -85,7 +80,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
         MemberProfileEntity savedMemberProfileEntity = memberProfileJpaRepository.save(memberProfileEntity);
-        if (version == 2 || version == 3) {
+        if (needsUntracking) {
             pendingFileService.untrackPendingFiles(List.of(imagePath));
         }
         return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity);
