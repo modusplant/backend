@@ -40,31 +40,36 @@ class MemberProfileRepositoryJpaAdapterTest implements
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
-    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(amazonS3Service, pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
+    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
 
     @Test
-    @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
+    @DisplayName("선택적인 데이터가 모두 있을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
     void testGetByIdWithoutImageBytes_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        MemberProfile result = memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId);
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(result).isEqualTo(createMemberProfile());
+        assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
     }
 
     @Test
-    @DisplayName("선택적인 데이터가 모두 없을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
+    @DisplayName("선택적인 데이터가 모두 없을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
     void testGetByIdWithoutImageBytes_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 
+        MemberProfile result = memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId);
+
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(result).isEqualTo(createMemberProfile());
+        assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
     }
 
     @Test
-    @DisplayName("getByNickname으로 예외 반환(가용하지 않을 때)")
+    @DisplayName("getByIdWithoutImageBytes로 예외 반환(가용하지 않을 때)")
     void testGetByIdWithoutImageBytes_givenValidMemberId_willThrowException() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
