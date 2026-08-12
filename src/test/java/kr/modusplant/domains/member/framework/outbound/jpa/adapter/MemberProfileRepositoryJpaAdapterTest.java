@@ -44,33 +44,33 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
     @Test
     @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
+    void testGetByIdWithoutImageBytes_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
         given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId)).isEqualTo(createMemberProfile());
     }
 
     @Test
     @DisplayName("선택적인 데이터가 모두 없을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
+    void testGetByIdWithoutImageBytes_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId)).isEqualTo(createMemberProfile());
     }
 
     @Test
     @DisplayName("getByNickname으로 예외 반환(가용하지 않을 때)")
-    void testGetById_givenValidMemberId_willThrowException() {
+    void testGetByIdWithoutImageBytes_givenValidMemberId_willThrowException() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
         // then
-        assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getById(testMemberId));
+        assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId));
     }
 
     @Test

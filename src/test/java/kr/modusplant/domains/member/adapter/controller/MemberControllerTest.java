@@ -180,7 +180,7 @@ class MemberControllerTest implements
     void testGetProfile_givenValidGetRecordAndStoredMemberProfile_willReturnResponse() throws IOException {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberProfileRepository.getById(any())).willReturn(createMemberProfile());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(createMemberProfile());
         given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
@@ -219,7 +219,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         MemberProfileImage originalMemberProfileImage = memberProfile.getMemberProfileImage();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
 
@@ -241,7 +241,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfileWithoutImage();
         MemberProfileImage originalMemberProfileImage = memberProfile.getMemberProfileImage();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.issueStorageUrl(any(MemberProfileImagePath.class), any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
 
@@ -389,7 +389,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberImageIOHelper.uploadImage(any(MemberId.class), any(MemberProfileOverrideRecord_V1.class))).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
@@ -414,7 +414,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(
                 MemberProfile.create(
                         testMemberId,
                         testEmptyMemberProfileImage,
@@ -444,7 +444,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.getById(any())).willReturn(memberProfile);
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         given(memberProfileRepository.update(any(), eq(false))).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
 

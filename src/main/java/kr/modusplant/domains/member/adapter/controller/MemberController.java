@@ -83,7 +83,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
     }
 
@@ -101,7 +101,7 @@ public class MemberController {
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
 
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MultipartFile image = record.image();
@@ -129,7 +129,7 @@ public class MemberController {
         MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
         memberValidationHelper.validateIfMemberExists(memberId);
 
-        MemberProfile existingMemberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile existingMemberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
         existingMemberProfile.clearImage();
         memberProfileRepository.update(existingMemberProfile, false);

@@ -6,7 +6,7 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import java.io.IOException;
 
 public interface MemberProfileRepository {
-    MemberProfile getById(MemberId memberId) throws IOException;
+    MemberProfile getByIdWithoutImageBytes(MemberId memberId) throws IOException;
 
     MemberProfile add(MemberProfile memberProfile) throws IOException;
 
