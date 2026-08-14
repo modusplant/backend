@@ -4,14 +4,12 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTe
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
-import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
@@ -42,37 +40,42 @@ class MemberProfileRepositoryJpaAdapterTest implements
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
-    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(amazonS3Service, pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
+    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
 
     @Test
-    @DisplayName("선택적인 데이터가 모두 있을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
+    @DisplayName("선택적인 데이터가 모두 있을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
+    void testGetByIdWithoutImageBytes_givenValidMemberIdAndNotNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build()));
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        MemberProfile result = memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId);
 
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(result).isEqualTo(createMemberProfile());
+        assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
     }
 
     @Test
-    @DisplayName("선택적인 데이터가 모두 없을 때 getById로 가용한 MemberProfile 반환(가용할 때)")
-    void testGetById_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
+    @DisplayName("선택적인 데이터가 모두 없을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
+    void testGetByIdWithoutImageBytes_givenValidMemberIdAndNullImageAndIntro_willReturnOptionalAvailableMemberProfile() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(MemberProfileEntity.builder().member(createMemberBasicUserEntityWithUuid()).imagePath(null).introduction(null).build()));
 
+        MemberProfile result = memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId);
+
         // then
-        assertThat(memberProfileRepositoryJpaAdapter.getById(testMemberId)).isEqualTo(createMemberProfile());
+        assertThat(result).isEqualTo(createMemberProfile());
+        assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
     }
 
     @Test
-    @DisplayName("getByNickname으로 예외 반환(가용하지 않을 때)")
-    void testGetById_givenValidMemberId_willThrowException() {
+    @DisplayName("getByIdWithoutImageBytes로 예외 반환(가용하지 않을 때)")
+    void testGetByIdWithoutImageBytes_givenValidMemberId_willThrowException() {
         // given & when
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
         // then
-        assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getById(testMemberId));
+        assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId));
     }
 
     @Test
@@ -93,8 +96,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("버전 1로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
-    void testUpdate_givenVersion1_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
+    @DisplayName("needsUntracking이 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
+    void testUpdate_givenNeedsUntrackingFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -107,7 +110,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // when
         MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, 1);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
@@ -116,8 +119,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("버전 2로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
-    void testUpdate_givenVersion2_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
+    @DisplayName("needsUntracking이 true로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
+    void testUpdate_givenNeedsUntrackingTrue_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -131,50 +134,12 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // when
         MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, 2);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
         assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
         verify(pendingFileService, times(1)).untrackPendingFiles(List.of(updatedMemberProfileEntity.getImagePath()));
-    }
-
-    @Test
-    @DisplayName("버전 3으로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
-    void testUpdate_givenVersion3_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
-        // given
-        MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
-        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
-        MemberEntity updatedMemberEntity = MemberEntity.builder().member(memberEntity).nickname("abcNickname").build();
-        MemberProfileEntity updatedMemberProfileEntity =
-                MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").imagePath(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH).build();
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
-        given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-        willDoNothing().given(pendingFileService).untrackPendingFiles(any());
-
-        // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, 3);
-
-        // then
-        assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
-        assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
-        verify(pendingFileService, times(1)).untrackPendingFiles(List.of(updatedMemberProfileEntity.getImagePath()));
-    }
-
-    @Test
-    @DisplayName("올바르지 않은 버전으로 update를 호출하여 오류 발생")
-    void testUpdate_givenInvalidVersion_willThrowException() {
-        // given
-        MemberProfile memberProfile = createMemberProfile();
-
-        // when
-        InvalidValueException exception = assertThrows(
-                InvalidValueException.class, () -> memberProfileRepositoryJpaAdapter.update(memberProfile, 4));
-
-        // then
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.INVALID_MEMBER_PROFILE_OVERRIDE_VERSION);
     }
 
     @Test

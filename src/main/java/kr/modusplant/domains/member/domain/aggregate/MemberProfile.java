@@ -2,6 +2,8 @@ package kr.modusplant.domains.member.domain.aggregate;
 
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.vo.MemberId;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
+import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -33,6 +35,11 @@ public class MemberProfile {
             throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
         }
         return new MemberProfile(id, profileImage, profileIntroduction, nickname);
+    }
+
+    public void clearImage() {
+        memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(null), MemberProfileImageBytes.create(null));
     }
 
     @Override

@@ -6,15 +6,12 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImageBytes;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.MemberProfileIntroduction;
-import kr.modusplant.domains.member.domain.vo.nullobject.EmptyMemberProfileImageBytes;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.MemberProfileJpaMapperImpl;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberProfileRepository;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +21,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.INVALID_MEMBER_PROFILE_OVERRIDE_VERSION;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
 
 @Repository
 @RequiredArgsConstructor
 public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepository {
-    private final AmazonS3Service amazonS3Service;
     private final PendingFileService pendingFileService;
 
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper;
@@ -38,19 +33,15 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     private final MemberProfileJpaRepository memberProfileJpaRepository;
 
     @Override
-    public MemberProfile getById(MemberId memberId) {
+    public MemberProfile getByIdWithoutImageBytes(MemberId memberId) {
         Optional<MemberProfileEntity> profileEntityOrEmpty =
                 memberProfileJpaRepository.findByUuid(memberId.getValue());
         if (profileEntityOrEmpty.isPresent()) {
             MemberProfileEntity profileEntity = profileEntityOrEmpty.orElseThrow();
             MemberProfileImagePath profileImagePath = MemberProfileImagePath.create(profileEntity.getImagePath());
-            MemberProfileImageBytes profileImageBytes = profileImagePath.getValue() != null ?
-                    MemberProfileImageBytes.create(amazonS3Service.downloadFile(profileImagePath.getValue())) :
-                    EmptyMemberProfileImageBytes.create();
-
             return MemberProfile.create(
                     memberId,
-                    MemberProfileImage.create(profileImagePath, profileImageBytes),
+                    MemberProfileImage.create(profileImagePath, MemberProfileImageBytes.create(null)),
                     MemberProfileIntroduction.create(profileEntity.getIntroduction()),
                     Nickname.create(profileEntity.getMember().getNickname()));
         } else {
@@ -72,10 +63,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     }
 
     @Override
-    public MemberProfile update(MemberProfile memberProfile, int version) throws IOException {
-        if (version != 1 && version != 2 && version != 3) {
-            throw new InvalidValueException(INVALID_MEMBER_PROFILE_OVERRIDE_VERSION, "version");
-        }
+    public MemberProfile update(MemberProfile memberProfile, boolean needsUntracking) throws IOException {
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
@@ -85,7 +73,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
         MemberProfileEntity savedMemberProfileEntity = memberProfileJpaRepository.save(memberProfileEntity);
-        if (version == 2 || version == 3) {
+        if (needsUntracking) {
             pendingFileService.untrackPendingFiles(List.of(imagePath));
         }
         return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity);

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.entity.MemberProfileImageTestUtils.testMemberProfileImage;
+import static kr.modusplant.domains.member.common.util.domain.entity.nullobject.EmptyMemberProfileImageTestUtils.testEmptyMemberProfileImage;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIntroductionTestUtils.testMemberProfileIntroduction;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
@@ -63,7 +64,7 @@ class MemberProfileTest implements MemberProfileTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(createMemberProfile(), testMemberId);
+        assertNotEquals(testMemberId, createMemberProfile());
     }
 
     @Test
@@ -78,5 +79,18 @@ class MemberProfileTest implements MemberProfileTestUtils {
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         MemberProfile memberProfile = createMemberProfile();
         assertEquals(memberProfile.hashCode(), memberProfile.hashCode());
+    }
+
+    @Test
+    @DisplayName("clearImage로 활동 수행")
+    void testClearImage_givenMemberProfileWithImage_willProcessAction() {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+
+        // when
+        memberProfile.clearImage();
+
+        // then
+        assertThat(memberProfile.getMemberProfileImage()).isEqualTo(testEmptyMemberProfileImage);
     }
 }

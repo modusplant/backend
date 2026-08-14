@@ -83,7 +83,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
     }
 
@@ -101,7 +101,7 @@ public class MemberController {
         Nickname memberNickname = Nickname.create(record.nickname());
         validateBeforeOverrideProfile(memberId, memberNickname);
 
-        MemberProfile memberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MultipartFile image = record.image();
@@ -120,7 +120,8 @@ public class MemberController {
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 1), 1);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, false), 1);
     }
 
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
@@ -128,8 +129,10 @@ public class MemberController {
         MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
         memberValidationHelper.validateIfMemberExists(memberId);
 
-        MemberProfile existingMemberProfile = memberProfileRepository.getById(memberId);
+        MemberProfile existingMemberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
+        existingMemberProfile.clearImage();
+        memberProfileRepository.update(existingMemberProfile, false);
 
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(memberId, memberProfileImageFileName);
@@ -152,7 +155,8 @@ public class MemberController {
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 2), 2);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, true), 2);
     }
 
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
@@ -169,7 +173,8 @@ public class MemberController {
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImagePath)
-                memberProfileMapper.toMemberProfileResponse(memberProfileRepository.update(memberProfile, 3), 3);
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, true), 3);
     }
 
     public void likePost(MemberPostLikeRecord record) {

@@ -62,6 +62,7 @@ member/
 **Aggregate** (`domain/aggregate/`):
 - `@AllArgsConstructor(AccessLevel.PRIVATE or PROTECTED)` + `static create(...)` factory with internal null checks
 - `equals/hashCode` based on the ID VO
+- May expose intent-named instance methods that reassign a field to a new valid state for in-place transitions outside the `create` factory (e.g. `MemberProfile.clearImage()` resetting the profile image field to its Empty entity)
 
 **Entity** (`domain/entity/`):
 - `protected` constructor + `static create()` factory
@@ -90,7 +91,7 @@ member/
 
 **Repository Ports** (`usecase/port/repository/`):
 - Parameters and return types use only domain VOs/Aggregates — no JPA entities or jOOQ records
-- Exception: a method may accept a trailing primitive `int version` parameter to select version-conditional behavior in its adapter implementation (e.g. whether to untrack a pending file after persist)
+- Exception: a method may accept a trailing primitive `int version` parameter to select version-conditional behavior in its adapter implementation
 
 **Records** (`usecase/record/`):
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
@@ -161,12 +162,11 @@ member/
 - `supers/` holds base mapper interfaces shared across multiple JPA mappers in this domain
 
 **JPA Adapter** (`framework/outbound/jpa/adapter/`) — `@Component`; `*RepositoryJpaAdapter` classes wrap a Spring Data JPA repository to present a narrower, domain-shaped interface to the outbound repository implementation
-- Exception: `MemberProfileRepositoryJpaAdapter` follows the version-conditional pending-file untracking
+- Exception: `MemberProfileRepositoryJpaAdapter` implements `MemberProfileRepository` directly (no separate `framework/outbound/`-level adapter)
 
 **Composite Key** (`framework/outbound/jpa/compositekey/`) — plain classes implementing `Serializable`, paired 1:1 with an `@IdClass` entity (e.g. like/abuse-report join tables)
 
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
-- When a port method takes a trailing `int version` param, each version that marks a presigned-URL upload flow calls `PendingFileService.untrackPendingFiles(...)` on the affected file key(s) immediately after the save succeeds, to release the pending registration made when the presigned URL was issued
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`
