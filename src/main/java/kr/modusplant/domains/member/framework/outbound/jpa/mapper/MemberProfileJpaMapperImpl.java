@@ -31,11 +31,11 @@ public class MemberProfileJpaMapperImpl implements MemberProfileJpaMapper {
     }
 
     @Override
-    public MemberProfile toMemberProfile(MemberProfileEntity entity) {
+    public MemberProfile toMemberProfile(MemberProfileEntity entity, boolean needsImageBytes) {
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(entity.getImagePath());
         MemberProfileImageBytes memberProfileImageBytes =
-                memberProfileImagePath.getValue() != null ?
+                memberProfileImagePath.getValue() != null && needsImageBytes ?
                         MemberProfileImageBytes.create(
                                 amazonS3Service.downloadFile(memberProfileImagePath.getValue())) :
                         EmptyMemberProfileImageBytes.create();

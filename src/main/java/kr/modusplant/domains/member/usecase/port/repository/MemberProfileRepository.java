@@ -8,9 +8,7 @@ import java.io.IOException;
 public interface MemberProfileRepository {
     MemberProfile getByIdWithoutImageBytes(MemberId memberId) throws IOException;
 
-    MemberProfile add(MemberProfile memberProfile) throws IOException;
-
-    MemberProfile update(MemberProfile memberProfile, boolean needsUntracking) throws IOException;
+    MemberProfile update(MemberProfile memberProfile, boolean needsUntracking, boolean needsImageBytes) throws IOException;
 
     boolean isIdExist(MemberId memberId);
 }

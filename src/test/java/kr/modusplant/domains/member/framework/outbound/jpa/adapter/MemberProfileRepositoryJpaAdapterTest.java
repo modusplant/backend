@@ -40,7 +40,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
-    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
+    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberProfileJpaRepository);
 
     @Test
     @DisplayName("선택적인 데이터가 모두 있을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
@@ -76,23 +76,6 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // then
         assertThrows(NotFoundEntityException.class, () -> memberProfileRepositoryJpaAdapter.getByIdWithoutImageBytes(testMemberId));
-    }
-
-    @Test
-    @DisplayName("add로 MemberProfile 반환")
-    void testAdd_givenValidMemberProfile_willReturnMemberProfile() throws IOException {
-        // given
-        MemberEntity memberBasicUserEntity = createMemberBasicUserEntityWithUuid();
-        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberBasicUserEntity).build();
-        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberBasicUserEntity));
-        given(memberProfileJpaRepository.save(memberProfileEntity)).willReturn(memberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-
-        // when
-        MemberProfile memberProfile = createMemberProfile();
-
-        // then
-        assertThat(memberProfileRepositoryJpaAdapter.add(memberProfile)).isEqualTo(memberProfile);
     }
 
     @Test
