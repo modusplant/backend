@@ -16,6 +16,9 @@ public interface PendingFileJpaRepository extends JpaRepository<PendingFileEntit
     @Query("SELECT p.fileKey FROM PendingFileEntity p WHERE p.createdAt < :threshold")
     List<String> findFileKeysByCreatedAtBefore(@Param("threshold") LocalDateTime threshold);
 
+    @Query("SELECT p.fileKey FROM PendingFileEntity p WHERE p.fileKey IN :fileKeys")
+    List<String> findFileKeysByFileKeyIn(@Param("fileKeys") List<String> fileKeys);
+
     @Modifying
     @Query("DELETE FROM PendingFileEntity p WHERE p.createdAt < :threshold")
     void deleteByCreatedAtBefore(@Param("threshold") LocalDateTime threshold);
