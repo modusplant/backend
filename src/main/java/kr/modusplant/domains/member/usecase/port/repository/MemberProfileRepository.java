@@ -2,7 +2,6 @@ package kr.modusplant.domains.member.usecase.port.repository;
 
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.vo.MemberId;
-import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 
 import java.io.IOException;
 
@@ -12,6 +11,4 @@ public interface MemberProfileRepository {
     MemberProfile update(MemberProfile memberProfile, boolean needsUntracking, boolean needsImageBytes) throws IOException;
 
     boolean isIdExist(MemberId memberId);
-
-    boolean isImagePathExist(MemberProfileImagePath memberProfileImagePath);
 }

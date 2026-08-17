@@ -27,7 +27,6 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -387,9 +386,8 @@ public class MemberController {
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
-        if (memberProfileImage != null &&
-                !memberProfileRepository.isImagePathExist(memberProfileImage.getMemberProfileImagePath())) {
-            throw new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfileImagePath");
+        if (memberProfileImage != null) {
+            memberImageIOHelper.validateIfImageExists(memberProfileImage.getMemberProfileImagePath());
         }
     }
 
