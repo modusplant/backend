@@ -27,6 +27,7 @@ import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -95,7 +96,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
+        validateBeforeOverrideProfile(memberId, memberNickname, null);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
@@ -140,12 +141,12 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
-
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
         );
+        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
@@ -158,12 +159,12 @@ public class MemberController {
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
-
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
         );
+        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
@@ -377,7 +378,7 @@ public class MemberController {
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (swearService.isSwearContained(nickname.getValue())) {
             throw new SwearContainedException();
@@ -385,6 +386,10 @@ public class MemberController {
         Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
+        }
+        if (memberProfileImage != null &&
+                !memberProfileRepository.isImagePathExist(memberProfileImage.getMemberProfileImagePath())) {
+            throw new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfileImagePath");
         }
     }
 

@@ -15,4 +15,6 @@ public interface MemberProfileJpaRepository extends
         LastModifiedAtRepository<MemberProfileEntity>,
         MemberUuidPrimaryKeyJpaRepository<MemberProfileEntity>,
         JpaRepository<MemberProfileEntity, UUID> {
+
+    boolean existsByImagePath(String imagePath);
 }
