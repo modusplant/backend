@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_MEMBER_PROFILE_FILE_KEY;
 import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_POST_CONTENT_FILE_KEY;
 import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_POST_DOMAIN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,7 +64,49 @@ class PendingFileServiceTest {
         // then
         ArgumentCaptor<List<PendingFileEntity>> captor = ArgumentCaptor.forClass(List.class);
         verify(pendingFileJpaRepository).saveAll(captor.capture());
-        assertThat(captor.getValue().get(0).getDomain()).isEqualTo(filename);
+        assertThat(captor.getValue().getFirst().getDomain()).isEqualTo(filename);
+    }
+
+    @DisplayName("이미 추적 중인 fileKey는 저장 대상에서 제외함")
+    @Test
+    void testTrackPendingFiles_givenAlreadyTrackedFileKeys_willExcludeFromSave() {
+        // given
+        String existingFileKey = TEST_POST_CONTENT_FILE_KEY;
+        String newFileKey = TEST_MEMBER_PROFILE_FILE_KEY;
+        List<String> fileKeys = List.of(existingFileKey, newFileKey);
+        given(pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys)).willReturn(List.of(existingFileKey));
+
+        // when
+        pendingFileService.trackPendingFiles(fileKeys);
+
+        // then
+        ArgumentCaptor<List<PendingFileEntity>> captor = ArgumentCaptor.forClass(List.class);
+        verify(pendingFileJpaRepository).saveAll(captor.capture());
+        List<PendingFileEntity> saved = captor.getValue();
+        assertThat(saved).hasSize(1);
+        assertThat(saved.getFirst().getFileKey()).isEqualTo(newFileKey);
+    }
+
+    @DisplayName("fileKey 목록이 null이면 리포지토리를 호출하지 않음")
+    @Test
+    void testTrackPendingFiles_givenNull_willNotCallRepository() {
+        // when
+        pendingFileService.trackPendingFiles(null);
+
+        // then
+        verify(pendingFileJpaRepository, never()).findFileKeysByFileKeyIn(any());
+        verify(pendingFileJpaRepository, never()).saveAll(any());
+    }
+
+    @DisplayName("fileKey 목록이 비어있으면 바로 return함")
+    @Test
+    void testTrackPendingFiles_givenEmptyFileKeyList_willDoNothing() {
+        // when
+        pendingFileService.trackPendingFiles(List.of());
+
+        // then
+        verify(pendingFileJpaRepository, never()).findFileKeysByFileKeyIn(any());
+        verify(pendingFileJpaRepository, never()).saveAll(any());
     }
 
     @DisplayName("fileKey 목록이 존재하면 추적 대상에서 해제함")
@@ -71,12 +114,29 @@ class PendingFileServiceTest {
     void testUntrackPendingFiles_givenNonEmptyList_willDeleteByFileKeyIn() {
         // given
         List<String> fileKeys = List.of(TEST_POST_CONTENT_FILE_KEY);
+        given(pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys)).willReturn(fileKeys);
 
         // when
         pendingFileService.untrackPendingFiles(fileKeys);
 
         // then
         verify(pendingFileJpaRepository).deleteByFileKeyIn(fileKeys);
+    }
+
+    @DisplayName("추적되지 않은 fileKey는 삭제 대상에서 제외함")
+    @Test
+    void testUntrackPendingFiles_givenNotTrackedFileKeys_willOnlyDeleteExistingOnes() {
+        // given
+        String trackedFileKey = TEST_POST_CONTENT_FILE_KEY;
+        String untrackedFileKey = TEST_MEMBER_PROFILE_FILE_KEY;
+        List<String> fileKeys = List.of(trackedFileKey, untrackedFileKey);
+        given(pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys)).willReturn(List.of(trackedFileKey));
+
+        // when
+        pendingFileService.untrackPendingFiles(fileKeys);
+
+        // then
+        verify(pendingFileJpaRepository).deleteByFileKeyIn(List.of(trackedFileKey));
     }
 
     @DisplayName("fileKey 목록이 null이면 리포지토리를 호출하지 않음")
@@ -86,6 +146,7 @@ class PendingFileServiceTest {
         pendingFileService.untrackPendingFiles(null);
 
         // then
+        verify(pendingFileJpaRepository, never()).findFileKeysByFileKeyIn(any());
         verify(pendingFileJpaRepository, never()).deleteByFileKeyIn(any());
     }
 
@@ -96,6 +157,7 @@ class PendingFileServiceTest {
         pendingFileService.untrackPendingFiles(List.of());
 
         // then
+        verify(pendingFileJpaRepository, never()).findFileKeysByFileKeyIn(any());
         verify(pendingFileJpaRepository, never()).deleteByFileKeyIn(any());
     }
 

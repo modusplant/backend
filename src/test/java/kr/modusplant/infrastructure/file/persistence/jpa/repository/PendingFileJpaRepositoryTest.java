@@ -80,6 +80,34 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(pendingFileRepository.existsById(pendingFile.getUlid())).isTrue();
     }
 
+    @DisplayName("fileKey 목록에 해당하는 존재하는 fileKey 조회")
+    @Test
+    void testFindFileKeysByFileKeyIn_givenExistingFileKeys_willReturnFileKeys() {
+        // given
+        PendingFileEntity target = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
+        PendingFileEntity other = pendingFileRepository.saveAndFlush(createPostPendingFileEntity(TEST_MEMBER_PROFILE_FILE_KEY, TEST_MEMBER_DOMAIN));
+
+        // when
+        List<String> fileKeys = pendingFileRepository.findFileKeysByFileKeyIn(List.of(target.getFileKey()));
+
+        // then
+        assertThat(fileKeys).containsExactly(target.getFileKey());
+        assertThat(fileKeys).doesNotContain(other.getFileKey());
+    }
+
+    @DisplayName("목록에 없는 fileKey는 조회되지 않음")
+    @Test
+    void testFindFileKeysByFileKeyIn_givenNonExistingFileKey_willReturnEmptyList() {
+        // given
+        pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
+
+        // when
+        List<String> fileKeys = pendingFileRepository.findFileKeysByFileKeyIn(List.of(TEST_MEMBER_PROFILE_FILE_KEY));
+
+        // then
+        assertThat(fileKeys).isEmpty();
+    }
+
     @DisplayName("fileKey 목록으로 레코드 삭제")
     @Test
     void testDeleteByFileKeyIn_givenFileKeys_willDeletePendingFiles() {
