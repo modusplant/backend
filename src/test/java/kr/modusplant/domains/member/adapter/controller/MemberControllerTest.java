@@ -48,6 +48,8 @@ import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -468,7 +470,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
+        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -486,7 +488,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
+        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -509,7 +511,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
+        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -527,7 +529,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
+        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -627,12 +629,12 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(false);
+        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExists(any());
 
         // when & then
-        NotFoundEntityException notFoundEntityException = assertThrows(
-                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+        NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
+                NotFoundFileKeyOnS3Exception.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
     }
 
     @Test
@@ -681,12 +683,12 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(memberProfileRepository.isImagePathExist(any())).willReturn(false);
+        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExists(any());
 
         // when & then
-        NotFoundEntityException notFoundEntityException = assertThrows(
-                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
-        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+        NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
+                NotFoundFileKeyOnS3Exception.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
+        assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
     }
 
     @Test

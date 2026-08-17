@@ -1,7 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
-import kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
@@ -34,7 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class MemberProfileRepositoryJpaAdapterTest implements
-        MemberProfileTestUtils, MemberProfileImagePathTestUtils,
+        MemberProfileTestUtils,
         MemberEntityTestUtils, MemberProfileEntityTestUtils {
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
@@ -165,25 +164,5 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // when & then
         assertThat(memberProfileRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
-    }
-
-    @Test
-    @DisplayName("isImagePathExist로 true 반환")
-    void testIsImagePathExist_givenPathThatExists_willReturnTrue() {
-        // given & when
-        given(memberProfileJpaRepository.existsByImagePath(testMemberProfileImagePath.getValue())).willReturn(true);
-
-        // when & then
-        assertThat(memberProfileRepositoryJpaAdapter.isImagePathExist(testMemberProfileImagePath)).isEqualTo(true);
-    }
-
-    @Test
-    @DisplayName("isImagePathExist로 false 반환")
-    void testIsImagePathExist_givenPathThatIsNotExist_willReturnFalse() {
-        // given & when
-        given(memberProfileJpaRepository.existsByImagePath(testMemberProfileImagePath.getValue())).willReturn(false);
-
-        // when & then
-        assertThat(memberProfileRepositoryJpaAdapter.isImagePathExist(testMemberProfileImagePath)).isEqualTo(false);
     }
 }
