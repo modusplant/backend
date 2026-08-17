@@ -63,7 +63,6 @@ public class AmazonS3Service {
         }
     }
 
-
     public void deleteFile(String fileKey) {
         DeleteObjectRequest request = DeleteObjectRequest.builder()
                 .bucket(bucket)
@@ -128,5 +127,19 @@ public class AmazonS3Service {
 
         PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(presignRequest);
         return presignedPutObjectRequest.url().toString();
+    }
+
+    public boolean checkIfFileExists(String fileKey) {
+        HeadObjectRequest request = HeadObjectRequest.builder()
+                .bucket(bucket)
+                .key(fileKey)
+                .build();
+
+        try {
+            s3Client.headObject(request);
+            return true;
+        } catch (NoSuchKeyException e) {
+            return false;
+        }
     }
 }

@@ -68,9 +68,4 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     public boolean isIdExist(MemberId memberId) {
         return memberProfileJpaRepository.existsByUuid(memberId.getValue());
     }
-
-    @Override
-    public boolean isImagePathExist(MemberProfileImagePath memberProfileImagePath) {
-        return memberProfileJpaRepository.existsByImagePath(memberProfileImagePath.getValue());
-    }
 }
