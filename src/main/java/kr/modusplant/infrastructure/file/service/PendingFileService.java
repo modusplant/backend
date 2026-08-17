@@ -59,8 +59,12 @@ public class PendingFileService {
     @Transactional
     public void untrackPendingFiles(List<String> fileKeys) {
         if (fileKeys == null || fileKeys.isEmpty()) return;
-        pendingFileJpaRepository.deleteByFileKeyIn(fileKeys);
-        log.debug("[PendingFile] Untracked {} file(s)", fileKeys.size());
+        List<String> existingFileKeys = pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys);
+        pendingFileJpaRepository.deleteByFileKeyIn(existingFileKeys);
+        log.debug("[PendingFile] Untracked {} file(s)", existingFileKeys.size());
+        if (fileKeys.size() != existingFileKeys.size()) {
+            log.warn("[PendingFile] Skipped {} already untracked file(s)", fileKeys.size() - existingFileKeys.size());
+        }
     }
 
     @Transactional(readOnly = true)
