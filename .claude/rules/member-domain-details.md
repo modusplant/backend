@@ -122,6 +122,7 @@ member/
 - Used only for controller
 - `*ValidationHelper`: DB-backed pre-condition checks via repository ports
 - `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`, so an S3 upload never confirmed by a DB write can later be cleaned up as an orphan
+- `*IOHelper` may also expose an S3-backed validation (e.g. `validateIfImageExists`), complementing the DB-backed checks in `*ValidationHelper`
 
 **Listener** (`adapter/listener/`) — `@Component`:
 - `@EventListener` / `@TransactionalEventListener`; apply Semaphore bulkhead when concurrency control is needed
