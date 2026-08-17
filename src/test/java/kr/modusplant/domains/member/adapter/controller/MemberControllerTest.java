@@ -468,6 +468,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -485,6 +486,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -507,6 +509,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -524,6 +527,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(true);
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -617,6 +621,21 @@ class MemberControllerTest implements
     }
 
     @Test
+    @DisplayName("존재하지 않는 이미지 경로로 인해 overrideProfile V2로 프로필 덮어쓰기 실패")
+    void testValidateThatImagePathNotExistsV2_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(false);
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV2));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+    }
+
+    @Test
     @DisplayName("존재하지 않는 아이디로 인해 overrideProfile V3로 프로필 덮어쓰기 실패")
     void testValidateMemberIdAndNicknameBeforeOverrideProfileV3_givenNotFoundId_willThrowException() {
         // given
@@ -653,6 +672,21 @@ class MemberControllerTest implements
         ExistsEntityException existsEntityException = assertThrows(
                 ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
         assertThat(existsEntityException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이미지 경로로 인해 overrideProfile V3로 프로필 덮어쓰기 실패")
+    void testValidateThatImagePathNotExistsV3_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(memberProfileRepository.isImagePathExist(any())).willReturn(false);
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
     }
 
     @Test
