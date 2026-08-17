@@ -47,7 +47,8 @@
       "Bash(docker compose down*)",
 
       "Read(**/.gradle/**)",
-      "Read(**/.settings/**)"
+      "Read(**/.settings/**)",
+      "Read(./src/main/resources/application-secrets.yml)"
     ]
   },
   "env": {
