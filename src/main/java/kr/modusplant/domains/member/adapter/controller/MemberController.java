@@ -17,11 +17,7 @@ import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
-import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
-import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
-import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
+import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
@@ -99,7 +95,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
+        validateBeforeOverrideProfile(memberId, memberNickname, null);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
@@ -121,7 +117,7 @@ public class MemberController {
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
                 memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, false), 1);
+                        memberProfileRepository.update(memberProfile, false, true), 1);
     }
 
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
@@ -132,7 +128,7 @@ public class MemberController {
         MemberProfile existingMemberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
         existingMemberProfile.clearImage();
-        memberProfileRepository.update(existingMemberProfile, false);
+        memberProfileRepository.update(existingMemberProfile, false, false);
 
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(memberId, memberProfileImageFileName);
@@ -144,37 +140,37 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
-
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
         );
+        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImageUrl)
                 memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, true), 2);
+                        memberProfileRepository.update(memberProfile, true, false), 2);
     }
 
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
-
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
         );
+        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         MemberProfile memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
         return (MemberProfileResponseWithImagePath)
                 memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, true), 3);
+                        memberProfileRepository.update(memberProfile, true, false), 3);
     }
 
     public void likePost(MemberPostLikeRecord record) {
@@ -381,7 +377,7 @@ public class MemberController {
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (swearService.isSwearContained(nickname.getValue())) {
             throw new SwearContainedException();
@@ -389,6 +385,9 @@ public class MemberController {
         Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
+        }
+        if (memberProfileImage != null) {
+            memberImageIOHelper.validateIfImageExists(memberProfileImage.getMemberProfileImagePath());
         }
     }
 

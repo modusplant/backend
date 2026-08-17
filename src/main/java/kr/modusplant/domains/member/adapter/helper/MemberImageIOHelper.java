@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.domain.vo.ReportImagePath;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -64,6 +65,13 @@ public class MemberImageIOHelper {
         String imagePath = image.getMemberProfileImagePath().getValue();
         if (imagePath != null) {
             amazonS3Service.deleteFile(imagePath);
+        }
+    }
+
+    public void validateIfImageExists(MemberProfileImagePath memberProfileImagePath) {
+        String imagePath = memberProfileImagePath.getValue();
+        if (imagePath != null && !amazonS3Service.checkIfFileExists(imagePath)) {
+            throw new NotFoundFileKeyOnS3Exception();
         }
     }
 }

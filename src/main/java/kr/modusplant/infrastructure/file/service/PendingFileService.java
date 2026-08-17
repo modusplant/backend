@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Presigned URL 기반 파일 업로드에서 고아파일(S3에는 있지만 DB에 파일키 등 메타데이터가 없는 파일)을 추적하고 정리하기 위한 전역 서비스.
- *
+ * <p>
  * 사용 도메인은 Presigned URL 발급 직후 {@link #trackPendingFiles}를,
  * 메타데이터 저장(또는 파일 교체 시 기존 fileKey) 성공 직후 {@link #untrackPendingFiles}를
  * 반드시 호출해야 고아파일 없이 정확하게 추적된다.
@@ -32,14 +32,22 @@ public class PendingFileService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void trackPendingFiles(List<String> fileKeys) {
-        List<PendingFileEntity> entities = fileKeys.stream()
+        if (fileKeys == null || fileKeys.isEmpty()) return;
+        List<String> existingFileKeys = pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys);
+        List<String> newFileKeys = fileKeys.stream()
+                .filter(fileKey -> !existingFileKeys.contains(fileKey))
+                .toList();
+        List<PendingFileEntity> entities = newFileKeys.stream()
                 .map(fileKey -> PendingFileEntity.builder()
                         .fileKey(fileKey)
                         .domain(extractDomain(fileKey))
                         .build())
                 .toList();
         pendingFileJpaRepository.saveAll(entities);
-        log.debug("[PendingFile] Tracked {} file(s)", fileKeys.size());
+        log.debug("[PendingFile] Tracked {} file(s)", newFileKeys.size());
+        if (fileKeys.size() != newFileKeys.size()) {
+            log.warn("[PendingFile] Skipped {} already tracked file(s)", fileKeys.size() - newFileKeys.size());
+        }
     }
 
     /**
@@ -51,8 +59,12 @@ public class PendingFileService {
     @Transactional
     public void untrackPendingFiles(List<String> fileKeys) {
         if (fileKeys == null || fileKeys.isEmpty()) return;
-        pendingFileJpaRepository.deleteByFileKeyIn(fileKeys);
-        log.debug("[PendingFile] Untracked {} file(s)", fileKeys.size());
+        List<String> existingFileKeys = pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys);
+        pendingFileJpaRepository.deleteByFileKeyIn(existingFileKeys);
+        log.debug("[PendingFile] Untracked {} file(s)", existingFileKeys.size());
+        if (fileKeys.size() != existingFileKeys.size()) {
+            log.warn("[PendingFile] Skipped {} already untracked file(s)", fileKeys.size() - existingFileKeys.size());
+        }
     }
 
     @Transactional(readOnly = true)

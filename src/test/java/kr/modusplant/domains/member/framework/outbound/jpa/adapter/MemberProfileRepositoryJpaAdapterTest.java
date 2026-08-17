@@ -40,7 +40,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
     private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
-    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberJpaRepository, memberProfileJpaRepository);
+    private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberProfileJpaRepository);
 
     @Test
     @DisplayName("선택적인 데이터가 모두 있을 때 getByIdWithoutImageBytes로 가용한 MemberProfile 반환(가용할 때)")
@@ -79,23 +79,6 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("add로 MemberProfile 반환")
-    void testAdd_givenValidMemberProfile_willReturnMemberProfile() throws IOException {
-        // given
-        MemberEntity memberBasicUserEntity = createMemberBasicUserEntityWithUuid();
-        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberBasicUserEntity).build();
-        given(memberJpaRepository.findByUuid(any())).willReturn(Optional.of(memberBasicUserEntity));
-        given(memberProfileJpaRepository.save(memberProfileEntity)).willReturn(memberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-
-        // when
-        MemberProfile memberProfile = createMemberProfile();
-
-        // then
-        assertThat(memberProfileRepositoryJpaAdapter.add(memberProfile)).isEqualTo(memberProfile);
-    }
-
-    @Test
     @DisplayName("needsUntracking이 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
     void testUpdate_givenNeedsUntrackingFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
         // given
@@ -109,8 +92,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
         given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false, true);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
@@ -133,13 +116,34 @@ class MemberProfileRepositoryJpaAdapterTest implements
         willDoNothing().given(pendingFileService).untrackPendingFiles(any());
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true, true);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
         assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
         verify(pendingFileService, times(1)).untrackPendingFiles(List.of(updatedMemberProfileEntity.getImagePath()));
+    }
+
+    @Test
+    @DisplayName("needsImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
+    void testUpdate_givenNeedsImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
+        // given
+        MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
+        MemberEntity updatedMemberEntity = MemberEntity.builder().member(memberEntity).nickname("abcNickname").build();
+        MemberProfileEntity updatedMemberProfileEntity =
+                MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").imagePath(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH).build();
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
+        given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
+
+        // when
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, false);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false, false);
+
+        // then
+        assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
+        verify(amazonS3Service, never()).downloadFile(any());
     }
 
     @Test

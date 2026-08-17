@@ -8,5 +8,5 @@ import java.io.IOException;
 public interface MemberProfileJpaMapper {
     MemberProfileEntity toMemberProfileEntity(MemberProfile memberProfile);
 
-    MemberProfile toMemberProfile(MemberProfileEntity entity) throws IOException;
+    MemberProfile toMemberProfile(MemberProfileEntity entity, boolean needsImageBytes) throws IOException;
 }
