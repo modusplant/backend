@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * Presigned URL 기반 파일 업로드에서 고아파일(S3에는 있지만 DB에 파일키 등 메타데이터가 없는 파일)을 추적하고 정리하기 위한 전역 서비스.
- *
+ * <p>
  * 사용 도메인은 Presigned URL 발급 직후 {@link #trackPendingFiles}를,
  * 메타데이터 저장(또는 파일 교체 시 기존 fileKey) 성공 직후 {@link #untrackPendingFiles}를
  * 반드시 호출해야 고아파일 없이 정확하게 추적된다.
