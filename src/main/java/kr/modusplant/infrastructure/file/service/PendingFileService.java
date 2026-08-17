@@ -32,14 +32,22 @@ public class PendingFileService {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void trackPendingFiles(List<String> fileKeys) {
-        List<PendingFileEntity> entities = fileKeys.stream()
+        if (fileKeys == null || fileKeys.isEmpty()) return;
+        List<String> existingFileKeys = pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys);
+        List<String> newFileKeys = fileKeys.stream()
+                .filter(fileKey -> !existingFileKeys.contains(fileKey))
+                .toList();
+        List<PendingFileEntity> entities = newFileKeys.stream()
                 .map(fileKey -> PendingFileEntity.builder()
                         .fileKey(fileKey)
                         .domain(extractDomain(fileKey))
                         .build())
                 .toList();
         pendingFileJpaRepository.saveAll(entities);
-        log.debug("[PendingFile] Tracked {} file(s)", fileKeys.size());
+        log.debug("[PendingFile] Tracked {} file(s)", newFileKeys.size());
+        if (fileKeys.size() != newFileKeys.size()) {
+            log.warn("[PendingFile] Skipped {} already tracked file(s)", fileKeys.size() - newFileKeys.size());
+        }
     }
 
     /**
