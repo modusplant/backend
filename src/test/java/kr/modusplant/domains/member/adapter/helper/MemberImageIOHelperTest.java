@@ -1,6 +1,8 @@
 package kr.modusplant.domains.member.adapter.helper;
 
 import kr.modusplant.infrastructure.file.service.PendingFileService;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
+import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,11 +22,14 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUti
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
+import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.testEmptyMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -88,5 +93,41 @@ class MemberImageIOHelperTest {
         // then
         assertThat(storageUrl).isEqualTo(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1);
         verify(pendingFileService, times(1)).trackPendingFiles(List.of(testReportImagePath1.getValue()));
+    }
+
+    @Test
+    @DisplayName("존재하는 이미지 경로로 validateIfImageExists 검증 활동 수행")
+    void testValidateIfImageExists_givenExistingImagePath_willProcessAction() {
+        // given
+        given(amazonS3Service.checkIfFileExists(testMemberProfileImagePath.getValue())).willReturn(true);
+
+        // when
+        memberImageIOHelper.validateIfImageExists(testMemberProfileImagePath);
+
+        // then
+        verify(amazonS3Service, times(1)).checkIfFileExists(testMemberProfileImagePath.getValue());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이미지 경로로 validateIfImageExists 검증 예외 반환")
+    void testValidateIfImageExists_givenNonExistingImagePath_willThrowException() {
+        // given
+        given(amazonS3Service.checkIfFileExists(testMemberProfileImagePath.getValue())).willReturn(false);
+
+        // when & then
+        NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
+                NotFoundFileKeyOnS3Exception.class,
+                () -> memberImageIOHelper.validateIfImageExists(testMemberProfileImagePath));
+        assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
+    }
+
+    @Test
+    @DisplayName("null 이미지 경로로 validateIfImageExists 검증 활동 수행")
+    void testValidateIfImageExists_givenNullImagePath_willProcessAction() {
+        // given & when
+        memberImageIOHelper.validateIfImageExists(testEmptyMemberProfileImagePath);
+
+        // then
+        verify(amazonS3Service, never()).checkIfFileExists(any());
     }
 }
