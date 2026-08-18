@@ -17,6 +17,7 @@ import kr.modusplant.domains.post.usecase.response.PostFileUploadUrlResponse;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
@@ -72,7 +73,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         // contentText : 글자수 초과하는지 확인
         // contentFiles : order 값 검증(1부터인지 순차적인지), 파일타입 검증, 파일명 중복 검증
         // thunmbnailFilename이 실제로 filename에 존재하는지, image 타입인지
-        // fileKey 형식이 우리가 발급한 형식인지, 우리가 발급한 fileKey가 맞는지
+        // fileKey 형식이 우리가 발급한 형식인지, 우리가 발급한 fileKey가 맞는지, 실제로 S3에 업로드됐는지
         // jsonnode 타입으로 반환
 
         // 게시글 내용 검증(텍스트+파일)
@@ -284,6 +285,10 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
             // 우리가 발급한 fileKey가 맞는지 검증(presign 발급 후 pending 상태여야 함)
             if (!trackedFileKeys.contains(contentFile.fileKey())) {
                 throw new InvalidFileInputException();
+            }
+            // presign은 발급됐으나 실제로 S3에 업로드됐는지 검증
+            if (!amazonS3Service.checkIfFileExists(contentFile.fileKey())) {
+                throw new NotFoundFileKeyOnS3Exception();
             }
             // 순서 검증을 위한 추가
             orders.add(contentFile.order());

@@ -19,6 +19,7 @@ import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
@@ -51,10 +52,11 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     private final PostContentDataProcessor postContentDataProcessor = new PostContentDataProcessor(amazonS3Service, pendingFileService, objectMapperHolder, ulidGeneratorHolder);
 
     @BeforeEach
-    void setUpPendingFileService() {
-        // 기본적으로 검증 대상 fileKey 전부를 발급된(pending) 상태로 취급한다.
+    void setUpFileValidationDefaults() {
+        // 기본적으로 검증 대상 fileKey 전부를 발급된(pending) 상태 + S3에 실제 존재하는 것으로 취급한다.
         given(pendingFileService.findTrackedFileKeys(anyList()))
                 .willAnswer(invocation -> invocation.getArgument(0));
+        given(amazonS3Service.checkIfFileExists(anyString())).willReturn(true);
     }
 
     private static final String DATA = "data";
@@ -299,6 +301,20 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
             // when & then
             assertThatThrownBy(() -> postContentDataProcessor.generateContentJson(null, untrackedFiles, TEST_IMAGE_JPG_FILENAME))
                     .isInstanceOf(InvalidFileInputException.class);
+        }
+
+        @Test
+        @DisplayName("presign은 발급됐으나 S3에 실제로 업로드되지 않은 fileKey 사용 시 예외 발생")
+        void testGenerateContentJson_givenFileKeyNotUploadedToS3_willThrowException() {
+            // given - pending 상태(발급은 됨)이지만 실제 PUT은 수행되지 않은 상황을 흉내낸다
+            given(amazonS3Service.checkIfFileExists(anyString())).willReturn(false);
+            List<FileOrder> notUploadedFiles = List.of(
+                    new FileOrder(1, TEST_IMAGE_JPG_FILENAME, TEST_IMAGE_JPG_FILE_KEY)
+            );
+
+            // when & then
+            assertThatThrownBy(() -> postContentDataProcessor.generateContentJson(null, notUploadedFiles, TEST_IMAGE_JPG_FILENAME))
+                    .isInstanceOf(NotFoundFileKeyOnS3Exception.class);
         }
 
         @Test
