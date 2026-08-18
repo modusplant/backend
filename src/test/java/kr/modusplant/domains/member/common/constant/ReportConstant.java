@@ -11,6 +11,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
@@ -64,6 +65,11 @@ public final class ReportConstant {
                             "image", TEST_REPORT_IMAGE_FILE_NAME_2_PNG, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_BYTES_2),
                     new MockMultipartFile(
                             "image", TEST_REPORT_IMAGE_FILE_NAME_3_PNG, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_BYTES_3));
+    public static final List<MultipartFile> TEST_REPORT_IMAGES_WITH_NULL =
+            Arrays.asList(
+                    new MockMultipartFile(
+                            "image", TEST_REPORT_IMAGE_FILE_NAME_1_PNG, TEST_REPORT_IMAGE_CONTENT_TYPE, TEST_REPORT_IMAGE_BYTES_1),
+                    null);
     public static final String TEST_REPORT_IMAGE_JSON =
             String.format("""
                             [
