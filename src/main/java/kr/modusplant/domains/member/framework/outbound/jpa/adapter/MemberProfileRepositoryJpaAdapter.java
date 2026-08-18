@@ -58,7 +58,7 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
         MemberProfileEntity savedMemberProfileEntity = memberProfileJpaRepository.save(memberProfileEntity);
-        if (needsUntracking) {
+        if (imagePath != null && needsUntracking) {
             pendingFileService.untrackPendingFiles(List.of(imagePath));
         }
         return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity, needsImageBytes);
