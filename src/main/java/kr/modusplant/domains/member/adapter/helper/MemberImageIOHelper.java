@@ -28,23 +28,36 @@ public class MemberImageIOHelper {
 
     public String issueStorageUrl(MemberProfileImagePath imagePath, String contentType) {
         String fileKey = imagePath.getValue();
-        String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
-        pendingFileService.trackPendingFiles(List.of(fileKey));
-        return storageUrl;
+        if (fileKey != null) {
+            String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
+            pendingFileService.trackPendingFiles(List.of(fileKey));
+            return storageUrl;
+        } else {
+            return null;
+        }
     }
 
     public String issueStorageUrl(ReportImagePath imagePath, String contentType) {
         String fileKey = imagePath.getValue();
-        String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
-        pendingFileService.trackPendingFiles(List.of(fileKey));
-        return storageUrl;
+        if (fileKey != null) {
+            String storageUrl = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
+            pendingFileService.trackPendingFiles(List.of(fileKey));
+            return storageUrl;
+        } else {
+            return null;
+        }
     }
 
     public String uploadImage(MemberId memberId, MemberProfileOverrideRecord_V1 record) throws IOException {
-        String filename = record.image().getOriginalFilename();
-        String imagePath = String.format(MEMBER_PROFILE_IMAGE_PATH_FORMAT, memberId.getValue(), filename);
-        amazonS3Service.uploadFile(record.image(), imagePath);
-        return imagePath;
+        MultipartFile image = record.image();
+        if (image != null) {
+            String filename = image.getOriginalFilename();
+            String imagePath = String.format(MEMBER_PROFILE_IMAGE_PATH_FORMAT, memberId.getValue(), filename);
+            amazonS3Service.uploadFile(image, imagePath);
+            return imagePath;
+        } else {
+            return null;
+        }
     }
 
     public List<String> uploadImage(MemberId memberId,
@@ -52,11 +65,13 @@ public class MemberImageIOHelper {
                                     List<MultipartFile> images) throws IOException {
         List<String> imagePaths = new ArrayList<>();
         for (MultipartFile image : images) {
-            String filename = image.getOriginalFilename();
-            String imagePath = String.format(
-                    PROPOSAL_OR_BUG_REPORT_IMAGE_PATH_FORMAT, memberId.getValue(), reportId.getValue(), filename);
-            amazonS3Service.uploadFile(image, imagePath);
-            imagePaths.add(imagePath);
+            if (image != null) {
+                String filename = image.getOriginalFilename();
+                String imagePath = String.format(
+                        PROPOSAL_OR_BUG_REPORT_IMAGE_PATH_FORMAT, memberId.getValue(), reportId.getValue(), filename);
+                amazonS3Service.uploadFile(image, imagePath);
+                imagePaths.add(imagePath);
+            }
         }
         return imagePaths;
     }

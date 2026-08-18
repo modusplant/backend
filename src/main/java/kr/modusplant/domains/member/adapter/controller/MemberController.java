@@ -95,7 +95,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname, null);
+        validateBeforeOverrideProfile(memberId, memberNickname);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
@@ -377,6 +377,17 @@ public class MemberController {
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if (swearService.isSwearContained(nickname.getValue())) {
+            throw new SwearContainedException();
+        }
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
+        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
+        }
+    }
+
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (swearService.isSwearContained(nickname.getValue())) {
@@ -386,9 +397,7 @@ public class MemberController {
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
-        if (memberProfileImage != null) {
-            memberImageIOHelper.validateIfImageExists(memberProfileImage.getMemberProfileImagePath());
-        }
+        memberImageIOHelper.validateIfImageExists(memberProfileImage.getMemberProfileImagePath());
     }
 
     private void validateBeforeLikePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
