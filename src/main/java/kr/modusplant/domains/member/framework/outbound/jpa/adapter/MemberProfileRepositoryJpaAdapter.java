@@ -48,7 +48,9 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
     }
 
     @Override
-    public MemberProfile update(MemberProfile memberProfile, boolean needsUntracking, boolean needsImageBytes) throws IOException {
+    public MemberProfile update(MemberProfile memberProfile,
+                                boolean needsToUntrackImage,
+                                boolean needsToReturnImageBytes) throws IOException {
         String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
@@ -58,10 +60,10 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);
         MemberProfileEntity savedMemberProfileEntity = memberProfileJpaRepository.save(memberProfileEntity);
-        if (needsUntracking) {
+        if (imagePath != null && needsToUntrackImage) {
             pendingFileService.untrackPendingFiles(List.of(imagePath));
         }
-        return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity, needsImageBytes);
+        return memberProfileJpaMapper.toMemberProfile(savedMemberProfileEntity, needsToReturnImageBytes);
     }
 
     @Override

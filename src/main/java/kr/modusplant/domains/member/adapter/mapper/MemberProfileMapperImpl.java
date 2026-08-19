@@ -38,34 +38,18 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
             }
         } else if (version == 2) {
             String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
-            if (imagePath == null) {
-                return new MemberProfileResponseWithImageUrl(
-                        memberProfile.getMemberId().getValue(),
-                        null,
-                        memberProfile.getMemberProfileIntroduction().getValue(),
-                        memberProfile.getNickname().getValue());
-            } else {
-                return new MemberProfileResponseWithImageUrl(
-                        memberProfile.getMemberId().getValue(),
-                        imagePath,
-                        memberProfile.getMemberProfileIntroduction().getValue(),
-                        memberProfile.getNickname().getValue());
-            }
+            return new MemberProfileResponseWithImageUrl(
+                    memberProfile.getMemberId().getValue(),
+                    imagePath,
+                    memberProfile.getMemberProfileIntroduction().getValue(),
+                    memberProfile.getNickname().getValue());
         } else if (version == 3) {
             String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
-            if (imagePath == null) {
-                return new MemberProfileResponseWithImagePath(
-                        memberProfile.getMemberId().getValue(),
-                        null,
-                        memberProfile.getMemberProfileIntroduction().getValue(),
-                        memberProfile.getNickname().getValue());
-            } else {
-                return new MemberProfileResponseWithImagePath(
-                        memberProfile.getMemberId().getValue(),
-                        imagePath,
-                        memberProfile.getMemberProfileIntroduction().getValue(),
-                        memberProfile.getNickname().getValue());
-            }
+            return new MemberProfileResponseWithImagePath(
+                    memberProfile.getMemberId().getValue(),
+                    imagePath,
+                    memberProfile.getMemberProfileIntroduction().getValue(),
+                    memberProfile.getNickname().getValue());
         } else {
             throw new InvalidValueException(INVALID_MEMBER_PROFILE_OVERRIDE_VERSION, "version");
         }

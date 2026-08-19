@@ -95,7 +95,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname, null);
+        validateBeforeOverrideProfile(memberId, memberNickname);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
@@ -111,10 +111,10 @@ public class MemberController {
                 MemberProfileImagePath.create(newImagePath),
                 MemberProfileImageBytes.create(newImageBytes)
         );
-
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+
         return (MemberProfileResponseWithImageUrl)
                 memberProfileMapper.toMemberProfileResponse(
                         memberProfileRepository.update(memberProfile, false, true), 1);
@@ -146,10 +146,14 @@ public class MemberController {
         );
         validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
 
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
-        MemberProfile memberProfile = MemberProfile.create(
+        memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+
         return (MemberProfileResponseWithImageUrl)
                 memberProfileMapper.toMemberProfileResponse(
                         memberProfileRepository.update(memberProfile, true, false), 2);
@@ -164,10 +168,14 @@ public class MemberController {
         );
         validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
 
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
         MemberProfileIntroduction memberProfileIntroduction =
                 MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
-        MemberProfile memberProfile = MemberProfile.create(
+        memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+
         return (MemberProfileResponseWithImagePath)
                 memberProfileMapper.toMemberProfileResponse(
                         memberProfileRepository.update(memberProfile, true, false), 3);
@@ -377,6 +385,17 @@ public class MemberController {
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
+    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
+        memberValidationHelper.validateIfMemberExists(memberId);
+        if (swearService.isSwearContained(nickname.getValue())) {
+            throw new SwearContainedException();
+        }
+        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
+        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
+            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
+        }
+    }
+
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (swearService.isSwearContained(nickname.getValue())) {
@@ -386,9 +405,7 @@ public class MemberController {
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
         }
-        if (memberProfileImage != null) {
-            memberImageIOHelper.validateIfImageExists(memberProfileImage.getMemberProfileImagePath());
-        }
+        memberImageIOHelper.validateIfImageExistsInStorage(memberProfileImage.getMemberProfileImagePath());
     }
 
     private void validateBeforeLikePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {

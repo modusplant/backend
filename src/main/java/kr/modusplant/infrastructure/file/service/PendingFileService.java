@@ -72,6 +72,16 @@ public class PendingFileService {
         return pendingFileJpaRepository.findFileKeysByCreatedAtBefore(threshold);
     }
 
+    /**
+     * 주어진 fileKey 중 실제로 pending 상태로 추적 중인 것만 반환한다.
+     * 등록 시점에 fileKey가 우리가 발급한 presign을 통해 생성된 것인지 검증하는 용도로 사용한다.
+     */
+    @Transactional(readOnly = true)
+    public List<String> findTrackedFileKeys(List<String> fileKeys) {
+        if (fileKeys == null || fileKeys.isEmpty()) return List.of();
+        return pendingFileJpaRepository.findFileKeysByFileKeyIn(fileKeys);
+    }
+
     @Transactional
     public void deleteExpiredRecords(LocalDateTime threshold) {
         pendingFileJpaRepository.deleteByCreatedAtBefore(threshold);

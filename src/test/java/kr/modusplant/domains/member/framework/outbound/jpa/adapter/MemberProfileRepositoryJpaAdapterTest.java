@@ -79,8 +79,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsUntracking이 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
-    void testUpdate_givenNeedsUntrackingFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
+    @DisplayName("needsToUntrackImage가 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
+    void testUpdate_givenNeedsToUntrackImageFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -102,8 +102,31 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsUntracking이 true로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
-    void testUpdate_givenNeedsUntrackingTrue_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
+    @DisplayName("needsToUntrackImage가 true이지만 이미지 경로가 없어 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
+    void testUpdate_givenNeedsToUntrackImageTrueAndNullImagePath_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
+        // given
+        MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
+        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
+        MemberEntity updatedMemberEntity = MemberEntity.builder().member(memberEntity).nickname("abcNickname").build();
+        MemberProfileEntity updatedMemberProfileEntity =
+                MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
+        given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
+        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
+
+        // when
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true, true);
+
+        // then
+        assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
+        assertThat(result.getMemberProfileIntroduction().getValue()).isEqualTo("abcIntroduction");
+        verify(pendingFileService, never()).untrackPendingFiles(any());
+    }
+
+    @Test
+    @DisplayName("needsToUntrackImage가 true로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
+    void testUpdate_givenNeedsToUntrackImageTrue_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -126,8 +149,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
-    void testUpdate_givenNeedsImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
+    @DisplayName("needsToReturnImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
+    void testUpdate_givenNeedsToReturnImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();

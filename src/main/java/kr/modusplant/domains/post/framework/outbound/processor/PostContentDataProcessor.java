@@ -17,10 +17,12 @@ import kr.modusplant.domains.post.usecase.response.PostFileUploadUrlResponse;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
+import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -32,6 +34,7 @@ import static kr.modusplant.domains.post.framework.outbound.processor.constant.P
 @Service
 public class PostContentDataProcessor implements ContentDataProcessorPort {
     private final AmazonS3Service amazonS3Service;
+    private final PendingFileService pendingFileService;
     private final ObjectMapper objectMapper;
     private final RandomUlidGenerator generator;
     public static final String DATA = "data";
@@ -44,9 +47,11 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
     private static final Pattern FILE_KEY_PATTERN = Pattern.compile("^post/[0-9A-HJKMNP-TV-Z]{26}/(image|video)/[^/]+\\.[^/]+$");
 
     public PostContentDataProcessor(AmazonS3Service amazonS3Service,
+                                    PendingFileService pendingFileService,
                                     ObjectMapperHolder objectMapperHolder,
                                     UlidGeneratorHolder ulidGeneratorHolder) {
         this.amazonS3Service = amazonS3Service;
+        this.pendingFileService = pendingFileService;
         this.objectMapper = objectMapperHolder.getObjectMapper();
         this.generator = ulidGeneratorHolder.getUlidGenerator();
     }
@@ -68,7 +73,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         // contentText : 글자수 초과하는지 확인
         // contentFiles : order 값 검증(1부터인지 순차적인지), 파일타입 검증, 파일명 중복 검증
         // thunmbnailFilename이 실제로 filename에 존재하는지, image 타입인지
-        // fileKey 형식이 우리가 발급한 형식인지
+        // fileKey 형식이 우리가 발급한 형식인지, 우리가 발급한 fileKey가 맞는지, 실제로 S3에 업로드됐는지
         // jsonnode 타입으로 반환
 
         // 게시글 내용 검증(텍스트+파일)
@@ -257,6 +262,10 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
     private void validateContentFiles(List<FileOrder> contentFiles) {
         if (contentFiles == null || contentFiles.isEmpty()) return;
 
+        // 제출된 fileKey는 예외 없이 전부 presign 발급 후 pending 상태여야 한다
+        List<String> fileKeysToVerify = contentFiles.stream().map(FileOrder::fileKey).toList();
+        Set<String> trackedFileKeys = new HashSet<>(pendingFileService.findTrackedFileKeys(fileKeysToVerify));
+
         Set<String> filenames = new HashSet<>();
         List<Integer> orders = new ArrayList<>();
         for (FileOrder contentFile: contentFiles) {
@@ -272,6 +281,14 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
             // file key 형식 검증
             if (!FILE_KEY_PATTERN.matcher(contentFile.fileKey()).matches()) {
                 throw new InvalidFileInputException();
+            }
+            // 우리가 발급한 fileKey가 맞는지 검증(presign 발급 후 pending 상태여야 함)
+            if (!trackedFileKeys.contains(contentFile.fileKey())) {
+                throw new InvalidFileInputException();
+            }
+            // presign은 발급됐으나 실제로 S3에 업로드됐는지 검증
+            if (!amazonS3Service.checkIfFileExists(contentFile.fileKey())) {
+                throw new NotFoundFileKeyOnS3Exception();
             }
             // 순서 검증을 위한 추가
             orders.add(contentFile.order());
