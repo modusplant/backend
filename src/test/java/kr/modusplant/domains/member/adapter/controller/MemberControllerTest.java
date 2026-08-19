@@ -471,6 +471,8 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -478,6 +480,7 @@ class MemberControllerTest implements
 
         // then
         assertThat(memberProfileResponseWithImageUrl).isEqualTo(testMemberProfileResponseWithImageUrlV2);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
         verify(memberProfileRepository, times(1)).update(any(), eq(true), eq(false));
     }
 
@@ -489,6 +492,8 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -500,6 +505,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(null);
         assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(null);
         assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
         verify(memberProfileRepository, times(1)).update(any(), eq(true), eq(false));
     }
 
@@ -512,6 +518,8 @@ class MemberControllerTest implements
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -519,6 +527,7 @@ class MemberControllerTest implements
 
         // then
         assertThat(memberProfileResponseWithImagePath).isEqualTo(testMemberProfileResponseWithImagePathV3);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
         verify(memberProfileRepository, times(1)).update(any(), eq(true), eq(false));
     }
 
@@ -530,6 +539,8 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -541,6 +552,7 @@ class MemberControllerTest implements
         assertThat(memberProfileResponseWithImagePath.imagePath()).isEqualTo(null);
         assertThat(memberProfileResponseWithImagePath.introduction()).isEqualTo(null);
         assertThat(memberProfileResponseWithImagePath.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
         verify(memberProfileRepository, times(1)).update(any(), eq(true), eq(false));
     }
 
