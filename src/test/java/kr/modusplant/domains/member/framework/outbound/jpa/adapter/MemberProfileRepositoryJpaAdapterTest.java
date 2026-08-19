@@ -79,8 +79,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsUntracking이 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
-    void testUpdate_givenNeedsUntrackingFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
+    @DisplayName("needsToUntrackImage가 false로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
+    void testUpdate_givenNeedsToUntrackImageFalse_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -102,8 +102,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsUntracking이 true이지만 이미지 경로가 없어 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
-    void testUpdate_givenNeedsUntrackingTrueAndNullImagePath_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
+    @DisplayName("needsToUntrackImage가 true이지만 이미지 경로가 없어 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제 생략")
+    void testUpdate_givenNeedsToUntrackImageTrueAndNullImagePath_willReturnMemberProfileWithoutUntrackingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -125,8 +125,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsUntracking이 true로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
-    void testUpdate_givenNeedsUntrackingTrue_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
+    @DisplayName("needsToUntrackImage가 true로 update 실행 시 MemberProfile 반환 및 대기 파일 추적 해제")
+    void testUpdate_givenNeedsToUntrackImageTrue_willReturnMemberProfileAndUntrackPendingFiles() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -149,8 +149,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
-    void testUpdate_givenNeedsImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
+    @DisplayName("needsToReturnImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
+    void testUpdate_givenNeedsToReturnImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
