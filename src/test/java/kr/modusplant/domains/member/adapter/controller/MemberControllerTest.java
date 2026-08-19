@@ -470,7 +470,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -488,7 +488,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -511,7 +511,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
-        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -529,7 +529,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        willDoNothing().given(memberImageIOHelper).validateIfImageExists(any());
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.update(any(), eq(true), eq(false))).willReturn(memberProfile);
 
         // when
@@ -629,7 +629,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExists(any());
+        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExistsInStorage(any());
 
         // when & then
         NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
@@ -683,7 +683,7 @@ class MemberControllerTest implements
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExists(any());
+        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExistsInStorage(any());
 
         // when & then
         NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(

@@ -83,7 +83,7 @@ public class MemberImageIOHelper {
         }
     }
 
-    public void validateIfImageExists(MemberProfileImagePath memberProfileImagePath) {
+    public void validateIfImageExistsInStorage(MemberProfileImagePath memberProfileImagePath) {
         String imagePath = memberProfileImagePath.getValue();
         if (imagePath != null && !amazonS3Service.checkIfFileExists(imagePath)) {
             throw new NotFoundFileKeyOnS3Exception();

@@ -103,36 +103,36 @@ class MemberImageIOHelperTest {
     }
 
     @Test
-    @DisplayName("존재하는 이미지 경로로 validateIfImageExists 검증 활동 수행")
-    void testValidateIfImageExists_givenExistingImagePath_willProcessAction() {
+    @DisplayName("존재하는 이미지 경로로 validateIfImageExistsInStorage 검증 활동 수행")
+    void testValidateIfImageExistsInStorage_givenExistingImagePath_willProcessAction() {
         // given
         given(amazonS3Service.checkIfFileExists(testMemberProfileImagePath.getValue())).willReturn(true);
 
         // when
-        memberImageIOHelper.validateIfImageExists(testMemberProfileImagePath);
+        memberImageIOHelper.validateIfImageExistsInStorage(testMemberProfileImagePath);
 
         // then
         verify(amazonS3Service, times(1)).checkIfFileExists(testMemberProfileImagePath.getValue());
     }
 
     @Test
-    @DisplayName("존재하지 않는 이미지 경로로 validateIfImageExists 검증 예외 반환")
-    void testValidateIfImageExists_givenNonExistingImagePath_willThrowException() {
+    @DisplayName("존재하지 않는 이미지 경로로 validateIfImageExistsInStorage 검증 예외 반환")
+    void testValidateIfImageExistsInStorage_givenNonExistingImagePath_willThrowException() {
         // given
         given(amazonS3Service.checkIfFileExists(testMemberProfileImagePath.getValue())).willReturn(false);
 
         // when & then
         NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
                 NotFoundFileKeyOnS3Exception.class,
-                () -> memberImageIOHelper.validateIfImageExists(testMemberProfileImagePath));
+                () -> memberImageIOHelper.validateIfImageExistsInStorage(testMemberProfileImagePath));
         assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
     }
 
     @Test
-    @DisplayName("null 이미지 경로로 validateIfImageExists 검증 활동 수행")
-    void testValidateIfImageExists_givenNullImagePath_willProcessAction() {
+    @DisplayName("null 이미지 경로로 validateIfImageExistsInStorage 검증 활동 수행")
+    void testValidateIfImageExistsInStorage_givenNullImagePath_willProcessAction() {
         // given & when
-        memberImageIOHelper.validateIfImageExists(testEmptyMemberProfileImagePath);
+        memberImageIOHelper.validateIfImageExistsInStorage(testEmptyMemberProfileImagePath);
 
         // then
         verify(amazonS3Service, never()).checkIfFileExists(any());
