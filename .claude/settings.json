@@ -24,6 +24,9 @@
       "Bash(docker compose logs*)",
       "Bash(docker compose config*)",
 
+      "Write(./claude/logs/**)",
+      "Edit(./claude/logs/**)",
+
       "Read(./src/main/resources/application-local.yml)",
       "Read(./docker-compose.override.yml)",
       "Read(./env)"
@@ -32,7 +35,11 @@
       "Bash(docker exec*)",
       "Bash(docker run*)",
 
-      "Bash(docker compose exec*)"
+      "Bash(docker compose exec*)",
+
+      "Edit(./src/main/resources/application-local.yml)",
+      "Edit(./docker-compose.override.yml)",
+      "Edit(./env)"
     ],
     "deny": [
       "Bash(rm -rf **/src/**)",
