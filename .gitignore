@@ -1,7 +1,7 @@
 ### Coding AI Tool ###
 /.claude/CLAUDE.local.md
 /.claude/settings.local.json
-/.claude/skills/logs/
+/.claude/logs/
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/resolve-error-with-stack-trace/result
 /.claude/skills/write-portfolio/
