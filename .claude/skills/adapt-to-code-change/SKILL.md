@@ -2,7 +2,7 @@
 name: adapt-to-code-change
 description: This skill applies the follow-up actions required in response to code changes.
 disable-model-invocation: true
-disallowed-tools: Write(./src/**) Edit(./src/**)
+disallowed-tools: Write(/src/**) Edit(/src/**)
 ---
 
 # Detailed Action Items
