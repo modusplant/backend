@@ -54,10 +54,6 @@ public class DefaultUserDetails implements UserDetails {
         return true;
     }
 
-    public boolean isActive() { return isActive; }
-
-    public boolean isBanned() { return isBanned; }
-
     public static DefaultUserDetailsBuilder builder() { return new DefaultUserDetailsBuilder(); }
 
     public static class DefaultUserDetailsBuilder {
