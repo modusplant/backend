@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "모니터링 API", description = "정상적으로 로깅 및 예외 처리가 이루어지는지 모니터링하기 위한 API입니다.")
 @RestController
-@RequestMapping("/api/monitor")
+@RequestMapping("/api/admin/v1/monitor")
 @RequiredArgsConstructor
 public class MonitorController {
 

@@ -29,11 +29,11 @@ The package is flat: two classes (`MonitorService`, `MonitorController`), no sub
   - Calls `RedisHelper.setString` three times inside a single try/catch: once with no TTL, once with a 10-second TTL, once with a 1-minute TTL, each under a distinct fixed test key.
   - Any exception caught here is swallowed and replaced with a new `RuntimeException()`.
 
-**`MonitorController`** — `@RestController @RequestMapping("/api/monitor") @RequiredArgsConstructor`:
-- `GET /api/monitor/monitor-success` → `monitorService.performBusinessLogic(true)`
-- `GET /api/monitor/monitor-error` → `monitorService.performBusinessLogic(false)`
-- `GET /api/monitor/monitor-error-controller` → throws `RuntimeException()` directly, with no call into `MonitorService`.
-- `GET /api/monitor/monitor-redis` → `monitorService.monitorRedisHelper()`
+**`MonitorController`** — `@RestController @RequestMapping("/api/admin/v1/monitor") @RequiredArgsConstructor`:
+- `GET /api/admin/v1/monitor/monitor-success` → `monitorService.performBusinessLogic(true)`
+- `GET /api/admin/v1/monitor/monitor-error` → `monitorService.performBusinessLogic(false)`
+- `GET /api/admin/v1/monitor/monitor-error-controller` → throws `RuntimeException()` directly, with no call into `MonitorService`.
+- `GET /api/admin/v1/monitor/monitor-redis` → `monitorService.monitorRedisHelper()`
 
 ---
 
