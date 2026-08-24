@@ -13,8 +13,8 @@ public class MonitorService {
 
     private final RedisHelper redisHelper;
 
-    public String performBusinessLogic(boolean shouldThrowError) {
-        if (shouldThrowError) {
+    public String performBusinessLogic(boolean shouldNotThrowError) {
+        if (shouldNotThrowError) {
             return "Business logic executed successfully!"; // 정상 흐름
         } else {
             throw new RuntimeException("Exception occurred during the business logic execution!"); // 예외 발생
