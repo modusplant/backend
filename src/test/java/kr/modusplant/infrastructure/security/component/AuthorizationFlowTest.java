@@ -113,7 +113,7 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
 //        given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
 //
 //        // when
-//        mockMvc.perform(get("/api/monitor/monitor-success")
+//        mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
 //                .header("Authorization", rawAccessToken)
 //                )
 //                .andExpect(status().is(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))

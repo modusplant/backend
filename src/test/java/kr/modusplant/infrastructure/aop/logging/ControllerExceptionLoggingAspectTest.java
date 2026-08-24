@@ -28,13 +28,13 @@ public class ControllerExceptionLoggingAspectTest {
     void getMonitorControllerError_givenRestController_returnErrorStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ControllerExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-error-controller")
+        mockMvc.perform(get("/api/admin/v1/monitor/monitor-error-controller")
                         .with(user("admin").roles("ADMIN")))
                 .andExpect(status().is5xxServerError());
 
         // then
         boolean logFound = logCaptor.getErrorLogs().stream()
-                .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-error-controller"));
+                .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/admin/v1/monitor/monitor-error-controller"));
         assertThat(logFound).isTrue();
     }
 }

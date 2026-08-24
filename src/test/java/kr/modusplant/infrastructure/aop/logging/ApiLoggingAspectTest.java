@@ -28,13 +28,13 @@ public class ApiLoggingAspectTest {
     void getMonitorSuccess_givenRestController_willReturnSuccessStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-success")
+        mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
                         .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
 
         // then
         boolean logFound = logCaptor.getInfoLogs().stream()
-                        .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-success"));
+                        .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/admin/v1/monitor/monitor-success"));
         assertThat(logFound).isTrue();
     }
 }
