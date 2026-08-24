@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +30,7 @@ public class ApiLoggingAspectTest {
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
         mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
-                        .with(user("admin").roles("ADMIN")))
+                        .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().isOk());
 
         // then
