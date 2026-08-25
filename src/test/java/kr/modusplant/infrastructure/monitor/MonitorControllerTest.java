@@ -51,4 +51,14 @@ class MonitorControllerTest {
         // then
         assertThat(monitorController.monitorRedisHelper()).isEqualTo(returnedValue);
     }
+
+    @Test
+    void monitorAmazonS3Test() {
+        // given & when
+        String returnedValue = "Amazon S3 test executed successfully!";
+        given(monitorService.monitorAmazonS3()).willReturn(returnedValue);
+
+        // then
+        assertThat(monitorController.monitorAmazonS3()).isEqualTo(returnedValue);
+    }
 }
