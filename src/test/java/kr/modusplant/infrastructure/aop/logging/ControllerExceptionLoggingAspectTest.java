@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,13 +29,13 @@ public class ControllerExceptionLoggingAspectTest {
     void getMonitorControllerError_givenRestController_returnErrorStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ControllerExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-error-controller")
-                        .with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/api/admin/v1/monitor/monitor-error-controller")
+                        .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().is5xxServerError());
 
         // then
         boolean logFound = logCaptor.getErrorLogs().stream()
-                .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-error-controller"));
+                .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/admin/v1/monitor/monitor-error-controller"));
         assertThat(logFound).isTrue();
     }
 }

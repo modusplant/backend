@@ -53,7 +53,7 @@ public class TokenService {
         }
 
         // accessToken , refresh token 생성
-        Map<String,String> claims = createClaims(nickname,email, role);
+        Map<String, String> claims = createClaims(nickname, email, role);
         String accessToken = jwtTokenProvider.generateAccessToken(memberUuid, claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(memberUuid);
 
@@ -66,7 +66,7 @@ public class TokenService {
                         .build()
         );
 
-        return new TokenPair(accessToken,refreshToken);
+        return new TokenPair(accessToken, refreshToken);
     }
 
     // 토큰 삭제
@@ -78,7 +78,7 @@ public class TokenService {
         // refresh token 조회
         UUID memberUuid = jwtTokenProvider.getMemberUuidFromToken(refreshToken);
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberUuid).orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER));
-        RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity,refreshToken).orElseThrow(TokenNotFoundException::new);
+        RefreshTokenEntity refreshTokenEntity = refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity, refreshToken).orElseThrow(TokenNotFoundException::new);
 
         // 토큰 삭제
         refreshTokenJpaRepository.deleteByUuid(refreshTokenEntity.getUuid());
@@ -114,16 +114,16 @@ public class TokenService {
 
         // access token 재발급
         Map<String,String> claims = createClaims(memberEntity.getNickname(), email, role);
-        String accessToken = jwtTokenProvider.generateAccessToken(memberUuid,claims);
+        String accessToken = jwtTokenProvider.generateAccessToken(memberUuid, claims);
 
-        return new TokenPair(accessToken,reissuedRefreshToken);
+        return new TokenPair(accessToken, reissuedRefreshToken);
     }
 
     // access token 블랙리스트
     public void blacklistAccessToken(String accessToken) {
         if (jwtTokenProvider.validateToken(accessToken)) {
             Instant expiration = jwtTokenProvider.getExpirationFromToken(accessToken).toInstant();
-            Long expirationSeconds = Duration.between(Instant.now(),expiration).getSeconds();
+            Long expirationSeconds = Duration.between(Instant.now(), expiration).getSeconds();
             accessTokenRedisRepository.addToBlacklist(accessToken, expirationSeconds);
         }
     }
@@ -136,7 +136,7 @@ public class TokenService {
     private Map<String,String> createClaims(String nickname, String email, Role role) {
         Map<String,String> claims = new HashMap<>();
         claims.put("nickname", nickname);
-        claims.put("email",email);
+        claims.put("email", email);
         claims.put("roles", role.name());
         return claims;
     }

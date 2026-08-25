@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,13 +29,13 @@ public class ApiLoggingAspectTest {
     void getMonitorSuccess_givenRestController_willReturnSuccessStatusWithAopLogging() throws Exception{
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
-        mockMvc.perform(get("/api/monitor/monitor-success")
-                        .with(user("admin").roles("ADMIN")))
+        mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
+                        .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().isOk());
 
         // then
         boolean logFound = logCaptor.getInfoLogs().stream()
-                        .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/monitor/monitor-success"));
+                        .anyMatch(log -> log.contains("method=GET") && log.contains("uri=/api/admin/v1/monitor/monitor-success"));
         assertThat(logFound).isTrue();
     }
 }

@@ -24,9 +24,14 @@
       "Bash(docker compose logs*)",
       "Bash(docker compose config*)",
 
-      "Read(./src/main/resources/application-local.yml)",
-      "Read(./docker-compose.override.yml)",
-      "Read(./env)"
+      "Edit(/claude/logs/**)",
+
+      "Read(/src/main/resources/application-local.yml)",
+      "Read(/docker-compose.override.yml)",
+      "Read(/env)",
+
+      "Read(~/.claude/CLAUDE.md)",
+      "Read(~/.claude/skills/**)"
     ],
     "ask": [
       "Bash(docker exec*)",
@@ -48,7 +53,11 @@
 
       "Read(**/.gradle/**)",
       "Read(**/.settings/**)",
-      "Read(./src/main/resources/application-secrets.yml)"
+      "Read(/src/main/resources/application-secrets.yml)",
+
+      "Edit(/src/main/resources/application-local.yml)",
+      "Edit(/docker-compose.override.yml)",
+      "Edit(/env)"
     ]
   },
   "env": {

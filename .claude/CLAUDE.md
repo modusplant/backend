@@ -21,12 +21,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Database & Code Generation
 
-The build chain requires a live DB: `processResources` → `flywayMigrate` → `jooqCodegen` → `compileJava`
+The build chain requires a live DB with schema migrations already applied: `processResources` → `jooqCodegen` → `compileJava`
 
 ```bash
-# Apply Flyway migrations
-./gradlew flywayMigrate
-
 # Regenerate jOOQ classes from the current schema
 ./gradlew jooqCodegen
 ```
@@ -82,11 +79,6 @@ Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comm
 - **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via Spring `ApplicationEvent`s defined in `shared/event/`.
 
 ### Spring Profiles
-- `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled, `flyway.clean-disabled=false`
+- `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled
 - `dev` / `prod`: deployed environments; secrets injected via AWS SSM Parameter Store
 - `secrets` is always included; it supplies sensitive values (DB credentials, keys, etc.) and is not tracked in the repository
-
-### Flyway Migrations
-- Schema DDL: `src/main/resources/db/migration/schema/` (prefix `V`)
-- Seed data: `src/main/resources/db/migration/data/seed/` (prefix `V`)
-- Java-based migrations: `src/main/java/db/migration/` (prefix `V`)
