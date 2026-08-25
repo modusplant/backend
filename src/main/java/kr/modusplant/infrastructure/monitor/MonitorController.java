@@ -50,4 +50,13 @@ public class MonitorController {
     public String monitorRedisHelper() {
         return monitorService.monitorRedisHelper();
     }
+
+    @Operation(
+            summary = "Amazon S3 헬스 체크 및 지연 측정",
+            description = "Amazon S3의 헬스 체크 엔드포인트로 요청을 보냅니다."
+    )
+    @GetMapping("/monitor-amazon-s3")
+    public String monitorAmazonS3() {
+        return monitorService.monitorAmazonS3();
+    }
 }
