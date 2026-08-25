@@ -28,7 +28,10 @@
 
       "Read(/src/main/resources/application-local.yml)",
       "Read(/docker-compose.override.yml)",
-      "Read(/env)"
+      "Read(/env)",
+
+      "Read(~/.claude/CLAUDE.md)",
+      "Read(~/.claude/skills/**)"
     ],
     "ask": [
       "Bash(docker exec*)",
