@@ -3,8 +3,6 @@ paths:
   - "src/main/java/kr/modusplant/infrastructure/security/**"
 ---
 
-> Supplements CLAUDE.md § Architecture — the `infrastructure` package's security concern. Assumes familiarity with the top-level package roles described there.
-
 # Security Infrastructure Conventions
 
 Applies to `kr.modusplant.infrastructure.security` and its sub-packages.
