@@ -3,8 +3,6 @@ paths:
   - "src/main/java/kr/modusplant/domains/search/**"
 ---
 
-> Supplements CLAUDE.md § Architecture — Domain Internal Structure. Assumes familiarity with the four-layer layout and JPA/jOOQ design decision documented there.
-
 # Search Domain Conventions
 
 Applies to `kr.modusplant.domains.search` and its sub-packages.

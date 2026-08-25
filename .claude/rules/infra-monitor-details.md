@@ -3,8 +3,6 @@ paths:
   - "src/main/java/kr/modusplant/infrastructure/monitor/**"
 ---
 
-> Supplements CLAUDE.md § Architecture — the `infrastructure` package's monitoring/diagnostics concern. Assumes familiarity with the top-level package roles described there.
-
 # Monitor Infrastructure Conventions
 
 Applies to `kr.modusplant.infrastructure.monitor`.

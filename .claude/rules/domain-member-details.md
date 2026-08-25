@@ -3,8 +3,6 @@ paths:
   - "src/main/java/kr/modusplant/domains/member/**"
 ---
 
-> Supplements CLAUDE.md § Architecture — Domain Internal Structure. Assumes familiarity with the four-layer layout and JPA/jOOQ design decision documented there.
-
 # Member Domain Conventions
 
 Applies to `kr.modusplant.domains.member` and its sub-packages.
