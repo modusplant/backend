@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,10 +21,10 @@ public class CommentContent {
 
     public static void validateSource(String source) {
         if(source.isBlank()) {
-            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT);
+            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content");
         }
         if(600 < source.length()) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_CONTENT);
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_CONTENT, "content");
         }
     }
 

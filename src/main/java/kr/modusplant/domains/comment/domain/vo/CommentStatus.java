@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.enums.CommentStatusType;
 import lombok.AllArgsConstructor;
@@ -20,14 +20,15 @@ public class CommentStatus {
     }
 
     public static void validateSource(String source) {
-        if(source.isBlank()) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
+        if(source.isBlank()) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status"); }
 
         if(!CommentStatusType.isValidStatus(source)) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS);
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS, "status");
         }
     }
 
     public static CommentStatus setAsValid() { return new CommentStatus(CommentStatusType.VALID); }
+
     public static CommentStatus setAsDeleted() { return new CommentStatus(CommentStatusType.DELETED); }
 
     @Override

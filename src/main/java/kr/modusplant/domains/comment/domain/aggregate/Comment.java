@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
 import lombok.AccessLevel;
@@ -19,20 +19,19 @@ public class Comment {
     private final CommentStatus status;
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content) {
-        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH); }
-        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
+        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
+        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
+        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
         return new Comment(postId, path, author, content, CommentStatus.setAsValid());
     }
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
-        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID); }
-        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH); }
-        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT); }
-        if (status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS); }
-
+        if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
+        if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
+        if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
+        if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
+        if(status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status"); }
         return new Comment(postId, path, author, content, status);
     }
 

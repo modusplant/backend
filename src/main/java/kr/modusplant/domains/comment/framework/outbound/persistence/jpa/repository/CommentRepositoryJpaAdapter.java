@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository;
 
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
@@ -32,12 +32,12 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     @Override
     public void save(Comment comment) {
         MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
-                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR));
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
         PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getId())
-                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST));
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
         CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
         if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getId(), comment.getPath().getPath()))) {
-            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT);
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
         }
         commentRepository.save(commentEntity);
     }
