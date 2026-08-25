@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,13 +24,13 @@ public class CommentPath {
      */
     public static void validateSource(String source) {
         if (source == null || source.isBlank()) {
-            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
+            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path");
         }
         if (!source.matches("^\\d+(\\.\\d+)*$")) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT);
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT, "path");
         }
         if (source.charAt(0) == '0' || source.contains(".0")) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX);
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX, "path");
         }
     }
 

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.shared.constant.Regex;
 import lombok.AccessLevel;
@@ -19,7 +19,7 @@ public class Author {
     private final String nickname;
 
     public static Author create(UUID memberUuid) {
-        if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
+        if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "memberUuid"); }
         return new Author(memberUuid, null);
     }
 
@@ -28,9 +28,9 @@ public class Author {
     }
 
     public static Author create(UUID memberUuid, String nickname) {
-        if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR); }
-        if(nickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME); }
-        if(!nickname.matches(Regex.REGEX_NICKNAME)) { throw new InvalidValueException(CommentErrorCode.INVALID_AUTHOR_NICKNAME); }
+        if(memberUuid == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "memberUuid"); }
+        if(nickname == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_MEMBER_NICKNAME, "nickname"); }
+        if(!nickname.matches(Regex.REGEX_NICKNAME)) { throw new InvalidValueException(CommentErrorCode.INVALID_AUTHOR_NICKNAME, "nickname"); }
         return new Author(memberUuid, nickname);
     }
 

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,10 +19,10 @@ public class PostId {
 
     public static PostId create(String ulid) {
         if (StringUtils.isBlank(ulid)) {
-            throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID);
+            throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "id");
         }
         if (!isValidUlid(ulid)) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID);
+            throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID, "id");
         }
         return new PostId(ulid);
     }
