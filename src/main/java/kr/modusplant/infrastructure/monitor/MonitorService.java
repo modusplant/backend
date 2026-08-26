@@ -45,7 +45,7 @@ public class MonitorService {
             String value3 = "Test String Value 3(1min), Expire Time : " + LocalDateTime.now().plusMinutes(1);
             redisHelper.setString(redisKey3, value3, Duration.ofMinutes(1));
         } catch (Exception e) {
-            throw new RuntimeException("Exception occurred during testing the Redis storage!"); // 예외 발생
+            throw new RuntimeException("Exception occurred during testing the Redis storage!: ", e); // 예외 발생
         }
 
         return "RedisHelper test executed successfully!"; // 정상 흐름
@@ -63,7 +63,7 @@ public class MonitorService {
                     .onStatus(HttpStatusCode::isError, (req, res) -> {}) // 상태 코드는 아래에서 직접 검사
                     .toBodilessEntity();
         } catch (Exception e) {
-            throw new RuntimeException("Exception occurred during testing the Amazon S3 storage!"); // 예외 발생
+            throw new RuntimeException("Exception occurred during testing the Amazon S3 storage!: ", e); // 예외 발생
         }
 
         double durationInMs = (System.nanoTime() - startTime) / 1_000_000.0; // 지연 측정을 위한 종료 시간
