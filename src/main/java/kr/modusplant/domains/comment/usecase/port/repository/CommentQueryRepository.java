@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface CommentReadRepository {
+public interface CommentQueryRepository {
 
     List<CommentOfPostReadModel> findByPost(PostId postId, Author author);
 
@@ -23,4 +23,6 @@ public interface CommentReadRepository {
     int countPostComment(PostId postId);
 
     Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId);
+
+    boolean isPostPublished(String postId);
 }

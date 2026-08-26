@@ -5,7 +5,7 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.jooq.tables.*;
 import lombok.RequiredArgsConstructor;
 import org.jooq.Condition;
@@ -26,7 +26,7 @@ import static org.jooq.impl.DSL.count;
 
 @Repository
 @RequiredArgsConstructor
-public class CommentJooqRepository implements CommentReadRepository {
+public class CommentJooqRepository implements CommentQueryRepository {
 
     private final DSLContext dsl;
     private final CommPost commPost = CommPost.COMM_POST;
@@ -149,5 +149,15 @@ public class CommentJooqRepository implements CommentReadRepository {
         } else {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
+    }
+
+    @Override
+    public boolean isPostPublished(String postId) {
+        return postId != null && Boolean.TRUE.equals(
+                dsl.select(commPost.IS_PUBLISHED)
+                        .from(commPost)
+                        .where(commPost.ULID.eq(postId))
+                        .fetchOne(commPost.IS_PUBLISHED)
+        );
     }
 }

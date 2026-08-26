@@ -7,7 +7,7 @@ import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.mapper.CommentJpaMapper;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
@@ -22,7 +22,7 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
-public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
+public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     private final MemberJpaRepository memberRepository;
     private final PostJpaRepository postRepository;
     private final CommentJpaRepository commentRepository;
