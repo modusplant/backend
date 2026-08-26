@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.mapper.MemberProfileMapperImpl;
