@@ -3,10 +3,11 @@ package kr.modusplant.infrastructure.monitor;
 import kr.modusplant.shared.framework.redis.RedisHelper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClient;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -17,8 +18,10 @@ import java.time.LocalDateTime;
 public class MonitorService {
 
     private final RedisHelper redisHelper;
-    private final RestClient.Builder restClientBuilder;
-    private static final String WASABI_HEALTHCHECK_ENDPOINT = "https://s3.wasabisys.com/ping";
+    private final S3Client s3Client;
+
+    @Value("${cloud.wasabi.s3.bucket}")
+    private String bucket;
 
     public String performBusinessLogic(boolean shouldNotThrowError) {
         if (shouldNotThrowError) {
@@ -54,25 +57,17 @@ public class MonitorService {
     public String monitorAmazonS3() {
         long startTime = System.nanoTime(); // 지연 측정을 위한 시작 시간
 
-        ResponseEntity<Void> response;
         try {
-            response = restClientBuilder.build()
-                    .get()
-                    .uri(WASABI_HEALTHCHECK_ENDPOINT)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::isError, (req, res) -> {}) // 상태 코드는 아래에서 직접 검사
-                    .toBodilessEntity();
+            s3Client.headBucket(HeadBucketRequest.builder()
+                    .bucket(bucket)
+                    .build());
+        } catch (S3Exception e) {
+            throw new RuntimeException("Wasabi health check failed!: " + e); // 4xx 및 5xx 에러 응답
         } catch (Exception e) {
             throw new RuntimeException("Exception occurred during testing the Amazon S3 storage!: ", e); // 예외 발생
         }
 
         double durationInMs = (System.nanoTime() - startTime) / 1_000_000.0; // 지연 측정을 위한 종료 시간
-
-        if (response.getStatusCode().is4xxClientError()) {
-            throw new RuntimeException("The request had problem!: statusCode=" + response.getStatusCode().value());
-        } else if (response.getStatusCode().is5xxServerError()) {
-            throw new RuntimeException("Amazon S3 had problem!: statusCode=" + response.getStatusCode().value());
-        }
 
         log.info("[Amazon S3] duration:{}ms", String.format("%.2f", durationInMs));
         return "Amazon S3 test executed successfully!"; // 정상 흐름
