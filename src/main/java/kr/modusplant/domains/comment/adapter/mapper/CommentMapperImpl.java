@@ -1,15 +1,13 @@
 package kr.modusplant.domains.comment.adapter.mapper;
 
-import kr.modusplant.domains.comment.domain.aggregate.Comment;
-import kr.modusplant.domains.comment.domain.vo.Author;
-import kr.modusplant.domains.comment.domain.vo.CommentContent;
-import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -19,8 +17,16 @@ public class CommentMapperImpl implements CommentMapper {
     private final AmazonS3Service fileService;
 
     @Override
-    public Comment toComment(PostId postId, CommentPath path, Author author, CommentContent content) {
-        return Comment.create(postId, path, author, content);
+    public CommentPageResponse<CommentOfAuthorReadModel> toCommentPageResponseWithOnePlusPage(
+            Page<CommentOfAuthorReadModel> paginatedReadModel) {
+        return new CommentPageResponse<>(
+                paginatedReadModel.getContent(),
+                paginatedReadModel.getNumber() + 1,
+                paginatedReadModel.getSize(),
+                paginatedReadModel.getTotalElements(),
+                paginatedReadModel.getTotalPages(),
+                paginatedReadModel.hasNext(),
+                paginatedReadModel.hasPrevious());
     }
 
     @Override

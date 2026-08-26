@@ -1,6 +1,5 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
-import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
@@ -10,10 +9,10 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
+import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -30,7 +29,7 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +42,7 @@ import java.util.UUID;
 @Transactional
 @Slf4j
 public class CommentController {
-    private final CommentMapperImpl mapper;
+    private final CommentMapper mapper;
     private final CommentQueryRepository queryRepository;
     private final CommentCommandRepository commandRepository;
     private final PostJpaRepository postJpaRepository;
@@ -64,7 +63,7 @@ public class CommentController {
 
     @Transactional(readOnly = true)
     public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID currentMemberUuid) {
-        if(!postJpaRepository.existsByUlid(postUlid)) {
+        if (!postJpaRepository.existsByUlid(postUlid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
         }
 
@@ -75,37 +74,22 @@ public class CommentController {
 
     @Transactional(readOnly = true)
     public CommentPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
-        if(!memberJpaRepository.existsById(memberUuid)) {
+        if (!memberJpaRepository.existsById(memberUuid)) {
             throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
         }
-        PageImpl<CommentOfAuthorReadModel> result = queryRepository.findByAuthor(Author.create(memberUuid), pageable);
 
-        CommentPageResponse<CommentOfAuthorReadModel> response =
-                new CommentPageResponse<>(result.getContent(), result.getNumber(),
-                result.getSize(), result.getTotalElements(), result.getTotalPages(),
-                result.hasNext(), result.hasPrevious());
-        
-        response.applyOneIndexBasedPage();
-
-        return response;
+        Page<CommentOfAuthorReadModel> result = queryRepository.findByAuthor(Author.create(memberUuid), pageable);
+        return mapper.toCommentPageResponseWithOnePlusPage(result);
     }
 
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
-        if(queryRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
-            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
-        }
+        validateBeforeRegister(request.postId(), request.path());
 
-        if (!queryRepository.isPostPublished(request.postId())) {
-            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "comment");
-        }
-
-        checkPathCondition(request.postId(), request.path());
-
-        Comment comment = mapper.toComment(
-                PostId.create(request.postId()),
-                CommentPath.create(request.path()),
-                Author.create(currentMemberUuid),
-                CommentContent.create(swearService.filterSwear(request.content())));
+        PostId postId = PostId.create(request.postId());
+        CommentPath path = CommentPath.create(request.path());
+        Author author = Author.create(currentMemberUuid);
+        Comment comment = Comment.create(
+                postId, path, author, CommentContent.create(swearService.filterSwear(request.content())));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
@@ -114,28 +98,29 @@ public class CommentController {
     }
 
     public void update(CommentUpdateRequest request) {
-        if(!queryRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
+        if (!queryRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
 
-        CommentCompositeKey id = CommentCompositeKey.builder()
-                .post(request.postId())
-                .path(request.path())
-                .build();
-
-        commandRepository.update(id, CommentContent.create(request.content()));
+        commandRepository.update(
+                PostId.create(request.postId()),
+                CommentPath.create(request.path()),
+                CommentContent.create(request.content()));
     }
 
     public void delete(String postUlid, String commentPath) {
-        commandRepository.setCommentAsDeleted(CommentCompositeKey.builder()
-                .post(postUlid)
-                .path(commentPath)
-                .build());
+        commandRepository.setCommentAsDeleted(PostId.create(postUlid), CommentPath.create(commentPath));
     }
 
-    private void checkPathCondition(String postId, String path) {
-        PostId commentPost = PostId.create(postId);
+    private void validateBeforeRegister(String postId, String path) {
+        if (queryRepository.existsByPostAndPath(PostId.create(postId), CommentPath.create(path))) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
+        }
+        if (!queryRepository.isPostPublished(postId)) {
+            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "comment");
+        }
 
+        PostId commentPost = PostId.create(postId);
         if (path.contains(".")) {
             int lastDotIndex = path.lastIndexOf(".");
             String lastNumOfPath = path.substring(lastDotIndex + 1);

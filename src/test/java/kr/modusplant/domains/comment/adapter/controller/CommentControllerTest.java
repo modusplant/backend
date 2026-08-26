@@ -361,7 +361,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
+        given(Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -404,7 +404,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
+        given(Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -447,7 +447,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
+        given(Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -490,7 +490,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
+        given(Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -512,16 +512,17 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(rawContent)).willReturn(filteredContent);
-        given(mapper.toComment(any(), any(), any(),
-                eq(CommentContent.create(filteredContent)))).willReturn(mockComment);
+        CommentContent content1 = ArgumentMatchers.eq(CommentContent.create(filteredContent));
+        given(Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), content1)).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
         then(swearService).should(times(1)).filterSwear(rawContent);
-        then(mapper).should(times(1))
-                .toComment(any(), any(), any(), eq(CommentContent.create(filteredContent)));
+        BDDMockito.then(mapper).should(times(1));
+        CommentContent content = ArgumentMatchers.eq(CommentContent.create(filteredContent));
+        Comment.create(ArgumentMatchers.any(), ArgumentMatchers.any(), ArgumentMatchers.any(), content);
     }
 
     @Test
