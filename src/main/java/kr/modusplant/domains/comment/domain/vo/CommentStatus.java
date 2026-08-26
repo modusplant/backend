@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.domain.vo;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.vo.enums.CommentStatusType;
+import kr.modusplant.domains.comment.domain.enums.CommentStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.builder.EqualsBuilder;
