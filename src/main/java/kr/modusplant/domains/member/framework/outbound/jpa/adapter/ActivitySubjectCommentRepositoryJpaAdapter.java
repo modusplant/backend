@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;

@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey;
+package kr.modusplant.domains.comment.framework.outbound.jpa.compositekey;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

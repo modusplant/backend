@@ -7,8 +7,10 @@ import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.
 import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;

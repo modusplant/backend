@@ -1,7 +1,7 @@
 package kr.modusplant.domains.notification.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.notification.domain.vo.CommentPath;
 import kr.modusplant.domains.notification.domain.vo.PostId;

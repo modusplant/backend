@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.compositekey;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
