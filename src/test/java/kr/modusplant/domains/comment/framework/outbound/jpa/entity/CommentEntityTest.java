@@ -1,7 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.entity;
 
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
-import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
@@ -90,7 +89,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
         commentEntity.markAsDeleted();
 
         // then
-        assertEquals(commentEntity.getIsDeleted(), true);
+        assertEquals(true, commentEntity.getIsDeleted());
     }
 
     @Test
@@ -104,7 +103,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
     @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(commentEntity, testMemberId);
+        assertNotEquals(testMemberId, commentEntity);
     }
 
     @Test
