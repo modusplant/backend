@@ -102,7 +102,7 @@ public class CommentController {
         if (queryRepository.existsByPostAndPath(PostId.create(postId), CommentPath.create(path))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
         }
-        if (!queryRepository.isPostPublished(postId)) {
+        if (!queryRepository.isPostPublished(PostId.create(postId))) {
             throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "comment");
         }
 
