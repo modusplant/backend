@@ -1,13 +1,13 @@
-package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository;
+package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
@@ -28,7 +28,6 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     private final MemberJpaRepository memberRepository;
     private final PostJpaRepository postRepository;
     private final CommentJpaRepository commentRepository;
-
     private final CommentJpaMapper mapper;
 
     @Override

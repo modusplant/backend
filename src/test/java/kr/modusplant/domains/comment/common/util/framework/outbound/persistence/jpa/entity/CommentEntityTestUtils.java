@@ -3,8 +3,8 @@ package kr.modusplant.domains.comment.common.util.framework.outbound.persistence
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.*;
-import static kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity.CommentEntityBuilder;
-import static kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity.builder;
+import static kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity.CommentEntityBuilder;
+import static kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity.builder;
 
 public interface CommentEntityTestUtils extends PostEntityTestUtils {
     default CommentEntityBuilder createCommentEntityBuilder() {

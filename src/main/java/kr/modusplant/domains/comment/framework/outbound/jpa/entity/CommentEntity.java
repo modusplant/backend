@@ -1,7 +1,7 @@
-package kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity;
+package kr.modusplant.domains.comment.framework.outbound.jpa.entity;
 
 import jakarta.persistence.*;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import lombok.AccessLevel;

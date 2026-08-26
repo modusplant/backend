@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.framework.outbound.jooq.repository.CommentJooqRepository;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.jooq.*;
 import org.jooq.impl.DSL;

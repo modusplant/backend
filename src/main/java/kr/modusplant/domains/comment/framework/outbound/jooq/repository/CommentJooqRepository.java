@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.framework.outbound.persistence.jooq;
+package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
