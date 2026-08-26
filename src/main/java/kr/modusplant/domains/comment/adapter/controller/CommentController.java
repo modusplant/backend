@@ -1,6 +1,5 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
-import jakarta.transaction.Transactional;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
@@ -35,15 +34,16 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 @Slf4j
 public class CommentController {
-
     private final CommentMapperImpl mapper;
     private final CommentReadRepository readRepository;
     private final CommentWriteRepository writeRepository;
@@ -55,17 +55,17 @@ public class CommentController {
     private final CommentCacheService cacheService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentCacheData getCacheData(UUID memberUuid, String ifNoneMatch, String ifModifiedSince) {
         return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID currentMemberUuid) {
         if(!postJpaRepository.existsByUlid(postUlid)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
@@ -76,7 +76,7 @@ public class CommentController {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
             throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
@@ -93,7 +93,6 @@ public class CommentController {
         return response;
     }
 
-    @Transactional
     public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
         if(readRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
@@ -117,7 +116,6 @@ public class CommentController {
         );
     }
 
-    @Transactional
     public void update(CommentUpdateRequest request) {
         if(!readRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
@@ -131,7 +129,6 @@ public class CommentController {
         writeRepository.update(id, CommentContent.create(request.content()));
     }
 
-    @Transactional
     public void delete(String postUlid, String commentPath) {
         writeRepository.setCommentAsDeleted(CommentCompositeKey.builder()
                 .post(postUlid)
