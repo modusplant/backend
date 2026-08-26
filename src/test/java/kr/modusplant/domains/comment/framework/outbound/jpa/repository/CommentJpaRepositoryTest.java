@@ -139,23 +139,23 @@ public class CommentJpaRepositoryTest implements
         assertThat(List.of(savedCommentEntity)).isEqualTo(result);
     }
 
-//    @Test
-//    @DisplayName("댓글 내용으로 컨텐츠 댓글 찾기")
-//    void findByContentTest() {
-//        // given
-//        CommCommentEntity commentEntity = createCommCommentEntityBuilder()
-//                .postEntity(savedPostEntity)
-//                .authMember(savedMemberEntity)
-//                .isDeleted(true)
-//                .build();
-//
-//        // when
-//        CommCommentEntity savedCommCommentEntity = commentRepository.save(commentEntity);
-//        List<CommCommentEntity> result = commentRepository.findByContent(savedCommCommentEntity.getContent());
-//
-//        // then
-//        assertThat(List.of(savedCommCommentEntity)).isEqualTo(result);
-//    }
+    @Test
+    @DisplayName("댓글 내용으로 컨텐츠 댓글 찾기")
+    void findByContentTest() {
+        // given
+        CommentEntity commentEntity = createCommentEntityBuilder()
+                .post(savedPostEntity)
+                .authMember(savedMemberEntity)
+                .isDeleted(true)
+                .build();
+
+        // when
+        CommentEntity savedCommentEntity = commentRepository.save(commentEntity);
+        List<CommentEntity> result = commentRepository.findByContent(savedCommentEntity.getContent());
+
+        // then
+        assertThat(result.contains(savedCommentEntity)).isTrue();
+    }
 
     @Test
     @DisplayName("댓글 엔터티 toString 호출 시 순환 오류 발생 여부 확인")

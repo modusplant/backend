@@ -23,13 +23,14 @@ public class MockGlobalRepositoryBeanFactoryPostProcessor implements BeanFactory
         ClassPathScanningCandidateComponentProvider scanner = new ClassPathScanningCandidateComponentProvider(false) {
             @Override
             protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
-                return beanDefinition.getMetadata().isInterface() && beanDefinition.getMetadata().hasAnnotation(Repository.class.getName());
+                return (beanDefinition.getMetadata().isInterface() || beanDefinition.getMetadata().isConcrete())
+                        && beanDefinition.getMetadata().hasAnnotation(Repository.class.getName());
             }
         };
         scanner.addIncludeFilter(new AnnotationTypeFilter(Repository.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of("kr.modusplant.framework", "kr.modusplant.infrastructure")) {
+        for (String reference: List.of("kr.modusplant.domains", "kr.modusplant.infrastructure")) {
             for (BeanDefinition repositoryDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {

@@ -157,6 +157,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         assertThat(ex.getEntityName()).isEqualTo("member");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("유효한 memberUuid로 페이지 댓글 조회 성공 - 응답 필드 검증")
     void testGatherByAuthor_givenValidMemberUuid_willReturnMappedPageResponse() {
