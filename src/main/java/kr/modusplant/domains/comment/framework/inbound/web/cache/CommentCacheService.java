@@ -4,7 +4,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
@@ -34,17 +34,17 @@ public class CommentCacheService {
 
     private final PostJpaRepository postJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
-    private final CommentReadRepository commentReadRepository;
+    private final CommentQueryRepository commentQueryRepository;
 
     private final PasswordEncoder passwordEncoder;
 
     public CommentCacheService(PostJpaRepository postJpaRepository,
                                MemberJpaRepository memberJpaRepository,
-                               CommentReadRepository commentReadRepository,
+                               CommentQueryRepository commentQueryRepository,
                                @Qualifier("pbkdf2PasswordEncoder") PasswordEncoder passwordEncoder) {
         this.postJpaRepository = postJpaRepository;
         this.memberJpaRepository = memberJpaRepository;
-        this.commentReadRepository = commentReadRepository;
+        this.commentQueryRepository = commentQueryRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -57,7 +57,7 @@ public class CommentCacheService {
                 .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
         // 댓글의 최신 변경 시각 조회
-        LocalDateTime latestCommentUpdatedAt = commentReadRepository.findLatestUpdatedAtByPost(postUlid)
+        LocalDateTime latestCommentUpdatedAt = commentQueryRepository.findLatestUpdatedAtByPost(postUlid)
                 .orElse(LocalDateTime.MIN);
 
         // post와 댓글 변경 시각 중 더 최신 것을 기준으로 함

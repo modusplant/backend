@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
 
-public interface CommentWriteRepository {
+public interface CommentCommandRepository {
 
     void save(Comment comment);
 

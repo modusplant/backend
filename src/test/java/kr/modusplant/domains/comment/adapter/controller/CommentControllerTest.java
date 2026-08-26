@@ -18,7 +18,6 @@ import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.composit
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentRepositoryJpaAdapter;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -64,11 +63,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final CommentPostRepository postValidator = Mockito.mock(CommentPostRepository.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
-            writeRepository, postJpaRepository, memberJpaRepository, swearService, postValidator, cacheService, applicationEventPublisher);
+            writeRepository, postJpaRepository, memberJpaRepository, swearService, cacheService, applicationEventPublisher);
 
     private final String testIfNoneMatch = "\"abc123\"";
     private final String testIfModifiedSince = "Sat, 01 Jan 2025 00:00:00 GMT";
@@ -324,7 +322,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(false);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -340,7 +338,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(1);
 
         // when
@@ -360,7 +358,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(content)).willReturn(content);
         given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
@@ -379,7 +377,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "3", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         // sibling path "2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(false);
@@ -402,7 +400,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
@@ -422,7 +420,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2.1", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         // parent "1.2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(false);
@@ -445,7 +443,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
@@ -465,7 +463,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.5.3", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         // sibling "1.5.2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(false);
@@ -488,7 +486,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
@@ -511,7 +509,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(TEST_POST_ULID)).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(rawContent)).willReturn(filteredContent);
         given(mapper.toComment(any(), any(), any(),
