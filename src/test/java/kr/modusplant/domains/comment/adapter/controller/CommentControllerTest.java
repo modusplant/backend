@@ -164,7 +164,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(postJpaRepository.existsByUlid(TEST_POST_ULID)).willReturn(true);
         given(readRepository.findByPost(
                 eq(PostId.create(TEST_POST_ULID)),
-                eq(Author.createNullable(MEMBER_BASIC_USER_UUID))))
+                eq(Author.createWithNullableUuid(MEMBER_BASIC_USER_UUID))))
                 .willReturn(testPostReadModel);
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(mockResponse);
 
@@ -176,7 +176,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(mockResponse);
         then(readRepository).should(times(1))
-                .findByPost(PostId.create(TEST_POST_ULID), Author.createNullable(MEMBER_BASIC_USER_UUID));
+                .findByPost(PostId.create(TEST_POST_ULID), Author.createWithNullableUuid(MEMBER_BASIC_USER_UUID));
     }
 
     @Test
@@ -189,7 +189,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(postJpaRepository.existsByUlid(TEST_POST_ULID)).willReturn(true);
         given(readRepository.findByPost(
                 eq(PostId.create(TEST_POST_ULID)),
-                eq(Author.createNullable(null))))
+                eq(Author.createWithNullableUuid(null))))
                 .willReturn(testPostReadModel);
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(mockResponse);
 

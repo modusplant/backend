@@ -31,12 +31,12 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
 
     @Override
     public void save(Comment comment) {
-        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getMemberUuid())
+        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
-        PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getId())
+        PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getValue())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
         CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
-        if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getId(), comment.getPath().getPath()))) {
+        if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getValue(), comment.getPath().getValue()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
         }
         commentRepository.save(commentEntity);
@@ -46,7 +46,7 @@ public class CommentRepositoryJpaAdapter implements CommentWriteRepository {
     public void update(CommentCompositeKey id, CommentContent content) {
         CommentEntity comment = commentRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT));
-        comment.updateContent(content.getContent());
+        comment.updateContent(content.getValue());
         comment.updateEditedAt();
         
         commentRepository.save(comment);

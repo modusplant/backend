@@ -52,7 +52,7 @@ public class CommentJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testPostId.getId()) && bindings[1].equals(testCommentPath.getPath())) {
+            if (bindings[0].equals(testPostId.getValue()) && bindings[1].equals(testCommentPath.getValue())) {
                 DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
                 Field<Boolean> existsField = DSL.field("exists", Boolean.class);
                 Result<Record1<Boolean>> result = dsl.newResult(existsField);

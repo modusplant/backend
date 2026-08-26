@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CommentStatusType {
-    VALID("valid"),
+    ACTIVE("active"),
     DELETED("deleted");
 
-    private final String statusType;
+    private final String value;
 
-    public static boolean isValidStatus(String input) {
+    public static boolean contains(String input) {
         for (CommentStatusType type : CommentStatusType.values()) {
-            if(type.getStatusType().equals(input)) {
+            if(type.getValue().equals(input)) {
                 return true;
             }
         }

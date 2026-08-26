@@ -71,7 +71,7 @@ public class CommentController {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
         }
 
-        return readRepository.findByPost(PostId.create(postUlid), Author.createNullable(currentMemberUuid))
+        return readRepository.findByPost(PostId.create(postUlid), Author.createWithNullableUuid(currentMemberUuid))
                 .stream().map(mapper::toCommentOfPostResponse)
                 .toList();
     }

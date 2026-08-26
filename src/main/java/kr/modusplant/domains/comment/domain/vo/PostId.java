@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.domain.vo;
 
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,23 +15,19 @@ import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostId {
-    private final String id;
+    private final String value;
 
-    public static PostId create(String ulid) {
-        if (StringUtils.isBlank(ulid)) {
-            throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "id");
+    public static PostId create(String value) {
+        if (StringUtils.isBlank(value)) {
+            throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId");
         }
-        if (!isValidUlid(ulid)) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID, "id");
+        if (value.length() != 26) {
+            throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID, "postId");
         }
-        return new PostId(ulid);
-    }
-
-    private static boolean isValidUlid(String ulid) {
-        if (StringUtils.isBlank(ulid) || ulid.length() != 26) {
-            return false;
+        if (!PATTERN_ULID.matcher(value).matches()) {
+            throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID, "postId");
         }
-        return PATTERN_ULID.matcher(ulid).matches();
+        return new PostId(value);
     }
 
     @Override
@@ -41,13 +37,13 @@ public class PostId {
         if (!(o instanceof PostId postId)) return false;
 
         return new EqualsBuilder()
-                .append(getId(), postId.getId())
+                .append(getValue(), postId.getValue())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getId()).toHashCode();
+                .append(getValue()).toHashCode();
     }
 }

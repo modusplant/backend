@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
+import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +23,7 @@ public class Comment {
         if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
-        return new Comment(postId, path, author, content, CommentStatus.setAsValid());
+        return new Comment(postId, path, author, content, CommentStatus.active());
     }
 
     public static Comment create(PostId postId, CommentPath path, Author author, CommentContent content, CommentStatus status) {
