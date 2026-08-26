@@ -16,6 +16,7 @@ import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -81,6 +82,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertNotNull(result.getBody());
         assertThat(result.getBody().getData()).isEqualTo(List.of(testCommentOfPostResponse));
     }
 
@@ -133,6 +135,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertNotNull(result.getBody());
         assertThat(result.getBody().getData()).isEqualTo(testCommentPageResponseOfAuthorPageModel);
         then(controller).should(times(1)).gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(0, 8));
     }
@@ -141,7 +144,6 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     @DisplayName("1-based page 파라미터가 0-based로 변환되어 controller에 위임됨")
     void testGatherByAuthor_givenSecondPage_willConvertToZeroBasedPageIndex() {
         // given
-        MemberId memberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
         given(cacheService.getCacheData(any(), any(), any(MemberId.class))).willReturn(cacheData);
         given(controller.gatherByAuthor(any(UUID.class), any())).willReturn(null);
