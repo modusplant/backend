@@ -152,7 +152,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public boolean isPostPublished(String postId) {
+    public boolean isPostPublished(PostId postIdVO) {
+        String postId = postIdVO.getValue();
         return postId != null && Boolean.TRUE.equals(
                 dsl.select(commPost.IS_PUBLISHED)
                         .from(commPost)

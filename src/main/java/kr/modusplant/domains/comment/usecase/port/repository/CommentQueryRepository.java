@@ -24,5 +24,5 @@ public interface CommentQueryRepository {
 
     Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId);
 
-    boolean isPostPublished(String postId);
+    boolean isPostPublished(PostId postId);
 }

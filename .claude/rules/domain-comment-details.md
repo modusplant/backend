@@ -65,7 +65,7 @@ comment/
 - May derive a classification field (e.g. an action-type string) internally from the shape of another field rather than accepting it as a parameter
 
 **Domain Exceptions** (`domain/exception/`):
-- This domain defines no domain-local exception subclasses; validation failures throw the shared kernel exceptions (`EmptyValueException` for a missing required value, `InvalidValueException` for a present-but-invalid value) directly, parameterized with a `domain/exception/enums` error code
+- This domain defines no domain-local exception subclasses; validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
 
 **Error Codes** (`domain/exception/enums/`):
 - `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`
@@ -78,15 +78,15 @@ comment/
 ## 3. usecase/ Patterns
 
 **Read Models** (`usecase/model/`):
-- Java records optimized for specific views, direct targets of jOOQ query mapping; placed directly under `model/` rather than a further version/purpose subdirectory; named with a `*ReadModel` suffix
+- Java records optimized for specific views, direct targets of jOOQ query mapping; placed directly under `model/`; named with a `*ReadModel` suffix
 
 **Repository Ports** (`usecase/port/repository/`):
 - Split by responsibility into a query-side port (`*QueryRepository`) and a command-side port (`*CommandRepository`) (CQRS-style), each implemented by a different framework technology
-- Parameters and return types use domain VOs/Aggregates on both ports; a command port may additionally accept a framework-level composite-key type where the aggregate's own identity fields are insufficient to address a single row for update/delete
-- The query port may also declare a cross-domain read-only precondition check (e.g. whether a referenced parent resource is in a publishable state); such a check is implemented directly by the same read-repository class as the domain's own reads, without a separate client port
+- Parameters and return types use domain VOs/Aggregates on both ports;
+- The query port may also declare a cross-domain read-only precondition check (e.g. whether a referenced parent resource is in a publishable state);
 
 **Mapper Port** (`usecase/port/mapper/`):
-- Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping; implemented by a hand-written (non-generated) adapter class
+- Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping; implemented by a handwritten (non-generated) adapter class
 
 **Request DTOs** (`usecase/request/`):
 - Java records carrying Bean Validation annotations (e.g. `@NotBlank`) and Swagger `@Schema` documentation; deserialized directly from external input
@@ -101,11 +101,11 @@ comment/
 
 **Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
-- Enforces cross-aggregate preconditions before a write (e.g. referenced parent resource must be in a publishable state, an addressed record must not already exist) via injected repositories and ports
+- Enforces cross-aggregate preconditions before write (e.g. referenced parent resource must be in a publishable state, an addressed record must not already exist) via injected repositories and ports
 - For hierarchically-addressed records (a delimited path identifying position in a tree), validates structural placement consistency (that a claimed parent or preceding-sibling position already exists) before allowing an insert at a given path
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
-**Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port: constructs the Aggregate from VOs, and converts a read model to a response DTO (may resolve a stored file key to a full external URL)
+**Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
 
 ---
 
@@ -113,7 +113,7 @@ comment/
 
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
-- Extracts auth via `@AuthenticationPrincipal` (may be nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
+- Extracts auth via `@AuthenticationPrincipal` (may nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
 
@@ -123,12 +123,12 @@ comment/
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`; DSLContext directly for joined reads, aggregate counts, and paginated read models; conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present (e.g. to compute a per-viewer "liked" flag); may also implement a cross-domain read-only state check (e.g. whether a referenced parent resource is published) directly, in place of a separate client adapter
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`; DSLContext directly for joined reads, aggregate counts, and paginated read models; conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present; may also implement a cross-domain read-only state check
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:
 - Composite PK via `@IdClass` referencing a dedicated composite-key class in `compositekey/`
 - Foreign-key associations may be declared with `foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)` where no DB-level FK constraint is enforced
-- Exposes intent-named mutation methods (e.g. increment/decrement a counter floored at zero, mark as deleted, update a text field and its edited-timestamp) rather than public setters
+- Exposes intent-named mutation methods (e.g. increment/decrement a counter floored at zero, mark as deleted) rather than public setters
 - `@PrePersist` callback defaults nullable numeric/boolean columns before insert
 - Auditing: `@CreatedDate` / `@LastModifiedDate` timestamp columns
 - Manual static nested builder class alongside the Lombok-generated accessors
@@ -139,4 +139,4 @@ comment/
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
-**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers (raising a not-found/invalid-value error if absent), maps the Aggregate to an Entity via the JPA mapper, checks for a pre-existing row before insert, and delegates soft-delete/update operations to the entity's mutation methods before saving
+**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, checks for a pre-existing row before insert, and delegates soft-delete/update operations to the entity's mutation methods before saving
