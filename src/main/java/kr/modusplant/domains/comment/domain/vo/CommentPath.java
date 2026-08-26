@@ -1,37 +1,31 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
-import kr.modusplant.domains.comment.domain.exception.InvalidValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentPath {
-    private final String path;
+    private final String value;
 
-    public static CommentPath create(String path) {
-        CommentPath.validateSource(path);
-        return new CommentPath(path);
-    }
-
-    /**
-     * @param source 의 형식은 반드시 숫자와 점(.)의 연속물이어야 합니다.
-     */
-    public static void validateSource(String source) {
-        if (source == null || source.isBlank()) {
-            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH);
+    public static CommentPath create(String value) {
+        if (StringUtils.isBlank(value)) {
+            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path");
         }
-        if (!source.matches("^\\d+(\\.\\d+)*$")) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT);
+        if (!value.matches("^\\d+(\\.\\d+)*$")) {
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT, "path");
         }
-        if (source.charAt(0) == '0' || source.contains(".0")) {
-            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX);
+        if (value.charAt(0) == '0' || value.contains(".0")) { // value의 형식은 반드시 숫자와 점(.)의 연속물이어야 함
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX, "path");
         }
+        return new CommentPath(value);
     }
 
     @Override
@@ -41,13 +35,13 @@ public class CommentPath {
         if (!(o instanceof CommentPath commentPath)) return false;
 
         return new EqualsBuilder()
-                .append(getPath(), commentPath.getPath())
+                .append(getValue(), commentPath.getValue())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getPath()).toHashCode();
+                .append(getValue()).toHashCode();
     }
 }

@@ -13,7 +13,7 @@ public interface CommentResponseTestUtils extends
         NicknameTestUtils, CommentContentTestUtils {
 
     CommentResponse testCommentResponse = new CommentResponse(
-            testPostId.getId(), testCommentPath.getPath(), testNormalUserNickname.getValue(),
-            testCommentContent.getContent(), false, TEST_COMMENT_CREATED_AT.toString()
+            testPostId.getValue(), testCommentPath.getValue(), testNormalUserNickname.getValue(),
+            testCommentContent.getValue(), false, TEST_COMMENT_CREATED_AT.toString()
     );
 }

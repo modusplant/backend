@@ -3,28 +3,23 @@ package kr.modusplant.domains.comment.adapter.controller;
 import kr.modusplant.domains.comment.adapter.mapper.CommentMapperImpl;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.common.util.framework.outbound.persistence.jpa.compositekey.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
-import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jooq.CommentJooqRepository;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.framework.outbound.jooq.repository.CommentJooqRepository;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentRepositoryJpaAdapter;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
-import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -34,6 +29,7 @@ import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageImpl;
@@ -43,9 +39,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collections;
 import java.util.List;
 
-import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfAuthorPageModelTestUtils.testCommentOfAuthorPageModel;
+import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfAuthorPageModelTestUtils.testCommentOfAuthorReadModel;
 import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfPostReadModelTestUtils.testCommentOfPostReadModel;
-import static kr.modusplant.domains.comment.common.util.usecase.response.CommentPageResponseTestUtils.testCommentPageResponseOfAuthorPageModel;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,87 +52,16 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.times;
 
 public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
-        CommentResponseTestUtils, CommentCompositeKeyTestUtils {
+        CommentResponseTestUtils {
     private final CommentMapperImpl mapper = Mockito.mock(CommentMapperImpl.class);
     private final CommentJooqRepository readRepository = Mockito.mock(CommentJooqRepository.class);
     private final CommentRepositoryJpaAdapter writeRepository = Mockito.mock(CommentRepositoryJpaAdapter.class);
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final CommentPostRepository postValidator = Mockito.mock(CommentPostRepository.class);
-    private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
-            writeRepository, postJpaRepository, memberJpaRepository, swearService, postValidator, cacheService, applicationEventPublisher);
-
-    private final String testIfNoneMatch = "\"abc123\"";
-    private final String testIfModifiedSince = "Sat, 01 Jan 2025 00:00:00 GMT";
-
-    @Test
-    @DisplayName("postUlid 기반 캐시 데이터 조회 성공")
-    void testGetCacheDataByPost_givenValidPostUlid_willReturnCacheData() {
-        // given
-        CommentCacheData expected = Mockito.mock(CommentCacheData.class);
-        given(cacheService.getCacheData(
-                eq(testIfNoneMatch),
-                eq(testIfModifiedSince),
-                eq(PostId.create(TEST_POST_ULID))))
-                .willReturn(expected);
-
-        // when
-        CommentCacheData result =
-                controller.getCacheData(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince);
-
-        // then
-        assertThat(result).isEqualTo(expected);
-        then(cacheService).should(times(1))
-                .getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID));
-    }
-
-    @Test
-    @DisplayName("postUlid 기반 캐시 조회 시 cacheService 예외가 그대로 전파")
-    void testGetCacheDataByPost_whenCacheServiceThrows_willPropagateException() {
-        // given
-        given(cacheService.getCacheData(any(), any(), any(PostId.class)))
-                .willThrow(new RuntimeException("cache error"));
-
-        // when / then
-        assertThrows(RuntimeException.class,
-                () -> controller.getCacheData(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince));
-    }
-
-    @Test
-    @DisplayName("memberUuid 기반 캐시 데이터 조회 성공")
-    void testGetCacheDataByMember_givenValidMemberUuid_willReturnCacheData() {
-        // given
-        CommentCacheData expected = Mockito.mock(CommentCacheData.class);
-        given(cacheService.getCacheData(
-                eq(testIfNoneMatch),
-                eq(testIfModifiedSince),
-                eq(MemberId.fromUuid(MEMBER_BASIC_USER_UUID))))
-                .willReturn(expected);
-
-        // when
-        CommentCacheData result =
-                controller.getCacheData(MEMBER_BASIC_USER_UUID, testIfNoneMatch, testIfModifiedSince);
-
-        // then
-        assertThat(result).isEqualTo(expected);
-        then(cacheService).should(times(1))
-                .getCacheData(testIfNoneMatch, testIfModifiedSince, MemberId.fromUuid(MEMBER_BASIC_USER_UUID));
-    }
-
-    @Test
-    @DisplayName("memberUuid 기반 캐시 조회 시 cacheService 예외가 그대로 전파")
-    void testGetCacheDataByMember_whenCacheServiceThrows_willPropagateException() {
-        // given
-        given(cacheService.getCacheData(any(), any(), any(MemberId.class)))
-                .willThrow(new RuntimeException("cache error"));
-
-        // when / then
-        assertThrows(RuntimeException.class,
-                () -> controller.getCacheData(MEMBER_BASIC_USER_UUID, testIfNoneMatch, testIfModifiedSince));
-    }
+            writeRepository, postJpaRepository, memberJpaRepository, swearService, applicationEventPublisher);
 
     @Test
     @DisplayName("존재하지 않는 postUlid로 조회 시 NotFoundEntityException 발생")
@@ -164,7 +88,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(postJpaRepository.existsByUlid(TEST_POST_ULID)).willReturn(true);
         given(readRepository.findByPost(
                 eq(PostId.create(TEST_POST_ULID)),
-                eq(Author.createNullable(MEMBER_BASIC_USER_UUID))))
+                eq(Author.createWithNullableUuid(MEMBER_BASIC_USER_UUID))))
                 .willReturn(testPostReadModel);
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(mockResponse);
 
@@ -176,7 +100,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         assertThat(result).hasSize(1);
         assertThat(result.getFirst()).isEqualTo(mockResponse);
         then(readRepository).should(times(1))
-                .findByPost(PostId.create(TEST_POST_ULID), Author.createNullable(MEMBER_BASIC_USER_UUID));
+                .findByPost(PostId.create(TEST_POST_ULID), Author.createWithNullableUuid(MEMBER_BASIC_USER_UUID));
     }
 
     @Test
@@ -189,7 +113,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         given(postJpaRepository.existsByUlid(TEST_POST_ULID)).willReturn(true);
         given(readRepository.findByPost(
                 eq(PostId.create(TEST_POST_ULID)),
-                eq(Author.createNullable(null))))
+                eq(Author.createWithNullableUuid(null))))
                 .willReturn(testPostReadModel);
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(mockResponse);
 
@@ -233,73 +157,29 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         assertThat(ex.getEntityName()).isEqualTo("member");
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("유효한 memberUuid로 페이지 댓글 조회 성공 - 응답 필드 검증")
     void testGatherByAuthor_givenValidMemberUuid_willReturnMappedPageResponse() {
         // given
         Pageable pageable = PageRequest.of(0, 1);
-        List<CommentOfAuthorPageModel> content = List.of(testCommentOfAuthorPageModel);
-        PageImpl<CommentOfAuthorPageModel> page =
+        List<CommentOfAuthorReadModel> content = List.of(testCommentOfAuthorReadModel);
+        PageImpl<CommentOfAuthorReadModel> page =
                 new PageImpl<>(content, pageable, 1L);
+        CommentPageResponse<CommentOfAuthorReadModel> mockResponse = Mockito.mock(CommentPageResponse.class);
 
         given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
         given(readRepository.findByAuthor(Author.create(MEMBER_BASIC_USER_UUID), pageable))
                 .willReturn(page);
+        given(mapper.toCommentPageResponseWithOnePlusPage(page)).willReturn(mockResponse);
 
         // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
+        CommentPageResponse<CommentOfAuthorReadModel> response =
                 controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
 
         // then
-        assertThat(response.getCommentList()).isEqualTo(testCommentPageResponseOfAuthorPageModel.getCommentList());
-        assertThat(response.getPage()).isEqualTo(testCommentPageResponseOfAuthorPageModel.getPage());
-        assertThat(response.getSize()).isEqualTo(testCommentPageResponseOfAuthorPageModel.getSize());
-        assertThat(response.getTotalElements()).isEqualTo(testCommentPageResponseOfAuthorPageModel.getTotalElements());
-        assertThat(response.getTotalPages()).isEqualTo(testCommentPageResponseOfAuthorPageModel.getTotalPages());
-        assertThat(response.isHasNext()).isEqualTo(testCommentPageResponseOfAuthorPageModel.isHasNext());
-        assertThat(response.isHasPrevious()).isEqualTo(testCommentPageResponseOfAuthorPageModel.isHasPrevious());
-    }
-
-    @Test
-    @DisplayName("gatherByAuthor 반환 페이지 번호는 1-based index 적용됨")
-    void testGatherByAuthor_givenSecondPage_willApplyOneIndexedPageNumber() {
-        // given
-        Pageable pageable = PageRequest.of(1, 10); // 0-based page 1
-        PageImpl<CommentOfAuthorPageModel> page =
-                new PageImpl<>(Collections.emptyList(), pageable, 25L);
-
-        given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
-        given(readRepository.findByAuthor(Author.create(MEMBER_BASIC_USER_UUID), pageable))
-                .willReturn(page);
-
-        // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
-                controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
-
-        // then
-        // 0-based index 1 → 1-based index 2
-        assertThat(response.getPage()).isEqualTo(2);
-    }
-
-    @Test
-    @DisplayName("gatherByAuthor - 결과가 없는 페이지 조회 시 빈 컨텐츠 반환")
-    void testGatherByAuthor_givenPageWithNoResults_willReturnEmptyContent() {
-        // given
-        Pageable pageable = PageRequest.of(0, 10);
-        PageImpl<CommentOfAuthorPageModel> emptyPage =
-                new PageImpl<>(Collections.emptyList(), pageable, 0L);
-
-        given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
-        given(readRepository.findByAuthor(Author.create(MEMBER_BASIC_USER_UUID), pageable))
-                .willReturn(emptyPage);
-
-        // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
-                controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
-
-        // then
-        assertThat(response.getCommentList()).isEmpty();
-        assertThat(response.getTotalElements()).isZero();
+        assertThat(response).isEqualTo(mockResponse);
+        then(mapper).should(times(1)).toCommentPageResponseWithOnePlusPage(page);
     }
 
     @Test
@@ -324,7 +204,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(false);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -340,7 +220,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(1);
 
         // when
@@ -357,19 +237,22 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         String content = "hello";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", content);
-        Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(writeRepository).should(times(1)).save(mockComment);
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        then(writeRepository).should(times(1)).save(captor.capture());
+        assertThat(captor.getValue().getPostId()).isEqualTo(PostId.create(TEST_POST_ULID));
+        assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("1"));
+        assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(content));
+        then(applicationEventPublisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
     }
 
     @Test
@@ -379,7 +262,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "3", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // sibling path "2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(false);
@@ -398,21 +281,19 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given: path "3" requires path "2" to exist
         String content = "hello";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "3", content);
-        Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(writeRepository).should(times(1)).save(mockComment);
+        then(writeRepository).should(times(1)).save(any(Comment.class));
     }
 
     @Test
@@ -422,7 +303,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2.1", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // parent "1.2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(false);
@@ -441,21 +322,19 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given: path "1.2.1" requires parent "1.2" to exist
         String content = "reply";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2.1", content);
-        Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(writeRepository).should(times(1)).save(mockComment);
+        then(writeRepository).should(times(1)).save(any(Comment.class));
     }
 
     @Test
@@ -465,7 +344,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.5.3", "content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // sibling "1.5.2" does not exist
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(false);
@@ -484,21 +363,19 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given: path "1.5.3" requires sibling "1.5.2" to exist
         String content = "nested reply";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.5.3", content);
-        Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
-        given(mapper.toComment(any(), any(), any(), any())).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(writeRepository).should(times(1)).save(mockComment);
+        then(writeRepository).should(times(1)).save(any(Comment.class));
     }
 
     @Test
@@ -508,22 +385,20 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String rawContent = "욕설 포함 내용";
         String filteredContent = "*** 포함 내용";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", rawContent);
-        Comment mockComment = Mockito.mock(Comment.class);
 
         given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
-        given(postValidator.isPostPublished(TEST_POST_ULID)).willReturn(true);
+        given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(rawContent)).willReturn(filteredContent);
-        given(mapper.toComment(any(), any(), any(),
-                eq(CommentContent.create(filteredContent)))).willReturn(mockComment);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
         then(swearService).should(times(1)).filterSwear(rawContent);
-        then(mapper).should(times(1))
-                .toComment(any(), any(), any(), eq(CommentContent.create(filteredContent)));
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        then(writeRepository).should(times(1)).save(captor.capture());
+        assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(filteredContent));
     }
 
     @Test
@@ -549,10 +424,6 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         // given
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1", updatedContent);
-        CommentCompositeKey expectedId = CommentCompositeKey.builder()
-                .post(TEST_POST_ULID)
-                .path("1")
-                .build();
 
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
                 .willReturn(true);
@@ -562,7 +433,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // then
         then(writeRepository).should(times(1))
-                .update(eq(expectedId), eq(CommentContent.create(updatedContent)));
+                .update(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")), eq(CommentContent.create(updatedContent)));
     }
 
     @Test
@@ -570,16 +441,13 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testDelete_givenValidRequest_willCallSetCommentAsDeleted() {
         // given
         String commentPath = "1.2";
-        CommentCompositeKey expectedId = CommentCompositeKey.builder()
-                .post(TEST_POST_ULID)
-                .path(commentPath)
-                .build();
 
         // when
         controller.delete(TEST_POST_ULID, commentPath);
 
         // then
-        then(writeRepository).should(times(1)).setCommentAsDeleted(eq(expectedId));
+        then(writeRepository).should(times(1))
+                .setCommentAsDeleted(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
     }
 
     @Test
@@ -589,7 +457,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         controller.delete(TEST_POST_ULID, "1");
 
         // then
-        then(writeRepository).should(times(1)).setCommentAsDeleted(any());
+        then(writeRepository).should(times(1)).setCommentAsDeleted(any(), any());
         then(readRepository).shouldHaveNoInteractions();
         then(postJpaRepository).shouldHaveNoInteractions();
         then(memberJpaRepository).shouldHaveNoInteractions();

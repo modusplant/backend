@@ -32,9 +32,7 @@ public enum CommentErrorCode implements ErrorCode {
     EXIST_POST_COMMENT(HttpStatus.CONFLICT.value(), "exist_post_comment", "게시글에 하나 이상의 댓글이 존재합니다"),
 
     NOT_PUBLISHED_POST(HttpStatus.CONFLICT.value(), "not_published_post","게시글이 출간된 상태가 아닙니다"),
-
     ;
-
 
     private final int httpStatus;
     private final String code;

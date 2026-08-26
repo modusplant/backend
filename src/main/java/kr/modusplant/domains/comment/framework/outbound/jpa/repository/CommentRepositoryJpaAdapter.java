@@ -1,0 +1,74 @@
+package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
+
+import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
+import kr.modusplant.domains.comment.domain.vo.CommentContent;
+import kr.modusplant.domains.comment.domain.vo.CommentPath;
+import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.persistence.constant.TableName;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+@RequiredArgsConstructor
+public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
+    private final MemberJpaRepository memberRepository;
+    private final PostJpaRepository postRepository;
+    private final CommentJpaRepository commentRepository;
+    private final CommentJpaMapper mapper;
+
+    @Override
+    public void save(Comment comment) {
+        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getUuid())
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
+        PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getValue())
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
+        CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
+        if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getValue(), comment.getPath().getValue()))) {
+            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
+        }
+        commentRepository.save(commentEntity);
+    }
+
+    @Override
+    public void update(PostId postId, CommentPath path, CommentContent content) {
+        CommentCompositeKey id = CommentCompositeKey.builder()
+                .post(postId.getValue())
+                .path(path.getValue())
+                .build();
+        CommentEntity comment = commentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT));
+        comment.updateContent(content.getValue());
+        comment.updateEditedAt();
+        
+        commentRepository.save(comment);
+    }
+
+    @Override
+    public void setCommentAsDeleted(PostId postId, CommentPath path) {
+        CommentCompositeKey id = CommentCompositeKey.builder()
+                .post(postId.getValue())
+                .path(path.getValue())
+                .build();
+        Optional<CommentEntity> comment = commentRepository.findById(id);
+        if (comment.isPresent()) {
+            CommentEntity actualComment = comment.get();
+            actualComment.markAsDeleted();
+            commentRepository.save(actualComment);
+        }
+    }
+
+}

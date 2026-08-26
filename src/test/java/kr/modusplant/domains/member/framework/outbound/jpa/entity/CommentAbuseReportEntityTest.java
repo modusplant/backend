@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.CommentAbuseReportEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;

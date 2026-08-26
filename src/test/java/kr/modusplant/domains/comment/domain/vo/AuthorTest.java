@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.domain.vo;
 
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.domain.exception.EmptyValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class AuthorTest implements AuthorTestUtils {
     @DisplayName("null인 작성자의 닉네임으로 작성자 생성")
     public void testCreate_givenInvalidNickname_willThrowEmptyValueException() {
         // given
-        EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getMemberUuid(), null));
+        EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getUuid(), null));
 
         // when & then
         assertEquals(CommentErrorCode.EMPTY_MEMBER_NICKNAME, result.getErrorCode());

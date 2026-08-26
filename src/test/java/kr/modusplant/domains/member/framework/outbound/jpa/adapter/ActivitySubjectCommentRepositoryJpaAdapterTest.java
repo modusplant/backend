@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
+import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
