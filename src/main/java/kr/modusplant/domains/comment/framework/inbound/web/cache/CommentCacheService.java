@@ -53,7 +53,7 @@ public class CommentCacheService {
             @Nullable String ifModifiedSince,
             @Nonnull PostId postUlid
     ) {
-        PostEntity postEntity = postJpaRepository.findByUlid(postUlid.getId())
+        PostEntity postEntity = postJpaRepository.findByUlid(postUlid.getValue())
                 .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
 
         // 댓글의 최신 변경 시각 조회

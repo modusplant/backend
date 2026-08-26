@@ -40,8 +40,8 @@ public class CommentJooqRepository implements CommentReadRepository {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getId()))
-                        .and(commComment.PATH.eq(path.getPath()))
+                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .and(commComment.PATH.eq(path.getValue()))
         );
     }
 
@@ -49,7 +49,7 @@ public class CommentJooqRepository implements CommentReadRepository {
     public int countPostComment(PostId postId) {
         return dsl.selectCount()
                 .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getId()))
+                .where(commComment.POST_ULID.eq(postId.getValue()))
                 .fetchOptional()
                 .map(Record1::value1)
                 .orElse(0);
@@ -60,7 +60,7 @@ public class CommentJooqRepository implements CommentReadRepository {
         return Optional.ofNullable(
                 dsl.select(DSL.max(commComment.UPDATED_AT))
                         .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getId()))
+                        .where(commComment.POST_ULID.eq(postId.getValue()))
                         .fetchOne(DSL.max(commComment.UPDATED_AT))
         );
     }
@@ -71,7 +71,7 @@ public class CommentJooqRepository implements CommentReadRepository {
         Condition likeJoinCondition = nullableAuthor != null
                 ? commComment.POST_ULID.eq(commentLike.POST_ULID)
                 .and(commComment.PATH.eq(commentLike.PATH))
-                .and(commentLike.MEMB_UUID.eq(nullableAuthor.getMemberUuid()))
+                .and(commentLike.MEMB_UUID.eq(nullableAuthor.getUuid()))
                 : DSL.falseCondition();
 
         return dsl.select(
@@ -88,7 +88,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(likeJoinCondition)
-                .where(commComment.POST_ULID.eq(postId.getId()))
+                .where(commComment.POST_ULID.eq(postId.getValue()))
                 .orderBy(commComment.CREATED_AT.desc())
                 .fetch(record -> new CommentOfPostReadModel(
                         record.getValue(memberProf.IMAGE_PATH),
@@ -110,7 +110,7 @@ public class CommentJooqRepository implements CommentReadRepository {
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
+                .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
                 .fetchOptional();
 
         if(totalComments.isPresent()) {
@@ -132,7 +132,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                     .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
-                    .where(commComment.AUTH_MEMB_UUID.eq(author.getMemberUuid()))
+                    .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
                         .and(commComment.IS_DELETED.eq(false))
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)

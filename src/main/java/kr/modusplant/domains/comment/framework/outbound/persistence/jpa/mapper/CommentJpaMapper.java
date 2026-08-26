@@ -24,10 +24,10 @@ public interface CommentJpaMapper {
 
     @Named("mapIsDeleted")
     default boolean mapIsDeleted(CommentStatus status) {
-        CommentStatusType type = status.getStatus();
+        CommentStatusType type = status.getValue();
 
         return switch (type) {
-            case CommentStatusType.VALID -> false;
+            case CommentStatusType.ACTIVE -> false;
             case CommentStatusType.DELETED -> true;
         };
     }

@@ -9,6 +9,6 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 public interface CommentRegisterRequestTestUtils extends PostIdTestUtils, CommentPathTestUtils,
         MemberTestUtils, CommentContentTestUtils {
     CommentRegisterRequest testCommentRegisterRequest = new CommentRegisterRequest(
-            testPostId.getId(), testCommentPath.getPath(), testCommentContent.getContent()
+            testPostId.getValue(), testCommentPath.getValue(), testCommentContent.getValue()
     );
 }

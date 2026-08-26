@@ -1,35 +1,33 @@
 package kr.modusplant.domains.comment.domain.vo;
 
+import kr.modusplant.domains.comment.domain.enums.CommentStatusType;
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.enums.CommentStatusType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @AllArgsConstructor
 public class CommentStatus {
-    private final CommentStatusType status;
+    private final CommentStatusType value;
 
-    public static CommentStatus create(String status) {
-        CommentStatus.validateSource(status);
-        return new CommentStatus(CommentStatusType.valueOf(status));
-    }
-
-    public static void validateSource(String source) {
-        if(source.isBlank()) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status"); }
-
-        if(!CommentStatusType.isValidStatus(source)) {
+    public static CommentStatus create(String value) {
+        if (StringUtils.isBlank(value)) {
+            throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status");
+        }
+        if (!CommentStatusType.contains(value)) {
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS, "status");
         }
+        return new CommentStatus(CommentStatusType.valueOf(value));
     }
 
-    public static CommentStatus setAsValid() { return new CommentStatus(CommentStatusType.VALID); }
+    public static CommentStatus active() { return new CommentStatus(CommentStatusType.ACTIVE); }
 
-    public static CommentStatus setAsDeleted() { return new CommentStatus(CommentStatusType.DELETED); }
+    public static CommentStatus deleted() { return new CommentStatus(CommentStatusType.DELETED); }
 
     @Override
     public boolean equals(Object o) {
@@ -38,13 +36,13 @@ public class CommentStatus {
         if (!(o instanceof CommentStatus commentStatus)) return false;
 
         return new EqualsBuilder()
-                .append(getStatus(), commentStatus.getStatus())
+                .append(getValue(), commentStatus.getValue())
                 .isEquals();
     }
 
     @Override
     public int hashCode() {
         return new HashCodeBuilder(17, 37)
-                .append(getStatus()).toHashCode();
+                .append(getValue()).toHashCode();
     }
 }
