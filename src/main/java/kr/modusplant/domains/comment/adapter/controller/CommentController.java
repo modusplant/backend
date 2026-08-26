@@ -7,8 +7,6 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
-import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
@@ -18,7 +16,6 @@ import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
@@ -48,18 +45,7 @@ public class CommentController {
     private final PostJpaRepository postJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
     private final SwearService swearService;
-    private final CommentCacheService cacheService;
     private final ApplicationEventPublisher applicationEventPublisher;
-
-    @Transactional(readOnly = true)
-    public CommentCacheData getCacheData(String postUlid, String ifNoneMatch, String ifModifiedSince) {
-        return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
-    }
-
-    @Transactional(readOnly = true)
-    public CommentCacheData getCacheData(UUID memberUuid, String ifNoneMatch, String ifModifiedSince) {
-        return cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
-    }
 
     @Transactional(readOnly = true)
     public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID currentMemberUuid) {

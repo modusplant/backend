@@ -9,12 +9,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
+import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +48,7 @@ import java.util.UUID;
 public class CommentRestController {
 
     private final CommentController controller;
+    private final CommentCacheService cacheService;
 
     /**
      * 소통 상세 페이지에 띄워지는 댓글에 대한 API입니다.
@@ -76,7 +80,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = controller.getCacheData(postUlid, ifNoneMatch, ifModifiedSince);
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -130,7 +134,7 @@ public class CommentRestController {
             @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
             String ifModifiedSince
     ) {
-        CommentCacheData cacheData = controller.getCacheData(memberUuid, ifNoneMatch, ifModifiedSince);
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
