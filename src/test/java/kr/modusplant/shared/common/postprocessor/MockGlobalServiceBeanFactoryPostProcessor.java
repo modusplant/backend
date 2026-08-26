@@ -29,7 +29,7 @@ public class MockGlobalServiceBeanFactoryPostProcessor implements BeanFactoryPos
         scanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
         ClassLoader classLoader = this.getClass().getClassLoader();
 
-        for (String reference: List.of("kr.modusplant.framework", "kr.modusplant.infrastructure")) {
+        for (String reference: List.of("kr.modusplant.domains", "kr.modusplant.infrastructure")) {
             for (BeanDefinition serviceDef : scanner.findCandidateComponents(reference)) {
                 Class<?> clazz;
                 try {
