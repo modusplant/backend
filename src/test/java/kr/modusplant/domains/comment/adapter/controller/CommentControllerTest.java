@@ -63,10 +63,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final SwearService swearService = Mockito.mock(SwearService.class);
-    private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, readRepository,
-            writeRepository, postJpaRepository, memberJpaRepository, swearService, cacheService, applicationEventPublisher);
+            writeRepository, postJpaRepository, memberJpaRepository, swearService, applicationEventPublisher);
 
     private final String testIfNoneMatch = "\"abc123\"";
     private final String testIfModifiedSince = "Sat, 01 Jan 2025 00:00:00 GMT";
@@ -84,7 +83,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // when
         CommentCacheData result =
-                controller.getCacheData(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince);
+                controller.cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(PostConstant.TEST_POST_ULID));
 
         // then
         assertThat(result).isEqualTo(expected);
@@ -101,7 +100,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // when / then
         assertThrows(RuntimeException.class,
-                () -> controller.getCacheData(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince));
+                () -> controller.cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(PostConstant.TEST_POST_ULID)));
     }
 
     @Test
@@ -117,7 +116,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // when
         CommentCacheData result =
-                controller.getCacheData(MEMBER_BASIC_USER_UUID, testIfNoneMatch, testIfModifiedSince);
+                controller.cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, MemberId.fromUuid(MemberConstant.MEMBER_BASIC_USER_UUID));
 
         // then
         assertThat(result).isEqualTo(expected);
@@ -134,7 +133,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // when / then
         assertThrows(RuntimeException.class,
-                () -> controller.getCacheData(MEMBER_BASIC_USER_UUID, testIfNoneMatch, testIfModifiedSince));
+                () -> controller.cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, MemberId.fromUuid(MemberConstant.MEMBER_BASIC_USER_UUID)));
     }
 
     @Test
