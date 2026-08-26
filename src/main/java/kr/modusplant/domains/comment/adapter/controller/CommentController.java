@@ -11,7 +11,7 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
-import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentWriteRepository;
@@ -77,13 +77,13 @@ public class CommentController {
     }
 
     @Transactional(readOnly = true)
-    public CommentPageResponse<CommentOfAuthorPageModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
+    public CommentPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
         if(!memberJpaRepository.existsById(memberUuid)) {
             throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
         }
-        PageImpl<CommentOfAuthorPageModel> result = readRepository.findByAuthor(Author.create(memberUuid), pageable);
+        PageImpl<CommentOfAuthorReadModel> result = readRepository.findByAuthor(Author.create(memberUuid), pageable);
 
-        CommentPageResponse<CommentOfAuthorPageModel> response =
+        CommentPageResponse<CommentOfAuthorReadModel> response =
                 new CommentPageResponse<>(result.getContent(), result.getNumber(),
                 result.getSize(), result.getTotalElements(), result.getTotalPages(),
                 result.hasNext(), result.hasPrevious());

@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.framework.outbound.persistence.jooq;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentReadRepository;
 import kr.modusplant.jooq.tables.*;
@@ -105,7 +105,7 @@ public class CommentJooqRepository implements CommentReadRepository {
 
     }
 
-    public PageImpl<CommentOfAuthorPageModel> findByAuthor(Author author, Pageable pageable) {
+    public PageImpl<CommentOfAuthorReadModel> findByAuthor(Author author, Pageable pageable) {
 
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
@@ -124,7 +124,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                             .and(commComment.IS_DELETED.eq(false)))
                     .asField();
 
-            List<CommentOfAuthorPageModel> commentList = dsl.select(commComment.CONTENT,
+            List<CommentOfAuthorReadModel> commentList = dsl.select(commComment.CONTENT,
                             commComment.CREATED_AT, commPost.TITLE, commPost.ULID,
                             isLiked, totalCommentsOfPost)
                     .from(commComment)
@@ -139,7 +139,7 @@ public class CommentJooqRepository implements CommentReadRepository {
                     .orderBy(commComment.CREATED_AT.desc())
                     .limit(pageable.getPageSize())
                     .offset(pageable.getOffset())
-                    .fetch(record -> new CommentOfAuthorPageModel(
+                    .fetch(record -> new CommentOfAuthorReadModel(
                             record.getValue(commComment.CONTENT), record.getValue(commComment.CREATED_AT).withNano(0),
                             record.getValue(commPost.TITLE), record.getValue(commPost.ULID),
                             record.getValue(isLiked), record.getValue(totalCommentsOfPost)

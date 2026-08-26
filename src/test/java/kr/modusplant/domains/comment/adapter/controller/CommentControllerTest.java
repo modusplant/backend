@@ -16,7 +16,7 @@ import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCa
 import kr.modusplant.domains.comment.framework.outbound.persistence.jooq.CommentJooqRepository;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.outbound.persistence.jpa.repository.CommentRepositoryJpaAdapter;
-import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorPageModel;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.client.CommentPostRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
@@ -43,7 +43,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.Collections;
 import java.util.List;
 
-import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfAuthorPageModelTestUtils.testCommentOfAuthorPageModel;
+import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfAuthorPageModelTestUtils.testCommentOfAuthorReadModel;
 import static kr.modusplant.domains.comment.common.util.usecase.model.CommentOfPostReadModelTestUtils.testCommentOfPostReadModel;
 import static kr.modusplant.domains.comment.common.util.usecase.response.CommentPageResponseTestUtils.testCommentPageResponseOfAuthorPageModel;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
@@ -238,8 +238,8 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testGatherByAuthor_givenValidMemberUuid_willReturnMappedPageResponse() {
         // given
         Pageable pageable = PageRequest.of(0, 1);
-        List<CommentOfAuthorPageModel> content = List.of(testCommentOfAuthorPageModel);
-        PageImpl<CommentOfAuthorPageModel> page =
+        List<CommentOfAuthorReadModel> content = List.of(testCommentOfAuthorReadModel);
+        PageImpl<CommentOfAuthorReadModel> page =
                 new PageImpl<>(content, pageable, 1L);
 
         given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
@@ -247,7 +247,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 .willReturn(page);
 
         // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
+        CommentPageResponse<CommentOfAuthorReadModel> response =
                 controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
 
         // then
@@ -265,7 +265,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testGatherByAuthor_givenSecondPage_willApplyOneIndexedPageNumber() {
         // given
         Pageable pageable = PageRequest.of(1, 10); // 0-based page 1
-        PageImpl<CommentOfAuthorPageModel> page =
+        PageImpl<CommentOfAuthorReadModel> page =
                 new PageImpl<>(Collections.emptyList(), pageable, 25L);
 
         given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
@@ -273,7 +273,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 .willReturn(page);
 
         // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
+        CommentPageResponse<CommentOfAuthorReadModel> response =
                 controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
 
         // then
@@ -286,7 +286,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testGatherByAuthor_givenPageWithNoResults_willReturnEmptyContent() {
         // given
         Pageable pageable = PageRequest.of(0, 10);
-        PageImpl<CommentOfAuthorPageModel> emptyPage =
+        PageImpl<CommentOfAuthorReadModel> emptyPage =
                 new PageImpl<>(Collections.emptyList(), pageable, 0L);
 
         given(memberJpaRepository.existsById(MEMBER_BASIC_USER_UUID)).willReturn(true);
@@ -294,7 +294,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 .willReturn(emptyPage);
 
         // when
-        CommentPageResponse<CommentOfAuthorPageModel> response =
+        CommentPageResponse<CommentOfAuthorReadModel> response =
                 controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, pageable);
 
         // then
