@@ -4,11 +4,13 @@ import kr.modusplant.shared.framework.redis.RedisHelper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Answers;
 import org.mockito.Mockito;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientException;
+import org.springframework.test.util.ReflectionTestUtils;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
+import software.amazon.awssdk.services.s3.model.HeadBucketResponse;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.time.Duration;
 
@@ -18,8 +20,12 @@ import static org.mockito.Mockito.*;
 
 public class MonitorServiceTest {
     RedisHelper redisHelper = Mockito.mock(RedisHelper.class);
-    RestClient.Builder restClientBuilder = Mockito.mock(RestClient.Builder.class, Answers.RETURNS_DEEP_STUBS);
-    MonitorService monitorService = new MonitorService(redisHelper, restClientBuilder);
+    S3Client s3Client = Mockito.mock(S3Client.class);
+    MonitorService monitorService = new MonitorService(redisHelper, s3Client);
+
+    {
+        ReflectionTestUtils.setField(monitorService, "bucket", "test-bucket");
+    }
 
     @Nested
     @DisplayName("performBusinessLogic 테스트")
@@ -81,16 +87,11 @@ public class MonitorServiceTest {
     class MonitorAmazonS3Test {
 
         @Test
-        @DisplayName("200 OK 응답 시 성공 메시지 반환")
-        void testMonitorAmazonS3_given200Response_willReturnSuccessMessage() {
+        @DisplayName("정상 응답 시 성공 메시지 반환")
+        void testMonitorAmazonS3_givenNormalResponse_willReturnSuccessMessage() {
             // given
-            when(restClientBuilder.build()
-                    .get()
-                    .uri(anyString())
-                    .retrieve()
-                    .onStatus(any(), any())
-                    .toBodilessEntity())
-                    .thenReturn(ResponseEntity.ok().build());
+            when(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .thenReturn(HeadBucketResponse.builder().build());
 
             // when
             String result = monitorService.monitorAmazonS3();
@@ -100,54 +101,24 @@ public class MonitorServiceTest {
         }
 
         @Test
-        @DisplayName("4xx 응답 시 상태 코드와 함께 예외 발생")
-        void testMonitorAmazonS3_given4xxResponse_willThrowExceptionWithStatusCode() {
+        @DisplayName("S3Exception 발생 시 예외 발생")
+        void testMonitorAmazonS3_givenS3Exception_willThrowException() {
             // given
-            when(restClientBuilder.build()
-                    .get()
-                    .uri(anyString())
-                    .retrieve()
-                    .onStatus(any(), any())
-                    .toBodilessEntity())
-                    .thenReturn(ResponseEntity.status(404).build());
+            when(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .thenThrow(S3Exception.builder().message("Not Found").statusCode(404).build());
 
             // when + then
             assertThatThrownBy(() -> monitorService.monitorAmazonS3())
                     .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("The request had problem!")
-                    .hasMessageContaining("404");
-        }
-
-        @Test
-        @DisplayName("5xx 응답 시 상태 코드와 함께 예외 발생")
-        void testMonitorAmazonS3_given5xxResponse_willThrowExceptionWithStatusCode() {
-            // given
-            when(restClientBuilder.build()
-                    .get()
-                    .uri(anyString())
-                    .retrieve()
-                    .onStatus(any(), any())
-                    .toBodilessEntity())
-                    .thenReturn(ResponseEntity.status(503).build());
-
-            // when + then
-            assertThatThrownBy(() -> monitorService.monitorAmazonS3())
-                    .isInstanceOf(RuntimeException.class)
-                    .hasMessageContaining("Amazon S3 had problem!")
-                    .hasMessageContaining("503");
+                    .hasMessageContaining("Wasabi health check failed!");
         }
 
         @Test
         @DisplayName("요청 중 예외 발생 시 예외 발생")
         void testMonitorAmazonS3_givenRequestFailure_willThrowException() {
             // given
-            when(restClientBuilder.build()
-                    .get()
-                    .uri(anyString())
-                    .retrieve()
-                    .onStatus(any(), any())
-                    .toBodilessEntity())
-                    .thenThrow(new RestClientException("Connection refused"));
+            when(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .thenThrow(SdkClientException.create("Connection refused"));
 
             // when + then
             assertThatThrownBy(() -> monitorService.monitorAmazonS3())
