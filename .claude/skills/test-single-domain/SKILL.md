@@ -13,9 +13,8 @@ disallowed-tools: Write(/src/main/**) Edit(/src/main/**)
 
 # Loading the Domain Profile
 
-Locate the section matching $DOMAIN_NAME in @.claude/documents/test-domain-profiles.md 
-and use its fields everywhere those terms are referenced below. 
-If no section exists yet for $DOMAIN_NAME, check if @.claude/rules/domain-$DOMAIN_NAME-details.md file is present.
+Read @.claude/documents/test-domain-profiles-$DOMAIN_NAME.md and use its fields everywhere those terms are referenced below.
+If that file does not exist, check if @.claude/rules/domain-$DOMAIN_NAME-details.md file is present.
 If the file exists, derive these facts yourself from @.claude/rules/domain-$DOMAIN_NAME-details.md 
 and the domain's actual @src/main / @src/test package layout, applying the same classification rules, then proceed.
 If the file doesn't exist, instantly terminate the skill and guide the user to create Rule file first.
