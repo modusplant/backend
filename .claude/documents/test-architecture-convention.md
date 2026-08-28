@@ -63,9 +63,10 @@ needed for testing, find or create its utility at:
 ## Categorized Strategy
 
 The Group A / Group B split below is a **classification rule**, not a path list — apply it to
-whatever subpackages a given domain actually has. Each domain's profile in
-`test-domain-profiles.md` records the resulting concrete path list once, so it doesn't need to be
-re-derived on every run; a package's role does not change without a matching source refactor.
+whatever subpackages a given domain actually has. Each domain's own
+`test-domain-profiles-[domain].md` file records the resulting concrete path list once, so it
+doesn't need to be re-derived on every run; a package's role does not change without a matching
+source refactor.
 
 ### Group A: Immutable/Data Objects (Fields)
 - **Applies to:** value objects, domain events, read models, records (request/response/model/
