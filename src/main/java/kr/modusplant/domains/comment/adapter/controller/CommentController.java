@@ -83,12 +83,12 @@ public class CommentController {
         );
     }
 
-    public void update(CommentUpdateRequest request) {
+    public void updateContent(CommentUpdateRequest request) {
         if (!queryRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
 
-        commandRepository.update(
+        commandRepository.updateContent(
                 PostId.create(request.postId()),
                 CommentPath.create(request.path()),
                 CommentContent.create(request.content()));

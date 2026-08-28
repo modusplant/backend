@@ -403,7 +403,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
     @Test
     @DisplayName("존재하지 않는 댓글 경로로 수정 시 NotFoundEntityException 발생")
-    void testUpdate_givenNonExistentComment_willThrowNotFoundEntityException() {
+    void testUpdateContent_givenNonExistentComment_willThrowNotFoundEntityException() {
         // given
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1", "updated content");
         given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
@@ -411,7 +411,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
-                () -> controller.update(request));
+                () -> controller.updateContent(request));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
@@ -420,7 +420,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
 
     @Test
     @DisplayName("유효한 요청으로 댓글 수정 시 writeRepository.update 호출됨")
-    void testUpdate_givenValidRequest_willCallRepositoryUpdate() {
+    void testUpdateContent_givenValidRequest_willCallRepositoryUpdate() {
         // given
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1", updatedContent);
@@ -429,11 +429,11 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
                 .willReturn(true);
 
         // when
-        controller.update(request);
+        controller.updateContent(request);
 
         // then
         then(writeRepository).should(times(1))
-                .update(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")), eq(CommentContent.create(updatedContent)));
+                .updateContent(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")), eq(CommentContent.create(updatedContent)));
     }
 
     @Test
