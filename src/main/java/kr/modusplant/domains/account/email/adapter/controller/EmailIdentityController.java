@@ -74,7 +74,7 @@ public class EmailIdentityController {
 
         UUID uuid = UUID.randomUUID();
         String stringUuid = String.valueOf(uuid);
-        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
+        String redisKey = RedisKeys.generateRedisKeyWithLowerCase(RESET_PASSWORD_PREFIX, stringUuid);
         redisHelper.setString(redisKey, email, Duration.ofMinutes(5));
 
         apiGateway.execute(email, stringUuid, EmailType.RESET_PASSWORD_EMAIL);
@@ -87,7 +87,7 @@ public class EmailIdentityController {
      */
     public String verifyResetPasswordEmail(UUID uuid) {
         String stringUuid = String.valueOf(uuid);
-        String redisKey = RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, stringUuid);
+        String redisKey = RedisKeys.generateRedisKeyWithLowerCase(RESET_PASSWORD_PREFIX, stringUuid);
         String storedEmail = redisHelper.getString(redisKey)
                 .orElseThrow(() -> new InvalidValueException(EmailIdentityErrorCode.INVALID_EMAIL_VERIFY_LINK));
         return tokenHelper.generateResetPasswordAccessToken(storedEmail, stringUuid, RESET_PASSWORD_INPUT);
@@ -99,6 +99,6 @@ public class EmailIdentityController {
         String uuid = tokenHelper.getClaims(accessToken).get("uuid", String.class);
         String password = request.password();
         repository.updatePassword(Email.create(email), Password.create(password));
-        redisHelper.delete(RedisKeys.generateRedisKey(RESET_PASSWORD_PREFIX, uuid));
+        redisHelper.delete(RedisKeys.generateRedisKeyWithLowerCase(RESET_PASSWORD_PREFIX, uuid));
     }
 }

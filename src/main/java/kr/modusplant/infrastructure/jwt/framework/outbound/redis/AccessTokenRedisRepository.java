@@ -6,13 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 
+import static kr.modusplant.shared.framework.redis.RedisKeys.BLACKLIST_ACCESS_TOKEN_PREFIX;
+import static kr.modusplant.shared.framework.redis.RedisKeys.generateRedisKeyWithEqualCase;
 import static kr.modusplant.shared.util.EncryptUtils.encryptWithSha256;
 
 @Repository
 @RequiredArgsConstructor
 public class AccessTokenRedisRepository {
     private final RedisHelper redisHelper;
-    private static final String KEY_FORMAT = "blacklist:access_token:%s";
 
     public void addToBlacklist(String token, Long ttlSeconds) {
         redisHelper.setString(generateKey(token), token, Duration.ofSeconds(ttlSeconds));
@@ -27,7 +28,6 @@ public class AccessTokenRedisRepository {
     }
 
     private String generateKey(String token) {
-        return KEY_FORMAT.formatted(encryptWithSha256(token));
+        return generateRedisKeyWithEqualCase(BLACKLIST_ACCESS_TOKEN_PREFIX, encryptWithSha256(token));
     }
-
 }
