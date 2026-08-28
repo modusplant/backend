@@ -101,6 +101,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	// Spring Retry (Version managed by Spring Boot BOM)
+	implementation 'org.springframework.retry:spring-retry'
+
 	// Spring Security (Version managed by Spring Boot BOM)
 	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
