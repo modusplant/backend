@@ -9,7 +9,7 @@ public interface CommentCommandRepository {
 
     void save(Comment comment);
 
-    void update(PostId postId, CommentPath path, CommentContent content);
+    void updateContent(PostId postId, CommentPath path, CommentContent content);
 
     void setCommentAsDeleted(PostId postId, CommentPath path);
 }

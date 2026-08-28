@@ -44,7 +44,7 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     }
 
     @Override
-    public void update(PostId postId, CommentPath path, CommentContent content) {
+    public void updateContent(PostId postId, CommentPath path, CommentContent content) {
         CommentCompositeKey id = CommentCompositeKey.builder()
                 .post(postId.getValue())
                 .path(path.getValue())
