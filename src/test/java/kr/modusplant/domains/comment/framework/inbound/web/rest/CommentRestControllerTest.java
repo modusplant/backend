@@ -2,6 +2,7 @@ package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.request.CommentDeleteRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
@@ -39,7 +40,8 @@ import static org.mockito.Mockito.times;
 
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
-        CommentUpdateRequestTestUtils, MemberIdTestUtils, CommentPageResponseTestUtils {
+        CommentUpdateRequestTestUtils, CommentDeleteRequestTestUtils, MemberIdTestUtils,
+        CommentPageResponseTestUtils {
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final CommentRestController restController = new CommentRestController(controller, cacheService);
@@ -174,26 +176,29 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     @DisplayName("유효한 댓글 갱신 요청 객체로 댓글 갱신하기")
     public void testUpdateContent_givenValidCommentUpdateRequest_willReturnResponseEntity() {
         // given
-        doNothing().when(controller).updateContent(testCommentUpdateRequest);
+        DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
+        doNothing().when(controller).updateContent(testCommentUpdateRequest, MEMBER_BASIC_USER_UUID);
 
         // when
-        ResponseEntity<DataResponse<Void>> result = restController.updateContent(testCommentUpdateRequest);
+        ResponseEntity<DataResponse<Void>> result = restController.updateContent(userDetails, testCommentUpdateRequest);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        then(controller).should(times(1)).updateContent(testCommentUpdateRequest, MEMBER_BASIC_USER_UUID);
     }
 
     @Test
     @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
-    public void testDelete_givenValidPathAndUlid_willReturnResponseEntity() {
+    public void testDelete_givenValidDeleteRequest_willReturnResponseEntity() {
         // given
-        doNothing().when(controller).delete(TEST_POST_ULID, "1");
+        DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
+        doNothing().when(controller).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
 
         // when
-        ResponseEntity<DataResponse<Void>> result = restController.delete(TEST_POST_ULID, "1");
+        ResponseEntity<DataResponse<Void>> result = restController.delete(userDetails, testCommentDeleteRequest);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(controller).should(times(1)).delete(TEST_POST_ULID, "1");
+        then(controller).should(times(1)).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
     }
 }
