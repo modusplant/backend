@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
 public interface CommentJpaRepository extends JpaRepository<CommentEntity, CommentCompositeKey> {
@@ -23,4 +24,6 @@ public interface CommentJpaRepository extends JpaRepository<CommentEntity, Comme
     void deleteByPostUlidAndPath(String postUlid, String path);
 
     boolean existsByPostUlidAndPath(String postUlid, String path);
+
+    boolean existsByPostUlidAndPathAndAuthMemberUuid(String postUlid, String path, UUID authMemberUuid);
 }

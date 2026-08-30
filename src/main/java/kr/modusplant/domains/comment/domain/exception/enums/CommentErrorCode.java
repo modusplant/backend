@@ -18,6 +18,7 @@ public enum CommentErrorCode implements ErrorCode {
 
     INVALID_POST_ID(HttpStatus.BAD_REQUEST.value(), "invalid_post_id", "게시글 식별자의 형식이 올바르지 않습니다"),
     INVALID_COMMENT_CONTENT(HttpStatus.BAD_REQUEST.value(), "invalid_comment_content", "댓글의 길이가 600자를 초과했습니다"),
+    INVALID_COMMENT_PATH_DEPTH(HttpStatus.BAD_REQUEST.value(), "invalid_comment_path_depth", "댓글 경로의 깊이가 3 이상입니다"),
     INVALID_COMMENT_PATH_FORMAT(HttpStatus.BAD_REQUEST.value(), "invalid_comment_path_format", "댓글 경로의 형식이 올바르지 않습니다"),
     INVALID_COMMENT_PATH_INDEX(HttpStatus.BAD_REQUEST.value(), "invalid_comment_path_index", "댓글 경로가 1 기반 인덱스를 따르지 않습니다"),
     INVALID_COMMENT_STATUS(HttpStatus.BAD_REQUEST.value(), "invalid_comment_status", "댓글의 상태가 올바르지 않습니다"),
@@ -31,7 +32,9 @@ public enum CommentErrorCode implements ErrorCode {
     EXIST_COMMENT(HttpStatus.CONFLICT.value(), "exist_comment", "댓글이 이미 존재합니다"),
     EXIST_POST_COMMENT(HttpStatus.CONFLICT.value(), "exist_post_comment", "게시글에 하나 이상의 댓글이 존재합니다"),
 
-    NOT_PUBLISHED_POST(HttpStatus.CONFLICT.value(), "not_published_post","게시글이 출간된 상태가 아닙니다"),
+    NOT_WRITTEN_COMMENT_BY_AUTHOR(HttpStatus.FORBIDDEN.value(), "not_written_comment_by_author", "댓글을 작성한 저자가 아닙니다"),
+
+    NOT_PUBLISHED_POST(HttpStatus.CONFLICT.value(), "not_published_post", "게시글이 출간된 상태가 아닙니다"),
     ;
 
     private final int httpStatus;
