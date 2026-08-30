@@ -6,12 +6,12 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
 import kr.modusplant.shared.exception.ConnectionFailedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.IntSupplier;
 
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.CONNECTION_FAILED;
@@ -21,12 +21,13 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.CONNECTION_F
 public class CommentCacheRedisRepository implements CommentCacheRepository {
     private final StringRedisTemplate stringRedisTemplate;
 
-    // post:{ulid}:comment-path:{path}:member-uuid:{uuid} - 작성자별 멱등성 마커
-    private static final String IDEMPOTENCY_KEY_FORMAT = "post:%s:comment-path:%s:member-uuid:%s";
-    // post:{ulid}:comment-path:{reservedPath} - 예약된 경로 (member-uuid 미포함)
-    private static final String RESERVED_KEY_FORMAT = "post:%s:comment-path:%s";
-    // post:{ulid}:comment-path: - 키 접두사 (형제 스캔 및 파싱용)
-    private static final String KEY_PREFIX_FORMAT = "post:%s:comment-path:";
+    // comment:idempotency:post:{ulid}:comment-path:{path}:member-uuid:{uuid} - 작성자별 멱등성 마커(값은 빈 문자열)
+    private static final String IDEMPOTENCY_KEY_FORMAT =
+            "comment:idempotency:post:%s:comment-path:%s:member-uuid:%s";
+    // comment:sibling-order:post:{ulid}:parent:{parentPath|ROOT} - 같은 부모 아래 마지막으로 발급된 형제 순서 카운터에 대한 키
+    private static final String SIBLING_ORDER_KEY_FORMAT = "comment:sibling-order:post:%s:parent:%s";
+    // parentPath가 빈 문자열(루트)일 때 카운터 키에 넣을 리터럴 식별자 (빈 식별자 방지)
+    private static final String ROOT_PARENT_IDENTIFIER = "ROOT";
 
     private static final Duration TTL = Duration.ofHours(1);
 
@@ -36,54 +37,60 @@ public class CommentCacheRedisRepository implements CommentCacheRepository {
         String postIdValue = postId.getValue();
         String pathValue = path.getValue();
 
-        String idempotencyKey = IDEMPOTENCY_KEY_FORMAT.formatted(postIdValue, pathValue, author.getUuid());
-        Boolean reserveSucceeded = stringRedisTemplate.opsForValue().setIfAbsent(idempotencyKey, "", TTL);
-        if (reserveSucceeded == null) {
-            throw new ConnectionFailedException(CONNECTION_FAILED, "redis");
-        } else if (reserveSucceeded.equals(Boolean.FALSE)) {
-            return Optional.empty();
+        try {
+            String idempotencyKey =
+                    IDEMPOTENCY_KEY_FORMAT.formatted(postIdValue, pathValue, author.getUuid());
+            Boolean reserveSucceeded = stringRedisTemplate.opsForValue().setIfAbsent(idempotencyKey, "", TTL);
+            if (reserveSucceeded == null) {
+                throw new ConnectionFailedException(CONNECTION_FAILED, "redis");
+            }
+            if (reserveSucceeded.equals(Boolean.FALSE)) {
+                return Optional.empty(); // 이미 처리된 (게시글, 요청 경로, 작성자) 요청 - 멱등 보장을 위해 무시
+            }
+
+            String parentPath = getParentPath(pathValue);
+            long nextPathOrder = issueNextSiblingPathOrder(postIdValue, parentPath, getMaximumSiblingPathOrderFromDB);
+            String reservedPath = parentPath.isEmpty()
+                    ? String.valueOf(nextPathOrder)
+                    : parentPath + "." + nextPathOrder;
+
+            return Optional.of(CommentPath.create(reservedPath));
+        } catch (DataAccessException e) {
+            throw new ConnectionFailedException(CONNECTION_FAILED, "redis", e);
+        }
+    }
+
+    /**
+     * 같은 부모 아래 다음 형제 경로 순서를 (게시글, 부모경로)당 단일 카운터 키에서 원자적으로 발급한다.
+     * 카운터가 없을 때에만 DB 하한값으로 값을 설정하며, 그 외에는 {@code INCR} 한 번으로 끝난다.
+     *
+     * <p><b>Load-Bearing:</b> 값 설정({@code SET NX})은 반드시 {@code INCR} 보다 먼저 실행되어야 한다.
+     * {@code INCR} 는 존재하지 않는 키를 0에서 자동 생성하므로, 값 설정 없이 {@code INCR} 가 먼저 돌면
+     * DB 하한값 대신 1을 발급해 기존 형제 경로와 충돌한다.
+     */
+    private long issueNextSiblingPathOrder(String postIdValue, String parentPath,
+                                           IntSupplier getMaximumSiblingPathOrderFromDB) {
+        String counterKey = SIBLING_ORDER_KEY_FORMAT.formatted(
+                postIdValue, parentPath.isEmpty() ? ROOT_PARENT_IDENTIFIER : parentPath);
+
+        // 카운터가 살아 있는 활성 게시글에서는 DB 조회가 발생하지 않음
+        if (!stringRedisTemplate.hasKey(counterKey)) {
+            int maximumSiblingPathOrder = getMaximumSiblingPathOrderFromDB.getAsInt();
+            stringRedisTemplate.opsForValue()
+                    .setIfAbsent(counterKey, String.valueOf(maximumSiblingPathOrder), TTL);
         }
 
-        String parentPath = getParentPath(pathValue);
-        // 예약 키가 하나라도 살아 있으면 Redis 스캔값이 최신이므로 그대로 쓰고,
-        // 전혀 없을 때(조용한 게시글 / TTL 만료 / 캐시 플러시 등)만 DB 하한값을 조회한다.
-        int redisMaximumSiblingPathOrder = getMaximumSiblingPathOrder(postIdValue, parentPath);
-        int nextPathOrder = (redisMaximumSiblingPathOrder > 0 ? redisMaximumSiblingPathOrder : getMaximumSiblingPathOrderFromDB.getAsInt()) + 1;
-        String reservedPath = parentPath.isEmpty() ? String.valueOf(nextPathOrder) : parentPath + "." + nextPathOrder;
-        stringRedisTemplate.opsForValue().set(RESERVED_KEY_FORMAT.formatted(postIdValue, reservedPath), "", TTL);
+        Long nextPathOrder = stringRedisTemplate.opsForValue().increment(counterKey);
+        if (nextPathOrder == null) {
+            throw new ConnectionFailedException(CONNECTION_FAILED, "redis");
+        }
+        stringRedisTemplate.expire(counterKey, TTL); // 슬라이딩 TTL 갱신
 
-        return Optional.of(CommentPath.create(reservedPath));
+        return nextPathOrder;
     }
 
     private String getParentPath(String path) {
         int lastDotIndex = path.lastIndexOf('.');
         return lastDotIndex < 0 ? "" : path.substring(0, lastDotIndex);
-    }
-
-    private int getMaximumSiblingPathOrder(String ulid, String parentPath) {
-        String prefix = KEY_PREFIX_FORMAT.formatted(ulid);
-        String siblingPathOrderGlob = parentPath.isEmpty() ? prefix + "*" : prefix + parentPath + ".*";
-
-        Set<String> keys = stringRedisTemplate.keys(siblingPathOrderGlob);
-        if (keys.isEmpty()) {
-            return 0; // 댓글이 1 기반이므로 0은 키가 비었음을 의미
-        }
-
-        int maximumPathOrder = 0;
-        for (String key : keys) {
-            String pathWithOptionalMemberUuid = key.substring(prefix.length());
-            if (pathWithOptionalMemberUuid.contains(":")) { // :member-uuid: 멱등성 키는 제외
-                continue;
-            }
-            if (parentPath.isEmpty()) {
-                if (pathWithOptionalMemberUuid.contains(".")) { // Depth 2 이상의 키는 제외
-                    continue;
-                }
-            }
-
-            String lastSegment = pathWithOptionalMemberUuid.substring(pathWithOptionalMemberUuid.lastIndexOf('.') + 1);
-            maximumPathOrder = Math.max(maximumPathOrder, Integer.parseInt(lastSegment));
-        }
-        return maximumPathOrder;
     }
 }
