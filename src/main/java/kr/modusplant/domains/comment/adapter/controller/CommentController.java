@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
+import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
@@ -10,19 +11,15 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
+import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
-import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
-import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -42,104 +40,85 @@ public class CommentController {
     private final CommentMapper mapper;
     private final CommentQueryRepository queryRepository;
     private final CommentCommandRepository commandRepository;
-    private final PostJpaRepository postJpaRepository;
-    private final MemberJpaRepository memberJpaRepository;
+    private final CommentCacheRepository cacheRepository;
+    private final CommentValidationHelper commentValidationHelper;
     private final SwearService swearService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
-    public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID currentMemberUuid) {
-        if (!postJpaRepository.existsByUlid(postUlid)) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
-        }
+    public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID authorId) {
+        commentValidationHelper.validateIfPostExists(PostId.create(postUlid));
 
-        return queryRepository.findByPost(PostId.create(postUlid), Author.createWithNullableUuid(currentMemberUuid))
+        return queryRepository.findByPost(PostId.create(postUlid), Author.createWithNullableUuid(authorId))
                 .stream().map(mapper::toCommentOfPostResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public CommentPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID memberUuid, Pageable pageable) {
-        if (!memberJpaRepository.existsById(memberUuid)) {
-            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member");
-        }
+    public CommentPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID authorId, Pageable pageable) {
+        commentValidationHelper.validateIfAuthorExists(Author.create(authorId));
 
-        Page<CommentOfAuthorReadModel> result = queryRepository.findByAuthor(Author.create(memberUuid), pageable);
+        Page<CommentOfAuthorReadModel> result = queryRepository.findByAuthor(Author.create(authorId), pageable);
         return mapper.toCommentPageResponseWithOnePlusPage(result);
     }
 
-    public void register(CommentRegisterRequest request, UUID currentMemberUuid) {
-        validateBeforeRegister(request.postId(), request.path());
-
+    public void register(CommentRegisterRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
-        Author author = Author.create(currentMemberUuid);
+        Author author = Author.create(authorId);
+        commentValidationHelper.validateIfPostExists(postId);
+        commentValidationHelper.validateIfPostIsPublished(postId);
+        validateIfParentCommentExists(postId, path);
+
+        // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
+        // DB 하한값 조회(findMaximumSiblingPathOrder)는 Redis 예약 키가 전혀 없을 때만 실행되도록 지연 전달한다.
+        Optional<CommentPath> optionalReservedPath =
+                cacheRepository.reservePath(postId, path, author,
+                        () -> queryRepository.findMaximumSiblingPathOrder(postId, path));
+        if (optionalReservedPath.isEmpty()) {
+            return; // 이미 처리된 요청 - 멱등성을 위해 무시
+        }
+        CommentPath reservedPath = optionalReservedPath.get();
+
         Comment comment = Comment.create(
-                postId, path, author, CommentContent.create(swearService.filterSwear(request.content())));
+                postId, reservedPath, author, CommentContent.create(swearService.filterSwear(request.content())));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
-                CommentRegisterEvent.create(currentMemberUuid, request.postId(), request.path(), request.content())
+                CommentRegisterEvent.create(authorId, request.postId(), reservedPath.getValue(), request.content())
         );
     }
 
-    public void updateContent(CommentUpdateRequest request) {
-        if (!queryRepository.existsByPostAndPath(PostId.create(request.postId()), CommentPath.create(request.path()))) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
-        }
+    public void updateContent(CommentUpdateRequest request, UUID currentMemberUuid) {
+        PostId postId = PostId.create(request.postId());
+        CommentPath path = CommentPath.create(request.path());
+        commentValidationHelper.validateIfPostExists(postId);
+        commentValidationHelper.validateIfPostIsPublished(postId);
+        commentValidationHelper.validateIfCommentExists(postId, path);
+        commentValidationHelper.validateIfCommentWrittenByAuthor(postId, path, currentMemberUuid);
 
-        commandRepository.updateContent(
-                PostId.create(request.postId()),
-                CommentPath.create(request.path()),
-                CommentContent.create(request.content()));
+        commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
     }
 
-    public void delete(String postUlid, String commentPath) {
-        commandRepository.setCommentAsDeleted(PostId.create(postUlid), CommentPath.create(commentPath));
+    public void delete(CommentDeleteRequest request, UUID currentMemberUuid) {
+        PostId postId = PostId.create(request.postId());
+        CommentPath path = CommentPath.create(request.path());
+        commentValidationHelper.validateIfPostExists(postId);
+        commentValidationHelper.validateIfPostIsPublished(postId);
+        commentValidationHelper.validateIfCommentExists(postId, path);
+        commentValidationHelper.validateIfCommentWrittenByAuthor(postId, path, currentMemberUuid);
+
+        commandRepository.setCommentAsDeleted(postId, path);
     }
 
-    private void validateBeforeRegister(String postId, String path) {
-        if (queryRepository.existsByPostAndPath(PostId.create(postId), CommentPath.create(path))) {
-            throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
+    private void validateIfParentCommentExists(PostId postId, CommentPath path) {
+        String pathValue = path.getValue();
+        if (!pathValue.contains(".")) {
+            return;
         }
-        if (!queryRepository.isPostPublished(PostId.create(postId))) {
-            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "comment");
+        String parentCommentPath = pathValue.substring(0, pathValue.lastIndexOf("."));
+        if (!queryRepository.isCommentExists(postId, CommentPath.create(parentCommentPath))) {
+            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
         }
-
-        PostId commentPost = PostId.create(postId);
-        if (path.contains(".")) {
-            int lastDotIndex = path.lastIndexOf(".");
-            String lastNumOfPath = path.substring(lastDotIndex + 1);
-
-            // 댓글 경로가 1로 끝나는 경우, 마지막 . 이후의 값을 제거한 경로에 해당하는 댓글이 있어야 댓글 등록 가능
-            // 예시: 경로가 1.2.1인 댓글을 등록하려면 경로가 1.2인 댓글이 있어야 함
-            String parentCommentPath = path.substring(0, lastDotIndex);
-            if (lastNumOfPath.equals("1") && !queryRepository.existsByPostAndPath(commentPost, CommentPath.create(parentCommentPath))) {
-                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
-            }
-
-            // 그 외의 경우 경로의 마지막 숫자 -1을 한 경로의 댓글이 있어야 댓글 등록 가능
-            // 예시: 경로가 1.5.3인 댓글을 등록하려면 경로가 1.5.2인 댓글이 있어야 함
-            String siblingPathLastNum = String.valueOf(Integer.parseInt(lastNumOfPath) - 1);
-            String siblingCommentPath = path.substring(0, lastDotIndex + 1).concat(siblingPathLastNum);
-            if (1 < Integer.parseInt(lastNumOfPath) && !queryRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath))) {
-                throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT, "commentPath");
-            }
-            
-        } else {
-            // 댓글 경로가 1인 경우 게시글에 댓글이 없어야 등록 가능
-            if(path.equals("1")) {
-                if (!(queryRepository.countPostComment(commentPost) == 0)) {
-                    throw new InvalidValueException(CommentErrorCode.EXIST_POST_COMMENT, "commentPath");
-                }
-            } else {
-                // 댓글 경로에 .가 없고 1이 아닌 경우, 형제 댓글이 있어야 등록 가능
-                String siblingCommentPath = String.valueOf(Integer.parseInt(path) - 1);
-                if (!(queryRepository.existsByPostAndPath(commentPost, CommentPath.create(siblingCommentPath)))) {
-                    throw new InvalidValueException(CommentErrorCode.NOT_EXIST_SIBLING_COMMENT, "commentPath");
-                }
-            }
-        }
-
     }
 }

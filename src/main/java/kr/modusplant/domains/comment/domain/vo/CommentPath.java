@@ -25,6 +25,9 @@ public class CommentPath {
         if (value.charAt(0) == '0' || value.contains(".0")) { // value의 형식은 반드시 숫자와 점(.)의 연속물이어야 함
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_INDEX, "path");
         }
+        if (StringUtils.countMatches(value, ".") >= 2) { // 허용되는 최대 Depth는 2 (예: "1", "1.2")
+            throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_PATH_DEPTH, "path");
+        }
         return new CommentPath(value);
     }
 

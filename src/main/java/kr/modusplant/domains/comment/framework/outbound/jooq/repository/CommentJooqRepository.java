@@ -35,36 +35,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
 
-    @Override
-    public boolean existsByPostAndPath(PostId postId, CommentPath path) {
-        return dsl.fetchExists(
-                dsl.selectOne()
-                        .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getValue()))
-                        .and(commComment.PATH.eq(path.getValue()))
-        );
-    }
-
-    @Override
-    public int countPostComment(PostId postId) {
-        return dsl.selectCount()
-                .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getValue()))
-                .fetchOptional()
-                .map(Record1::value1)
-                .orElse(0);
-    }
-
-    @Override
-    public Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId) {
-        return Optional.ofNullable(
-                dsl.select(DSL.max(commComment.UPDATED_AT))
-                        .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getValue()))
-                        .fetchOne(DSL.max(commComment.UPDATED_AT))
-        );
-    }
-
     public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {
         Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
@@ -99,10 +69,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
                         record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0),
                         record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
-//                        record.getValue(commComment.EDITED_AT).withNano(0),
                         record.getValue(commComment.IS_DELETED)
                 ));
-
     }
 
     public PageImpl<CommentOfAuthorReadModel> findByAuthor(Author author, Pageable pageable) {
@@ -133,7 +101,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
                     .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
-                        .and(commComment.IS_DELETED.eq(false))
+                    .and(commComment.IS_DELETED.eq(false))
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)
                     .orderBy(commComment.CREATED_AT.desc())
@@ -149,6 +117,60 @@ public class CommentJooqRepository implements CommentQueryRepository {
         } else {
             return new PageImpl<>(new ArrayList<>(), pageable, 0);
         }
+    }
+
+    @Override
+    public Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId) {
+        return Optional.ofNullable(
+                dsl.select(DSL.max(commComment.UPDATED_AT))
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .fetchOne(DSL.max(commComment.UPDATED_AT))
+        );
+    }
+
+    @Override
+    public int findMaximumSiblingPathOrder(PostId postId, CommentPath path) {
+        String pathValue = path.getValue();
+        int lastDotIndex = pathValue.lastIndexOf('.');
+        String parentPath = lastDotIndex < 0 ? "" : pathValue.substring(0, lastDotIndex);
+
+        Condition siblingCondition = parentPath.isEmpty()
+                ? commComment.PATH.notLike("%.%")
+                : commComment.PATH.like(parentPath + ".%").and(commComment.PATH.notLike(parentPath + ".%.%"));
+
+        List<String> siblingPathOrders = dsl.select(commComment.PATH)
+                .from(commComment)
+                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .and(siblingCondition)
+                .fetch(commComment.PATH);
+
+        int maxIndex = 0;
+        for (String siblingPath : siblingPathOrders) {
+            String lastSegment = siblingPath.substring(siblingPath.lastIndexOf('.') + 1);
+            maxIndex = Math.max(maxIndex, Integer.parseInt(lastSegment));
+        }
+        return maxIndex;
+    }
+
+    @Override
+    public int countPostComment(PostId postId) {
+        return dsl.selectCount()
+                .from(commComment)
+                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .fetchOptional()
+                .map(Record1::value1)
+                .orElse(0);
+    }
+
+    @Override
+    public boolean isCommentExists(PostId postId, CommentPath path) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .and(commComment.PATH.eq(path.getValue()))
+        );
     }
 
     @Override

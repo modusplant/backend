@@ -187,7 +187,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenExistingCommentPath_willThrowInvalidValueException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
                 .willReturn(true);
 
         // when
@@ -203,7 +203,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenUnpublishedPost_willThrowInvalidValueException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
-        given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
+        given(readRepository.isCommentExists(any(), any())).willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(false);
 
         // when
@@ -219,7 +219,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenPathIsOneButPostAlreadyHasComment_willThrowInvalidValueException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
-        given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
+        given(readRepository.isCommentExists(any(), any())).willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(1);
 
@@ -238,7 +238,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String content = "hello";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", content);
 
-        given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
+        given(readRepository.isCommentExists(any(), any())).willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(content)).willReturn(content);
@@ -260,11 +260,11 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenRootLevelPathWithNoSiblingComment_willThrowInvalidValueException() {
         // given: path "3" requires path "2" to exist
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "3", "content");
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // sibling path "2" does not exist
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(false);
 
         // when
@@ -282,10 +282,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String content = "hello";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "3", content);
 
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("3")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
 
@@ -301,11 +301,11 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenNestedPathEndingInOneWithNoParent_willThrowInvalidValueException() {
         // given: path "1.2.1" requires parent "1.2" to exist
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2.1", "content");
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // parent "1.2" does not exist
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(false);
 
         // when
@@ -323,10 +323,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String content = "reply";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2.1", content);
 
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.2.1")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
 
@@ -342,11 +342,11 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testRegister_givenNestedPathWithNoSiblingComment_willThrowInvalidValueException() {
         // given: path "1.5.3" requires sibling "1.5.2" to exist
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.5.3", "content");
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         // sibling "1.5.2" does not exist
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(false);
 
         // when
@@ -364,10 +364,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String content = "nested reply";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.5.3", content);
 
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.3")))
                 .willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.5.2")))
                 .willReturn(true);
         given(swearService.filterSwear(content)).willReturn(content);
 
@@ -386,7 +386,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String filteredContent = "*** 포함 내용";
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", rawContent);
 
-        given(readRepository.existsByPostAndPath(any(), any())).willReturn(false);
+        given(readRepository.isCommentExists(any(), any())).willReturn(false);
         given(readRepository.isPostPublished(PostId.create(TEST_POST_ULID))).willReturn(true);
         given(readRepository.countPostComment(PostId.create(TEST_POST_ULID))).willReturn(0);
         given(swearService.filterSwear(rawContent)).willReturn(filteredContent);
@@ -406,7 +406,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
     void testUpdateContent_givenNonExistentComment_willThrowNotFoundEntityException() {
         // given
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1", "updated content");
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
                 .willReturn(false);
 
         // when
@@ -425,7 +425,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils,
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1", updatedContent);
 
-        given(readRepository.existsByPostAndPath(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
+        given(readRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
                 .willReturn(true);
 
         // when

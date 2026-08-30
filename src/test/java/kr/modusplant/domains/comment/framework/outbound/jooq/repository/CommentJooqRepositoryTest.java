@@ -33,7 +33,7 @@ public class CommentJooqRepositoryTest implements
 
     @Test
     @DisplayName("게시글의 식별자와 댓글 경로로 댓글 엔티티가 존재하는지 확인")
-    void testExistsByPostAndPath_givenValidPostUlidAndCommentPath_willReturnTrue() {
+    void testIsCommentExists_willReturnTrue() {
         // given
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
@@ -51,7 +51,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.existsByPostAndPath(testPostId, testCommentPath);
+        boolean result = repository.isCommentExists(testPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(true);
