@@ -10,8 +10,8 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
-import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
@@ -76,7 +76,7 @@ public class CommentController {
                 cacheRepository.reservePath(postId, path, author,
                         () -> queryRepository.findMaximumSiblingPathOrder(postId, path));
         if (optionalReservedPath.isEmpty()) {
-            return; // 이미 처리된 요청 - 멱등성을 위해 무시
+            return;
         }
         CommentPath reservedPath = optionalReservedPath.get();
 
