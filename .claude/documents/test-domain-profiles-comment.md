@@ -14,6 +14,11 @@ The Group A / Group B lists below are relative to
   (`org.jooq.tools.jdbc`), asserting on bound parameters and returned `Result`s. No Spring
   context, and `DSLContext` itself is never Mockito-mocked. Applies to `framework/outbound/jooq/repository`.
   Evidence: `src/test/java/kr/modusplant/domains/comment/framework/outbound/jooq/CommentJooqRepositoryTest.java`
+- **Redis repository test policy:** `unit-test (mocked StringRedisTemplate)` — a pure unit
+  test that Mockito-mocks `StringRedisTemplate` and the `ValueOperations` returned by
+  `opsForValue()`, stubs `setIfAbsent` / `increment` / `expire`, and asserts on the composed
+  key strings, the counter set value, and the TTL. No Spring context. Applies to
+  `framework/outbound/redis`.
 - **TestUtils shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`, `domains/member/common/constant`
 - **Group A (fields):** `domain/vo`, `domain/event`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey` (builder-based but treated as a simple field type, matching member's own compositekey classification)
 - **Group B (methods):** `domain/aggregate`, `framework/outbound/jpa/entity`

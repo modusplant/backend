@@ -24,11 +24,12 @@ comment/
  │   ├─ model/                            # Read models for jOOQ query mapping
  │   ├─ port/
  │   │   ├─ mapper/                       # Domain → DTO mapper interface
- │   │   └─ repository/                   # Query/Command repository port interfaces
+ │   │   └─ repository/                   # Query/Command/Cache repository port interfaces
  │   ├─ request/                          # Inbound REST DTOs (Bean Validation)
  │   └─ response/                         # Outbound REST DTOs
  ├─ adapter/
  │   ├─ controller/                       # Business orchestration
+ │   ├─ helper/                           # Cross-aggregate write-precondition checks
  │   └─ mapper/                           # Mapper port implementation
  └─ framework/
      ├─ inbound/web/rest/                 # HTTP entry point
@@ -37,6 +38,7 @@ comment/
      └─ outbound/
          ├─ jooq/
          │   └─ repository/               # DSLContext-based read repository
+         ├─ redis/                        # Redis-backed idempotency + sibling-order allocation
          └─ jpa/
              ├─ entity/                    # @Entity classes
              ├─ compositekey/              # Composite PK class for @IdClass entities
@@ -57,7 +59,7 @@ comment/
 - `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, blank, regex, or length)
 - May expose an additional `createNullable(...)` factory that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
-- A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing)
+- A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `setAsValid()`, `setAsDeleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
@@ -81,9 +83,14 @@ comment/
 - Java records optimized for specific views, direct targets of jOOQ query mapping; placed directly under `model/`; named with a `*ReadModel` suffix
 
 **Repository Ports** (`usecase/port/repository/`):
-- Split by responsibility into a query-side port (`*QueryRepository`) and a command-side port (`*CommandRepository`) (CQRS-style), each implemented by a different framework technology
-- Parameters and return types use domain VOs/Aggregates on both ports;
+- Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology
+- Parameters and return types use domain VOs/Aggregates on every port;
 - The query port may also declare a cross-domain read-only precondition check (e.g. whether a referenced parent resource is in a publishable state);
+- The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
+
+**Cache Port** (`usecase/port/repository/`):
+- Declares a single reservation operation that returns an `Optional` which is empty when the same request was already processed (idempotency)
+- Accepts a lazily-evaluated fallback supplier so the implementation reads the database only when its own state is cold
 
 **Mapper Port** (`usecase/port/mapper/`):
 - Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping; implemented by a handwritten (non-generated) adapter class
@@ -101,9 +108,15 @@ comment/
 
 **Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
-- Enforces cross-aggregate preconditions before write (e.g. referenced parent resource must be in a publishable state, an addressed record must not already exist) via injected repositories and ports
-- For hierarchically-addressed records (a delimited path identifying position in a tree), validates structural placement consistency (that a claimed parent or preceding-sibling position already exists) before allowing an insert at a given path
+- Delegates cross-aggregate precondition checks to a dedicated validation helper; operations that modify an existing record additionally require the caller to be its author
+- For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
+- Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
+
+**Validation Helper** (`adapter/helper/`) — `@Component @RequiredArgsConstructor`:
+- Exposes single-purpose precondition checks
+- Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
+- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code; the ownership failure maps to HTTP 403
 
 **Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
 
@@ -114,6 +127,7 @@ comment/
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
 - Extracts auth via `@AuthenticationPrincipal` (may nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
+- Endpoints that mutate an existing record forward the authenticated principal for a downstream ownership check
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
 
@@ -123,7 +137,16 @@ comment/
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`; DSLContext directly for joined reads, aggregate counts, and paginated read models; conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present; may also implement a cross-domain read-only state check
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
+- DSLContext directly for joined reads, aggregate counts, and paginated read models
+- Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
+- May also implement a cross-domain read-only state check
+- May expose a highest-child-ordinal lookup beneath a given parent path (root-level vs. nested distinguished by different pattern matches)
+
+**Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
+- Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a bounded, slidingly-refreshed TTL
+- The reservation runs a set-if-absent idempotency guard (a lost race yields an empty `Optional`), then draws the next ordinal from an atomic increment counter that is set from the caller-supplied database lower bound before its first increment, so a cold counter cannot collide with existing rows
+- Null replies and data-access errors are rethrown as a shared connection-failure exception
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:
 - Composite PK via `@IdClass` referencing a dedicated composite-key class in `compositekey/`
