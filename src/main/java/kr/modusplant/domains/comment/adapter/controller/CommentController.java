@@ -66,8 +66,7 @@ public class CommentController {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
         Author author = Author.create(authorId);
-        commentValidationHelper.validateIfPostExists(postId);
-        commentValidationHelper.validateIfPostIsPublished(postId);
+        commentValidationHelper.validateIfAuthorCanWriteWithinPost(postId, author);
         validateIfParentCommentExists(postId, path);
 
         // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
@@ -89,24 +88,20 @@ public class CommentController {
         );
     }
 
-    public void updateContent(CommentUpdateRequest request, UUID currentMemberUuid) {
+    public void updateContent(CommentUpdateRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
-        commentValidationHelper.validateIfPostExists(postId);
-        commentValidationHelper.validateIfPostIsPublished(postId);
-        commentValidationHelper.validateIfCommentExists(postId, path);
-        commentValidationHelper.validateIfCommentWrittenByAuthor(postId, path, currentMemberUuid);
+        Author author = Author.create(authorId);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postId, path, author);
 
         commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
     }
 
-    public void delete(CommentDeleteRequest request, UUID currentMemberUuid) {
+    public void delete(CommentDeleteRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
-        commentValidationHelper.validateIfPostExists(postId);
-        commentValidationHelper.validateIfPostIsPublished(postId);
-        commentValidationHelper.validateIfCommentExists(postId, path);
-        commentValidationHelper.validateIfCommentWrittenByAuthor(postId, path, currentMemberUuid);
+        Author author = Author.create(authorId);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postId, path, author);
 
         commandRepository.setCommentAsDeleted(postId, path);
     }

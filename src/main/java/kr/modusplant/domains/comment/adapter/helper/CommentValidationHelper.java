@@ -16,8 +16,6 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class CommentValidationHelper {
@@ -50,9 +48,23 @@ public class CommentValidationHelper {
         }
     }
 
-    public void validateIfCommentWrittenByAuthor(PostId postId, CommentPath path, UUID currentMemberUuid) {
-        if (!commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(postId.getValue(), path.getValue(), currentMemberUuid)) {
+    public void validateIfCommentWrittenByAuthor(PostId postId, CommentPath path, Author author) {
+        if (!commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(postId.getValue(), path.getValue(), author.getUuid())) {
             throw new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "comment", path.getValue());
         }
+    }
+
+    public void validateIfAuthorCanWriteWithinPost(PostId postId, Author author) {
+        validateIfAuthorExists(author);
+        validateIfPostExists(postId);
+        validateIfPostIsPublished(postId);
+    }
+
+    public void validateIfAuthorCanWriteCommentWithinPost(PostId postId, CommentPath path, Author author) {
+        validateIfAuthorExists(author);
+        validateIfPostExists(postId);
+        validateIfPostIsPublished(postId);
+        validateIfCommentExists(postId, path);
+        validateIfCommentWrittenByAuthor(postId, path, author);
     }
 }
