@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
 import kr.modusplant.domains.comment.common.util.domain.*;
-import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -92,6 +92,7 @@ public class CommentTest implements
     @Test
     @DisplayName("다른 객체로 동등성 비교")
     void testEquals_givenDifferentObject_willReturnFalse() {
+        //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testValidComment, testCommentPath);
     }
 
@@ -99,7 +100,7 @@ public class CommentTest implements
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Comment compare = Comment.create(testPostId, CommentPath.create("1.1.1.1"), testAuthor, testCommentContent);
+        Comment compare = Comment.create(testPostId, CommentPath.create("1"), testAuthor, testCommentContent);
 
         assertNotEquals(testValidComment, compare);
     }

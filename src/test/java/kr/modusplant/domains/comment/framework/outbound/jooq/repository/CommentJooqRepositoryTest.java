@@ -100,6 +100,47 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.isDeleted()).isFalse();
     }
 
+    @Test
+    @DisplayName("같은 부모 아래 형제 댓글들의 마지막 세그먼트 중 가장 큰 값 반환")
+    void testFindMaximumSiblingPathOrder_givenSiblingComments_willReturnHighestOrdinal() {
+        // given
+        Field<String> path = DSL.field("path", String.class);
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record1<String>> result = dsl.newResult(path);
+            result.add(dsl.newRecord(path).values("1.1"));
+            result.add(dsl.newRecord(path).values("1.5"));
+            result.add(dsl.newRecord(path).values("1.2"));
+            return new MockResult[] { new MockResult(result.size(), result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(5);
+    }
+
+    @Test
+    @DisplayName("형제 댓글이 없으면 0 반환")
+    void testFindMaximumSiblingPathOrder_givenNoSiblingComments_willReturnZero() {
+        // given
+        Field<String> path = DSL.field("path", String.class);
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record1<String>> result = dsl.newResult(path);
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(0);
+    }
+
     // findByAuthor issues two sequential statements (a selectCount() pre-check, then a grouped,
     // paginated join with a nested totalCommentsOfPost subquery). Reliably distinguishing both
     // statements through MockDataProvider's positional field-matching would be too brittle to

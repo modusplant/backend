@@ -33,4 +33,15 @@ public class CommentPathTest implements CommentPathTestUtils {
         // when & then
         assertEquals(CommentErrorCode.INVALID_COMMENT_PATH_FORMAT, result.getErrorCode());
     }
+
+    @Test
+    @DisplayName("최대 깊이를 초과하는 댓글 경로 생성")
+    public void testCreate_givenPathDeeperThanMaxDepth_willThrowInvalidValueException() {
+        // given
+        InvalidValueException result = assertThrows(InvalidValueException.class, () ->
+                CommentPath.create("1.2.3"));
+
+        // when & then
+        assertEquals(CommentErrorCode.INVALID_COMMENT_PATH_DEPTH, result.getErrorCode());
+    }
 }

@@ -6,4 +6,5 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 
 public interface CommentPathTestUtils {
     CommentPath testCommentPath = CommentPath.create(TEST_COMMENT_PATH);
+    CommentPath testCommentRootPath = CommentPath.create("1");
 }
