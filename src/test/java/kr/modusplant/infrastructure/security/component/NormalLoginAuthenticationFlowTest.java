@@ -10,6 +10,7 @@ import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestU
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SecurityOnlyContext
+@Slf4j
 public class NormalLoginAuthenticationFlowTest implements
         SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, MemberEntityTestUtils {
 
@@ -52,7 +54,7 @@ public class NormalLoginAuthenticationFlowTest implements
     @Test
     public void verifyFilterChain() {
         filterChainProxy.getFilterChains()
-                .forEach(filter -> System.out.println("Filter being chained: " + filter));
+                .forEach(filter -> log.info("Filter being chained: {}", filter));
     }
 
     @Test

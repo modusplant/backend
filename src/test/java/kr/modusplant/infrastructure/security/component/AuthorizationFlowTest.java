@@ -63,18 +63,6 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     private String rawAccessToken;
     private Claims accessTokenClaims;
 
-//    @RestController
-//    static class TestController {
-//        @GetMapping("/api/test/user")
-//        public String mockCommentRegister() {
-//            System.out.println("!!---- mock test controller.");
-//            return "ok";
-//        }
-//
-//        @PostMapping("/api/test/admin")
-//        public String userPath() { return "ok"; }
-//    }
-
     @BeforeEach
     void setUp() {
         rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";

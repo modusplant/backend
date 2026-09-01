@@ -9,6 +9,7 @@ import kr.modusplant.jooq.tables.records.CommPostRecord;
 import kr.modusplant.jooq.tables.records.CommPriCateRecord;
 import kr.modusplant.jooq.tables.records.CommSecoCateRecord;
 import kr.modusplant.jooq.tables.records.SiteMemberRecord;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "spring.jpa.properties.hibernate.jdbc.time_zone=Asia/Seoul"
 })
+@Slf4j
 class PostQueryForMemberJooqRepositoryIntegrationTest {
 
     @Autowired
@@ -41,6 +43,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
 
     private SiteMemberRecord testMember1, testMember2;
     private CommPriCateRecord testPrimaryCategory1, testPrimaryCategory2;
+    @SuppressWarnings("FieldCanBeLocal")
     private CommSecoCateRecord testSecondaryCategory1, testSecondaryCategory2, testSecondaryCategory3;
     private CommPostRecord testPost1, testPost2, testPost3, testPost4, testPost5, testDraftPost;
 
@@ -54,27 +57,27 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         LocalDateTime baseTime = LocalDateTime.now();
         testMember1 = testDataHelper.insertTestMember("TestMember1");
         testMember2 = testDataHelper.insertTestMember("TestMember2");
-        testPrimaryCategory1 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory1",100);
-        testPrimaryCategory2 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory2",101);
-        testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory1",100);
-        testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1,"testSecondaryCategory2",101);
-        testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2,"testSecondaryCategory3",102);
-        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title1",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(31));
-        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory2,testMember1,"title2",TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY,baseTime.plusDays(32));
-        testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1,testSecondaryCategory1,testMember1,"title3",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(31));
-        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2,testSecondaryCategory3,testMember1,"title4",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(33));
-        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1,testSecondaryCategory1,testMember2,"title5",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY,baseTime.plusDays(34));
-        testDraftPost = testDataHelper.insertTestDraftPost(testPrimaryCategory1,null,testMember1,"drafttest",null,null,baseTime.plusDays(32));
-        testDataHelper.insertTestComment(testPost1,"1",testMember2,"content1",false);
-        testDataHelper.insertTestComment(testPost1,"1.1",testMember1,"content2",true);
-        testDataHelper.insertTestComment(testPost1,"1.2",testMember2,"content3",false);
-        testDataHelper.insertTestComment(testPost2,"1",testMember2,"content1",false);
-        testDataHelper.insertTestPostLike(testPost1,testMember2, baseTime.plusDays(35));
-        testDataHelper.insertTestPostLike(testPost4,testMember2, baseTime.plusDays(36));
-        testDataHelper.insertTestPostLike(testPost5,testMember1, baseTime.plusDays(37));
-        testDataHelper.insertTestPostBookmark(testPost1,testMember2, baseTime.plusDays(35));
-        testDataHelper.insertTestPostBookmark(testPost2,testMember2, baseTime.plusDays(36));
-        testDataHelper.insertTestPostBookmark(testPost5,testMember1, baseTime.plusDays(37));
+        testPrimaryCategory1 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory1", 100);
+        testPrimaryCategory2 = testDataHelper.insertTestPrimaryCategory("testPrimaryCategory2", 101);
+        testSecondaryCategory1 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1, "testSecondaryCategory1", 100);
+        testSecondaryCategory2 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory1, "testSecondaryCategory2", 101);
+        testSecondaryCategory3 = testDataHelper.insertTestSecondaryCategory(testPrimaryCategory2, "testSecondaryCategory3", 102);
+        testPost1 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1, testSecondaryCategory1, testMember1, "title1", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY, baseTime.plusDays(31));
+        testPost2 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1, testSecondaryCategory2, testMember1, "title2", TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY, baseTime.plusDays(32));
+        testPost3 = testDataHelper.insertTestDraftPost(testPrimaryCategory1, testSecondaryCategory1, testMember1, "title3", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY, baseTime.plusDays(31));
+        testPost4 = testDataHelper.insertTestPublishedPost(testPrimaryCategory2, testSecondaryCategory3, testMember1, "title4", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY, baseTime.plusDays(33));
+        testPost5 = testDataHelper.insertTestPublishedPost(testPrimaryCategory1, testSecondaryCategory1, testMember2, "title5", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY, baseTime.plusDays(34));
+        testDraftPost = testDataHelper.insertTestDraftPost(testPrimaryCategory1, null, testMember1, "drafttest", null, null, baseTime.plusDays(32));
+        testDataHelper.insertTestComment(testPost1, "1", testMember2, "content1", false);
+        testDataHelper.insertTestComment(testPost1, "1.1", testMember1, "content2", true);
+        testDataHelper.insertTestComment(testPost1, "1.2", testMember2, "content3", false);
+        testDataHelper.insertTestComment(testPost2, "1", testMember2, "content1", false);
+        testDataHelper.insertTestPostLike(testPost1, testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostLike(testPost4, testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostLike(testPost5, testMember1, baseTime.plusDays(37));
+        testDataHelper.insertTestPostBookmark(testPost1, testMember2, baseTime.plusDays(35));
+        testDataHelper.insertTestPostBookmark(testPost2, testMember2, baseTime.plusDays(36));
+        testDataHelper.insertTestPostBookmark(testPost5, testMember1, baseTime.plusDays(37));
     }
 
     @AfterEach
@@ -100,23 +103,23 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getTotalElements()).isEqualTo(3);
         assertThat(firstPage.getTotalPages()).isEqualTo(2);
         assertThat(firstPage.getContent()).hasSize(2);
-        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testPost4.getUlid());
+        assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testPost4.getUlid());
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost2.getUlid());
         assertThat(secondPage.getTotalElements()).isEqualTo(3);
         assertThat(secondPage.getTotalPages()).isEqualTo(2);
         assertThat(secondPage.getContent()).hasSize(1);
-        assertThat(secondPage.getContent().get(0).ulid()).isEqualTo(testPost1.getUlid());
+        assertThat(secondPage.getContent().getFirst().ulid()).isEqualTo(testPost1.getUlid());
 
-        assertThat(firstPage.getContent().get(0).publishedAt()).isNotNull();
+        assertThat(firstPage.getContent().getFirst().publishedAt()).isNotNull();
         assertThat(firstPage.getContent().get(1).publishedAt()).isNotNull();
-        assertThat(secondPage.getContent().get(0).publishedAt()).isNotNull();
+        assertThat(secondPage.getContent().getFirst().publishedAt()).isNotNull();
 
         // 댓글 수, 좋아요, 북마크 검증
-        PostSummaryReadModel post4Result = firstPage.getContent().get(0);
+        PostSummaryReadModel post4Result = firstPage.getContent().getFirst();
         assertThat(post4Result.commentCount()).isEqualTo(0);
         assertThat(post4Result.isLiked()).isFalse();
         assertThat(post4Result.isBookmarked()).isFalse();
-        PostSummaryReadModel post1Result = secondPage.getContent().get(0);
+        PostSummaryReadModel post1Result = secondPage.getContent().getFirst();
         assertThat(post1Result.commentCount()).isEqualTo(2);
         assertThat(post1Result.isLiked()).isFalse();
         assertThat(post1Result.isBookmarked()).isFalse();
@@ -158,9 +161,9 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getTotalPages()).isEqualTo(1);
         assertThat(firstPage.getContent()).hasSize(2);
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost3.getUlid());
-        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testDraftPost.getUlid());
-        assertThat(firstPage.getContent().get(0).secondaryCategory()).isEqualTo(testDraftPost.getSecoCateId());
-        assertThat(firstPage.getContent().get(0).content()).isEqualTo(testDraftPost.getContent());
+        assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testDraftPost.getUlid());
+        assertThat(firstPage.getContent().getFirst().secondaryCategory()).isEqualTo(testDraftPost.getSecoCateId());
+        assertThat(firstPage.getContent().getFirst().content()).isEqualTo(testDraftPost.getContent());
     }
 
     @Test
@@ -194,7 +197,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         List<PostSummaryReadModel> results = postQueryForMemberJooqRepository.findByIds(postIds,testMember2.getUuid());
 
         // then
-        PostSummaryReadModel post4 = results.get(0);
+        PostSummaryReadModel post4 = results.getFirst();
         PostSummaryReadModel post1 = results.get(1);
         PostSummaryReadModel post2 = results.get(2);
 
@@ -245,7 +248,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getTotalElements()).isEqualTo(2);
         assertThat(firstPage.getTotalPages()).isEqualTo(1);
         assertThat(firstPage.getContent()).hasSize(2);
-        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testPost4.getUlid());
+        assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testPost4.getUlid());
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost1.getUlid());
 
         // 좋아요
@@ -256,7 +259,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getContent()).allMatch(PostSummaryReadModel::isLiked);
 
         // 댓글수 & 북마크
-        PostSummaryReadModel post4Result = firstPage.getContent().get(0);
+        PostSummaryReadModel post4Result = firstPage.getContent().getFirst();
         assertThat(post4Result.commentCount()).isEqualTo(0);
         assertThat(post4Result.isBookmarked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
@@ -294,14 +297,14 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         // when
         Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findBookmarkedByMemberWithOffset(currentMemberUuid, page, size);
 
-        System.out.println(firstPage.getContent().get(0).ulid());
-        System.out.println(firstPage.getContent().get(1).ulid());
+        log.info(firstPage.getContent().getFirst().ulid());
+        log.info(firstPage.getContent().get(1).ulid());
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(2);
         assertThat(firstPage.getTotalPages()).isEqualTo(1);
         assertThat(firstPage.getContent()).hasSize(2);
-        assertThat(firstPage.getContent().get(0).ulid()).isEqualTo(testPost2.getUlid());
+        assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testPost2.getUlid());
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost1.getUlid());
 
         // 북마크
@@ -312,7 +315,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getContent()).allMatch(PostSummaryReadModel::isBookmarked);
 
         // 댓글수 & 좋아요
-        PostSummaryReadModel post2Result = firstPage.getContent().get(0);
+        PostSummaryReadModel post2Result = firstPage.getContent().getFirst();
         assertThat(post2Result.commentCount()).isEqualTo(1);
         assertThat(post2Result.isLiked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
