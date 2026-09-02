@@ -20,5 +20,5 @@ The Group A / Group B lists below are relative to
   key strings, the counter set value, and the TTL. No Spring context. Applies to
   `framework/outbound/redis`.
 - **TestUtils shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`, `domains/member/common/constant`
-- **Group A (fields):** `domain/vo`, `domain/event`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey` (builder-based but treated as a simple field type, matching member's own compositekey classification)
+- **Group A (fields):** `domain/vo`, `domain/event`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey` (builder-based but treated as a simple field type)
 - **Group B (methods):** `domain/aggregate`, `framework/outbound/jpa/entity`

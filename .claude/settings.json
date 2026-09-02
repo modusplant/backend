@@ -24,7 +24,7 @@
       "Bash(docker compose logs*)",
       "Bash(docker compose config*)",
 
-      "Edit(/claude/logs/**)",
+      "Edit(/.claude/logs/**)",
 
       "Read(/src/main/resources/application-local.yml)",
       "Read(/docker-compose.override.yml)",
