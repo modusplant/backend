@@ -42,8 +42,7 @@
     "deny": [
       "Bash(rm -rf **/src/**)",
 
-      "Bash(git push origin main*)",
-      "Bash(git push origin develop*)",
+      "Bash(git push*)",
 
       "Bash(docker rm*)",
       "Bash(docker rmi*)",
