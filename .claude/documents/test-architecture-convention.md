@@ -1,21 +1,23 @@
-# Pure Unit Test Baseline
+# Test Architecture Convention
+
+## Pure Unit Test Baseline
 
 Unit tests must maintain a pure POJO state. **Do not use** Spring Context (`@SpringBootTest`,
 `@WebMvcTest`) or Mockito Extension (`@ExtendWith(MockitoExtension.class)`), except for the
 paths explicitly listed as exceptions in the target domain's profile.
 
-# Mocking Strategy
+## Mocking Strategy
 
 All dependent classes, except for the explicit instance containing the method under test, must
 be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks`
 annotations.
 
-# REST Controller Unit Test
+## REST Controller Unit Test
 
 Covers unit tests that verify method calls, return values, and exceptions by injecting mock
 dependencies into the controller instance, without using MockMvc.
 
-# Test Method Naming Convention
+## Test Method Naming Convention
 
 - **Format:** `testMethodName_givenCondition_willDoAction`
 - **Conciseness:** Should not be overly verbose. Use clear and simple language that gets to the heart of the matter.
@@ -24,7 +26,7 @@ dependencies into the controller instance, without using MockMvc.
   - **Case 2: Return value exists:** `..._willReturnResponse` or `..._willReturnReadModel` (Specify the concrete return type name)
   - **Case 3: Exception occurs:** `..._willThrowException` (Fixed format)
 
-# Test Method Display Name Convention (Exceptionally Allowed to Use Korean Only Within This Sector)
+## Test Method Display Name Convention (Exceptionally Allowed to Use Korean Only Within This Sector)
 
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
@@ -32,7 +34,7 @@ dependencies into the controller instance, without using MockMvc.
   - **Case 2:** `..._willReturnResponse` -> `응답 반환`, `..._willReturnReadModel` -> `읽기 모델 반환`
   - **Case 3:** `..._willThrowException` -> `예외 반환` (Fixed format)
 
-# Test Body Convention (BDD Style)
+## Test Body Convention (BDD Style)
 
 Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
 
@@ -43,24 +45,24 @@ Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
     - For exception testing, thoroughly verify that the exception code (the target domain's
       `[Domain]ErrorCode`, named in its profile) returned by `getErrorCode()` matches the expected value.
 
-# Test Utility (`TestUtils`) Convention
+## Test Utility (`TestUtils`) Convention
 
 To prevent code duplication, highly encourage reusing or creating Test Utility classes when
 instantiating domain objects or models.
 
-## Path Mapping Rule
+### Path Mapping Rule
 When a class in `src/main/java/kr/modusplant/domains/[DOMAIN]/[SUB_PATH]/[ClassName].java` is
 needed for testing, find or create its utility at:
 `src/test/java/kr/modusplant/domains/[DOMAIN]/common/util/[SUB_PATH]/[ClassName]TestUtils.java`
 
-## Common Constraints for TestUtils
+### Common Constraints for TestUtils
 - **Type:** Must be an `interface`.
 - **Naming:** `[Target Class Name] + TestUtils`
 - **Parameter Sources:** Actively reuse existing constant fields from the target domain's own
   `common/constant` path and any cross-domain `common/constant` paths listed in its profile. If
   missing, create them.
 
-## Categorized Strategy
+### Categorized Strategy
 
 The Group A / Group B split below is a **classification rule**, not a path list — apply it to
 whatever subpackages a given domain actually has. Each domain's own
@@ -68,7 +70,7 @@ whatever subpackages a given domain actually has. Each domain's own
 doesn't need to be re-derived on every run; a package's role does not change without a matching
 source refactor.
 
-### Group A: Immutable/Data Objects (Fields)
+#### Group A: Immutable/Data Objects (Fields)
 - **Applies to:** value objects, domain events, read models, records (request/response/model/
   jOOQ-record/composite-key — anything constructed once and not mutated afterward, even if it
   exposes a builder), and similar data carriers.
@@ -82,7 +84,7 @@ source refactor.
   }
   ```
 
-### Group B: Mutable/Stateful Objects (Methods)
+#### Group B: Mutable/Stateful Objects (Methods)
 - **Applies to:** aggregates, entities (domain-level and JPA), and other classes with
   intent-named mutation methods or lifecycle callbacks.
 - **Rule:** Define as `default` methods to allow flexible creation or parameter alteration.
@@ -111,6 +113,6 @@ source refactor.
   }
   ```
 
-# Post-Generation Verification
+## Post-Generation Verification
 
 Once test codes are generated, they must be verified and validated by running them.
