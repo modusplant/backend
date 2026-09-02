@@ -28,7 +28,6 @@
                         <pattern>
                             <pattern>
                                 {
-                                "timestamp":"%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ}",
                                 "level":"%level",
                                 "logger":"%logger{36}",
                                 "thread":"%thread",
