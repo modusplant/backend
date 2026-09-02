@@ -14,20 +14,20 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: secrets
       SERVER_FORWARD_HEADERS_STRATEGY: framework  # Nginx 리버스 프록시 관련 설정
-      LOG_TO_FILE: "true"
+      LOG_TO_FILE: true
       LOG_DIR: /var/log/app
       # MANAGEMENT_OTLP_TRACING_EXPORT_ENABLED: "true"
-      MANAGEMENT_OTLP_TRACING_EXPORT_ENABLED: "false"
-      MANAGEMENT_OTLP_TRACING_ENDPOINT: "http://otel-collector:4317"
+      MANAGEMENT_OTLP_TRACING_EXPORT_ENABLED: false
+      MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4317
       MANAGEMENT_OTLP_TRACING_EXPORT_PROTOCOL: grpc
-      OTEL_JAVAAGENT_EXPERIMENTAL_LOG_CORRELATION: "true"
-      OTEL_INSTRUMENTATION_JDBC_ENABLED: "true"
-      OTEL_INSTRUMENTATION_HIBERNATE_ENABLED: "true"
+      OTEL_JAVAAGENT_EXPERIMENTAL_LOG_CORRELATION: true
+      OTEL_INSTRUMENTATION_JDBC_ENABLED: true
+      OTEL_INSTRUMENTATION_HIBERNATE_ENABLED: true
 
     expose:
-      - "8080"
+      - 8080
     # ports:
-    #   - "80:8080" # Infra Server
+    #   - 80:8080 # Infra Server
     container_name: modusplant-be
     volumes:
       - /var/log/app:/var/log/app
@@ -37,7 +37,7 @@ services:
 #  frontend:
 #    build: modusplant-frontend
 #    ports:
-#      - "8081:8081"
+#      - 8081:8081
 #    depends_on:
 #      - backend
 #    container_name: modusplant-fe
