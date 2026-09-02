@@ -38,6 +38,9 @@
                         </pattern>
                         <stackTrace/>
                     </providers>
+                    <globalCustomFields>
+                        {"job":"spring", "service":"app"}
+                    </globalCustomFields>
                 </encoder>
             </appender>
         </then>
