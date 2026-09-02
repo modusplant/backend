@@ -41,11 +41,6 @@
                 </encoder>
             </appender>
         </then>
-        <!-- 필요하면 콘솔도 함께 남기고, 아니면 FILE_JSON만 -->
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE_JSON"/>
-        </root>
     </if>
 
 </configuration>
