@@ -15,7 +15,11 @@
 
     <if condition='property("LOG_TO_FILE").equals("true")'>
         <then>
-            <property name="LOG_DIR" value="${LOG_DIR}" />
+            <!-- 콘솔에도 남기고, 파일에도 남김 -->
+            <root level="INFO">
+                <appender-ref ref="CONSOLE"/>
+                <appender-ref ref="FILE_JSON"/>
+            </root>
             <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${LOG_DIR}/app.log</file>
                 <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
@@ -42,5 +46,4 @@
             </appender>
         </then>
     </if>
-
 </configuration>
