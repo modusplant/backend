@@ -16,8 +16,6 @@ services:
       SERVER_FORWARD_HEADERS_STRATEGY: framework  # Nginx 리버스 프록시 관련 설정
       LOG_TO_FILE: true
       LOG_DIR: /var/log/app
-      MANAGEMENT_OTLP_TRACING_EXPORT_ENABLED: true
-#      MANAGEMENT_OTLP_TRACING_EXPORT_ENABLED: false
       MANAGEMENT_OTLP_TRACING_ENDPOINT: http://otel-collector:4317
       MANAGEMENT_OTLP_TRACING_TRANSPORT: grpc
 
