@@ -57,6 +57,14 @@ spring:
       max-file-size: 20MB             # 파일 최대 크기: 10MB, 동영상 최대 크기: 20MB
       max-request-size: 220MB         # 파일 최대 개수: 10개, 동영상 최대 개수: 5개
 
+# Apache HttpClient
+http-client:
+  pool:
+    connect-timeout: 3              # 3초
+    socket-timeout: 10              # 10초
+    connection-request-timeout: 3   # 3초
+    idle-eviction: 30               # 30초
+
 # Application
 app:
   semaphore:
@@ -102,6 +110,9 @@ management:
         http.server.requests: [ 0.95, 0.99 ]
       percentiles-histogram:
         http.server.requests: true
+        http.client.requests: true
+      slo:
+        http.client.requests: 100ms, 250ms, 500ms, 1s, 2s
 
 # Redis
 redis:

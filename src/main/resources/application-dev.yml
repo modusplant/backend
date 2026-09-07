@@ -1,3 +1,9 @@
+# Apache HttpClient
+http-client:
+  pool:
+    max-connection-total: 10
+    max-connection-per-route: 8
+
 # Apache Tomcat
 server:
   tomcat:
