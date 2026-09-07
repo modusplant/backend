@@ -34,21 +34,11 @@
       "Read(~/.claude/skills/**)"
     ],
     "ask": [
-      "Bash(docker exec*)",
-      "Bash(docker run*)",
-
-      "Bash(docker compose exec*)"
     ],
     "deny": [
       "Bash(rm -rf **/src/**)",
 
       "Bash(git push*)",
-
-      "Bash(docker rm*)",
-      "Bash(docker rmi*)",
-
-      "Bash(docker compose up*)",
-      "Bash(docker compose down*)",
 
       "Read(/.gradle/**)",
       "Read(/.idea/**)",
