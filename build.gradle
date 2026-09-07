@@ -109,6 +109,9 @@ dependencies {
 	implementation 'org.springframework.security:spring-security-crypto'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	// Outbound HTTP Client (Version managed by Spring Boot BOM)
+	implementation 'org.apache.httpcomponents.client5:httpclient5'
+
 	// Spring Cloud AWS (Version managed by Spring Cloud AWS Dependencies)
 	implementation platform('io.awspring.cloud:spring-cloud-aws-dependencies:3.2.0')
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-parameter-store'
