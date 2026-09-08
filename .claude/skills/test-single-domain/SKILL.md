@@ -37,10 +37,12 @@ Regardless of the scope above, never generate tests for:
 
 # Test Architecture & Strategy
 
-!`cat ${CLAUDE_PROJECT_DIR}/.claude/documents/test-architecture-convention.md`
+!`cat ${CLAUDE_PROJECT_DIR}/.claude/rules/test-architecture-details.md`
 
 Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjustments from its profile:
 
+- **ErrorCode class:** exception assertions in $DOMAIN_NAME tests check `getErrorCode()` against
+  the enum named under $DOMAIN_NAME's `ErrorCode class` in its profile.
 - **Pure-Unit-Test path exceptions:** the paths listed under $DOMAIN_NAME's `Pure-Unit-Test path
   exceptions` may use a real Spring context / `TestEntityManager` / real DB instead of a pure POJO test.
 - **jOOQ repository test policy:** classes under $DOMAIN_NAME's `framework/outbound/jooq/repository`
@@ -55,7 +57,7 @@ Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjust
 
 # Test Utility (`TestUtils`) Convention
 
-Follow the TestUtils convention from `test-architecture-convention.md` above, applied to $DOMAIN_NAME:
+Follow the TestUtils convention from `test-architecture-details.md` above, applied to $DOMAIN_NAME:
 
 - **Parameter Sources:** reuse constant fields from $DOMAIN_NAME's own `common/constant` path, plus
   every path listed under $DOMAIN_NAME's `TestUtils shared constant paths` in its profile. If missing, create them.
