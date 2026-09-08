@@ -26,6 +26,9 @@ docker-compose.override.yml
 *.ipr
 /out/
 
+### MCP ###
+/.playwright-mcp/
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
