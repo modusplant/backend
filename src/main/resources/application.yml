@@ -112,7 +112,7 @@ management:
         http.server.requests: true
         http.client.requests: true
       slo:
-        http.client.requests: 100ms, 250ms, 500ms, 1s, 2s
+        http.server.requests: 100ms, 250ms, 500ms, 1s, 2s
 
 # Redis
 redis:
