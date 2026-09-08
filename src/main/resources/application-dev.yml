@@ -36,6 +36,12 @@ security:
   debug:
     enabled: true
 
+# Monitoring
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
 # MinIO
 minio:
   public-endpoint: ${DEV_PUBLIC_ENDPOINT}

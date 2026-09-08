@@ -11,8 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.UUID;
-
 /**
  * API 요청 및 응답 정보를 로깅하는 역할을 수행하는 AOP 클래스
  * 주요 기능:
@@ -29,7 +27,7 @@ import java.util.UUID;
 @Slf4j
 public class ApiLoggingAspect {
     private static final ThreadLocal<Long> THREAD_ID = new ThreadLocal<>();
-    private static final long SLOW_API_THRESHOLD_MS = 500;     // TODO : SLOW 쿼리 로깅의 기준은 변경 가능
+    private static final long SLOW_API_THRESHOLD_MS = 500;
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object traceApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -41,7 +39,6 @@ public class ApiLoggingAspect {
         MDC.put("uri", request.getRequestURI());
         MDC.put("method", request.getMethod());
         MDC.put("clientIp", request.getRemoteAddr());
-        MDC.put("traceId", UUID.randomUUID().toString()); // 추적용 ID
         MDC.put("methodName", joinPoint.getSignature().getName());
         MDC.put("isLogged", Boolean.FALSE.toString()); // 예외 로깅 중복 방지용
 
@@ -52,21 +49,31 @@ public class ApiLoggingAspect {
             double durationInMs = duration / 1_000_000.0;
             String durationFormatted = String.format("%.2f", durationInMs);
 
-            log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms"
-                    , MDC.get("traceId"), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
+            log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms",
+                    getCurrentTraceId(), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
             if (durationInMs > SLOW_API_THRESHOLD_MS) {
-                log.warn("[SLOW API] traceId={} | duration:{}ms", MDC.get("traceId"), durationFormatted);
+                log.warn("[SLOW API] traceId={} | duration:{}ms", getCurrentTraceId(), durationFormatted);
             }
 
             return result;
         } finally {
             THREAD_ID.remove();
-            MDC.clear();
+            // 이 AOP 가 직접 넣은 키만 제거
+            MDC.remove("uri");
+            MDC.remove("method");
+            MDC.remove("clientIp");
+            MDC.remove("methodName");
+            MDC.remove("isLogged");
         }
     }
 
     public static boolean isSameThread() {
         Long original = THREAD_ID.get();
         return original != null && original.equals(Thread.currentThread().threadId());
+    }
+
+    private static String getCurrentTraceId() {
+        String traceId = MDC.get("traceId");
+        return traceId != null ? traceId : "N/A";
     }
 }
