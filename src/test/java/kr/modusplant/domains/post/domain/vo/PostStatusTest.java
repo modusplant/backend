@@ -14,8 +14,8 @@ class PostStatusTest implements PostTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("draft() 메서드로 DRAFT 상태의 PostStatus를 생성한다")
-        void testDraft_givenNothing_willReturnDraftPostStatus() {
+        @DisplayName("draft()로 PostStatus 반환")
+        void testDraft_givenNothing_willReturnPostStatus() {
             // when
             PostStatus postStatus = PostStatus.draft();
 
@@ -26,8 +26,8 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("published() 메서드로 PUBLISHED 상태의 PostStatus를 생성한다")
-        void testDraft_givenNothing_willReturnPublishedPostStatus() {
+        @DisplayName("published()로 PostStatus 반환")
+        void testPublished_givenNothing_willReturnPostStatus() {
             // when
             PostStatus postStatus = PostStatus.published();
 
@@ -43,7 +43,7 @@ class PostStatusTest implements PostTestUtils {
     class StatusCheckTests {
 
         @Test
-        @DisplayName("draft() 상태에서 isPublished()는 false를 반환한다")
+        @DisplayName("draft 상태에서 거짓 반환")
         void testIsPublished_givenDraftStatus_willReturnFalse() {
             // given
             PostStatus draftStatus = PostStatus.draft();
@@ -53,7 +53,7 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("published() 상태에서 isPublished()는 true를 반환한다")
+        @DisplayName("published 상태에서 참 반환")
         void testIsPublished_givenPublishedStatus_willReturnTrue() {
             // given
             PostStatus publishedStatus = PostStatus.published();
@@ -63,7 +63,7 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("draft() 상태에서 isDraft()는 true를 반환한다")
+        @DisplayName("draft 상태에서 참 반환")
         void testIsDraft_givenDraftStatus_willReturnTrue() {
             // given
             PostStatus draftStatus = PostStatus.draft();
@@ -73,7 +73,7 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("published() 상태에서 isDraft()는 false를 반환한다")
+        @DisplayName("published 상태에서 거짓 반환")
         void testIsDraft_givenPublishedStatus_willReturnFalse() {
             // given
             PostStatus publishedStatus = PostStatus.published();
@@ -89,8 +89,8 @@ class PostStatusTest implements PostTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // given
             PostStatus draftStatus = PostStatus.draft();
             PostStatus publishedStatus = PostStatus.published();
@@ -101,8 +101,8 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // given
             PostStatus draftStatus = PostStatus.draft();
 
@@ -111,8 +111,8 @@ class PostStatusTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // given
             PostStatus draftStatus = PostStatus.draft();
             PostStatus publishedStatus = PostStatus.published();

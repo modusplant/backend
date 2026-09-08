@@ -16,15 +16,15 @@ import static org.mockito.Mockito.verify;
 
 class SocialIdentityLinkAdminControllerTest {
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
-    private final SocialIdentityLinkAdminController adminController = 
+    private final SocialIdentityLinkAdminController adminController =
             new SocialIdentityLinkAdminController(socialIdentityRepository);
 
     @Nested
     @DisplayName("소셜 연동 데이터 제거 테스트")
     class RemoveSocialLinkTests {
         @Test
-        @DisplayName("연동된 카카오 계정을 연동 해제한다")
-        void testRemoveSocialLink_givenLinkedKakaoMember_willUnlinkSuccessfully() {
+        @DisplayName("연동된 카카오 계정 연동 해제 활동 수행")
+        void testRemoveSocialLink_givenLinkedKakaoMember_willProcessAction() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
 
@@ -36,7 +36,7 @@ class SocialIdentityLinkAdminControllerTest {
         }
 
         @Test
-        @DisplayName("일반 계정의 연동 해제 시도 시 예외가 발생한다")
+        @DisplayName("일반 계정 연동 해제 시 예외 반환")
         void testRemoveSocialLink_givenBasicMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
@@ -47,8 +47,8 @@ class SocialIdentityLinkAdminControllerTest {
         }
 
         @Test
-        @DisplayName("소셜 전용 계정의 연동 해제 시도 시 탈퇴 필요 예외가 발생한다")
-        void testRemoveSocialLink_givenPureSocialMember_willThrowSocialWithdrawalRequiredException() {
+        @DisplayName("소셜 전용 계정 연동 해제 시 예외 반환")
+        void testRemoveSocialLink_givenPureSocialMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfile);
 

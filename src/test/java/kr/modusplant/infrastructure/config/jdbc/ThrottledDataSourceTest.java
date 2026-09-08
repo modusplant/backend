@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.config.jdbc;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -19,7 +20,8 @@ class ThrottledDataSourceTest {
     private final ThrottledDataSource throttledDataSource = new ThrottledDataSource(dataSource, 10);
 
     @Test
-    void getLogWriterTest() throws SQLException {
+    @DisplayName("인자 없이 PrintWriter 반환")
+    void testGetLogWriter_givenNoArgs_willReturnPrintWriter() throws SQLException {
         // given & when
         PrintWriter returnedValue = Mockito.mock(PrintWriter.class);
         given(dataSource.getLogWriter()).willReturn(returnedValue);
@@ -29,7 +31,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void setLogWriterTest() throws SQLException {
+    @DisplayName("Writer로 DataSource 위임 활동 수행")
+    void testSetLogWriter_givenWriter_willDelegateToDataSource() throws SQLException {
         // given
         PrintWriter mockWriter = Mockito.mock(PrintWriter.class);
 
@@ -41,7 +44,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void setLoginTimeoutTest() throws SQLException {
+    @DisplayName("타임아웃으로 DataSource 위임 활동 수행")
+    void testSetLoginTimeout_givenTimeout_willDelegateToDataSource() throws SQLException {
         // given
         int timeout = 10;
 
@@ -53,7 +57,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void getLoginTimeoutTest() throws SQLException {
+    @DisplayName("인자 없이 int 반환")
+    void testGetLoginTimeout_givenNoArgs_willReturnInt() throws SQLException {
         // given & when
         int returnedValue = 10;
         given(dataSource.getLoginTimeout()).willReturn(returnedValue);
@@ -63,7 +68,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void getParentLoggerTest() throws SQLFeatureNotSupportedException {
+    @DisplayName("인자 없이 Logger 반환")
+    void testGetParentLogger_givenNoArgs_willReturnLogger() throws SQLFeatureNotSupportedException {
         // given & when
         Logger returnedValue = Mockito.mock(Logger.class);
         given(dataSource.getParentLogger()).willReturn(returnedValue);
@@ -73,7 +79,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void unwrapTest() throws SQLException {
+    @DisplayName("클래스로 Object 반환")
+    void testUnwrap_givenClass_willReturnObject() throws SQLException {
         // given & when
         Object returnedValue = Mockito.mock(Object.class);
         given(dataSource.unwrap(any())).willReturn(returnedValue);
@@ -83,7 +90,8 @@ class ThrottledDataSourceTest {
     }
 
     @Test
-    void isWrapperForTest() throws SQLException {
+    @DisplayName("클래스로 불리언 반환")
+    void testIsWrapperFor_givenClass_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = true;
         given(dataSource.isWrapperFor(any())).willReturn(returnedValue);

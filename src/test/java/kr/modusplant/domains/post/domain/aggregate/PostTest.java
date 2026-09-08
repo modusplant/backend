@@ -20,7 +20,7 @@ class PostTest implements PostTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("모든 파라미터가 유효할 때 Post를 성공적으로 생성한다")
+        @DisplayName("유효한 파라미터로 Post 반환")
         void testCreate_givenValidParameter_willReturnPost() {
             // then
             assertNotNull(createPublishedPost());
@@ -34,7 +34,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("파라미터가 null일 때 예외 반환")
         void testCreate_givenNullParameter_willThrowException() {
             assertThrows(EmptyValueException.class, () ->
                     Post.create(null, testAuthorId, testPrimaryCategoryId,
@@ -67,7 +67,7 @@ class PostTest implements PostTestUtils {
     @DisplayName("Draft Post 생성 테스트")
     class CreateDraftTests {
         @Test
-        @DisplayName("유효한 파라미터로 Draft Post를 성공적으로 생성한다")
+        @DisplayName("유효한 파라미터로 Draft Post 반환")
         void testCreateDraft_givenValidParameter_willReturnPost() {
             // when
             Post post = Post.createDraft(testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
@@ -83,7 +83,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("파라미터가 null일 때 예외 반환")
         void testCreateDraft_givenNullParameter_willThrowException() {
             assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
@@ -98,7 +98,7 @@ class PostTest implements PostTestUtils {
     @DisplayName("Published Post 생성 테스트")
     class CreatePublishedTests {
         @Test
-        @DisplayName("유효한 파라미터로 Draft Post를 성공적으로 생성한다")
+        @DisplayName("유효한 파라미터로 Published Post 반환")
         void testCreatePublished_givenValidParameter_willReturnPost() {
             // when
             Post post = Post.createPublished(testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
@@ -114,7 +114,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("파라미터가 null일 때 예외 반환")
         void testCreatePublished_givenNullParameter_willThrowException() {
             assertThrows(EmptyValueException.class, () ->
                     Post.createPublished( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
@@ -134,8 +134,8 @@ class PostTest implements PostTestUtils {
     @DisplayName("Post 업데이트 테스트")
     class UpdateTests {
         @Test
-        @DisplayName("유효한 파라미터로 Post를 성공적으로 업데이트한다")
-        void testUpdate_givenValidParameter_willReturnPost() {
+        @DisplayName("유효한 파라미터로 수정 활동 수행")
+        void testUpdate_givenValidParameter_willProcessAction() {
             // given
             Post post = createDraftPost();
             PostContent postContent = PostContent.create("title",TEST_POST_CONTENT,TEST_POST_CONTENT_THUMBNAIL_KEY);
@@ -152,7 +152,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("파라미터가 null일 때 예외 반환")
         void testUpdate_givenNullParameter_willThrowException() {
             // given
             Post post = createDraftPost();
@@ -176,7 +176,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("발행글을 임시저장으로 수정 시 예외 반환")
         void testUpdate_givenPublishedPostToDraftPost_willThrowException() {
             // given
             Post post = createPublishedPost();
@@ -192,8 +192,8 @@ class PostTest implements PostTestUtils {
     @DisplayName("Post 임시저장 업데이트 테스트")
     class UpdateDraftTests {
         @Test
-        @DisplayName("유효한 파라미터로 Post를 성공적으로 업데이트한다")
-        void testUpdateDraft_givenValidParameter_willReturnPost() {
+        @DisplayName("유효한 파라미터로 수정 활동 수행")
+        void testUpdateDraft_givenValidParameter_willProcessAction() {
             // given
             Post post = createDraftPost();
             PostContent postContent = testPostContent;
@@ -210,7 +210,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Post의 파라미터가 null일 때 Exception을 발생시킨다.")
+        @DisplayName("파라미터가 null일 때 예외 반환")
         void testUpdateDraft_givenNullParameter_willThrowException() {
             // given
             Post post = createDraftPost();
@@ -228,7 +228,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("발행된 게시글을 임시저장할 때 Exception을 발생시킨다.")
+        @DisplayName("발행된 게시글일 때 예외 반환")
         void testUpdateDraft_givenInvalidStatus_willThrowException() {
             // given
             Post post = createPublishedPost();
@@ -246,8 +246,8 @@ class PostTest implements PostTestUtils {
     class UpdateAuthorIdTests {
 
         @Test
-        @DisplayName("유효한 AuthorId로 성공적으로 업데이트한다")
-        void testUpdateAuthorId_givenValidParameter_willReturnPost() {
+        @DisplayName("유효한 AuthorId로 수정 활동 수행")
+        void testUpdateAuthorId_givenValidParameter_willProcessAction() {
             // given
             Post post = createPublishedPost();
 
@@ -259,7 +259,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("AuthorId가 null일 때 EmptyValueException을 발생시킨다")
+        @DisplayName("AuthorId가 null일 때 예외 반환")
         void testUpdateAuthorId_givenNullParameter_willThrowException() {
             // given
             Post post = createPublishedPost();
@@ -275,8 +275,8 @@ class PostTest implements PostTestUtils {
     class UpdateContentTests {
 
         @Test
-        @DisplayName("새로운 Content로 성공적으로 업데이트한다")
-        void testUpdateContent_givenValidParameter_willReturnPost() {
+        @DisplayName("새 Content로 수정 활동 수행")
+        void testUpdateContent_givenValidParameter_willProcessAction() {
             // given
             Post post = createDraftPost();
             PostContent postContent = PostContent.create("title",TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY);
@@ -294,8 +294,8 @@ class PostTest implements PostTestUtils {
     class PublishTests {
 
         @Test
-        @DisplayName("Draft 상태의 Post를 성공적으로 발행한다")
-        void testPublish_givenNothing_willChangeStatus() {
+        @DisplayName("Draft 게시글 발행 활동 수행")
+        void testPublish_givenDraftPost_willProcessAction() {
             // given
             Post post = createDraftPost();
 
@@ -307,7 +307,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("유효하지 않은 Draft 상태의 Post를 발행하려 할 때 EmptyValueException을 발생시킨다")
+        @DisplayName("유효하지 않은 Draft일 때 예외 반환")
         void testPublish_givenInvalidPost_willThrowException() {
             // given
             Post post = createDraftPostWithEmptyValue();
@@ -317,7 +317,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("이미 발행된 Post를 발행하려 할 때 InvalidValueException을 발생시킨다")
+        @DisplayName("이미 발행된 게시글일 때 예외 반환")
         void testPublish_givenPublishedPost_willThrowException() {
             // given
             Post post = createPublishedPost();
@@ -332,8 +332,8 @@ class PostTest implements PostTestUtils {
     class LikeTests {
 
         @Test
-        @DisplayName("발행된 Post에 Like를 성공적으로 추가한다")
-        void testLike_givenPublishedPost_willSucceed() {
+        @DisplayName("발행 게시글 좋아요 활동 수행")
+        void testLike_givenPublishedPost_willProcessAction() {
             // given
             Post post = createPublishedPost();
             LikeCount originalLikeCount = post.getLikeCount();
@@ -346,7 +346,7 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Draft 상태의 Post에 Like를 추가하려 할 때 InvalidValueException을 발생시킨다")
+        @DisplayName("Draft 게시글 좋아요 시 예외 반환")
         void testLike_givenDraftPost_willThrowException() {
             // given
             Post post = createDraftPost();
@@ -361,8 +361,8 @@ class PostTest implements PostTestUtils {
     class UnlikeTests {
 
         @Test
-        @DisplayName("발행된 Post에서 Like를 성공적으로 제거한다")
-        void testUnlike_givenPublishedPost_willSucceed() {
+        @DisplayName("발행 게시글 좋아요 취소 활동 수행")
+        void testUnlike_givenPublishedPost_willProcessAction() {
             // given
             Post post = createPublishedPost();
             post.like(); // 먼저 like를 추가
@@ -376,8 +376,8 @@ class PostTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("Draft 상태의 Post에서 Like를 제거하려 할 때 InvalidValueException을 발생시킨다")
-        void testunlike_givenDraftPost_willThrowException() {
+        @DisplayName("Draft 게시글 좋아요 취소 시 예외 반환")
+        void testUnlike_givenDraftPost_willThrowException() {
             // given
             Post post = createDraftPost();
 
@@ -391,21 +391,21 @@ class PostTest implements PostTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             assertEquals(createDraftPost(), createDraftPost());
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             assertNotEquals(createDraftPost(), testPostId);
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             assertNotEquals(
                     createPublishedPost(),
                     Post.create(testPostId2,testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())

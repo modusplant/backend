@@ -14,55 +14,62 @@ import static org.junit.jupiter.api.Assertions.*;
 class EmailTest implements EmailTestUtils {
 
     @Test
-    @DisplayName("Email 문자열로 Email 생성하기")
-    void testCreate_givenValidEmailString_willReturnEmailVo() {
-        assertNotNull(testKakaoUserEmail);
-        assertThat(testKakaoUserEmail.getValue()).isEqualTo(MEMBER_AUTH_KAKAO_USER_EMAIL);
+    @DisplayName("Email 문자열로 Email 반환")
+    void testCreate_givenValidEmailString_willReturnEmail() {
+        // given
+        String emailValue = MEMBER_AUTH_KAKAO_USER_EMAIL;
+
+        // when
+        Email email = Email.create(emailValue);
+
+        // then
+        assertThat(email.getValue()).isEqualTo(emailValue);
     }
 
     @Test
-    @DisplayName("null이나 빈 문자열으로 이메일 생성시 예외 발생")
+    @DisplayName("null이나 빈 문자열로 이메일 생성 시 예외 반환")
     void testCreate_givenEmptyEmail_willThrowException() {
-        // when & then
-        EmptyValueException exception1 = assertThrows(EmptyValueException.class, () -> Email.create(null));
-        EmptyValueException exception2 = assertThrows(EmptyValueException.class, () -> Email.create(""));
-        EmptyValueException exception3 = assertThrows(EmptyValueException.class, () -> Email.create("   "));
-        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
-        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
-        assertThat(exception3.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        // given & when & then
+        EmptyValueException nullException = assertThrows(EmptyValueException.class, () -> Email.create(null));
+        EmptyValueException emptyException = assertThrows(EmptyValueException.class, () -> Email.create(""));
+        EmptyValueException blankException = assertThrows(EmptyValueException.class, () -> Email.create("   "));
+        assertThat(nullException.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(emptyException.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
+        assertThat(blankException.getErrorCode()).isEqualTo(KernelErrorCode.EMPTY_EMAIL);
     }
 
     @Test
-    @DisplayName("유효하지 않은 문자열로 이메일 생성 시 예외 발생")
+    @DisplayName("유효하지 않은 문자열로 이메일 생성 시 예외 반환")
     void testCreate_givenInvalidEmailFormat_willThrowException() {
-        InvalidValueException exception1 = assertThrows(InvalidValueException.class, () -> Email.create("invalid-email"));
-        InvalidValueException exception2 = assertThrows(InvalidValueException.class, () -> Email.create("@example.com"));
-        assertThat(exception1.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
-        assertThat(exception2.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
+        // given & when & then
+        InvalidValueException noLocalPartException = assertThrows(InvalidValueException.class, () -> Email.create("invalid-email"));
+        InvalidValueException emptyLocalPartException = assertThrows(InvalidValueException.class, () -> Email.create("@example.com"));
+        assertThat(noLocalPartException.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
+        assertThat(emptyLocalPartException.getErrorCode()).isEqualTo(KernelErrorCode.INVALID_EMAIL_FORMAT);
     }
 
     @Test
-    @DisplayName("같은 객체에 대한 equals 호출")
-    void useEqual_givenSameObject_willReturnTrue() {
+    @DisplayName("같은 객체로 참 반환")
+    void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testKakaoUserEmail, testKakaoUserEmail);
     }
 
     @Test
-    @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+    @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+    void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
         //noinspection AssertBetweenInconvertibleTypes
         assertNotEquals(testKakaoUserEmail, "Different Class");
     }
 
     @Test
-    @DisplayName("다른 프로퍼티를 가진 인스턴스에 대한 equals 호출")
-    void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+    @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+    void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testKakaoUserEmail, testGoogleUserEmail);
     }
 
     @Test
-    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    @DisplayName("같은 객체로 같은 해시코드 반환")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         assertEquals(testKakaoUserEmail.hashCode(), testKakaoUserEmail.hashCode());
     }

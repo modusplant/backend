@@ -77,8 +77,8 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     }
 
     @Test
-    @DisplayName("사용자의 역할이 유효한 경우 요청 진행")
-    public void testCommentApiWithRole_givenMatchingRole_willReturnSuccessResponse() throws Exception {
+    @DisplayName("일치하는 역할로 정상 응답 반환")
+    public void testAuthorize_givenMatchingRole_willReturnOkResponse() throws Exception {
         // given
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
@@ -96,14 +96,14 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     }
 
     @Test
-    @DisplayName("사용자의 역할이 무효한 경우 에러 발생")
-    public void testMonitorApiWithRole_givenMismatchingRole_willReturnErrorResponse() throws Exception {
+    @DisplayName("불일치하는 역할로 에러 응답 반환")
+    public void testAuthorize_givenMismatchingRole_willReturnErrorResponse() throws Exception {
         // given
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
         given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
 
-        // when
+        // when & then
         mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
                         .header("Authorization", rawAccessToken))
                 .andExpect(status().is(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))

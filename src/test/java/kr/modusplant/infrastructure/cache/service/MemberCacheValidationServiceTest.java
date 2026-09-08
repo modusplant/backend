@@ -37,9 +37,18 @@ class MemberCacheValidationServiceTest implements MemberEntityTestUtils, MemberP
 
     private final UUID id = UUID.randomUUID();
 
+    private MemberProfileEntity givenMemberProfileEntity(LocalDateTime lastModifiedAt) {
+        MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder()
+                .member(createMemberBasicUserEntityWithUuid()).build();
+        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", lastModifiedAt);
+        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
+        return memberProfileEntity;
+    }
+
     @Test
-    @DisplayName("비어 있는 프로필로 인해 예외 발생")
-    void testGetMemberCacheValidationResult_willThrowException() {
+    @DisplayName("비어 있는 프로필로 예외 반환")
+    void testGetMemberCacheValidationResult_givenEmptyProfile_willThrowException() {
         // given
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
 
@@ -56,119 +65,99 @@ class MemberCacheValidationServiceTest implements MemberEntityTestUtils, MemberP
     }
 
     @Test
-    @DisplayName("ifNoneMatch가 null일 때 응답 반환")
-    void testGetMemberCacheValidationResult_givenNullIfNoneMatch_willReturnResponse() {
+    @DisplayName("ifNoneMatch가 null일 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenNullIfNoneMatch_willReturnMemberCacheValidationResult() {
         // given
-        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
-        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
+        givenMemberProfileEntity(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         // when
-        MemberCacheValidationResult returnedMap = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 null, ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME), id);
 
         // then
-        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
+        assertThat(result.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
-    @DisplayName("매칭되는 엔터티 태그가 없을 때 응답 반환")
-    void testGetMemberCacheValidationResult_givenNotMatchedEntityTag_willReturnResponse() {
+    @DisplayName("매칭되는 엔터티 태그가 없을 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenNotMatchedEntityTag_willReturnMemberCacheValidationResult() {
         // given
-        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
-        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
+        MemberProfileEntity memberProfileEntity = givenMemberProfileEntity(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         // when
-        MemberCacheValidationResult returnedMap = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getUuid() + "-99")),
                 ZonedDateTime.now().format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
-        assertThat(returnedMap.isCacheUsable()).isEqualTo(false);
+        assertThat(result.isCacheUsable()).isEqualTo(false);
     }
 
     @Test
-    @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 null일 때 응답 반환")
-    void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNullIfModifiedSince_willReturnResponse() {
+    @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 null일 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNullIfModifiedSince_willReturnMemberCacheValidationResult() {
         // given
-        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
-        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
+        MemberProfileEntity memberProfileEntity = givenMemberProfileEntity(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         // when
-        MemberCacheValidationResult returnedMap = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 null,
                 id);
 
         // then
-        assertThat(returnedMap.isCacheUsable()).isEqualTo(true);
+        assertThat(result.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
-    @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 조건을 만족할 때 응답 반환")
-    void testGetMemberCacheValidationResult_givenMatchedEntityTagAndRangedIfModifiedSince_willReturnResponse() {
+    @DisplayName("ifModifiedSince가 lastModifiedAt과 같을 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenModifiedSinceEqualToLastModified_willReturnMemberCacheValidationResult() {
         // given
-        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
-        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
+        MemberProfileEntity memberProfileEntity = givenMemberProfileEntity(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-        // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값과 같을 때
         // when
-        MemberCacheValidationResult returnedMapEqual = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds(),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(true);
+        assertThat(result.isCacheUsable()).isEqualTo(true);
+    }
 
-        // 엔터티의 lastModifiedAt 값이 ifModifiedSince 값보다 과거일 때
+    @Test
+    @DisplayName("ifModifiedSince가 lastModifiedAt보다 이후일 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenModifiedSinceAfterLastModified_willReturnMemberCacheValidationResult() {
+        // given
+        MemberProfileEntity memberProfileEntity = givenMemberProfileEntity(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
         // when
-        MemberCacheValidationResult returnedMapPast = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().plusMinutes(5),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
-        assertThat(returnedMapPast.isCacheUsable()).isEqualTo(true);
+        assertThat(result.isCacheUsable()).isEqualTo(true);
     }
 
     @Test
-    @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 조건을 만족하지 않을 때 응답 반환")
-    void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNotRangedIfModifiedSince_willReturnResponse() {
+    @DisplayName("매칭되는 엔터티 태그가 있고 ifModifiedSince가 조건을 만족하지 않을 때 MemberCacheValidationResult 반환")
+    void testGetMemberCacheValidationResult_givenMatchedEntityTagAndNotRangedIfModifiedSince_willReturnMemberCacheValidationResult() {
         // given
-        Optional<MemberProfileEntity> optionalMemberProfileEntity = Optional.of(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
-        MemberProfileEntity memberProfileEntity = optionalMemberProfileEntity.orElseThrow();
-        ReflectionTestUtils.setField(memberProfileEntity, "lastModifiedAt", LocalDateTime.now());
-        ReflectionTestUtils.setField(memberProfileEntity, "versionNumber", 0L);
-        given(memberProfileJpaRepository.findByUuid(any())).willReturn(optionalMemberProfileEntity);
+        MemberProfileEntity memberProfileEntity = givenMemberProfileEntity(LocalDateTime.now());
 
         // when
-        MemberCacheValidationResult returnedMapEqual = memberCacheValidationService.getMemberCacheValidationResult(
+        MemberCacheValidationResult result = memberCacheValidationService.getMemberCacheValidationResult(
                 String.format("\"%s\"", passwordEncoder.encode(memberProfileEntity.getETagSource())),
                 ZonedDateTime.of(memberProfileEntity.getLastModifiedAtAsTruncatedToSeconds().minusMinutes(5),
                         ZoneId.of("Asia/Seoul")).format(DateTimeFormatter.RFC_1123_DATE_TIME),
                 id);
 
         // then
-        assertThat(returnedMapEqual.isCacheUsable()).isEqualTo(false);
+        assertThat(result.isCacheUsable()).isEqualTo(false);
     }
 }

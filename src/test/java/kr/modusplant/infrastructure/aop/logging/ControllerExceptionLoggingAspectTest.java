@@ -25,10 +25,13 @@ public class ControllerExceptionLoggingAspectTest {
     }
 
     @Test
-    @DisplayName("AOP 적용 컨트롤러 메소드 예외 상황 로깅")
-    void getMonitorControllerError_givenRestController_returnErrorStatusWithAopLogging() throws Exception{
+    @DisplayName("컨트롤러 예외 발생 시 에러 로그 기록 활동 수행")
+    void testControllerLogException_givenControllerThrows_willWriteErrorLog() throws Exception {
+        // given
         LogCaptor logCaptor = LogCaptor.forClass(ControllerExceptionLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
+
+        // when
         mockMvc.perform(get("/api/admin/v1/monitor/monitor-error-controller")
                         .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().is5xxServerError());

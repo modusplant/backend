@@ -73,8 +73,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     class testGetMultipleUploadUrls {
 
         @Test
-        @DisplayName("단일 이미지 업로드 요청 시 presigned URL과 fileKey 반환")
-        void testGetMultipleUploadUrls_givenSingleImageRequest_willReturnUploadUrlResponse() {
+        @DisplayName("단일 이미지 요청 시 응답 반환")
+        void testGetMultipleUploadUrls_givenSingleImageRequest_willReturnResponse() {
             // given
             List<PostFileUploadRequest> requests = List.of(testImageJpgFileUploadRequest);
             given(amazonS3Service.generatePutPresignedUrl(anyString(), anyString()))
@@ -92,8 +92,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("이미지와 비디오 혼합 요청 시 각 파일에 대한 presigned URL과 fileKey 반환")
-        void testGetMultipleUploadUrls_givenMultipleFiles_willReturnMultipleUploadUrlResponses() {
+        @DisplayName("혼합 파일 요청 시 응답 반환")
+        void testGetMultipleUploadUrls_givenMultipleFiles_willReturnResponse() {
             // given
             List<PostFileUploadRequest> requests = List.of(testImageJpgFileUploadRequest, testVideoMp4FileUploadRequest);
             given(amazonS3Service.generatePutPresignedUrl(anyString(), anyString()))
@@ -112,7 +112,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("파일명 중복 요청 시 예외 발생")
+        @DisplayName("파일명 중복 요청 시 예외 반환")
         void testGetMultipleUploadUrls_givenDuplicateFilename_willThrowException() {
             // given
             List<PostFileUploadRequest> dupRequests = List.of(
@@ -126,7 +126,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("지원하지 않는 파일 확장자 요청 시 예외 발생")
+        @DisplayName("지원하지 않는 파일 확장자 요청 시 예외 반환")
         void testGetMultipleUploadUrls_givenUnsupportedFileExtension_willThrowException() {
             // given
             List<PostFileUploadRequest> unsupportedRequests = List.of(
@@ -139,7 +139,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("이미지 파일 개수 초과 시 예외 발생")
+        @DisplayName("이미지 파일 개수 초과 시 예외 반환")
         void testGetMultipleUploadUrls_givenTooManyImageFiles_willThrowException() {
             // given - MAX_IMAGE_FILES = 10, 11개면 초과
             List<PostFileUploadRequest> tooManyImages = new ArrayList<>();
@@ -158,8 +158,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     class testGenerateContentJson {
 
         @Test
-        @DisplayName("텍스트와 파일을 순서대로 처리")
-        void testGenerateContentJson_givenTextAndFiles_willReturnJsonContentWithCorrectOrder() throws IOException {
+        @DisplayName("텍스트·파일 순서 처리 시 JsonNode 반환")
+        void testGenerateContentJson_givenTextAndFiles_willReturnJsonNode() throws IOException {
             // given
             List<FileOrder> files = allMediaFilesOrder; // [imageJpg(1), videoMp4(2)]
 
@@ -191,8 +191,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("순서 정보가 섞여 들어왔을 때, FileOrder.order 기준으로 정렬하여 처리")
-        void testGenerateContentJson_givenFilesWithMixedOrder_willReturnJsonSortedByOrder() throws IOException {
+        @DisplayName("섞인 순서 정렬 시 JsonNode 반환")
+        void testGenerateContentJson_givenFilesWithMixedOrder_willReturnJsonNode() throws IOException {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(null, mixedOrder, TEST_IMAGE_JPG_FILENAME);
             JsonNode result = record.content();
@@ -206,8 +206,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("이미지가 없는 경우, thumbnailPath null로 반환")
-        void testGenerateContentJson_givenNoImageFiles_willReturnNullThumbnailPath() throws IOException {
+        @DisplayName("이미지 없을 때 JsonNode 반환")
+        void testGenerateContentJson_givenNoImageFiles_willReturnJsonNode() throws IOException {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, onlyVideoFileOrder, null);
 
@@ -216,8 +216,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트만 있고 파일이 없는 경우, 텍스트 노드만 반환")
-        void testGenerateContentJson_givenTextOnly_willReturnOnlyTextNode() throws IOException {
+        @DisplayName("텍스트만 있을 때 JsonNode 반환")
+        void testGenerateContentJson_givenTextOnly_willReturnJsonNode() throws IOException {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, null, null);
 
@@ -229,8 +229,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트 글자수 5000자 정확히 입력 시 정상 처리")
-        void testGenerateContentJson_givenTextExactly5000Chars_willSuccess() throws IOException {
+        @DisplayName("5000자 정확히 입력 시 JsonNode 반환")
+        void testGenerateContentJson_givenTextExactly5000Chars_willReturnJsonNode() throws IOException {
             // given
             String exactText = "a".repeat(5000);
 
@@ -239,7 +239,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트 글자수 5000자 초과 시 예외 발생")
+        @DisplayName("텍스트 글자수 5000자 초과 시 예외 반환")
         void testGenerateContentJson_givenTextExceeds5000Chars_willThrowException() {
             // given
             String longText = "a".repeat(5001);
@@ -250,7 +250,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("파일명 중복 시 예외 발생")
+        @DisplayName("파일명 중복 시 예외 반환")
         void testGenerateContentJson_givenDuplicateFilenames_willThrowException() {
             // given
             List<FileOrder> dupFiles = List.of(
@@ -264,7 +264,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("지원하지 않는 파일 확장자 사용 시 예외 발생")
+        @DisplayName("지원하지 않는 파일 확장자 사용 시 예외 반환")
         void testGenerateContentJson_givenUnsupportedFileExtension_willThrowException() {
             // given
             List<FileOrder> unsupportedFiles = List.of(
@@ -277,7 +277,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("유효하지 않은 fileKey 형식 사용 시 예외 발생")
+        @DisplayName("유효하지 않은 fileKey 형식 사용 시 예외 반환")
         void testGenerateContentJson_givenInvalidFileKey_willThrowException() {
             // given
             List<FileOrder> badKeyFiles = List.of(
@@ -290,7 +290,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("발급(pending)된 적 없는 fileKey 사용 시 예외 발생")
+        @DisplayName("발급(pending)된 적 없는 fileKey 사용 시 예외 반환")
         void testGenerateContentJson_givenUntrackedFileKey_willThrowException() {
             // given - 우리가 발급하지 않은 fileKey를 사용하는 상황을 흉내낸다
             given(pendingFileService.findTrackedFileKeys(anyList())).willReturn(List.of());
@@ -304,7 +304,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("presign은 발급됐으나 S3에 실제로 업로드되지 않은 fileKey 사용 시 예외 발생")
+        @DisplayName("presign은 발급됐으나 S3에 실제로 업로드되지 않은 fileKey 사용 시 예외 반환")
         void testGenerateContentJson_givenFileKeyNotUploadedToS3_willThrowException() {
             // given - pending 상태(발급은 됨)이지만 실제 PUT은 수행되지 않은 상황을 흉내낸다
             given(amazonS3Service.checkIfFileExists(anyString())).willReturn(false);
@@ -318,7 +318,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("파일 순서가 1부터 시작하지 않거나 연속적이지 않을 때 예외 발생")
+        @DisplayName("파일 순서가 1부터 시작하지 않거나 연속적이지 않을 때 예외 반환")
         void testGenerateContentJson_givenNonSequentialOrder_willThrowException() {
             // given
             List<FileOrder> order0Files = List.of(
@@ -338,16 +338,16 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("이미지 존재 시 thumbnailFilename이 null이면 EmptyThumbnailException 발생")
-        void testGenerateContentJson_givenImageFilesWithNullThumbnailFilename_willThrowEmptyThumbnailException() {
+        @DisplayName("썸네일 파일명이 null일 때 예외 반환")
+        void testGenerateContentJson_givenNullThumbnailFilename_willThrowException() {
             // when & then
             assertThatThrownBy(() -> postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, null))
                     .isInstanceOf(EmptyThumbnailException.class);
         }
 
         @Test
-        @DisplayName("이미지 존재 시 thumbnailFilename이 이미지가 아닌 파일이거나 목록에 없으면 InvalidThumbnailException 발생")
-        void testGenerateContentJson_givenImageFilesWithInvalidThumbnailFilename_willThrowInvalidThumbnailException() {
+        @DisplayName("썸네일 파일명이 유효하지 않을 때 예외 반환")
+        void testGenerateContentJson_givenInvalidThumbnailFilename_willThrowException() {
             // when & then
             // thumbnail이 비디오 파일명인 경우
             assertThatThrownBy(() -> postContentDataProcessor.generateContentJson(null, allMediaFilesOrder, TEST_VIDEO_MP4_FILENAME))
@@ -358,8 +358,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("이미지 미존재 시 thumbnailFilename이 null이 아니면 ThumbnailNotAllowedException 발생")
-        void testGenerateContentJson_givenNoImageFilesWithNonNullThumbnailFilename_willThrowThumbnailNotAllowedException() {
+        @DisplayName("이미지 없이 썸네일 지정 시 예외 반환")
+        void testGenerateContentJson_givenNonNullThumbnailWithoutImages_willThrowException() {
             // when & then
             assertThatThrownBy(() -> postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, onlyVideoFileOrder, TEST_IMAGE_JPG_FILENAME))
                     .isInstanceOf(ThumbnailNotAllowedException.class);
@@ -370,8 +370,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     @DisplayName("convertFileSrcToFullFileSrc 메서드 테스트")
     class testConvertFileSrcToFullFileSrc {
         @Test
-        @DisplayName("저장된 파일 경로를 전체 파일 경로로 변환")
-        void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNodeContent() throws IOException {
+        @DisplayName("저장 경로를 전체 경로로 변환한 ArrayNode 반환")
+        void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNode() throws IOException {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
@@ -397,8 +397,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     @DisplayName("convertFileSrcToFullFileSrcWithFileKey 메서드 테스트")
     class testConvertFileSrcToFullFileSrcWithFileKey {
         @Test
-        @DisplayName("저장된 파일 경로를 전체 파일 경로로 변환하면서 fileKey도 함께 반환")
-        void testConvertFileSrcToFullFileSrcWithFileKey_givenJsonContent_willReturnArrayNodeContentWithFileKey() throws IOException {
+        @DisplayName("fileKey 포함 ArrayNode 반환")
+        void testConvertFileSrcToFullFileSrcWithFileKey_givenJsonContent_willReturnArrayNode() throws IOException {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
@@ -425,8 +425,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     @DisplayName("convertToPreview 메서드 테스트")
     class testConvertToPreview {
         @Test
-        @DisplayName("텍스트와 이미지 썸네일이 모두 있을 때, 텍스트와 이미지 미리보기 반환")
-        void testConvertToPreview_givenTextAndThumbnail_willReturnTextAndImagePreview() {
+        @DisplayName("텍스트·썸네일 있을 때 ArrayNode 반환")
+        void testConvertToPreview_givenTextAndThumbnail_willReturnArrayNode() {
             // given
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
             given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
@@ -451,8 +451,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트만 있고 썸네일이 없을 때, 텍스트 미리보기만 반환")
-        void testConvertToPreview_givenTextOnlyContent_willReturnTextPreview() {
+        @DisplayName("텍스트만 있을 때 ArrayNode 반환")
+        void testConvertToPreview_givenTextOnly_willReturnArrayNode() {
             // when
             ArrayNode result = postContentDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_VIDEO, null);
 
@@ -467,8 +467,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트 없이 이미지 썸네일만 있을 때, 이미지 미리보기만 반환")
-        void testConvertToPreview_givenThumbnailOnlyContent_willReturnImagePreview() {
+        @DisplayName("썸네일만 있을 때 ArrayNode 반환")
+        void testConvertToPreview_givenThumbnailOnly_willReturnArrayNode() {
             // given
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
             given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
@@ -489,8 +489,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("텍스트와 이미지 썸네일이 모두 없을 때, 빈 배열 반환")
-        void testConvertToPreview_givenNoTextAndNoThumbnail_willReturnEmpty() {
+        @DisplayName("텍스트·썸네일 없을 때 ArrayNode 반환")
+        void testConvertToPreview_givenNoTextAndNoThumbnail_willReturnArrayNode() {
             // when
             ArrayNode result = postContentDataProcessor.convertToPreview(TEST_POST_CONTENT_VIDEO_AND_FILE, null);
 
@@ -504,7 +504,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     @DisplayName("deleteFiles 메서드 테스트")
     class testDeleteFiles {
         @Test
-        @DisplayName("저장된 파일 경로로 파일 삭제")
+        @DisplayName("저장 경로로 파일 삭제 활동 수행")
         void testDeleteFiles_givenJsonContent_willDeleteFiles() throws IOException {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
@@ -518,8 +518,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         }
 
         @Test
-        @DisplayName("content가 null인 경우, 아무 동작도 하지 않음")
-        void testDeleteFiles_givenNullContent_willDoNothing() {
+        @DisplayName("content가 null일 때 활동 수행")
+        void testDeleteFiles_givenNullContent_willProcessAction() {
             // when
             postContentDataProcessor.deleteFiles(null);
 
@@ -532,8 +532,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     @DisplayName("extractOriginalFilenameFromFileKey 메서드 테스트")
     class testExtractOriginalFilenameFromFileKey {
         @Test
-        @DisplayName("fileKey에서 원본 파일명 추출")
-        void testExtractOriginalFilenameFromFileKey_givenFileKey_willReturnFilename() {
+        @DisplayName("fileKey에서 원본 파일명 문자열 반환")
+        void testExtractOriginalFilenameFromFileKey_givenFileKey_willReturnString() {
             assertThat(postContentDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/image_0_1.jpg")).isEqualTo("image_0.jpg");
             assertThat(postContentDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/cat_0_10.jpeg")).isEqualTo("cat_0.jpeg");
             assertThat(postContentDataProcessor.extractOriginalFilenameFromFileKey("post/01HV6ABCDEF/image/photo_2023_2.png")).isEqualTo("photo_2023.png");

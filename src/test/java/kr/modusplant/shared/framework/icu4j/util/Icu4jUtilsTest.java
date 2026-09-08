@@ -29,8 +29,8 @@ class Icu4jUtilsTest {
     }
 
     @Test
-    @DisplayName("NFD Transliterator로 한국어 입력 시 분해된 문자열 반환")
-    void testGetAnyNFDTransliterator_givenKoreanInput_willReturnDecomposedOutput() {
+    @DisplayName("NFD Transliterator로 한국어 입력 시 문자열 반환")
+    void testGetAnyNFDTransliterator_givenKoreanInput_willReturnString() {
         // given
         String korean = "장미";
 
@@ -44,8 +44,8 @@ class Icu4jUtilsTest {
     }
 
     @Test
-    @DisplayName("NFC Transliterator로 NFD 분해 문자열 입력 시 원래 한국어 문자열 반환")
-    void testGetAnyNFCTransliterator_givenNFDInput_willReturnComposedOutput() {
+    @DisplayName("NFC Transliterator로 NFD 입력 시 문자열 반환")
+    void testGetAnyNFCTransliterator_givenNFDInput_willReturnString() {
         // given
         String korean = "장미";
         String nfd = Icu4jUtils.getAnyNFDTransliterator().transliterate(korean);

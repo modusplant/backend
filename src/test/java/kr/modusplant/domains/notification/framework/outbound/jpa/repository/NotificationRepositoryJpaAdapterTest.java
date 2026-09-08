@@ -109,8 +109,8 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
     class SaveWithLimitTests {
 
         @Test
-        @DisplayName("알림을 저장하고, limit을 초과하지 않으면 삭제 로직이 호출되지 않는다")
-        void testSaveWithLimit_whenUnderLimit_willOnlySave() {
+        @DisplayName("limit 미초과 시 저장만 하는 활동 수행")
+        void testSaveWithLimit_givenUnderLimit_willProcessAction() {
             // given
             int limit = 10;
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
@@ -133,8 +133,8 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("알림을 저장하고, limit을 초과하면 기준 ULID 이전의 알림들을 삭제한다")
-        void testSaveWithLimit_whenOverLimit_willSaveAndCleanup() {
+        @DisplayName("limit 초과 시 저장 및 정리 활동 수행")
+        void testSaveWithLimit_givenOverLimit_willProcessAction() {
             // given
             int limit = 5;
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
@@ -157,7 +157,7 @@ class NotificationRepositoryJpaAdapterTest  implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 수신자 아이디로 저장 시도 시 예외가 발생한다")
+        @DisplayName("존재하지 않는 수신자일 때 예외 반환")
         void testSaveWithLimit_givenInvalidRecipient_willThrowException() {
             // given
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());

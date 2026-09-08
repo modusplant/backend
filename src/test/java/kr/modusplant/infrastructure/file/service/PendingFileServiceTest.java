@@ -31,11 +31,11 @@ class PendingFileServiceTest {
     @Mock
     private PendingFileJpaRepository pendingFileJpaRepository;
 
-    @DisplayName("fileKey 목록을 domain과 함께 추적 대상으로 저장함")
+    @DisplayName("fileKey와 domain 저장 활동 수행")
     @Test
     void testTrackPendingFiles_givenFileKeys_willSavePendingFileKeysAndDomain() {
         // given
-        List<String> fileKeys = List.of(TEST_POST_CONTENT_FILE_KEY, TEST_POST_DOMAIN+"/01KM6B54J6G4DSGHT22NJ8Z1WC/video/video_0_1.png");
+        List<String> fileKeys = List.of(TEST_POST_CONTENT_FILE_KEY, TEST_POST_DOMAIN + "/01KM6B54J6G4DSGHT22NJ8Z1WC/video/video_0_1.png");
 
         // when
         pendingFileService.trackPendingFiles(fileKeys);
@@ -51,7 +51,7 @@ class PendingFileServiceTest {
         assertThat(saved.get(1).getDomain()).isEqualTo(TEST_POST_DOMAIN);
     }
 
-    @DisplayName("fileKey에 구분자가 없으면 fileKey 전체를 domain으로 사용함")
+    @DisplayName("구분자 없는 fileKey로 도메인 설정 활동 수행")
     @Test
     void testTrackPendingFiles_givenFileKeyWithoutSlash_willUseWholeKeyAsDomain() {
         // given
@@ -67,7 +67,7 @@ class PendingFileServiceTest {
         assertThat(captor.getValue().getFirst().getDomain()).isEqualTo(filename);
     }
 
-    @DisplayName("이미 추적 중인 fileKey는 저장 대상에서 제외함")
+    @DisplayName("이미 추적 중인 fileKey 제외 활동 수행")
     @Test
     void testTrackPendingFiles_givenAlreadyTrackedFileKeys_willExcludeFromSave() {
         // given
@@ -87,10 +87,10 @@ class PendingFileServiceTest {
         assertThat(saved.getFirst().getFileKey()).isEqualTo(newFileKey);
     }
 
-    @DisplayName("fileKey 목록이 null이면 리포지토리를 호출하지 않음")
+    @DisplayName("null 목록으로 리포지토리 미호출")
     @Test
     void testTrackPendingFiles_givenNull_willNotCallRepository() {
-        // when
+        // given & when
         pendingFileService.trackPendingFiles(null);
 
         // then
@@ -98,10 +98,10 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository, never()).saveAll(any());
     }
 
-    @DisplayName("fileKey 목록이 비어있으면 바로 return함")
+    @DisplayName("빈 목록으로 리포지토리 미호출")
     @Test
-    void testTrackPendingFiles_givenEmptyFileKeyList_willDoNothing() {
-        // when
+    void testTrackPendingFiles_givenEmptyFileKeyList_willNotCallRepository() {
+        // given & when
         pendingFileService.trackPendingFiles(List.of());
 
         // then
@@ -109,7 +109,7 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository, never()).saveAll(any());
     }
 
-    @DisplayName("fileKey 목록이 존재하면 추적 대상에서 해제함")
+    @DisplayName("fileKey 목록으로 추적 해제 활동 수행")
     @Test
     void testUntrackPendingFiles_givenNonEmptyList_willDeleteByFileKeyIn() {
         // given
@@ -123,9 +123,9 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository).deleteByFileKeyIn(fileKeys);
     }
 
-    @DisplayName("추적되지 않은 fileKey는 삭제 대상에서 제외함")
+    @DisplayName("추적된 fileKey만 삭제 활동 수행")
     @Test
-    void testUntrackPendingFiles_givenNotTrackedFileKeys_willOnlyDeleteExistingOnes() {
+    void testUntrackPendingFiles_givenNotTrackedFileKeys_willDeleteOnlyTrackedFileKeys() {
         // given
         String trackedFileKey = TEST_POST_CONTENT_FILE_KEY;
         String untrackedFileKey = TEST_MEMBER_PROFILE_FILE_KEY;
@@ -139,10 +139,10 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository).deleteByFileKeyIn(List.of(trackedFileKey));
     }
 
-    @DisplayName("fileKey 목록이 null이면 리포지토리를 호출하지 않음")
+    @DisplayName("null 목록으로 리포지토리 미호출")
     @Test
     void testUntrackPendingFiles_givenNull_willNotCallRepository() {
-        // when
+        // given & when
         pendingFileService.untrackPendingFiles(null);
 
         // then
@@ -150,10 +150,10 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository, never()).deleteByFileKeyIn(any());
     }
 
-    @DisplayName("fileKey 목록이 비어있으면 바로 return함")
+    @DisplayName("빈 목록으로 리포지토리 미호출")
     @Test
-    void testUntrackPendingFiles_givenEmptyFileKeyList_willDoNothing() {
-        // when
+    void testUntrackPendingFiles_givenEmptyFileKeyList_willNotCallRepository() {
+        // given & when
         pendingFileService.untrackPendingFiles(List.of());
 
         // then
@@ -161,9 +161,9 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository, never()).deleteByFileKeyIn(any());
     }
 
-    @DisplayName("threshold 이전에 생성된 fileKey 목록 조회를 리포지토리에 위임함")
+    @DisplayName("threshold 이전 만료 fileKey 목록 반환")
     @Test
-    void testFindExpiredFileKeys_givenThreshold_willReturnFileKeys() {
+    void testFindExpiredFileKeys_givenThreshold_willReturnList() {
         // given
         LocalDateTime threshold = LocalDateTime.now();
         given(pendingFileJpaRepository.findFileKeysByCreatedAtBefore(threshold)).willReturn(List.of(TEST_POST_CONTENT_FILE_KEY));
@@ -176,9 +176,9 @@ class PendingFileServiceTest {
         verify(pendingFileJpaRepository).findFileKeysByCreatedAtBefore(threshold);
     }
 
-    @DisplayName("threshold 이전에 생성된 레코드 삭제를 리포지토리에 위임함")
+    @DisplayName("threshold 이전 만료 레코드 삭제 활동 수행")
     @Test
-    void testDeleteExpiredRecords_givenThreshold_willDelegateToRepository() {
+    void testDeleteExpiredRecords_givenThreshold_willDeleteExpiredRecords() {
         // given
         LocalDateTime threshold = LocalDateTime.now();
 

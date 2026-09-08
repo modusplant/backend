@@ -22,8 +22,8 @@ class ParseHttpHeaderUtilsTest implements MemberEntityTestUtils, MemberProfileEn
     private final PasswordEncoder passwordEncoder = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
 
     @Test
-    @DisplayName("parseIfNoneMatch 테스트")
-    void parseIfNoneMatchTest() {
+    @DisplayName("복수 엔터티 태그로 목록 반환")
+    void testParseIfNoneMatch_givenMultipleEntityTags_willReturnList() {
         // given
         String firstEntityTag = passwordEncoder.encode(MEMBER_BASIC_USER_UUID + "-null");
         String secondEntityTag = passwordEncoder.encode(MEMBER_BASIC_USER_UUID + "-0");
@@ -37,7 +37,7 @@ class ParseHttpHeaderUtilsTest implements MemberEntityTestUtils, MemberProfileEn
     }
 
     @Test
-    @DisplayName("RFC 1123 형식으로 parseIfModifiedSince를 통해 서울 기준의 날짜 및 시간 반환")
+    @DisplayName("RFC 1123 형식으로 LocalDateTime 반환")
     void testParseIfModifiedSince_givenRFC1123_willReturnLocalDateTime() {
         // given & when
         LocalDateTime now = LocalDateTime.now();
@@ -48,7 +48,7 @@ class ParseHttpHeaderUtilsTest implements MemberEntityTestUtils, MemberProfileEn
     }
 
     @Test
-    @DisplayName("RFC 1123이 아닌 형식으로 parseIfModifiedSince를 통해 서울 기준의 날짜 및 시간 반환")
+    @DisplayName("RFC 1123이 아닌 형식으로 LocalDateTime 반환")
     void testParseIfModifiedSince_givenNoRFC1123_willReturnLocalDateTime() {
         // given & when
         LocalDateTime now = LocalDateTime.now();

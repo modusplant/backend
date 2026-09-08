@@ -18,8 +18,8 @@ class CommentLikeEventTest {
     class CreateTest {
 
         @Test
-        @DisplayName("유효한 파라미터로 객체 생성 성공")
-        void testCreate_givenValidParameters_willReturnEvent() {
+        @DisplayName("유효한 파라미터로 CommentLikeEvent 반환")
+        void testCreate_givenValidParameters_willReturnCommentLikeEvent() {
             CommentLikeEvent event = CommentLikeEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3);
 
             assertNotNull(event);
@@ -29,7 +29,7 @@ class CommentLikeEventTest {
         }
 
         @Test
-        @DisplayName("memberId가 null일 때 오류 발생")
+        @DisplayName("memberId가 null일 때 예외 반환")
         void testCreate_givenNullMemberId_willThrowException() {
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
                     CommentLikeEvent.create(null, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3));
@@ -38,7 +38,7 @@ class CommentLikeEventTest {
         }
 
         @Test
-        @DisplayName("postUlid가 null일 때 오류 발생")
+        @DisplayName("postUlid가 null일 때 예외 반환")
         void testCreate_givenNullPostUlid_willThrowException() {
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
                     CommentLikeEvent.create(TEST_NOTIFICATION_ACTOR_ID, null, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3));
@@ -47,7 +47,7 @@ class CommentLikeEventTest {
         }
 
         @Test
-        @DisplayName("commentPath가 비어 있을 때 오류 발생")
+        @DisplayName("commentPath가 비어 있을 때 예외 반환")
         void testCreate_givenEmptyCommentPath_willThrowException() {
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
                     CommentLikeEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, " "));

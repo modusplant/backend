@@ -22,7 +22,7 @@ class PostIdTest implements PostTestUtils {
     class GenerateTests {
 
         @Test
-        @DisplayName("generate() 메서드로 유효한 PostId를 생성한다")
+        @DisplayName("파라미터 없이 PostId 반환")
         void testGenerate_givenNoParameter_willReturnPostId() {
             // when
             PostId postId = PostId.generate();
@@ -40,7 +40,7 @@ class PostIdTest implements PostTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("유효한 ULID 문자열로 PostId를 생성한다")
+        @DisplayName("유효한 ULID 문자열로 PostId 반환")
         void testCreate_givenUlid_willReturnPostId() {
             // then
             assertFalse(StringUtils.isBlank(testPostId.getValue()));
@@ -51,7 +51,7 @@ class PostIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("null이나 빈 문자열 ULID로 PostId 생성 시 EmptyPostIdException을 발생시킨다")
+        @DisplayName("null이나 빈 ULID일 때 예외 반환")
         void testCreate_givenNullOrEmptyPostId_willThrowException() {
             // when & then
             assertThrows(EmptyValueException.class, () -> PostId.create(null));
@@ -60,8 +60,8 @@ class PostIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("유효하지 않은 ULID로 PostId 생성 시 InvalidPostIdException을 발생시킨다")
-        void shouldThrowInvalidPostIdExceptionWhenUlidLengthIsNot26() {
+        @DisplayName("유효하지 않은 ULID일 때 예외 반환")
+        void testCreate_givenInvalidUlid_willThrowException() {
             // when & then
             assertThrows(InvalidValueException.class, () -> PostId.create(TEST_INVALID_POST_ULID)); // 25자
             assertThrows(InvalidValueException.class, () -> PostId.create(TEST_INVALID_POST_ULID2)); // 유효하지 않은 문자 @포함
@@ -74,23 +74,23 @@ class PostIdTest implements PostTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             assertEquals(testPostId, testPostId);
             assertEquals(testPostId.hashCode(), testPostId.hashCode());
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
             assertNotEquals(testPostId,testAuthorId);
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
             assertNotEquals(testPostId, PostId.generate());
         }

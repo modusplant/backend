@@ -18,8 +18,8 @@ class RedisEventListenerTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    @DisplayName("최근에 본 게시글 제거 이벤트 수신 시 Redis 키를 제거한다")
-    void handleRecentlyViewPostRemove_shouldRemoveRedisKeys() {
+    @DisplayName("최근 본 게시글 제거 이벤트로 Redis 키 제거 활동 수행")
+    void testHandleRecentlyViewPostRemove_givenRemoveEvent_willRemoveRedisKeys() {
         // given
         given(stringRedisTemplate.execute(any(RedisCallback.class))).willReturn(true);
 
