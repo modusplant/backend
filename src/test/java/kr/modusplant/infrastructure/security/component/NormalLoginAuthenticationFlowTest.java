@@ -11,6 +11,7 @@ import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTe
 import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,13 +54,19 @@ public class NormalLoginAuthenticationFlowTest implements
     }
 
     @Test
-    public void verifyFilterChain() {
-        filterChainProxy.getFilterChains()
-                .forEach(filter -> log.info("Filter being chained: {}", filter));
+    @DisplayName("보안 필터 체인 등록 활동 수행")
+    public void testSecurityFilterChain_givenConfiguredContext_willRegisterFilters() {
+        // given & when
+        var filterChains = filterChainProxy.getFilterChains();
+        filterChains.forEach(filter -> log.info("Filter being chained: {}", filter));
+
+        // then
+        assertThat(filterChains).isNotEmpty();
     }
 
     @Test
-    public void givenValidSiteMemberUserDetails_willCallSuccessHandler() throws Exception {
+    @DisplayName("유효한 사용자 정보로 성공 핸들러 호출 활동 수행")
+    public void testLogin_givenValidUserDetails_willInvokeSuccessHandler() throws Exception {
         // given
         DefaultUserDetails validDefaultUserDetails = testDefaultMemberUserDetailsBuilder
                 .password(bCryptPasswordEncoder.encode(testLoginRequest.password()))
@@ -85,7 +93,8 @@ public class NormalLoginAuthenticationFlowTest implements
     }
 
     @Test
-    public void givenInvalidSiteMemberUserDetails_thenCallFailureHandler() throws Exception {
+    @DisplayName("유효하지 않은 사용자 정보로 실패 핸들러 호출 활동 수행")
+    public void testLogin_givenInvalidUserDetails_willInvokeFailureHandler() throws Exception {
         // given
         DefaultUserDetails invalidDefaultUserDetails = testDefaultMemberUserDetailsBuilder
                 .password(bCryptPasswordEncoder.encode(testLoginRequest.password()))

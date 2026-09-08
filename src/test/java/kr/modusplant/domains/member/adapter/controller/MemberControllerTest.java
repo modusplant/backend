@@ -157,8 +157,8 @@ class MemberControllerTest implements
     @DisplayName("checkExistedNickname으로 회원 닉네임 중복 확인")
     class CheckExistedNicknameTest {
         @Test
-        @DisplayName("닉네임이 존재할 때 checkExistedNickname으로 회원 닉네임 중복 확인")
-        void testCheckExistedNickname_givenExistedNicknameRequest_willReturnResponse() {
+        @DisplayName("닉네임이 존재할 때 참 반환")
+        void testCheckExistedNickname_givenExistedNickname_willReturnTrue() {
             // given
             given(memberRepository.isNicknameExist(any())).willReturn(true);
 
@@ -167,8 +167,8 @@ class MemberControllerTest implements
         }
 
         @Test
-        @DisplayName("닉네임이 존재하지 않을 때 checkExistedNickname으로 회원 닉네임 중복 확인")
-        void testCheckExistedNickname_givenNotFoundNicknameRequest_willReturnResponse() {
+        @DisplayName("닉네임이 존재하지 않을 때 거짓 반환")
+        void testCheckExistedNickname_givenNotFoundNickname_willReturnFalse() {
             // given
             given(memberRepository.isNicknameExist(any())).willReturn(false);
 
@@ -1489,10 +1489,10 @@ class MemberControllerTest implements
     }
 
     @Nested
-    @DisplayName("유효하지 않은 인증 코드 및 인증 제공자로 인해 withdraw로 오류 발생")
-    class invalidWithdrawCallTests {
+    @DisplayName("유효하지 않은 인증 코드 및 인증 제공자로 인해 withdraw로 예외 반환")
+    class InvalidWithdrawCallTests {
         @Test
-        @DisplayName("인증 제공자만 null인 요청으로 인해 withdraw로 오류 발생")
+        @DisplayName("인증 제공자가 null인 요청으로 예외 반환")
         void testWithdraw_givenInvalidAuthCodeOrAuthProviderWithNullProvider_willThrowException() {
             // given
             given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
@@ -1513,7 +1513,7 @@ class MemberControllerTest implements
         }
 
         @Test
-        @DisplayName("인증 코드만 null인 요청으로 인해 withdraw로 오류 발생")
+        @DisplayName("인증 코드가 null인 요청으로 예외 반환")
         void testWithdraw_givenInvalidAuthCodeOrAuthProviderWithNullCode_willThrowException() {
             // given
             given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);

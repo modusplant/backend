@@ -46,7 +46,7 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
     class NotificationsTests {
 
         @Test
-        @DisplayName("알림 목록 조회")
+        @DisplayName("상태와 커서로 CursorPageResponse 반환")
         void testGetNotifications_givenStatusAndCursor_willReturnCursorPageResponse() {
             // given
             int size = 10;
@@ -67,8 +67,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("알림 단건 읽음 처리")
-        void testReadNotification_givenNotificationIdAndCurrentMemberUuid_willCallMarkAsRead() {
+        @DisplayName("알림 단건 읽음 처리 활동 수행")
+        void testReadNotification_givenNotificationIdAndMemberUuid_willProcessAction() {
 
             // when
             notificationController.readNotification(testNotificationId.getValue(), testRecipientId.getValue());
@@ -78,8 +78,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("알림 전체 읽음 처리")
-        void testReadAllNotifications_givenCurrentMemberUuid_willCallMarkAllAsRead() {
+        @DisplayName("알림 전체 읽음 처리 활동 수행")
+        void testReadAllNotifications_givenMemberUuid_willProcessAction() {
             // when
             notificationController.readAllNotifications(testRecipientId.getValue());
 
@@ -88,8 +88,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("읽지 않은 알림 개수 조회")
-        void testCountUnreadNotifications_givenCurrentMemberUuid_willReturnCount() {
+        @DisplayName("읽지 않은 알림 개수 Long 반환")
+        void testCountUnreadNotifications_givenMemberUuid_willReturnLong() {
             // given
             Long expectedCount = 7L;
             given(notificationRepository.countByRecipientIdAndStatus(testRecipientId, testNotificationStatusUnread)).willReturn(expectedCount);
@@ -108,8 +108,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
     class CreateNotificationTests {
 
         @Test
-        @DisplayName("다른 사용자가 좋아요를 누르면 알림을 저장하고 FCM을 전송한다")
-        void createPostLikeNotification_Success() {
+        @DisplayName("타인 좋아요 시 알림 저장 및 FCM 전송 활동 수행")
+        void testCreatePostLikeNotification_givenOtherUserLike_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(TEST_NOTIFICATION_RECIPIENT_ID, "게시글 제목");
 
@@ -126,8 +126,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("작성자 본인이 좋아요를 누르면 알림을 생성하지 않는다")
-        void createPostLikeNotification_SelfAction_NoNotification() {
+        @DisplayName("본인 좋아요 시 알림 미생성 활동 수행")
+        void testCreatePostLikeNotification_givenSelfLike_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(testPostLikeEvent.getMemberId(), "내 게시글 제목");
 
@@ -142,8 +142,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("게시글 작성자 정보가 없으면(null) 알림을 생성하지 않는다")
-        void createPostLikeNotification_NoAuthor_NoNotification() {
+        @DisplayName("게시글 작성자 null일 때 알림 미생성 활동 수행")
+        void testCreatePostLikeNotification_givenNullAuthor_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(null, "게시글 제목");
 
@@ -158,8 +158,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("다른 사용자의 댓글에 좋아요를 누르면 알림을 저장하고 FCM을 전송한다")
-        void createCommentLikeNotification_Success() {
+        @DisplayName("타인 댓글 좋아요 시 알림 저장 및 FCM 전송 활동 수행")
+        void testCreateCommentLikeNotification_givenOtherUserLike_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(TEST_NOTIFICATION_RECIPIENT_ID, "댓글 내용 프리뷰");
 
@@ -176,8 +176,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("본인의 댓글에 좋아요를 누르면 알림을 생성하지 않는다")
-        void createCommentLikeNotification_SelfAction_NoNotification() {
+        @DisplayName("본인 댓글 좋아요 시 알림 미생성 활동 수행")
+        void testCreateCommentLikeNotification_givenSelfLike_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(testCommentLikeEvent.getMemberId(), "내 댓글 내용");
 
@@ -192,8 +192,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("댓글 작성자 정보가 없으면(null) 알림을 생성하지 않는다")
-        void createCommentLikeNotification_NoAuthor_NoNotification() {
+        @DisplayName("댓글 작성자 null일 때 알림 미생성 활동 수행")
+        void testCreateCommentLikeNotification_givenNullAuthor_willProcessAction() {
             // given
             NotificationPreview preview = new NotificationPreview(null, "댓글 내용");
 
@@ -207,8 +207,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("일반 댓글 추가 시 게시글 작성자에게 알림이 전송된다")
-        void createCommentNotification_NormalComment() {
+        @DisplayName("일반 댓글 시 게시글 작성자 알림 전송 활동 수행")
+        void testCreateCommentNotification_givenNormalComment_willProcessAction() {
             // given
             given(memberInfoRepository.getNicknameByUuid(testCommentRegisterEvent.getAuthorId())).willReturn("ActorName");
             given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
@@ -223,8 +223,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("본인 게시글에 본인이 댓글을 달면 알림이 생성되지 않는다")
-        void createCommentNotification_SelfComment_NoNotification() {
+        @DisplayName("본인 게시글에 본인 댓글 시 알림 미생성 활동 수행")
+        void testCreateCommentNotification_givenSelfComment_willProcessAction() {
             // given
             UUID sameMember = testCommentRegisterEvent.getAuthorId();
 
@@ -241,8 +241,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("대댓글 추가 시 상위 댓글 작성자와 게시글 작성자 모두에게 알림이 전송된다")
-        void createCommentNotification_ReplyToOther() {
+        @DisplayName("대댓글 시 상위 댓글·게시글 작성자 알림 전송 활동 수행")
+        void testCreateCommentNotification_givenReplyToOther_willProcessAction() {
             // given
             UUID postAuthorId = UUID.randomUUID();
             UUID parentCommentAuthorId = UUID.randomUUID();
@@ -261,8 +261,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("게시글 작성자가 상위 댓글 작성자일 경우 대댓글 알림은 1번만 전송된다")
-        void createCommentNotification_ReplyWhenPostAuthorIsParentAuthor() {
+        @DisplayName("게시글 작성자가 상위 댓글 작성자일 때 알림 1회 전송 활동 수행")
+        void testCreateCommentNotification_givenPostAuthorIsParentAuthor_willProcessAction() {
             // given
             UUID postAuthorId = TEST_NOTIFICATION_RECIPIENT_ID;
             UUID parentCommentAuthorId = TEST_NOTIFICATION_RECIPIENT_ID; // 게시글 작성자 == 댓글 작성자
@@ -281,8 +281,8 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         }
 
         @Test
-        @DisplayName("본인 댓글에 본인이 대댓글을 달면 상위 댓글 작성자 알림이 생성되지 않는다")
-        void createCommentNotification_SelfReply_NoNotification() {
+        @DisplayName("본인 댓글에 본인 대댓글 시 상위 작성자 알림 미생성 활동 수행")
+        void testCreateCommentNotification_givenSelfReply_willProcessAction() {
             // given
             UUID sameMember = testCommentReplyNotificationEvent.getAuthorId();
 

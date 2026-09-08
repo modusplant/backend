@@ -20,14 +20,14 @@ class AuthorIdTest implements PostTestUtils {
     class FromUuidTests {
 
         @Test
-        @DisplayName("유효한 UUID로 AuthorId를 생성한다")
+        @DisplayName("유효한 UUID로 AuthorId 반환")
         void testFromUuid_givenUuid_willReturnAuthorId() {
             assertNotNull(testAuthorId);
             assertEquals(MEMBER_BASIC_USER_UUID, testAuthorId.getValue());
         }
 
         @Test
-        @DisplayName("null UUID로 AuthorId 생성 시 EmptyValueException을 발생시킨다")
+        @DisplayName("null UUID일 때 예외 반환")
         void testFromUuid_givenNullParameter_willThrowException() {
             // when & then
             assertThrows(EmptyValueException.class, () -> AuthorId.fromUuid(null));
@@ -39,7 +39,7 @@ class AuthorIdTest implements PostTestUtils {
     class FromStringTests {
 
         @Test
-        @DisplayName("유효한 UUID 문자열로 AuthorId를 생성한다")
+        @DisplayName("유효한 UUID 문자열로 AuthorId 반환")
         void testFromString_givenValidString_willReturnAuthorId() {
             // when
             AuthorId authorId = AuthorId.fromString(TEST_AUTHOR_ID_STRING);
@@ -50,7 +50,7 @@ class AuthorIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("null 이나 빈 문자열로 AuthorId 생성 시 EmptyValueException을 발생시킨다")
+        @DisplayName("null이나 빈 문자열일 때 예외 반환")
         void testFromString_givenNullOrEmptyParameter_willThrowException() {
             // when & then
             assertThrows(EmptyValueException.class, () -> AuthorId.fromString(null));
@@ -59,7 +59,7 @@ class AuthorIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("유효하지 않은 UUID 형식으로 AuthorId 생성 시 InvalidAuthorIdException을 발생시킨다")
+        @DisplayName("유효하지 않은 형식일 때 예외 반환")
         void testFromString_givenInvalidParameter_willThrowException() {
             // given
             String[] invalidUuids = {
@@ -84,8 +84,8 @@ class AuthorIdTest implements PostTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             //noinspection EqualsWithItself
             assertEquals(testAuthorId, testAuthorId);
@@ -93,15 +93,15 @@ class AuthorIdTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
             assertNotEquals(testAuthorId,testPostId);
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
             assertNotEquals(testAuthorId, testAuthorId2);
         }

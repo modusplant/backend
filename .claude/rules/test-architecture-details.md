@@ -45,7 +45,18 @@ dependencies into the controller instance, without using MockMvc.
 - **Will-Clause Rules:**
   - **Case 1: No return value (Void):** `..._willProcessAction` (e.g., `willReportAbuse`, `willVerifyRequest`)
   - **Case 2: Return value exists:** `..._willReturnResponse` or `..._willReturnReadModel` (Specify the concrete return type name)
+    - The return descriptor may be a concrete type name (`..._willReturnString`,
+      `..._willReturnOptional`, `..._willReturnTokenPair`) or a primitive value the method
+      returns (`..._willReturnTrue`, `..._willReturnFalse`). Do not use a vague noun that is
+      neither (`..._willReturnInfo`, `..._willReturnRepresentative`).
   - **Case 3: Exception occurs:** `..._willThrowException` (Fixed format)
+
+### Grouping Constructs
+
+`@Nested` classes (and any other grouping construct) organize scenarios; they never relax the
+rules for the leaf tests. Every `@Test` / `@ParameterizedTest` method inside a `@Nested` class
+follows the method-naming, display-name, and body conventions above exactly as a top-level test
+method does.
 
 ---
 
@@ -56,8 +67,8 @@ Korean is exceptionally allowed within this section's display-name values, and n
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
   - **Case 1:** `..._willProcessAction` -> `활동 수행`
-  - **Case 2:** `..._willReturnResponse` -> `응답 반환`, `..._willReturnReadModel` -> `읽기 모델 반환`
-  - **Case 3:** `..._willThrowException` -> `예외 반환` (Fixed format)
+  - **Case 2:** `..._willThrowException` -> `예외 반환`
+  - **Case 3:** `..._willReturn<Type>` -> `<Type> 반환`
 
 ---
 
@@ -71,6 +82,9 @@ Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
     - Use `Mockito.verify()` to verify that the mock object's methods were called with correct arguments.
     - For exception testing, thoroughly verify that the exception code returned by `getErrorCode()`
       — the `*ErrorCode` enum the class under test actually throws — matches the expected value.
+      If the thrown exception is a raw `RuntimeException` or a JDK exception with no
+      `getErrorCode()` contract, assert the exception type and, where it carries meaning, its
+      message instead.
 
 ---
 
@@ -80,9 +94,21 @@ To prevent code duplication, highly encourage reusing or creating Test Utility c
 instantiating domain objects or models.
 
 ### Path Mapping Rule
-When a class in `src/main/java/kr/modusplant/domains/[DOMAIN]/[SUB_PATH]/[ClassName].java` is
-needed for testing, find or create its utility at:
-`src/test/java/kr/modusplant/domains/[DOMAIN]/common/util/[SUB_PATH]/[ClassName]TestUtils.java`
+
+A test helper lives under the *area root* of the class it supports, mirroring the main-source
+sub-path (persistence / framework-plumbing segments such as `framework/outbound/jpa` or `models`
+may be flattened to their leaf, e.g. `entity`):
+
+| Class under test (`src/main/java/kr/modusplant/...`) | Area root                | TestUtils (`src/test/java/kr/modusplant/...`)                             |
+|------------------------------------------------------|--------------------------|---------------------------------------------------------------------------|
+| `domains/[DOMAIN]/[SUB_PATH]/[ClassName].java`       | `domains/[DOMAIN]`       | `domains/[DOMAIN]/common/util/[SUB_PATH]/[ClassName]TestUtils.java`       |
+| `infrastructure/[AREA]/[SUB_PATH]/[ClassName].java`  | `infrastructure/[AREA]`  | `infrastructure/[AREA]/common/util/[SUB_PATH]/[ClassName]TestUtils.java`  |
+| `shared/[AREA]/[SUB_PATH]/[ClassName].java`          | `shared/[AREA]`          | `shared/[AREA]/common/util/[SUB_PATH]/[ClassName]TestUtils.java`          |
+| `shared/framework/[LIB]/[SUB_PATH]/[ClassName].java` | `shared/framework/[LIB]` | `shared/framework/[LIB]/common/util/[SUB_PATH]/[ClassName]TestUtils.java` |
+
+The area root is the first package level that owns a `common/` folder: one segment under
+`domains/` and `infrastructure/`; one under `shared/`, except `shared/framework/[LIB]`. 
+Shared parameter constants follow the same mapping into `.../common/constant/`.
 
 ### Common Constraints for TestUtils
 - **Type:** Must be an `interface`.

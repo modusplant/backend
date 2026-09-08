@@ -14,7 +14,7 @@ class RecentlyViewPostRemoveEventTest {
     @DisplayName("create 테스트")
     class CreateTest {
         @Test
-        @DisplayName("postIds가 null일 때 오류 발생")
+        @DisplayName("postIds가 null일 때 예외 반환")
         void testCreate_givenNullPostIds_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
@@ -25,7 +25,7 @@ class RecentlyViewPostRemoveEventTest {
         }
 
         @Test
-        @DisplayName("postIds가 비어 있을 때 오류 발생")
+        @DisplayName("postIds가 비어 있을 때 예외 반환")
         void testCreate_givenEmptyPostIds_willThrowException() {
             // given & when
             InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->

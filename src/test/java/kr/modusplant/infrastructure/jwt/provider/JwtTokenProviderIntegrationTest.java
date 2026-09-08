@@ -26,25 +26,25 @@ class JwtTokenProviderIntegrationTest {
     }
 
     @Test
-    @DisplayName("비대칭키 생성 여부 확인")
-    void testInit_willCreateAsymmetricKeys() {
-        assertNotNull(ReflectionTestUtils.getField(tokenProvider,"privateKey"));
-        assertNotNull(ReflectionTestUtils.getField(tokenProvider,"publicKey"));
+    @DisplayName("키스토어 설정으로 비대칭키 생성 활동 수행")
+    void testInit_givenKeyStoreConfig_willCreateAsymmetricKeys() {
+        // given & when & then
+        assertNotNull(ReflectionTestUtils.getField(tokenProvider, "privateKey"));
+        assertNotNull(ReflectionTestUtils.getField(tokenProvider, "publicKey"));
     }
 
     @Test
-    @DisplayName("토큰 생성 여부 테스트")
-    void testGenerateToken_givenUuid_willReturnValidJwt(){
-        // Given
+    @DisplayName("UUID와 claims로 문자열 반환")
+    void testGenerateAccessToken_givenUuidAndClaims_willReturnString() {
+        // given
         UUID uuid = UUID.randomUUID();
         Map<String, String> claims = createDefaultClaims();
 
-        // When
+        // when
         String accessToken = tokenProvider.generateAccessToken(uuid, claims);
         String refreshToken = tokenProvider.generateRefreshToken(uuid);
 
-        // Then
-        // 토큰 값 형식 검증
+        // then
         assertNotNull(accessToken);
         assertNotNull(refreshToken);
         assertFalse(accessToken.isEmpty());
@@ -52,7 +52,6 @@ class JwtTokenProviderIntegrationTest {
         assertEquals(3, accessToken.split("\\.").length);
         assertEquals(3, refreshToken.split("\\.").length);
 
-        // 토큰 페이로드 검증
         String payloadBase64 = accessToken.split("\\.")[1];
         String payloadJson = new String(Base64.getUrlDecoder().decode(payloadBase64));
         assertTrue(payloadJson.contains("\"sub\":\"" + uuid + "\""));
@@ -61,74 +60,71 @@ class JwtTokenProviderIntegrationTest {
     }
 
     @Test
-    @DisplayName("유효한 토큰 검증 테스트")
-    void testValidateToken_givenValidToken_willReturnTrue(){
-        // Given
+    @DisplayName("유효한 토큰으로 참 반환")
+    void testValidateToken_givenValidToken_willReturnTrue() {
+        // given
         UUID uuid = UUID.randomUUID();
         Map<String, String> claims = createDefaultClaims();
         String accessToken = tokenProvider.generateAccessToken(uuid, claims);
         String refreshToken = tokenProvider.generateRefreshToken(uuid);
 
-        // When
+        // when
         boolean isAccessTokenValid = tokenProvider.validateToken(accessToken);
         boolean isRefreshTokenValid = tokenProvider.validateToken(refreshToken);
 
-        // Then
+        // then
         assertTrue(isAccessTokenValid);
         assertTrue(isRefreshTokenValid);
     }
 
     @Test
-    @DisplayName("payload가 변조된 토큰 검증 테스트")
-    void testValidateToken_givenTamperedToken_willThrowJwtException(){
-        // Given
+    @DisplayName("변조된 payload 토큰으로 예외 반환")
+    void testValidateToken_givenTamperedToken_willThrowException() {
+        // given
         UUID uuid = UUID.randomUUID();
         Map<String, String> claims = createDefaultClaims();
-        String originalToken = tokenProvider.generateAccessToken(uuid,claims);
+        String originalToken = tokenProvider.generateAccessToken(uuid, claims);
 
-        // When
         String[] parts = originalToken.split("\\.");
         String header = parts[0];
         String payload = parts[1];
         String signature = parts[2];
-        // payload 변조 (Base64)
         String decodePayload = new String(Base64.getUrlDecoder().decode(payload));
         String tamperedPayload = decodePayload.replace("\"nickname\":\"test\"", "\"nickname\":\"hacked\"");
         String encodedTamperedPayload = Base64.getUrlEncoder().encodeToString(tamperedPayload.getBytes());
         String tamperedToken = header + "." + encodedTamperedPayload + "." + signature;
 
-        // Then
+        // when & then
         assertThrows(RuntimeException.class, () -> tokenProvider.validateToken(tamperedToken));
     }
 
     @Test
-    @DisplayName("유효하지 않은 Signature를 가진 토큰 검증")
-    void testValidateToken_givenTamperedTokenWithInvalidSignature_willThrowJwtException() {
-        // Given
+    @DisplayName("유효하지 않은 서명 토큰으로 예외 반환")
+    void testValidateToken_givenTamperedTokenWithInvalidSignature_willThrowException() {
+        // given
         UUID uuid = UUID.randomUUID();
         Map<String, String> claims = createDefaultClaims();
-        String originalToken = tokenProvider.generateAccessToken(uuid,claims);
+        String originalToken = tokenProvider.generateAccessToken(uuid, claims);
 
-        // When
         String[] parts = originalToken.split("\\.");
         String tamperedToken = parts[0] + "." + parts[1] + ".fake-signature";
 
-        // Then
+        // when & then
         assertThrows(RuntimeException.class, () -> tokenProvider.validateToken(tamperedToken));
     }
 
     @Test
-    @DisplayName("토큰에서 정보 가져오기 테스트")
-    void testGetClaimsFromToken_givenToken_willReturnInfo() {
-        // Given
+    @DisplayName("토큰으로 Claims 반환")
+    void testGetClaimsFromToken_givenToken_willReturnClaims() {
+        // given
         UUID uuid = UUID.randomUUID();
         Map<String, String> claims = createDefaultClaims();
         String token = tokenProvider.generateAccessToken(uuid, claims);
 
-        // When
+        // when
         Claims extractedClaims = tokenProvider.getClaimsFromToken(token);
 
-        // Then
+        // then
         assertThat(extractedClaims.getIssuer()).isEqualTo("https://app.modusplant.kr");
         assertThat(extractedClaims.getAudience()).contains("https://www.modusplant.kr");
         assertThat(extractedClaims.getSubject()).isEqualTo(String.valueOf(uuid));
@@ -139,59 +135,59 @@ class JwtTokenProviderIntegrationTest {
         assertThat(extractedExpiration).isNotNull();
         assertThat(extractedExpiration.getTime()).isEqualTo(extractedIssuedAt.getTime() + 1800000L);
 
-        assertThat(extractedClaims.get("nickname",String.class)).isEqualTo(claims.get("nickname"));
-        assertThat(extractedClaims.get("roles",String.class)).isEqualTo(claims.get("roles"));
+        assertThat(extractedClaims.get("nickname", String.class)).isEqualTo(claims.get("nickname"));
+        assertThat(extractedClaims.get("roles", String.class)).isEqualTo(claims.get("roles"));
     }
 
     @Test
-    @DisplayName("토큰에서 member UUID 추출")
-    void testGetMemberUuidFromToken_givenToken_willReturnMemberUuid() {
-        // Given
+    @DisplayName("토큰으로 UUID 반환")
+    void testGetMemberUuidFromToken_givenToken_willReturnUuid() {
+        // given
         UUID uuid = UUID.randomUUID();
         String token = tokenProvider.generateRefreshToken(uuid);
 
-        // When
+        // when
         UUID memberUuid = tokenProvider.getMemberUuidFromToken(token);
 
-        // Then
+        // then
         assertThat(memberUuid).isEqualTo(uuid);
     }
 
     @Test
-    @DisplayName("토큰에서 issuedAt 추출")
-    void testGetIssuedAtFromToken_givenToken_willReturnIssuedAt() {
-        // Given
+    @DisplayName("토큰으로 Date 반환")
+    void testGetIssuedAtFromToken_givenToken_willReturnDate() {
+        // given
         Date now = new Date();
         UUID uuid = UUID.randomUUID();
         String token = tokenProvider.generateRefreshToken(uuid);
 
-        // When
+        // when
         Date issuedAt = tokenProvider.getIssuedAtFromToken(token);
 
-        // Then
-        assertThat(issuedAt.getTime()).isCloseTo(now.getTime(),within(5000L));
+        // then
+        assertThat(issuedAt.getTime()).isCloseTo(now.getTime(), within(5000L));
     }
 
     @Test
-    @DisplayName("토큰에서 expiration 추출")
-    void testGetExpirationFromToken_givenToken_willReturnExpiration() {
-        // Given
+    @DisplayName("토큰으로 Date 반환")
+    void testGetExpirationFromToken_givenToken_willReturnDate() {
+        // given
         UUID uuid = UUID.randomUUID();
         String token = tokenProvider.generateRefreshToken(uuid);
 
-        // When
+        // when
         Date issuedAt = tokenProvider.getIssuedAtFromToken(token);
         Date expiration = tokenProvider.getExpirationFromToken(token);
 
-        // Then
+        // then
         long expectedExpiration = issuedAt.getTime() + 604800000L;
         assertThat(expiration.getTime()).isEqualTo(expectedExpiration);
     }
 
-    private Map<String,String> createDefaultClaims() {
+    private Map<String, String> createDefaultClaims() {
         return Map.of(
                 "nickname", "test",
-                "roles","ROLE_USER"
+                "roles", "ROLE_USER"
         );
     }
 }

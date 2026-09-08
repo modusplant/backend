@@ -52,8 +52,8 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("파일 업로드")
-    void uploadFile_givenValidFile_returnActualRequest() throws IOException {
+    @DisplayName("유효한 파일로 S3 객체 업로드 활동 수행")
+    void testUploadFile_givenValidFile_willPutObjectToS3() throws IOException {
         // given
         MultipartFile multipartFile = mock(MultipartFile.class);
         String fileKey = "test-file-key";
@@ -78,8 +78,8 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("파일 다운로드")
-    void downloadFile_givenValidFile_returnFileContent() {
+    @DisplayName("유효한 파일 키로 바이트 배열 반환")
+    void testDownloadFile_givenValidFileKey_willReturnByteArray() {
         // given
         String fileKey = "test-file-key";
         byte[] fileContent = "test-download-content".getBytes();
@@ -99,8 +99,8 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("파일 다운로드 시 해당하는 파일 키가 없어 오류 발생")
-    void downloadFile_givenNotFoundFileKey_willThrowException() {
+    @DisplayName("존재하지 않는 파일 키로 예외 반환")
+    void testDownloadFile_givenNotFoundFileKey_willThrowException() {
         // given
         String fileKey = "test-file-key";
 
@@ -115,8 +115,8 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("파일 삭제")
-    void deleteFile_givenValidFile_returnActualRequest() {
+    @DisplayName("유효한 파일 키로 S3 객체 삭제 활동 수행")
+    void testDeleteFile_givenValidFileKey_willDeleteObjectFromS3() {
         // given
         String fileKey = "test-file-key";
 
@@ -133,16 +133,19 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("파일 src url 변환")
-    void testGenerateS3SrcUrl_givenFileKey_willReturnS3Url() throws Exception {
+    @DisplayName("파일 키로 문자열 반환")
+    void testGenerateS3SrcUrl_givenFileKey_willReturnString() throws Exception {
+        // given
         String fileKey = "test-file-key";
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
         PresignedGetObjectRequest mockPresignedRequest = mock(PresignedGetObjectRequest.class);
         given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
         given(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).willReturn(mockPresignedRequest);
 
+        // when
         String result = amazonS3Service.generateS3SrcUrl(fileKey);
 
+        // then
         assertThat(result).isEqualTo(expected);
         if (!Objects.equals(ReflectionTestUtils.getField(amazonS3Service, "profile"), "dev")) {
             verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
@@ -150,8 +153,9 @@ class AmazonS3ServiceTest {
     }
 
     @Test
-    @DisplayName("Presigned URL 만들어내기")
-    void testGeneratePutPresignedUrl_givenFileKeyAndContentType_willReturnPresignedUrl() throws Exception {
+    @DisplayName("파일 키와 contentType으로 문자열 반환")
+    void testGeneratePutPresignedUrl_givenFileKeyAndContentType_willReturnString() throws Exception {
+        // given
         String fileKey = "test-file-key.jpeg";
         String contentType = "image/jpeg";
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
@@ -159,19 +163,23 @@ class AmazonS3ServiceTest {
         given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
         given(s3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
 
-        String result = amazonS3Service.generatePutPresignedUrl(fileKey,contentType);
+        // when
+        String result = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
 
+        // then
         assertThat(result).isEqualTo(expected);
         verify(s3Presigner, times(1)).presignPutObject(any(PutObjectPresignRequest.class));
     }
 
     @Test
-    @DisplayName("범위를 벗어나는 contentType으로 Presigned URL 만들어낼 시 에러 반환")
+    @DisplayName("범위를 벗어나는 contentType으로 예외 반환")
     void testGeneratePutPresignedUrl_givenFileKeyAndContentTypeOutOfRange_willThrowException() {
+        // given & when
         InvalidValueException invalidValueException =
                 assertThrows(InvalidValueException.class,
                         () -> amazonS3Service.generatePutPresignedUrl("test-file-key.png", "image/jpeg"));
 
+        // then
         assertThat(invalidValueException.getErrorCode()).isEqualTo(INPUT_OUT_OF_RANGE);
     }
 }

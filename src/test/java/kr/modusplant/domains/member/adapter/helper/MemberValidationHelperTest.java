@@ -33,8 +33,8 @@ class MemberValidationHelperTest {
     @DisplayName("회원의 존재 여부 검증")
     class ValidateIfMemberExistsTest {
         @Test
-        @DisplayName("회원이 존재할 때 회원의 존재 여부 검증")
-        void testValidateIfMemberExists_givenExistedMember_willReturnNothing() {
+        @DisplayName("회원이 존재할 때 존재 검증 활동 수행")
+        void testValidateIfMemberExists_givenExistedMember_willProcessAction() {
             // given & when
             given(memberRepository.isIdExist(testMemberId)).willReturn(true);
 
@@ -43,7 +43,7 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("회원이 존재하지 않을 때 회원의 존재 여부 검증")
+        @DisplayName("회원이 존재하지 않을 때 예외 반환")
         void testValidateIfMemberExists_givenNotFoundMember_willThrowException() {
             // given
             given(memberRepository.isIdExist(testMemberId)).willReturn(false);
@@ -60,8 +60,8 @@ class MemberValidationHelperTest {
     @DisplayName("회원 프로필의 존재 여부 검증")
     class ValidateIfMemberProfileExistsTest {
         @Test
-        @DisplayName("회원 프로필이 존재할 때 회원 프로필의 존재 여부 검증")
-        void testValidateIfMemberProfileExists_givenExistedProfile_willReturnNothing() {
+        @DisplayName("회원 프로필이 존재할 때 존재 검증 활동 수행")
+        void testValidateIfMemberProfileExists_givenExistedProfile_willProcessAction() {
             // given & when
             given(memberProfileRepository.isIdExist(testMemberId)).willReturn(true);
 
@@ -70,7 +70,7 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("회원 프로필이 존재하지 않을 때 회원 프로필의 존재 여부 검증")
+        @DisplayName("회원 프로필이 존재하지 않을 때 예외 반환")
         void testValidateIfMemberProfileExists_givenNotFoundProfile_willThrowException() {
             // given
             given(memberProfileRepository.isIdExist(testMemberId)).willReturn(false);
@@ -87,7 +87,7 @@ class MemberValidationHelperTest {
     @DisplayName("닉네임의 중복 여부 검증")
     class ValidateIfNicknameNotDuplicatedTest {
         @Test
-        @DisplayName("닉네임이 이미 존재할 때 닉네임의 중복 여부 검증")
+        @DisplayName("닉네임이 이미 존재할 때 예외 반환")
         void testValidateIfNicknameNotDuplicated_givenExistedNickname_willThrowException() {
             // given
             given(memberRepository.isNicknameExist(testNormalUserNickname)).willReturn(true);
@@ -100,8 +100,8 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("닉네임이 존재하지 않을 때 닉네임의 중복 여부 검증")
-        void testValidateIfNicknameNotDuplicated_givenNotFoundNickname_willReturnNothing() {
+        @DisplayName("닉네임이 존재하지 않을 때 중복 검증 활동 수행")
+        void testValidateIfNicknameNotDuplicated_givenNotFoundNickname_willProcessAction() {
             // given & when
             given(memberRepository.isNicknameExist(testNormalUserNickname)).willReturn(false);
 
@@ -114,8 +114,8 @@ class MemberValidationHelperTest {
     @DisplayName("타겟 게시글의 존재 여부 검증")
     class ValidateIfActivitySubjectPostExistsTest {
         @Test
-        @DisplayName("타겟 게시글이 존재할 때 타겟 게시글의 존재 여부 검증")
-        void testValidateIfActivitySubjectPostExists_givenExistedActivitySubjectPost_willReturnNothing() {
+        @DisplayName("타겟 게시글이 존재할 때 존재 검증 활동 수행")
+        void testValidateIfActivitySubjectPostExists_givenExistedActivitySubjectPost_willProcessAction() {
             // given & when
             given(activitySubjectPostRepository.isIdExist(testActivitySubjectPostId)).willReturn(true);
 
@@ -124,7 +124,7 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("타겟 게시글이 존재하지 않을 때 타겟 게시글의 존재 여부 검증")
+        @DisplayName("타겟 게시글이 존재하지 않을 때 예외 반환")
         void testValidateIfActivitySubjectPostExists_givenNotFoundActivitySubjectPost_willThrowException() {
             // given
             given(activitySubjectPostRepository.isIdExist(testActivitySubjectPostId)).willReturn(false);
@@ -141,8 +141,8 @@ class MemberValidationHelperTest {
     @DisplayName("타겟 댓글의 존재 여부 검증")
     class ValidateIfActivitySubjectCommentExistsTest {
         @Test
-        @DisplayName("타겟 댓글이 존재할 때 타겟 댓글의 존재 여부 검증")
-        void testValidateIfActivitySubjectCommentExists_givenExistedComment_willReturnNothing() {
+        @DisplayName("타겟 댓글이 존재할 때 존재 검증 활동 수행")
+        void testValidateIfActivitySubjectCommentExists_givenExistedComment_willProcessAction() {
             // given & when
             given(activitySubjectCommentRepository.isIdExist(testActivitySubjectCommentId)).willReturn(true);
 
@@ -151,7 +151,7 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("타겟 댓글이 존재하지 않을 때 타겟 댓글의 존재 여부 검증")
+        @DisplayName("타겟 댓글이 존재하지 않을 때 예외 반환")
         void testValidateIfActivitySubjectCommentExists_givenNotFoundComment_willThrowException() {
             // given
             given(activitySubjectCommentRepository.isIdExist(testActivitySubjectCommentId)).willReturn(false);
@@ -168,8 +168,8 @@ class MemberValidationHelperTest {
     @DisplayName("보고서의 존재 여부 검증")
     class ValidateIfReportExistsTest {
         @Test
-        @DisplayName("보고서가 존재할 때 보고서의 존재 여부 검증")
-        void testValidateIfReportExists_givenExistedReport_willReturnNothing() {
+        @DisplayName("보고서가 존재할 때 존재 검증 활동 수행")
+        void testValidateIfReportExists_givenExistedReport_willProcessAction() {
             // given & when
             given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(true);
 
@@ -178,7 +178,7 @@ class MemberValidationHelperTest {
         }
 
         @Test
-        @DisplayName("타겟 댓글이 존재하지 않을 때 타겟 댓글의 존재 여부 검증")
+        @DisplayName("보고서가 존재하지 않을 때 예외 반환")
         void testValidateIfReportExists_givenNotFoundReport_willThrowException() {
             // given
             given(reportRepository.isIdExistInProposalOrBugReport(testReportId)).willReturn(false);

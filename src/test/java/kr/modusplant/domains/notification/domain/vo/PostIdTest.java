@@ -15,8 +15,8 @@ class PostIdTest {
     @DisplayName("generate 테스트")
     class GenerateTests {
         @Test
-        @DisplayName("generate 메서드는 유효한 ULID를 생성한다")
-        void testGenerate_willCreateValidPostId() {
+        @DisplayName("파라미터 없이 PostId 반환")
+        void testGenerate_givenNoParameter_willReturnPostId() {
             PostId postId = PostId.generate();
             assertNotNull(postId.getValue());
             assertEquals(26, postId.getValue().length());
@@ -28,21 +28,21 @@ class PostIdTest {
     class CreateTests {
 
         @Test
-        @DisplayName("유효한 26자 ULID로 PostId를 생성한다")
+        @DisplayName("유효한 ULID로 PostId 반환")
         void testCreate_givenValidUlid_willReturnPostId() {
             PostId postId = PostId.create(TEST_NOTIFICATION_POST_ULID);
             assertEquals(TEST_NOTIFICATION_POST_ULID, postId.getValue());
         }
 
         @Test
-        @DisplayName("빈 값이나 null인 경우 EmptyValueException 발생")
+        @DisplayName("빈 값이나 null일 때 예외 반환")
         void testCreate_givenBlank_willThrowException() {
             assertThrows(EmptyValueException.class, () -> PostId.create(null));
             assertThrows(EmptyValueException.class, () -> PostId.create(""));
         }
 
         @Test
-        @DisplayName("26자가 아니거나 ULID 패턴이 아니면 InvalidValueException 발생")
+        @DisplayName("ULID 패턴이 아닐 때 예외 반환")
         void testCreate_givenInvalidPattern_willThrowException() {
             assertThrows(InvalidValueException.class, () -> PostId.create("short-id"));
             assertThrows(InvalidValueException.class, () -> PostId.create("invalid-pattern-1234567890123"));
@@ -54,8 +54,8 @@ class PostIdTest {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("ULID 값이 같으면 equals는 true를 반환한다")
-        void useEqual_givenSameUlid_willReturnTrue() {
+        @DisplayName("ULID가 같을 때 참 반환")
+        void testEquals_givenSameUlid_willReturnTrue() {
             PostId id1 = PostId.create(TEST_NOTIFICATION_POST_ULID);
             PostId id2 = PostId.create(TEST_NOTIFICATION_POST_ULID);
 
@@ -64,8 +64,8 @@ class PostIdTest {
         }
 
         @Test
-        @DisplayName("다른 클래스나 null과 비교 시 false를 반환한다")
-        void useEqual_givenNullOrDifferentClass_willReturnFalse() {
+        @DisplayName("null이나 다른 클래스일 때 거짓 반환")
+        void testEquals_givenNullOrDifferentClass_willReturnFalse() {
             PostId id = PostId.generate();
 
             assertNotEquals(id, null);

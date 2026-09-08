@@ -37,8 +37,8 @@ public class PostBookmarkJpaRepositoryTest implements PostBookmarkEntityTestUtil
         }
 
         @Test
-        @DisplayName("게시글 북마크 후 조회")
-        void likeCommPost_success() {
+        @DisplayName("저장 후 조회 시 PostBookmarkEntity 반환")
+        void testSave_givenNewEntry_willReturnPostBookmarkEntity() {
             // when
             postBookmarkRepository.save(PostBookmarkEntity.of(postId, memberId));
 
@@ -51,8 +51,8 @@ public class PostBookmarkJpaRepositoryTest implements PostBookmarkEntityTestUtil
         }
 
         @Test
-        @DisplayName("특정 사용자 게시글 북마크 여부 확인")
-        void isBookmarkedByMember_willReturnTrue() {
+        @DisplayName("저장된 항목으로 참 반환")
+        void testExistsByPostIdAndMemberId_givenSavedEntry_willReturnTrue() {
             // given
             postBookmarkRepository.save(PostBookmarkEntity.of(postId, memberId));
 
@@ -64,8 +64,8 @@ public class PostBookmarkJpaRepositoryTest implements PostBookmarkEntityTestUtil
         }
 
         @Test
-        @DisplayName("게시글 북마크 취소")
-        void unlikeCommPost_success() {
+        @DisplayName("저장된 항목 삭제 활동 수행")
+        void testDeleteByPostIdAndMemberId_givenSavedEntry_willProcessAction() {
             // given
             postBookmarkRepository.save(PostBookmarkEntity.of(postId, memberId));
 
@@ -77,8 +77,8 @@ public class PostBookmarkJpaRepositoryTest implements PostBookmarkEntityTestUtil
         }
 
         @Test
-        @DisplayName("게시글 북마크 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
-        void testToString_givenCommPostBookmarkEntity_willReturnRepresentative() {
+        @DisplayName("엔터티로 문자열 반환")
+        void testToString_givenEntity_willReturnString() {
             // given & when
             PostBookmarkEntity entity = postBookmarkRepository.save(PostBookmarkEntity.of(postId, memberId));
 

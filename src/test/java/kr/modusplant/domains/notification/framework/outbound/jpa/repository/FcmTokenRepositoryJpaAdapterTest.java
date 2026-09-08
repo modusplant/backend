@@ -37,8 +37,8 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
     class SaveOrUpdateTests {
 
         @Test
-        @DisplayName("기존에 등록된 토큰이 있으면 멤버와 플랫폼 정보를 업데이트")
-        void testSaveOrUpdate_whenTokenExists_willUpdateEntity() {
+        @DisplayName("기존 토큰이 있을 때 갱신 활동 수행")
+        void testSaveOrUpdate_givenExistingToken_willProcessAction() {
             // given
             Platform platform = Platform.ANDROID;
             MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
@@ -57,8 +57,8 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
         }
 
         @Test
-        @DisplayName("기존에 등록된 토큰이 없으면 새로운 토큰 엔티티를 저장한다")
-        void testSaveOrUpdate_whenTokenNotExists_willSaveNewEntity() {
+        @DisplayName("기존 토큰이 없을 때 신규 저장 활동 수행")
+        void testSaveOrUpdate_givenNoExistingToken_willProcessAction() {
             // given
             Platform platform = Platform.WEB;
             MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
@@ -76,7 +76,7 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 멤버 UUID로 요청 시 NotFoundEntityException이 발생한다")
+        @DisplayName("존재하지 않는 멤버일 때 예외 반환")
         void testSaveOrUpdate_givenInvalidMember_willThrowException() {
             // given
             given(memberJpaRepository.findByUuid(any())).willReturn(Optional.empty());
@@ -91,8 +91,8 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
     class FindTokensTests {
 
         @Test
-        @DisplayName("수신자 ID로 등록된 모든 토큰 문자열 리스트를 반환한다")
-        void testFindTokensByRecipientId_givenValidId_willReturnTokenList() {
+        @DisplayName("수신자 ID로 목록 반환")
+        void testFindTokensByRecipientId_givenValidId_willReturnList() {
             // given
             RecipientId recipientId = RecipientId.fromUuid(MEMBER_BASIC_USER_UUID);
             MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
@@ -115,8 +115,8 @@ class FcmTokenRepositoryJpaAdapterTest implements FcmTokenEntityTestUtils {
     class DeleteTests {
 
         @Test
-        @DisplayName("토큰 문자열로 해당 토큰 정보를 삭제한다")
-        void testDeleteByToken_willCallDelete() {
+        @DisplayName("토큰으로 삭제 활동 수행")
+        void testDeleteByToken_givenToken_willProcessAction() {
             // when
             fcmTokenRepositoryJpaAdapter.deleteByToken(TEST_FCM_TOKEN_WEB);
 

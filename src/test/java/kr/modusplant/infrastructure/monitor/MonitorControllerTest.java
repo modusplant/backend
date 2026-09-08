@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.monitor;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -12,7 +13,8 @@ class MonitorControllerTest {
     private final MonitorController monitorController = new MonitorController(monitorService);
 
     @Test
-    void monitorSuccessTest() {
+    @DisplayName("정상 비즈니스 로직으로 문자열 반환")
+    void testMonitorSuccess_givenSuccessfulBusinessLogic_willReturnString() {
         // given & when
         String returnedValue = "Business logic executed successfully!";
         given(monitorService.performBusinessLogic(true)).willReturn(returnedValue);
@@ -22,7 +24,8 @@ class MonitorControllerTest {
     }
 
     @Test
-    void monitorErrorTest() {
+    @DisplayName("실패하는 비즈니스 로직으로 예외 반환")
+    void testMonitorError_givenFailingBusinessLogic_willThrowException() {
         // given
         given(monitorService.performBusinessLogic(false)).willThrow(new RuntimeException("Exception occurred during the business logic execution!"));
 
@@ -34,7 +37,8 @@ class MonitorControllerTest {
     }
 
     @Test
-    void monitorErrorControllerTest() {
+    @DisplayName("컨트롤러 오류로 예외 반환")
+    void testMonitorErrorController_givenControllerError_willThrowException() {
         // given & when
         RuntimeException runtimeException = assertThrows(RuntimeException.class, monitorController::monitorErrorController);
 
@@ -43,7 +47,8 @@ class MonitorControllerTest {
     }
 
     @Test
-    void monitorRedisHelperTest() {
+    @DisplayName("정상 Redis 호출로 문자열 반환")
+    void testMonitorRedisHelper_givenSuccessfulRedisCall_willReturnString() {
         // given & when
         String returnedValue = "RedisHelper test executed successfully!";
         given(monitorService.monitorRedisHelper()).willReturn(returnedValue);
@@ -53,7 +58,8 @@ class MonitorControllerTest {
     }
 
     @Test
-    void monitorAmazonS3Test() {
+    @DisplayName("정상 S3 호출로 문자열 반환")
+    void testMonitorAmazonS3_givenSuccessfulS3Call_willReturnString() {
         // given & when
         String returnedValue = "Amazon S3 test executed successfully!";
         given(monitorService.monitorAmazonS3()).willReturn(returnedValue);

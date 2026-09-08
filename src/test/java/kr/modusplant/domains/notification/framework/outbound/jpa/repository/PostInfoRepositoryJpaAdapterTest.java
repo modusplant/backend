@@ -27,8 +27,8 @@ class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
     class GetAuthorIdTests {
 
         @Test
-        @DisplayName("게시글 작성자의 UUID를 반환한다")
-        void testGetAuthorId_givenValidPostId_willReturnAuthorUuid() {
+        @DisplayName("유효한 게시글 ID로 UUID 반환")
+        void testGetAuthorIdByPostId_givenValidPostId_willReturnUuid() {
             // given
             PostEntity postEntity = Mockito.mock(PostEntity.class);
             MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
@@ -49,8 +49,8 @@ class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
     @DisplayName("getNotificationPreviewByPostId 테스트")
     class GetNotificationPreviewTests {
         @Test
-        @DisplayName("게시글 제목을 포함한 프리뷰를 반환한다")
-        void testGetNotificationPreview_givenValidPostId_willReturnPreview() {
+        @DisplayName("유효한 게시글 ID로 읽기 모델 반환")
+        void testGetNotificationPreviewByPostId_givenValidPostId_willReturnReadModel() {
             // given
             PostEntity postEntity = Mockito.mock(PostEntity.class);
             MemberEntity authorEntity = Mockito.mock(MemberEntity.class);

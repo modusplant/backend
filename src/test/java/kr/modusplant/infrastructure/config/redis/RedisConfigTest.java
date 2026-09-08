@@ -25,7 +25,7 @@ public class RedisConfigTest {
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private RedisTemplate<String,Object> redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @BeforeEach
     void setUp() {
@@ -38,46 +38,55 @@ public class RedisConfigTest {
     }
 
     @Test
-    @DisplayName("문자열 Redis 템플릿으로 문자열 저장")
-    void storeString_givenValidStringRedisTemplate_willReturnString() {
+    @DisplayName("StringRedisTemplate 왕복 시 문자열 반환")
+    void testStringRedisTemplate_givenStringValue_willReturnString() {
+        // given & when
         stringRedisTemplate.opsForValue().set("testStringKey", "testStringValue");
 
+        // then
         String result = stringRedisTemplate.opsForValue().get("testStringKey");
-        assertEquals("testStringValue",result);
+        assertEquals("testStringValue", result);
     }
 
     @Test
-    @DisplayName("Redis 템플릿으로 문자열 저장")
-    void storeString_givenValidRedisTemplate_willReturnString() {
+    @DisplayName("RedisTemplate 왕복 시 문자열 반환")
+    void testRedisTemplate_givenStringValue_willReturnString() {
+        // given & when
         redisTemplate.opsForValue().set("testStringKey", "testStringValue");
 
+        // then
         String result = (String) redisTemplate.opsForValue().get("testStringKey");
-        assertEquals("testStringValue",result);
+        assertEquals("testStringValue", result);
     }
 
     @Test
-    @DisplayName("Redis 템플릿으로 객체 저장")
-    void storeObject_givenValidRedisTemplate_willReturnObject() {
-        TestObject testObject = new TestObject("John",28, LocalDateTime.now());
+    @DisplayName("RedisTemplate 왕복 시 객체 반환")
+    void testRedisTemplate_givenObjectValue_willReturnObject() {
+        // given
+        TestObject testObject = new TestObject("John", 28, LocalDateTime.now());
 
-        redisTemplate.opsForValue().set("testObjectKey",testObject);
-
+        // when
+        redisTemplate.opsForValue().set("testObjectKey", testObject);
         TestObject result = (TestObject) redisTemplate.opsForValue().get("testObjectKey");
 
+        // then
         assertNotNull(result);
         assertEquals(testObject.getName(), result.getName());
         assertEquals(testObject.getAge(), result.getAge());
         assertEquals(testObject.getCreatedAt(), result.getCreatedAt());
     }
 
-
     @Test
-    @DisplayName("Redis 템플릿으로 집합 저장")
-    void storeSet_givenValidRedisTemplate_willReturnSet() {
+    @DisplayName("RedisTemplate 왕복 시 집합 반환")
+    void testRedisTemplate_givenSetValue_willReturnSet() {
+        // given
         SetOperations<String, Object> setOps = redisTemplate.opsForSet();
-        setOps.add("testSetKey","Item1", "Item2", "Item3");
 
+        // when
+        setOps.add("testSetKey", "Item1", "Item2", "Item3");
         Set<Object> result = setOps.members("testSetKey");
+
+        // then
         assertNotNull(result);
         assertTrue(result.contains("Item1"));
         assertTrue(result.contains("Item2"));
@@ -85,46 +94,53 @@ public class RedisConfigTest {
     }
 
     @Test
-    @DisplayName("Redis 템플릿으로 리스트 저장")
-    void storeList_givenValidRedisTemplate_willReturnList() {
+    @DisplayName("RedisTemplate 왕복 시 리스트 반환")
+    void testRedisTemplate_givenListValue_willReturnList() {
+        // given
         ListOperations<String, Object> listOps = redisTemplate.opsForList();
-        listOps.rightPush("testListKey","Item1");
-        listOps.rightPush("testListKey","Item2");
-        listOps.rightPush("testListKey","Item3");
 
+        // when
+        listOps.rightPush("testListKey", "Item1");
+        listOps.rightPush("testListKey", "Item2");
+        listOps.rightPush("testListKey", "Item3");
+
+        // then
         assertEquals(3, listOps.size("testListKey"));
-        assertEquals("Item3",listOps.rightPop("testListKey"));
-        assertEquals("Item2",listOps.rightPop("testListKey"));
-        assertEquals("Item1",listOps.rightPop("testListKey"));
+        assertEquals("Item3", listOps.rightPop("testListKey"));
+        assertEquals("Item2", listOps.rightPop("testListKey"));
+        assertEquals("Item1", listOps.rightPop("testListKey"));
     }
 
     @Test
-    @DisplayName("Redis 템플릿으로 해시 저장")
-    void storeHash_givenValidRedisTemplate_willReturnHash() {
+    @DisplayName("RedisTemplate 왕복 시 Map 반환")
+    void testRedisTemplate_givenHashValue_willReturnMap() {
+        // given
         Date birthday = new Date();
-
         HashOperations<String, Object, Object> hashOps = redisTemplate.opsForHash();
         Map<String, Object> map = new HashMap<>();
         map.put("name", "John");
         map.put("age", 28);
         map.put("birthday", birthday);
 
-        hashOps.putAll("testHashKey",map);
+        // when
+        hashOps.putAll("testHashKey", map);
 
-        assertEquals("John",hashOps.get("testHashKey","name"));
-        assertEquals(28,hashOps.get("testHashKey","age"));
-        assertEquals(birthday,hashOps.get("testHashKey","birthday"));
+        // then
+        assertEquals("John", hashOps.get("testHashKey", "name"));
+        assertEquals(28, hashOps.get("testHashKey", "age"));
+        assertEquals(birthday, hashOps.get("testHashKey", "birthday"));
     }
 
     @Test
-    @DisplayName("Redis 템플릿으로 열거형 저장")
-    void storeEnum_givenValidRedisTemplate_willReturnEnum() {
+    @DisplayName("RedisTemplate 왕복 시 열거형 반환")
+    void testRedisTemplate_givenEnumValue_willReturnEnum() {
+        // given & when
         redisTemplate.opsForValue().set("testEnumKey", Role.USER);
-
         Role role = (Role) redisTemplate.opsForValue().get("testEnumKey");
 
+        // then
         assertNotNull(role);
-        assertEquals(Role.USER,role);
+        assertEquals(Role.USER, role);
     }
 
     @Getter

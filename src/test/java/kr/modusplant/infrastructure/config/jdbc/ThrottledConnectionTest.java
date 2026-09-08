@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.config.jdbc;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -21,7 +22,8 @@ class ThrottledConnectionTest {
     private final ThrottledConnection throttledConnection = new ThrottledConnection(connection, semaphore);
 
     @Test
-    void createStatementTest() throws SQLException {
+    @DisplayName("인자 없이 Statement 반환")
+    void testCreateStatement_givenNoArgs_willReturnStatement() throws SQLException {
         // given & when
         Statement returnedValue = Mockito.mock(Statement.class);
         given(connection.createStatement()).willReturn(returnedValue);
@@ -31,7 +33,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareStatementTest() throws SQLException {
+    @DisplayName("SQL로 PreparedStatement 반환")
+    void testPrepareStatement_givenSql_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString())).willReturn(returnedValue);
@@ -41,7 +44,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareCallTest() throws SQLException {
+    @DisplayName("SQL로 CallableStatement 반환")
+    void testPrepareCall_givenSql_willReturnCallableStatement() throws SQLException {
         // given & when
         CallableStatement returnedValue = Mockito.mock(CallableStatement.class);
         given(connection.prepareCall(anyString())).willReturn(returnedValue);
@@ -51,7 +55,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void nativeSQLTest() throws SQLException {
+    @DisplayName("SQL로 문자열 반환")
+    void testNativeSQL_givenSql_willReturnString() throws SQLException {
         // given & when
         String returnedValue = "SELECT 1";
         given(connection.nativeSQL(anyString())).willReturn(returnedValue);
@@ -61,7 +66,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setAutoCommitTest() throws SQLException {
+    @DisplayName("플래그로 Connection 위임 활동 수행")
+    void testSetAutoCommit_givenFlag_willDelegateToConnection() throws SQLException {
         // given
         boolean autoCommit = false;
 
@@ -73,7 +79,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getAutoCommitTest() throws SQLException {
+    @DisplayName("인자 없이 불리언 반환")
+    void testGetAutoCommit_givenNoArgs_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = true;
         given(connection.getAutoCommit()).willReturn(returnedValue);
@@ -83,7 +90,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void commitTest() throws SQLException {
+    @DisplayName("인자 없이 Connection 위임 활동 수행")
+    void testCommit_givenNoArgs_willDelegateToConnection() throws SQLException {
         // given & when
         throttledConnection.commit();
 
@@ -92,7 +100,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void rollbackTest() throws SQLException {
+    @DisplayName("인자 없이 Connection 위임 활동 수행")
+    void testRollback_givenNoArgs_willDelegateToConnection() throws SQLException {
         // given & when
         throttledConnection.rollback();
 
@@ -101,7 +110,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void isClosedTest() throws SQLException {
+    @DisplayName("인자 없이 불리언 반환")
+    void testIsClosed_givenNoArgs_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = false;
         given(connection.isClosed()).willReturn(returnedValue);
@@ -111,7 +121,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getMetaDataTest() throws SQLException {
+    @DisplayName("인자 없이 DatabaseMetaData 반환")
+    void testGetMetaData_givenNoArgs_willReturnDatabaseMetaData() throws SQLException {
         // given & when
         DatabaseMetaData returnedValue = Mockito.mock(DatabaseMetaData.class);
         given(connection.getMetaData()).willReturn(returnedValue);
@@ -121,7 +132,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setReadOnlyTest() throws SQLException {
+    @DisplayName("플래그로 Connection 위임 활동 수행")
+    void testSetReadOnly_givenFlag_willDelegateToConnection() throws SQLException {
         // given
         boolean readOnly = true;
 
@@ -133,7 +145,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void isReadOnlyTest() throws SQLException {
+    @DisplayName("인자 없이 불리언 반환")
+    void testIsReadOnly_givenNoArgs_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = true;
         given(connection.isReadOnly()).willReturn(returnedValue);
@@ -143,7 +156,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setCatalogTest() throws SQLException {
+    @DisplayName("카탈로그로 Connection 위임 활동 수행")
+    void testSetCatalog_givenCatalog_willDelegateToConnection() throws SQLException {
         // given
         String catalog = "test catalog";
 
@@ -155,7 +169,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getCatalogTest() throws SQLException {
+    @DisplayName("인자 없이 문자열 반환")
+    void testGetCatalog_givenNoArgs_willReturnString() throws SQLException {
         // given & when
         String returnedValue = "test catalog";
         given(connection.getCatalog()).willReturn(returnedValue);
@@ -165,7 +180,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setTransactionIsolationTest() throws SQLException {
+    @DisplayName("격리 수준으로 Connection 위임 활동 수행")
+    void testSetTransactionIsolation_givenLevel_willDelegateToConnection() throws SQLException {
         // given
         int level = Connection.TRANSACTION_READ_COMMITTED;
 
@@ -177,7 +193,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getTransactionIsolationTest() throws SQLException {
+    @DisplayName("인자 없이 int 반환")
+    void testGetTransactionIsolation_givenNoArgs_willReturnInt() throws SQLException {
         // given & when
         int returnedValue = Connection.TRANSACTION_READ_COMMITTED;
         given(connection.getTransactionIsolation()).willReturn(returnedValue);
@@ -187,7 +204,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getWarningsTest() throws SQLException {
+    @DisplayName("인자 없이 SQLWarning 반환")
+    void testGetWarnings_givenNoArgs_willReturnSQLWarning() throws SQLException {
         // given & when
         SQLWarning returnedValue = Mockito.mock(SQLWarning.class);
         given(connection.getWarnings()).willReturn(returnedValue);
@@ -197,7 +215,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void clearWarningsTest() throws SQLException {
+    @DisplayName("인자 없이 Connection 위임 활동 수행")
+    void testClearWarnings_givenNoArgs_willDelegateToConnection() throws SQLException {
         // given & when
         throttledConnection.clearWarnings();
 
@@ -207,7 +226,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("MagicConstant")
     @Test
-    void createStatementWithResultSetTypeTest() throws SQLException {
+    @DisplayName("ResultSet 타입으로 Statement 반환")
+    void testCreateStatement_givenResultSetType_willReturnStatement() throws SQLException {
         // given & when
         Statement returnedValue = Mockito.mock(Statement.class);
         given(connection.createStatement(anyInt(), anyInt())).willReturn(returnedValue);
@@ -218,7 +238,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("MagicConstant")
     @Test
-    void prepareStatementWithResultSetTypeTest() throws SQLException {
+    @DisplayName("ResultSet 타입으로 PreparedStatement 반환")
+    void testPrepareStatement_givenResultSetType_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString(), anyInt(), anyInt())).willReturn(returnedValue);
@@ -228,7 +249,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareCallWithResultSetTypeTest() throws SQLException {
+    @DisplayName("ResultSet 타입으로 CallableStatement 반환")
+    void testPrepareCall_givenResultSetType_willReturnCallableStatement() throws SQLException {
         // given & when
         CallableStatement returnedValue = Mockito.mock(CallableStatement.class);
         given(connection.prepareCall(anyString(), anyInt(), anyInt())).willReturn(returnedValue);
@@ -239,7 +261,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void getTypeMapTest() throws SQLException {
+    @DisplayName("인자 없이 Map 반환")
+    void testGetTypeMap_givenNoArgs_willReturnMap() throws SQLException {
         // given & when
         Map<String, Class<?>> returnedValue = Mockito.mock(Map.class);
         given(connection.getTypeMap()).willReturn(returnedValue);
@@ -250,7 +273,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    void setTypeMapTest() throws SQLException {
+    @DisplayName("Map으로 Connection 위임 활동 수행")
+    void testSetTypeMap_givenMap_willDelegateToConnection() throws SQLException {
         // given
         Map<String, Class<?>> map = Mockito.mock(Map.class);
 
@@ -262,7 +286,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setHoldabilityTest() throws SQLException {
+    @DisplayName("holdability로 Connection 위임 활동 수행")
+    void testSetHoldability_givenHoldability_willDelegateToConnection() throws SQLException {
         // given
         int holdability = ResultSet.CLOSE_CURSORS_AT_COMMIT;
 
@@ -274,7 +299,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getHoldabilityTest() throws SQLException {
+    @DisplayName("인자 없이 int 반환")
+    void testGetHoldability_givenNoArgs_willReturnInt() throws SQLException {
         // given & when
         int returnedValue = ResultSet.CLOSE_CURSORS_AT_COMMIT;
         given(connection.getHoldability()).willReturn(returnedValue);
@@ -284,7 +310,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setSavepointTest() throws SQLException {
+    @DisplayName("인자 없이 Savepoint 반환")
+    void testSetSavepoint_givenNoArgs_willReturnSavepoint() throws SQLException {
         // given & when
         Savepoint returnedValue = Mockito.mock(Savepoint.class);
         given(connection.setSavepoint()).willReturn(returnedValue);
@@ -294,7 +321,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setSavepointWithNameTest() throws SQLException {
+    @DisplayName("이름으로 Savepoint 반환")
+    void testSetSavepoint_givenName_willReturnSavepoint() throws SQLException {
         // given & when
         Savepoint returnedValue = Mockito.mock(Savepoint.class);
         given(connection.setSavepoint(anyString())).willReturn(returnedValue);
@@ -304,7 +332,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void rollbackWithSavepointTest() throws SQLException {
+    @DisplayName("Savepoint로 Connection 위임 활동 수행")
+    void testRollback_givenSavepoint_willDelegateToConnection() throws SQLException {
         // given
         Savepoint savepoint = Mockito.mock(Savepoint.class);
 
@@ -316,7 +345,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void releaseSavepointTest() throws SQLException {
+    @DisplayName("Savepoint로 Connection 위임 활동 수행")
+    void testReleaseSavepoint_givenSavepoint_willDelegateToConnection() throws SQLException {
         // given
         Savepoint savepoint = Mockito.mock(Savepoint.class);
 
@@ -329,7 +359,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("MagicConstant")
     @Test
-    void createStatementWithHoldabilityTest() throws SQLException {
+    @DisplayName("holdability로 Statement 반환")
+    void testCreateStatement_givenHoldability_willReturnStatement() throws SQLException {
         // given & when
         Statement returnedValue = Mockito.mock(Statement.class);
         given(connection.createStatement(anyInt(), anyInt(), anyInt())).willReturn(returnedValue);
@@ -340,7 +371,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("MagicConstant")
     @Test
-    void prepareStatementWithHoldabilityTest() throws SQLException {
+    @DisplayName("holdability로 PreparedStatement 반환")
+    void testPrepareStatement_givenHoldability_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString(), anyInt(), anyInt(), anyInt())).willReturn(returnedValue);
@@ -350,7 +382,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareCallWithHoldabilityTest() throws SQLException {
+    @DisplayName("holdability로 CallableStatement 반환")
+    void testPrepareCall_givenHoldability_willReturnCallableStatement() throws SQLException {
         // given & when
         CallableStatement returnedValue = Mockito.mock(CallableStatement.class);
         given(connection.prepareCall(anyString(), anyInt(), anyInt(), anyInt())).willReturn(returnedValue);
@@ -361,7 +394,8 @@ class ThrottledConnectionTest {
 
     @SuppressWarnings("MagicConstant")
     @Test
-    void prepareStatementWithAutoGeneratedKeysTest() throws SQLException {
+    @DisplayName("autoGeneratedKeys로 PreparedStatement 반환")
+    void testPrepareStatement_givenAutoGeneratedKeys_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString(), anyInt())).willReturn(returnedValue);
@@ -371,7 +405,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareStatementWithColumnIndexesTest() throws SQLException {
+    @DisplayName("컬럼 인덱스로 PreparedStatement 반환")
+    void testPrepareStatement_givenColumnIndexes_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString(), any(int[].class))).willReturn(returnedValue);
@@ -381,7 +416,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void prepareStatementWithColumnNamesTest() throws SQLException {
+    @DisplayName("컬럼 이름으로 PreparedStatement 반환")
+    void testPrepareStatement_givenColumnNames_willReturnPreparedStatement() throws SQLException {
         // given & when
         PreparedStatement returnedValue = Mockito.mock(PreparedStatement.class);
         given(connection.prepareStatement(anyString(), any(String[].class))).willReturn(returnedValue);
@@ -391,7 +427,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createClobTest() throws SQLException {
+    @DisplayName("인자 없이 Clob 반환")
+    void testCreateClob_givenNoArgs_willReturnClob() throws SQLException {
         // given & when
         Clob returnedValue = Mockito.mock(Clob.class);
         given(connection.createClob()).willReturn(returnedValue);
@@ -401,7 +438,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createBlobTest() throws SQLException {
+    @DisplayName("인자 없이 Blob 반환")
+    void testCreateBlob_givenNoArgs_willReturnBlob() throws SQLException {
         // given & when
         Blob returnedValue = Mockito.mock(Blob.class);
         given(connection.createBlob()).willReturn(returnedValue);
@@ -411,7 +449,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createNClobTest() throws SQLException {
+    @DisplayName("인자 없이 NClob 반환")
+    void testCreateNClob_givenNoArgs_willReturnNClob() throws SQLException {
         // given & when
         NClob returnedValue = Mockito.mock(NClob.class);
         given(connection.createNClob()).willReturn(returnedValue);
@@ -421,7 +460,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createSQLXMLTest() throws SQLException {
+    @DisplayName("인자 없이 SQLXML 반환")
+    void testCreateSQLXML_givenNoArgs_willReturnSQLXML() throws SQLException {
         // given & when
         SQLXML returnedValue = Mockito.mock(SQLXML.class);
         given(connection.createSQLXML()).willReturn(returnedValue);
@@ -431,7 +471,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void isValidTest() throws SQLException {
+    @DisplayName("타임아웃으로 불리언 반환")
+    void testIsValid_givenTimeout_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = true;
         given(connection.isValid(anyInt())).willReturn(returnedValue);
@@ -441,7 +482,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setClientInfoWithNameTest() throws SQLClientInfoException {
+    @DisplayName("이름과 값으로 Connection 위임 활동 수행")
+    void testSetClientInfo_givenNameAndValue_willDelegateToConnection() throws SQLClientInfoException {
         // given
         String name = "ApplicationName";
         String value = "MyApp";
@@ -454,7 +496,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setClientInfoWithPropertiesTest() throws SQLClientInfoException {
+    @DisplayName("Properties로 Connection 위임 활동 수행")
+    void testSetClientInfo_givenProperties_willDelegateToConnection() throws SQLClientInfoException {
         // given
         Properties properties = new Properties();
 
@@ -466,7 +509,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getClientInfoWithNameTest() throws SQLException {
+    @DisplayName("이름으로 문자열 반환")
+    void testGetClientInfo_givenName_willReturnString() throws SQLException {
         // given & when
         String returnedValue = "ModusPlant";
         given(connection.getClientInfo(anyString())).willReturn(returnedValue);
@@ -476,7 +520,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getClientInfoTest() throws SQLException {
+    @DisplayName("인자 없이 Properties 반환")
+    void testGetClientInfo_givenNoArgs_willReturnProperties() throws SQLException {
         // given & when
         Properties returnedValue = Mockito.mock(Properties.class);
         given(connection.getClientInfo()).willReturn(returnedValue);
@@ -486,7 +531,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createArrayOfTest() throws SQLException {
+    @DisplayName("타입과 요소로 Array 반환")
+    void testCreateArrayOf_givenTypeAndElements_willReturnArray() throws SQLException {
         // given & when
         Array returnedValue = Mockito.mock(Array.class);
         given(connection.createArrayOf(anyString(), any(Object[].class))).willReturn(returnedValue);
@@ -496,7 +542,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void createStructTest() throws SQLException {
+    @DisplayName("타입과 속성으로 Struct 반환")
+    void testCreateStruct_givenTypeAndAttributes_willReturnStruct() throws SQLException {
         // given & when
         Struct returnedValue = Mockito.mock(Struct.class);
         given(connection.createStruct(anyString(), any(Object[].class))).willReturn(returnedValue);
@@ -506,7 +553,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setSchemaTest() throws SQLException {
+    @DisplayName("스키마로 Connection 위임 활동 수행")
+    void testSetSchema_givenSchema_willDelegateToConnection() throws SQLException {
         // given
         String schema = "public";
 
@@ -518,7 +566,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getSchemaTest() throws SQLException {
+    @DisplayName("인자 없이 문자열 반환")
+    void testGetSchema_givenNoArgs_willReturnString() throws SQLException {
         // given & when
         String returnedValue = "public";
         given(connection.getSchema()).willReturn(returnedValue);
@@ -528,7 +577,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void abortTest() throws SQLException {
+    @DisplayName("Executor로 Connection 위임 활동 수행")
+    void testAbort_givenExecutor_willDelegateToConnection() throws SQLException {
         // given
         Executor executor = Mockito.mock(Executor.class);
 
@@ -540,7 +590,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void setNetworkTimeoutTest() throws SQLException {
+    @DisplayName("Executor와 타임아웃으로 Connection 위임 활동 수행")
+    void testSetNetworkTimeout_givenExecutorAndTimeout_willDelegateToConnection() throws SQLException {
         // given
         Executor executor = Mockito.mock(Executor.class);
         int timeout = 5000;
@@ -553,7 +604,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void getNetworkTimeoutTest() throws SQLException {
+    @DisplayName("인자 없이 int 반환")
+    void testGetNetworkTimeout_givenNoArgs_willReturnInt() throws SQLException {
         // given & when
         int returnedValue = 5000;
         given(connection.getNetworkTimeout()).willReturn(returnedValue);
@@ -563,7 +615,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void unwrapTest() throws SQLException {
+    @DisplayName("클래스로 Object 반환")
+    void testUnwrap_givenClass_willReturnObject() throws SQLException {
         // given & when
         Object returnedValue = Mockito.mock(Object.class);
         given(connection.unwrap(any())).willReturn(returnedValue);
@@ -573,7 +626,8 @@ class ThrottledConnectionTest {
     }
 
     @Test
-    void isWrapperForTest() throws SQLException {
+    @DisplayName("클래스로 불리언 반환")
+    void testIsWrapperFor_givenClass_willReturnBoolean() throws SQLException {
         // given & when
         boolean returnedValue = true;
         given(connection.isWrapperFor(any())).willReturn(returnedValue);

@@ -16,8 +16,8 @@ class LikeCountTest implements PostTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("zero() 메서드로 0 값의 LikeCount를 생성한다")
-        void testZero_givenNothing_willReturnZero() {
+        @DisplayName("zero()로 LikeCount 반환")
+        void testZero_givenNothing_willReturnLikeCount() {
             // when
             LikeCount likeCount = LikeCount.zero();
 
@@ -27,7 +27,7 @@ class LikeCountTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("유효한 정수 값으로 LikeCount를 생성한다")
+        @DisplayName("유효한 정수 값으로 LikeCount 반환")
         void testCreate_givenValidParameter_willReturnLikeCount() {
             // given
             int largeValue = Integer.MAX_VALUE;
@@ -46,7 +46,7 @@ class LikeCountTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("음수 값으로 LikeCount 생성 시 InvalidLikeCountException을 발생시킨다")
+        @DisplayName("음수 값일 때 예외 반환")
         void testCreate_givenMinusValue_willThrowException() {
             // when & then
             assertThrows(InvalidValueException.class, () -> LikeCount.create(-1));
@@ -60,8 +60,8 @@ class LikeCountTest implements PostTestUtils {
     class IncrementTests {
 
         @Test
-        @DisplayName("increment 시 좋아요수+1을 반환한다")
-        void testIncrement_givenLikeCount_willReturnIncrementedLikeCount() {
+        @DisplayName("increment 시 LikeCount 반환")
+        void testIncrement_givenLikeCount_willReturnLikeCount() {
             // given
             LikeCount likeCount1 = LikeCount.zero();
             LikeCount likeCount2 = LikeCount.create(1000000);
@@ -84,8 +84,8 @@ class LikeCountTest implements PostTestUtils {
     class DecrementTests {
 
         @Test
-        @DisplayName("1 이상의 좋아요수에서 decrement 시 좋아요수-1을 반환한다")
-        void testDecrement_givenLikeCount_willReturnLikeCountMinusOne() {
+        @DisplayName("1 이상에서 decrement 시 LikeCount 반환")
+        void testDecrement_givenPositiveLikeCount_willReturnLikeCount() {
             // given
             LikeCount likeCount1 = LikeCount.create(1);
             LikeCount likeCount2 = LikeCount.create(1000000);
@@ -102,8 +102,8 @@ class LikeCountTest implements PostTestUtils {
         }
 
         @Test
-        @DisplayName("0에서 decrement 시 0으로 유지된다")
-        void testDecrement_givenLikeCountIsZero_willReturnZero() {
+        @DisplayName("0에서 decrement 시 LikeCount 반환")
+        void testDecrement_givenZeroLikeCount_willReturnLikeCount() {
             // given
             LikeCount likeCount = LikeCount.zero();
 
@@ -120,24 +120,24 @@ class LikeCountTest implements PostTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             assertEquals(testLikeCount, testLikeCount);
             assertEquals(testLikeCount.hashCode(), testLikeCount.hashCode());
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
             assertNotEquals(testLikeCount, testPostId);
             assertNotEquals(testLikeCount.hashCode(), testPostId.hashCode());
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
             assertNotEquals(testLikeCount, LikeCount.zero());
         }

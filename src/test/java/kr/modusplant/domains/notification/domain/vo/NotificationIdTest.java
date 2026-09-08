@@ -22,7 +22,7 @@ class NotificationIdTest implements NotificationTestUtils {
     class GenerateTests {
 
         @Test
-        @DisplayName("generate() 메서드로 유효한 NotificationId를 생성한다")
+        @DisplayName("파라미터 없이 NotificationId 반환")
         void testGenerate_givenNoParameter_willReturnNotificationId() {
             // when
             NotificationId notificationId = NotificationId.generate();
@@ -40,7 +40,7 @@ class NotificationIdTest implements NotificationTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("유효한 ULID 문자열로 NotificationId를 생성한다")
+        @DisplayName("유효한 ULID로 NotificationId 반환")
         void testCreate_givenUlid_willReturnNotificationId() {
             // then
             assertFalse(StringUtils.isBlank(testNotificationId.getValue()));
@@ -51,7 +51,7 @@ class NotificationIdTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("null이나 빈 문자열 ULID로 NotificationId 생성 시 EmptyValueException을 발생시킨다")
+        @DisplayName("null이나 빈 ULID일 때 예외 반환")
         void testCreate_givenNullOrEmptyNotificationId_willThrowException() {
             // when & then
             assertThrows(EmptyValueException.class, () -> NotificationId.create(null));
@@ -60,8 +60,8 @@ class NotificationIdTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("유효하지 않은 ULID로 NotificationId 생성 시 InvalidValueException을 발생시킨다")
-        void shouldThrowInvalidNotificationIdExceptionWhenUlidIsInvalid() {
+        @DisplayName("유효하지 않은 ULID일 때 예외 반환")
+        void testCreate_givenInvalidUlid_willThrowException() {
             // when & then
             assertThrows(InvalidValueException.class, () -> NotificationId.create("01K59D7R5ZT51X9HVZXGK4A6W")); // 25자
             assertThrows(InvalidValueException.class, () -> NotificationId.create("01K59D7R5ZT51X9HVZXGK4A6W@")); // 유효하지 않은 문자 @포함
@@ -73,23 +73,23 @@ class NotificationIdTest implements NotificationTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             assertEquals(testNotificationId, testNotificationId);
             assertEquals(testNotificationId.hashCode(), testNotificationId.hashCode());
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
             assertNotEquals(testNotificationId, testNotificationActionCommentAdded);
         }
 
         @Test
-        @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
             assertNotEquals(testNotificationId, NotificationId.generate());
         }

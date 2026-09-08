@@ -17,7 +17,7 @@ class ActorTest {
     class CreationTests {
 
         @Test
-        @DisplayName("유효한 UUID와 닉네임으로 Actor를 생성한다")
+        @DisplayName("유효한 UUID와 닉네임으로 Actor 반환")
         void testFromUuidWithNickname_givenValidParams_willReturnActor() {
             // when
             Actor actor = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_ACTOR_NICKNAME);
@@ -29,7 +29,7 @@ class ActorTest {
         }
 
         @Test
-        @DisplayName("유효한 UUID 문자열과 닉네임으로 Actor를 생성한다")
+        @DisplayName("유효한 UUID 문자열과 닉네임으로 Actor 반환")
         void testFromStringWithNickname_givenValidParams_willReturnActor() {
             // when
             Actor actor = Actor.fromStringWithNickname(TEST_NOTIFICATION_ACTOR_ID.toString(), TEST_NOTIFICATION_ACTOR_NICKNAME);
@@ -40,13 +40,17 @@ class ActorTest {
         }
 
         @Test
-        @DisplayName("닉네임이 null이거나 패턴에 맞지 않으면 예외를 발생시킨다")
-        void testValidateNickname_givenInvalidNickname_willThrowException() {
-            // null 체크
+        @DisplayName("닉네임이 null일 때 예외 반환")
+        void testFromUuidWithNickname_givenNullNickname_willThrowException() {
+            // given & when & then
             assertThrows(EmptyValueException.class, () ->
                     Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, null));
+        }
 
-            // 패턴 체크 (예: 특수문자 포함 등 PATTERN_NICKNAME 위반 시)
+        @Test
+        @DisplayName("닉네임 패턴 위반 시 예외 반환")
+        void testFromUuidWithNickname_givenInvalidNicknamePattern_willThrowException() {
+            // given & when & then
             assertThrows(InvalidValueException.class, () ->
                     Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, "@@@잘못된닉네임@@@"));
         }
@@ -58,8 +62,8 @@ class ActorTest {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("ID와 닉네임이 모두 같으면 equals는 true를 반환한다")
-        void useEqual_givenSameIdAndNickname_willReturnTrue() {
+        @DisplayName("ID와 닉네임이 같을 때 참 반환")
+        void testEquals_givenSameIdAndNickname_willReturnTrue() {
             Actor actor1 = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_ACTOR_NICKNAME);
             Actor actor2 = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_ACTOR_NICKNAME);
 
@@ -68,8 +72,8 @@ class ActorTest {
         }
 
         @Test
-        @DisplayName("ID가 같더라도 닉네임이 다르면 equals는 false를 반환한다")
-        void useEqual_givenDifferentNickname_willReturnFalse() {
+        @DisplayName("닉네임이 다를 때 거짓 반환")
+        void testEquals_givenDifferentNickname_willReturnFalse() {
             Actor actor1 = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, "테스터1");
             Actor actor2 = Actor.fromUuidWithNickname(TEST_NOTIFICATION_ACTOR_ID, "테스터2");
 

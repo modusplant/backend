@@ -28,10 +28,13 @@ public class ApiLoggingAspectTest {
     }
 
     @Test
-    @DisplayName("AOP 적용 컨트롤러 메소드 호출")
-    void getMonitorSuccess_givenRestController_willReturnSuccessStatusWithAopLogging() throws Exception{
+    @DisplayName("REST 컨트롤러 호출 시 API 로그 기록 활동 수행")
+    void testTraceApiCall_givenRestControllerCall_willWriteApiLog() throws Exception {
+        // given
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
+
+        // when
         mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
                         .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().isOk());
@@ -43,15 +46,18 @@ public class ApiLoggingAspectTest {
     }
 
     @Test
-    @DisplayName("[REST API] 로그의 traceId 는 랜덤 UUID 가 아니라 Micrometer/OTel 트레이스 ID(32-hex) 다")
-    void restApiLog_traceId_isOtelTraceIdNotRandomUuid() throws Exception {
+    @DisplayName("REST 컨트롤러 호출 시 OTel traceId 포함 API 로그 기록 활동 수행")
+    void testTraceApiCall_givenRestControllerCall_willWriteOtelTraceIdInApiLog() throws Exception {
+        // given
         LogCaptor logCaptor = LogCaptor.forClass(ApiLoggingAspect.class);
         logCaptor.setLogLevelToInfo();
 
+        // when
         mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
                         .with(user("admin").authorities(new SimpleGrantedAuthority("ADMIN"))))
                 .andExpect(status().isOk());
 
+        // then
         Pattern traceIdToken = Pattern.compile("traceId=(\\S+)");
         String restApiLog = logCaptor.getInfoLogs().stream()
                 .filter(log -> log.contains("[REST API]"))

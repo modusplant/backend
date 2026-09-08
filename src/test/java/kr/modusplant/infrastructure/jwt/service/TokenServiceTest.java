@@ -4,12 +4,14 @@ import kr.modusplant.domains.account.identity.common.util.framework.outbound.jpa
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.repository.MemberAuthJpaRepository;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.dto.TokenPair;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenNotFoundException;
+import kr.modusplant.infrastructure.jwt.exception.enums.AuthTokenErrorCode;
 import kr.modusplant.infrastructure.jwt.framework.outbound.jpa.entity.RefreshTokenEntity;
 import kr.modusplant.infrastructure.jwt.framework.outbound.jpa.repository.RefreshTokenJpaRepository;
 import kr.modusplant.infrastructure.jwt.framework.outbound.redis.AccessTokenRedisRepository;
@@ -61,7 +63,7 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
     private Role role;
     private String accessToken;
     private String refreshToken;
-    private Map<String,String> claims;
+    private Map<String, String> claims;
     private Date expiredAt;
 
     @BeforeEach
@@ -79,17 +81,17 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
         refreshToken = refreshTokenEntity.getRefreshToken();
         claims = Map.of(
                 "nickname", nickname,
-                "email",email,
+                "email", email,
                 "roles", role.name()
         );
         expiredAt = Date.from(Instant.now().plusSeconds(3600));
     }
 
     @Nested
-    @DisplayName("토큰 생성 테스트")
-    class testIssueToken {
+    @DisplayName("issueToken 메서드 테스트")
+    class IssueTokenTest {
         @Test
-        @DisplayName("회원 uuid, nickname, email, role로 TokenPair 생성하기")
+        @DisplayName("회원 정보로 TokenPair 반환")
         void testIssueToken_givenMemberUuidAndNicknameAndRole_willReturnTokenPair() {
             // given
             given(memberJpaRepository.existsByUuid(memberUuid)).willReturn(true);
@@ -108,21 +110,25 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
         }
 
         @Test
-        @DisplayName("존재하지 않는 회원으로 토큰 발급 시 예외 발생")
+        @DisplayName("존재하지 않는 회원으로 예외 반환")
         void testIssueToken_givenNotExistMember_willThrowException() {
             // given
             given(memberJpaRepository.existsByUuid(memberUuid)).willReturn(false);
 
-            // when & then
-            assertThrows(NotFoundEntityException.class, () -> tokenService.issueToken(memberUuid,nickname,email,Role.USER));
+            // when
+            NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                    () -> tokenService.issueToken(memberUuid, nickname, email, Role.USER));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
         }
     }
 
     @Nested
-    @DisplayName("토큰 삭제 테스트")
-    class testRemoveToken {
+    @DisplayName("removeToken 메서드 테스트")
+    class RemoveTokenTest {
         @Test
-        @DisplayName("refresh token으로 token 삭제")
+        @DisplayName("refresh token으로 token 삭제 활동 수행")
         void testRemoveToken_givenRefreshToken_willRemoveToken() {
             // given
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
@@ -139,24 +145,28 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
         }
 
         @Test
-        @DisplayName("존재하지 않는 refresh token 삭제 시 예외 발생")
+        @DisplayName("존재하지 않는 refresh token으로 예외 반환")
         void testRemoveToken_givenNotExistRefreshToken_willThrowException() {
             // given
             given(jwtTokenProvider.validateToken(refreshToken)).willReturn(true);
             given(refreshTokenJpaRepository.existsByRefreshToken(refreshToken)).willReturn(false);
 
-            // when & then
-            assertThrows(TokenNotFoundException.class, () -> tokenService.removeToken(refreshToken));
+            // when
+            TokenNotFoundException exception = assertThrows(TokenNotFoundException.class,
+                    () -> tokenService.removeToken(refreshToken));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(AuthTokenErrorCode.CREDENTIAL_NOT_AUTHORIZED);
             verify(jwtTokenProvider, never()).getMemberUuidFromToken(any());
         }
     }
 
     @Nested
-    @DisplayName("토큰 검증 및 재발급 테스트")
-    class testVerifyAndReissueToken {
+    @DisplayName("verifyAndReissueToken 메서드 테스트")
+    class VerifyAndReissueTokenTest {
         @Test
-        @DisplayName("만료된 access token과 유효한 refresh token으로 검증 시 토큰 갱신")
-        void testVerifyAndReissueToken_givenExpiredAccessTokenAndValidRefreshToken_willReissue() {
+        @DisplayName("만료 access token과 유효 refresh token으로 TokenPair 반환")
+        void testVerifyAndReissueToken_givenExpiredAccessTokenAndValidRefreshToken_willReturnTokenPair() {
             // given
             String newRefreshToken = "new_refresh_token";
             String newAccessToken = "new_access_token";
@@ -181,38 +191,42 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
         }
 
         @Test
-        @DisplayName("유효하지 않은 refresh token으로 검증 시 예외 발생")
+        @DisplayName("유효하지 않은 refresh token으로 예외 반환")
         void testVerifyAndReissueToken_givenInvalidRefreshToken_willThrowException() {
             // given
             String invalidRefreshToken = "invalid_refresh_token";
             given(jwtTokenProvider.validateToken(invalidRefreshToken)).willReturn(false);
 
-            // when & then
-            assertThrows(InvalidTokenException.class , () -> tokenService.verifyAndReissueToken(invalidRefreshToken));
+            // when
+            InvalidTokenException exception = assertThrows(InvalidTokenException.class,
+                    () -> tokenService.verifyAndReissueToken(invalidRefreshToken));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(AuthTokenErrorCode.CREDENTIAL_NOT_AUTHORIZED);
             verify(jwtTokenProvider).validateToken(invalidRefreshToken);
         }
     }
 
     @Nested
-    @DisplayName("access token 블랙리스트 추가 테스트")
-    class testBlacklistAccessToken {
+    @DisplayName("blacklistAccessToken 메서드 테스트")
+    class BlacklistAccessTokenTest {
         @Test
-        @DisplayName("access token을 블랙리스트에 추가")
+        @DisplayName("access token 블랙리스트 추가 활동 수행")
         void testBlacklistAccessToken_givenAccessToken_willAddToBlacklist() {
             // given
             given(jwtTokenProvider.validateToken(accessToken)).willReturn(true);
             given(jwtTokenProvider.getExpirationFromToken(accessToken)).willReturn(expiredAt);
-            willDoNothing().given(accessTokenRedisRepository).addToBlacklist(eq(accessToken),any(Long.class));
+            willDoNothing().given(accessTokenRedisRepository).addToBlacklist(eq(accessToken), any(Long.class));
 
             // when
             tokenService.blacklistAccessToken(accessToken);
 
             // then
-            verify(accessTokenRedisRepository).addToBlacklist(eq(accessToken),any(Long.class));
+            verify(accessTokenRedisRepository).addToBlacklist(eq(accessToken), any(Long.class));
         }
 
         @Test
-        @DisplayName("유효하지 않은 access token은 블랙리스트에 추가하지 않기")
+        @DisplayName("유효하지 않은 access token 블랙리스트 미추가")
         void testBlacklistAccessToken_givenInvalidAccessToken_willNotAddToBlacklist() {
             // given
             given(jwtTokenProvider.validateToken(accessToken)).willReturn(false);
@@ -223,16 +237,16 @@ class TokenServiceTest implements MemberEntityTestUtils, MemberAuthEntityTestUti
             // then
             verify(jwtTokenProvider).validateToken(accessToken);
             verify(jwtTokenProvider, never()).getExpirationFromToken(accessToken);
-            verify(accessTokenRedisRepository, never()).addToBlacklist(eq(accessToken),any(Long.class));
+            verify(accessTokenRedisRepository, never()).addToBlacklist(eq(accessToken), any(Long.class));
         }
     }
 
     @Nested
-    @DisplayName("access token 블랙리스트 제거 테스트")
-    class testRemoveAccessTokenFromBlacklist {
+    @DisplayName("removeAccessTokenFromBlacklist 메서드 테스트")
+    class RemoveAccessTokenFromBlacklistTest {
         @Test
-        @DisplayName("블랙리스트에서 access token 제거하기")
-        void testRemoveAccessTokenFromBlacklist_givenAccessToken_willDelete() {
+        @DisplayName("블랙리스트에서 access token 제거 활동 수행")
+        void testRemoveAccessTokenFromBlacklist_givenAccessToken_willRemoveFromBlacklist() {
             // given
             willDoNothing().given(accessTokenRedisRepository).removeFromBlacklist(accessToken);
 

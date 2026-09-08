@@ -13,35 +13,35 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PasswordTest implements PasswordTestUtils {
 
     @Test
-    @DisplayName("null로 비밀번호 생성")
-    public void testCreate_givenNull_willThrowEmptyValueException() {
-        // given
+    @DisplayName("null로 비밀번호 생성 시 예외 반환")
+    public void testCreate_givenNull_willThrowException() {
+        // given & when
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Password.create(null));
 
-        // when & then
+        // then
         assertEquals(KernelErrorCode.EMPTY_PASSWORD, result.getErrorCode());
     }
 
     @Test
-    @DisplayName("형식에 맞지 않는 값으로 비밀번호 생성")
-    public void testCreate_givenInvalidFormat_willThrowInvalidValueException() {
-        // given
+    @DisplayName("형식에 맞지 않는 값으로 비밀번호 생성 시 예외 반환")
+    public void testCreate_givenInvalidFormat_willThrowException() {
+        // given & when
         InvalidValueException result = assertThrows(InvalidValueException.class,
                 () -> Password.create("a".repeat(7)));
 
-        // when & then
+        // then
         assertEquals(KernelErrorCode.INVALID_PASSWORD_FORMAT, result.getErrorCode());
     }
 
     @Test
-    @DisplayName("동일한 객체로 동등성 비교")
+    @DisplayName("같은 객체로 참 반환")
     void testEquals_givenSameObject_willReturnTrue() {
         //noinspection EqualsWithItself
         assertEquals(testNormalUserPassword, testNormalUserPassword);
     }
 
     @Test
-    @DisplayName("다른 객체로 동등성 비교")
+    @DisplayName("다른 객체로 거짓 반환")
     void testEquals_givenDifferentObject_willReturnFalse() {
         EmptyValueException different = new EmptyValueException(KernelErrorCode.EMPTY_PASSWORD, "password");
         //noinspection AssertBetweenInconvertibleTypes
@@ -49,7 +49,7 @@ public class PasswordTest implements PasswordTestUtils {
     }
 
     @Test
-    @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
+    @DisplayName("다른 프로퍼티 객체로 거짓 반환")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
         Password different = Password.create(MEMBER_AUTH_BASIC_USER_PW + "1");
@@ -59,7 +59,7 @@ public class PasswordTest implements PasswordTestUtils {
     }
 
     @Test
-    @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
+    @DisplayName("같은 객체로 같은 해시코드 반환")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         assertEquals(testNormalUserPassword.hashCode(), testNormalUserPassword.hashCode());
     }

@@ -1,7 +1,9 @@
 package kr.modusplant.domains.comment.domain.event;
 
+import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.notification.domain.enums.NotificationActionType;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,8 +20,8 @@ class CommentRegisterEventTest {
     class CreateTest {
 
         @Test
-        @DisplayName("commentPath에 '.'이 없으면 COMMENT_ADDED 액션으로 생성")
-        void testCreate_givenRootPath_willHaveCommentAddedAction() {
+        @DisplayName("루트 경로로 CommentRegisterEvent 반환")
+        void testCreate_givenRootPath_willReturnCommentRegisterEvent() {
             // when
             CommentRegisterEvent event = CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH1, TEST_NOTIFICATION_COMMENT_PREVIEW);
 
@@ -32,8 +34,8 @@ class CommentRegisterEventTest {
         }
 
         @Test
-        @DisplayName("commentPath에 '.'이 포함되면 COMMENT_REPLY_ADDED 액션으로 생성")
-        void testCreate_givenChildPath_willHaveCommentReplyAddedAction() {
+        @DisplayName("자식 경로로 CommentRegisterEvent 반환")
+        void testCreate_givenChildPath_willReturnCommentRegisterEvent() {
             // when
             CommentRegisterEvent event = CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW);
 
@@ -47,19 +49,25 @@ class CommentRegisterEventTest {
 
 
         @Test
-        @DisplayName("actorId가 null일 때 오류 발생")
+        @DisplayName("actorId가 null일 때 예외 반환")
         void testCreate_givenNullActorId_willThrowException() {
-            assertThrows(InvalidValueException.class, () ->
-                    CommentRegisterEvent.create(null,  TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW));
+            // given & when
+            InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+                    CommentRegisterEvent.create(null, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_AUTHOR);
         }
 
         @Test
-        @DisplayName("commentPath가 null이거나 비어 있을 때 오류 발생")
+        @DisplayName("commentPath가 비어 있을 때 예외 반환")
         void testCreate_givenEmptyCommentPath_willThrowException() {
+            // given & when
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-                    CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID,"", TEST_NOTIFICATION_COMMENT_PREVIEW));
+                    CommentRegisterEvent.create(TEST_NOTIFICATION_ACTOR_ID, TEST_NOTIFICATION_POST_ULID, "", TEST_NOTIFICATION_COMMENT_PREVIEW));
 
-            assertThat(exception.getMessage()).contains("NOT_FOUND_COMMENT");
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
         }
 
     }

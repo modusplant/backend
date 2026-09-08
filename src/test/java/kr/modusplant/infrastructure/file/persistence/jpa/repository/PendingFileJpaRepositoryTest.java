@@ -24,9 +24,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         this.pendingFileRepository = pendingFileRepository;
     }
 
-    @DisplayName("createdAt 이전에 생성된 fileKey 조회")
+    @DisplayName("생성 시각 이후 threshold로 fileKey 목록 반환")
     @Test
-    void testFindFileKeysByCreatedAtBefore_givenThreshold_willReturnFileKeys() {
+    void testFindFileKeysByCreatedAtBefore_givenThresholdAfterCreatedAt_willReturnList() {
         // given
         PendingFileEntity pendingFile = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
         LocalDateTime threshold = pendingFile.getCreatedAt().plusSeconds(1);
@@ -38,9 +38,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(fileKeys).contains(pendingFile.getFileKey());
     }
 
-    @DisplayName("threshold 이후에 생성된 fileKey는 조회되지 않음")
+    @DisplayName("생성 시각 이전 threshold로 빈 목록 반환")
     @Test
-    void testFindFileKeysByCreatedAtBefore_givenThreshold_willReturnOnlyFileKeysBeforeThreshold() {
+    void testFindFileKeysByCreatedAtBefore_givenThresholdBeforeCreatedAt_willReturnList() {
         // given
         PendingFileEntity pendingFile = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
         LocalDateTime threshold = pendingFile.getCreatedAt().minusSeconds(1);
@@ -52,9 +52,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(fileKeys).doesNotContain(pendingFile.getFileKey());
     }
 
-    @DisplayName("createdAt 이전에 생성된 레코드 삭제")
+    @DisplayName("생성 시각 이후 threshold로 레코드 삭제 활동 수행")
     @Test
-    void testDeleteByCreatedAtBefore_givenThreshold_willDeletePendingFiles() {
+    void testDeleteByCreatedAtBefore_givenThresholdAfterCreatedAt_willDeletePendingFiles() {
         // given
         PendingFileEntity pendingFile = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
         LocalDateTime threshold = pendingFile.getCreatedAt().plusSeconds(1);
@@ -66,9 +66,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(pendingFileRepository.existsById(pendingFile.getUlid())).isFalse();
     }
 
-    @DisplayName("threshold 이후에 생성된 레코드는 삭제되지 않음")
+    @DisplayName("생성 시각 이전 threshold로 레코드 유지 활동 수행")
     @Test
-    void testDeleteByCreatedAtBefore_givenThreshold_willKeepPendingFilesAtOrAfterThreshold() {
+    void testDeleteByCreatedAtBefore_givenThresholdBeforeCreatedAt_willKeepPendingFiles() {
         // given
         PendingFileEntity pendingFile = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
         LocalDateTime threshold = pendingFile.getCreatedAt().minusSeconds(1);
@@ -80,9 +80,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(pendingFileRepository.existsById(pendingFile.getUlid())).isTrue();
     }
 
-    @DisplayName("fileKey 목록에 해당하는 존재하는 fileKey 조회")
+    @DisplayName("존재하는 fileKey로 목록 반환")
     @Test
-    void testFindFileKeysByFileKeyIn_givenExistingFileKeys_willReturnFileKeys() {
+    void testFindFileKeysByFileKeyIn_givenExistingFileKeys_willReturnList() {
         // given
         PendingFileEntity target = pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
         PendingFileEntity other = pendingFileRepository.saveAndFlush(createPostPendingFileEntity(TEST_MEMBER_PROFILE_FILE_KEY, TEST_MEMBER_DOMAIN));
@@ -95,9 +95,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(fileKeys).doesNotContain(other.getFileKey());
     }
 
-    @DisplayName("목록에 없는 fileKey는 조회되지 않음")
+    @DisplayName("존재하지 않는 fileKey로 빈 목록 반환")
     @Test
-    void testFindFileKeysByFileKeyIn_givenNonExistingFileKey_willReturnEmptyList() {
+    void testFindFileKeysByFileKeyIn_givenNonExistingFileKey_willReturnList() {
         // given
         pendingFileRepository.saveAndFlush(createPostPendingFileEntity());
 
@@ -108,7 +108,7 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(fileKeys).isEmpty();
     }
 
-    @DisplayName("fileKey 목록으로 레코드 삭제")
+    @DisplayName("fileKey 목록으로 레코드 삭제 활동 수행")
     @Test
     void testDeleteByFileKeyIn_givenFileKeys_willDeletePendingFiles() {
         // given
@@ -123,9 +123,9 @@ class PendingFileJpaRepositoryTest implements PendingFileEntityTestUtils {
         assertThat(pendingFileRepository.existsById(other.getUlid())).isTrue();
     }
 
-    @DisplayName("대기 파일 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
+    @DisplayName("대기 파일 엔터티로 문자열 반환")
     @Test
-    void testToString_givenPendingFileEntity_willReturnRepresentative() {
+    void testToString_givenPendingFileEntity_willReturnString() {
         // given
         PendingFileEntity pendingFile = pendingFileRepository.save(createPostPendingFileEntity());
 

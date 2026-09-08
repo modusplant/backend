@@ -28,8 +28,8 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
     @DisplayName("getAuthorIdByPostIdAndCommentPath 테스트")
     class GetAuthorIdTests {
         @Test
-        @DisplayName("댓글이 존재하면 작성자의 UUID를 반환한다")
-        void testGetAuthorId_givenValidParams_willReturnAuthorUuid() {
+        @DisplayName("댓글이 존재할 때 UUID 반환")
+        void testGetAuthorIdByPostIdAndCommentPath_givenExistingComment_willReturnUuid() {
             // given
             CommentEntity commentEntity = Mockito.mock(CommentEntity.class);
             MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
@@ -46,8 +46,8 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("댓글이 존재하지 않으면 NotFoundEntityException이 발생한다")
-        void testGetAuthorId_givenNonExistentComment_willThrowException() {
+        @DisplayName("댓글이 존재하지 않을 때 예외 반환")
+        void testGetAuthorIdByPostIdAndCommentPath_givenNonExistentComment_willThrowException() {
             // given
             given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
 
@@ -61,8 +61,8 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
     @DisplayName("getNotificationPreviewByPostIdAndCommentPath 테스트")
     class GetNotificationPreviewTests {
         @Test
-        @DisplayName("댓글 정보를 바탕으로 알림 프리뷰를 생성한다")
-        void testGetNotificationPreview_givenValidParams_willReturnPreview() {
+        @DisplayName("유효한 파라미터로 읽기 모델 반환")
+        void testGetNotificationPreviewByPostIdAndCommentPath_givenValidParams_willReturnReadModel() {
             // given
             CommentEntity commentEntity = Mockito.mock(CommentEntity.class);
             MemberEntity memberEntity = Mockito.mock(MemberEntity.class);

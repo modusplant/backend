@@ -45,17 +45,17 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
     }
 
     @Test
-    @DisplayName("소셜 접근 토큰 발급받기")
-    void testIssueSocialToken_givenSocialProviderAndCode_willReturnSocialToken() {
+    @DisplayName("소셜 provider와 code로 SocialUserInfo 반환")
+    void testIssueSocialToken_givenSocialProviderAndCode_willReturnSocialUserInfo() {
         // given
         String code = createTestKakaoLoginRequest().code();
         given(socialAuthClient.getTokenInfo(code, false)).willReturn(kakaoUserInfo);
 
         // when
-        SocialUserInfo result = socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO,code, false);
+        SocialUserInfo result = socialIdentityLinkController.issueSocialToken(SocialProvider.KAKAO, code, false);
 
         // then
-        assertEquals(result,kakaoUserInfo);
+        assertEquals(result, kakaoUserInfo);
         verify(clientFactory).getClient(SocialProvider.KAKAO);
         verify(socialAuthClient).getTokenInfo(code, false);
     }
@@ -64,8 +64,8 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
     @DisplayName("소셜 계정 연동 테스트")
     class LinkSocialAccountTests {
         @Test
-        @DisplayName("일반 회원이 카카오 소셜 계정을 연동한다")
-        void testLinkSocialAccount_givenBasicMemberAndKakao_willLinkSuccessfully() {
+        @DisplayName("일반 회원 카카오 계정 연동 활동 수행")
+        void testLinkSocialAccount_givenBasicMemberAndKakao_willProcessAction() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
             given(socialIdentityMapper.toLinkedAuthProvider(SocialProvider.KAKAO)).willReturn(AuthProvider.BASIC_KAKAO);
@@ -78,7 +78,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("이메일 불일치 시 연동 실패 예외가 발생한다")
+        @DisplayName("이메일 불일치 시 예외 반환")
         void testLinkSocialAccount_givenEmailMismatch_willThrowException() {
             // given
             SocialUserInfo mismatchUserInfo = createKakaoSocialUserInfo();
@@ -91,7 +91,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("이미 연동된 계정으로 연동 시도 시 예외가 발생한다")
+        @DisplayName("이미 연동된 계정으로 연동 시 예외 반환")
         void testLinkSocialAccount_givenAlreadyLinkedMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
@@ -103,7 +103,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("소셜 전용 카카오 계정으로 연동 시도 시 예외가 발생한다")
+        @DisplayName("소셜 전용 카카오 계정으로 연동 시 예외 반환")
         void testLinkSocialAccount_givenPureKakaoSocialMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfileWithBasicEmail);
@@ -120,8 +120,8 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
     @DisplayName("소셜 계정 연동 해제 테스트")
     class UnlinkSocialAccountTests {
         @Test
-        @DisplayName("연동된 카카오 계정을 연동 해제한다")
-        void testUnlinkSocialAccount_givenLinkedKakaoMember_willUnlinkSuccessfully() {
+        @DisplayName("연동된 카카오 계정 연동 해제 활동 수행")
+        void testUnlinkSocialAccount_givenLinkedKakaoMember_willProcessAction() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
 
@@ -134,7 +134,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("일반 계정의 연동 해제 시도 시 예외가 발생한다")
+        @DisplayName("일반 계정 연동 해제 시 예외 반환")
         void testUnlinkSocialAccount_givenBasicMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
@@ -146,8 +146,8 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("소셜 전용 계정의 연동 해제 시도 시 탈퇴 필요 예외가 발생한다")
-        void testUnlinkSocialAccount_givenPureSocialMember_willThrowSocialWithdrawalRequiredException() {
+        @DisplayName("소셜 전용 계정 연동 해제 시 예외 반환")
+        void testUnlinkSocialAccount_givenPureSocialMember_willThrowException() {
             // given
             SocialUserInfo kakaoUserInfoWithKakaoEmail = createKakaoSocialUserInfo();
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfile);
@@ -159,7 +159,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("이메일 불일치 시 연동 해제 예외가 발생한다")
+        @DisplayName("이메일 불일치 시 예외 반환")
         void testUnlinkSocialAccount_givenEmailMismatch_willThrowException() {
             // given
             SocialUserInfo mismatchUserInfo = createKakaoSocialUserInfo(); // 카카오 전용 이메일 (basicEmail 아님)
@@ -172,7 +172,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("provider 불일치 시 연동 해제 예외가 발생한다")
+        @DisplayName("provider 불일치 시 예외 반환")
         void testUnlinkSocialAccount_givenProviderMismatch_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
@@ -189,8 +189,8 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
     @DisplayName("소셜 계정 삭제 테스트")
     class DeleteSocialAccountTests {
         @Test
-        @DisplayName("소셜 전용 카카오 회원이 탈퇴한다")
-        void testDeleteSocialAccount_givenPureKakaoMember_willDeleteSuccessfully() {
+        @DisplayName("소셜 전용 카카오 회원 탈퇴 활동 수행")
+        void testDeleteSocialAccount_givenPureKakaoMember_willProcessAction() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfile);
             // todo: deleteSocialMember 부분 추가
@@ -203,7 +203,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("일반 회원이 소셜 탈퇴 시도 시 예외가 발생한다")
+        @DisplayName("일반 회원 소셜 탈퇴 시 예외 반환")
         void testDeleteSocialAccount_givenBasicMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicSocialMemberProfile);
@@ -215,8 +215,8 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("연동 계정이 탈퇴 시도 시 연동 해제 필요 예외가 발생한다")
-        void testDeleteSocialAccount_givenLinkedMember_willThrowSocialLinkageRequiredException() {
+        @DisplayName("연동 계정 탈퇴 시 예외 반환")
+        void testDeleteSocialAccount_givenLinkedMember_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testNormalMemberId)).willReturn(testBasicKakaoSocialMemberProfile);
 
@@ -227,7 +227,7 @@ class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, 
         }
 
         @Test
-        @DisplayName("provider 불일치 시 탈퇴 예외가 발생한다")
+        @DisplayName("provider 불일치 시 예외 반환")
         void testDeleteSocialAccount_givenProviderMismatch_willThrowException() {
             // given
             given(socialIdentityRepository.getSocialMemberProfileByAccountId(testKakaoAccountId)).willReturn(testKakaoSocialMemberProfile);

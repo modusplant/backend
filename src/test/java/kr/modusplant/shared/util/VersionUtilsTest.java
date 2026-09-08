@@ -12,17 +12,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class VersionUtilsTest {
 
     @Test
-    @DisplayName("올바른 형식의 버전 반환")
-    void inputVersion_givenValidInt_willReturnVersion() {
+    @DisplayName("유효한 숫자로 문자열 반환")
+    void testCreateVersion_givenValidNumbers_willReturnString() {
+        // given & when & then
         assertThat(createVersion(1, 0, 0)).isEqualTo("v1.0.0");
         assertThat(createVersion(1, 10, 0)).isEqualTo("v1.10.0");
     }
 
     @Test
-    @DisplayName("버전 숫자가 0보다 작을 때 예외 발생")
-    void inputVersion_givenVersionLowerThanZero_willThrowIllegalArgumentException() {
-        assertThat(assertThrows(InvalidValueException.class, () -> createVersion(-1, 0, 0)).getErrorCode()).isEqualTo(INVALID_INPUT);
-        assertThat(assertThrows(InvalidValueException.class, () -> createVersion(0, -1, 0)).getErrorCode()).isEqualTo(INVALID_INPUT);
-        assertThat(assertThrows(InvalidValueException.class, () -> createVersion(0, 0, -1)).getErrorCode()).isEqualTo(INVALID_INPUT);
+    @DisplayName("음수로 예외 반환")
+    void testCreateVersion_givenNegativeNumber_willThrowException() {
+        // given & when
+        InvalidValueException majorException = assertThrows(InvalidValueException.class, () -> createVersion(-1, 0, 0));
+        InvalidValueException minorException = assertThrows(InvalidValueException.class, () -> createVersion(0, -1, 0));
+        InvalidValueException patchException = assertThrows(InvalidValueException.class, () -> createVersion(0, 0, -1));
+
+        // then
+        assertThat(majorException.getErrorCode()).isEqualTo(INVALID_INPUT);
+        assertThat(minorException.getErrorCode()).isEqualTo(INVALID_INPUT);
+        assertThat(patchException.getErrorCode()).isEqualTo(INVALID_INPUT);
     }
 }

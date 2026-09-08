@@ -37,8 +37,8 @@ public class PostLikeJpaRepositoryTest implements PostLikeEntityTestUtils {
         }
 
         @Test
-        @DisplayName("게시글 좋아요 후 조회")
-        void likeCommPost_success() {
+        @DisplayName("저장 후 조회 시 PostLikeEntity 반환")
+        void testSave_givenNewEntry_willReturnPostLikeEntity() {
             // when
             commPostLikeRepository.save(PostLikeEntity.of(postId, memberId));
 
@@ -51,8 +51,8 @@ public class PostLikeJpaRepositoryTest implements PostLikeEntityTestUtils {
         }
 
         @Test
-        @DisplayName("특정 사용자 게시글 좋아요 여부 확인")
-        void isLikedByMember_willReturnTrue() {
+        @DisplayName("저장된 항목으로 참 반환")
+        void testExistsByPostIdAndMemberId_givenSavedEntry_willReturnTrue() {
             // given
             commPostLikeRepository.save(PostLikeEntity.of(postId, memberId));
 
@@ -64,8 +64,8 @@ public class PostLikeJpaRepositoryTest implements PostLikeEntityTestUtils {
         }
 
         @Test
-        @DisplayName("게시글 좋아요 취소")
-        void unlikeCommPost_success() {
+        @DisplayName("저장된 항목 삭제 활동 수행")
+        void testDeleteByPostIdAndMemberId_givenSavedEntry_willProcessAction() {
             // given
             commPostLikeRepository.save(PostLikeEntity.of(postId, memberId));
 
@@ -77,8 +77,8 @@ public class PostLikeJpaRepositoryTest implements PostLikeEntityTestUtils {
         }
 
         @Test
-        @DisplayName("게시글 좋아요 엔터티 toString 호출 시 순환 오류 발생 여부 확인")
-        void testToString_givenCommPostLikeEntity_willReturnRepresentative() {
+        @DisplayName("엔터티로 문자열 반환")
+        void testToString_givenEntity_willReturnString() {
             // given & when
             PostLikeEntity entity = commPostLikeRepository.save(PostLikeEntity.of(postId, memberId));
 

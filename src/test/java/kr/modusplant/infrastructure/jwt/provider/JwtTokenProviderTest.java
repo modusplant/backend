@@ -38,8 +38,8 @@ class JwtTokenProviderTest {
     }
 
     @Test
-    @DisplayName("비대칭키 생성 실패 테스트")
-    void testInit_willThrowTokenKeyCreationException() {
+    @DisplayName("키 생성 실패 시 예외 반환")
+    void testInit_givenKeyGenerationFailure_willThrowException() {
         try (
                 MockedStatic<Paths> mockedPaths = Mockito.mockStatic(Paths.class);
                 MockedStatic<Files> mockedFiles = Mockito.mockStatic(Files.class);

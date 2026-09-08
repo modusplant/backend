@@ -9,8 +9,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class EncryptUtilsTest {
 
     @Test
-    @DisplayName("null 입력 시 NullPointerException 발생")
-    void encrypt_givenSha256NullInput_willThrowNullPointerException() {
+    @DisplayName("null 입력 시 예외 반환")
+    void testEncryptWithSha256_givenNull_willThrowException() {
         // given
         String input = null;
 
@@ -20,8 +20,8 @@ class EncryptUtilsTest {
     }
 
     @Test
-    @DisplayName("빈 문자열 입력 시 올바른 해시값 반환")
-    void encrypt_givenSha256EmptyString_willReturnCorrectHash() {
+    @DisplayName("빈 문자열 입력 시 문자열 반환")
+    void testEncryptWithSha256_givenEmptyString_willReturnString() {
         // given
         String input = "";
         String expectedHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
@@ -35,8 +35,8 @@ class EncryptUtilsTest {
     }
 
     @Test
-    @DisplayName("같은 입력에 대해서는 항상 같은 해시값 반환")
-    void encrypt_givenSha256SameInput_willReturnSameHash() {
+    @DisplayName("같은 입력으로 문자열 반환")
+    void testEncryptWithSha256_givenSameInput_willReturnString() {
         // given
         String input = "test input";
 
@@ -49,8 +49,8 @@ class EncryptUtilsTest {
     }
 
     @Test
-    @DisplayName("다른 입력에 대해서는 다른 해시값 반환")
-    void encrypt_givenSha256DifferentInputs_willReturnDifferentHashes() {
+    @DisplayName("다른 입력으로 문자열 반환")
+    void testEncryptWithSha256_givenDifferentInputs_willReturnString() {
         // given
         String input1 = "test1";
         String input2 = "test2";
@@ -64,8 +64,8 @@ class EncryptUtilsTest {
     }
 
     @Test
-    @DisplayName("sha256 정상 생성")
-    void encrypt_givenSha256String_willReturnCorrectHash() {
+    @DisplayName("유효한 입력으로 문자열 반환")
+    void testEncryptWithSha256_givenValidInput_willReturnString() {
         // given
         String input = "test input";
         String expectedHash = "9dfe6f15d1ab73af898739394fd22fd72a03db01834582f24bb2e1c66c7aaeae";
