@@ -264,12 +264,9 @@ class NotificationControllerTest implements NotificationTestUtils, NotificationR
         @DisplayName("게시글 작성자가 상위 댓글 작성자일 때 알림 1회 전송 활동 수행")
         void testCreateCommentNotification_givenPostAuthorIsParentAuthor_willProcessAction() {
             // given
-            UUID postAuthorId = TEST_NOTIFICATION_RECIPIENT_ID;
-            UUID parentCommentAuthorId = TEST_NOTIFICATION_RECIPIENT_ID; // 게시글 작성자 == 댓글 작성자
-
             given(memberInfoRepository.getNicknameByUuid(testCommentReplyNotificationEvent.getAuthorId())).willReturn("ActorName");
-            given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(postAuthorId);
-            given(commentInfoRepository.getAuthorIdByPostIdAndCommentPath(any(), any())).willReturn(parentCommentAuthorId);
+            given(postInfoRepository.getAuthorIdByPostId(any())).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
+            given(commentInfoRepository.getAuthorIdByPostIdAndCommentPath(any(), any())).willReturn(TEST_NOTIFICATION_RECIPIENT_ID);
             given(notificationRepository.saveWithLimit(any(), anyInt())).willAnswer(invocation -> invocation.getArgument(0));
 
             // when

@@ -1,6 +1,5 @@
 package kr.modusplant.domains.post.domain.vo;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
@@ -18,8 +17,6 @@ class PostContentTest implements PostTestUtils {
 
     private static final String MAX_LENGTH_TITLE = "a".repeat(60); // 60자
     private static final String OVER_MAX_LENGTH_TITLE = "a".repeat(61); // 61자
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
 
     @Nested
     @DisplayName("PostContent 생성 테스트")
@@ -60,15 +57,15 @@ class PostContentTest implements PostTestUtils {
             // when & then
             EmptyValueException exception1 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create(null, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
-            assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception1.getErrorCode());
 
             EmptyValueException exception2 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create("", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
-            assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception2.getErrorCode());
 
             EmptyValueException exception3 = assertThrows(EmptyValueException.class,
                     () -> PostContent.create("   ", TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
-            assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception3.getErrorCode());
         }
 
         @Test
@@ -77,7 +74,7 @@ class PostContentTest implements PostTestUtils {
             // when & then
             InvalidValueException exception = assertThrows(InvalidValueException.class,
                     () -> PostContent.create(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
-            assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
+            assertEquals(PostErrorCode.INVALID_POST_CONTENT, exception.getErrorCode());
         }
 
         @Test
@@ -86,7 +83,7 @@ class PostContentTest implements PostTestUtils {
             // when & then
             EmptyValueException exception = assertThrows(EmptyValueException.class,
                     () -> PostContent.create(TEST_POST_TITLE, null,null));
-            assertEquals(exception.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception.getErrorCode());
         }
     }
 
@@ -113,15 +110,15 @@ class PostContentTest implements PostTestUtils {
             // when & then
             EmptyValueException exception1 = assertThrows(EmptyValueException.class,
                     () -> PostContent.createDraft(null, null,null));
-            assertEquals(exception1.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception1.getErrorCode());
 
             EmptyValueException exception2 = assertThrows(EmptyValueException.class,
                     () -> PostContent.createDraft("", null,null));
-            assertEquals(exception2.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception2.getErrorCode());
 
             EmptyValueException exception3 = assertThrows(EmptyValueException.class,
                     () -> PostContent.createDraft("   ", null, null));
-            assertEquals(exception3.getErrorCode(), PostErrorCode.EMPTY_POST_CONTENT);
+            assertEquals(PostErrorCode.EMPTY_POST_CONTENT, exception3.getErrorCode());
         }
 
         @Test
@@ -130,7 +127,7 @@ class PostContentTest implements PostTestUtils {
             // when & then
             InvalidValueException exception = assertThrows(InvalidValueException.class,
                     () -> PostContent.createDraft(OVER_MAX_LENGTH_TITLE, TEST_POST_CONTENT, TEST_POST_CONTENT_THUMBNAIL_KEY));
-            assertEquals(exception.getErrorCode(), PostErrorCode.INVALID_POST_CONTENT);
+            assertEquals(PostErrorCode.INVALID_POST_CONTENT, exception.getErrorCode());
         }
     }
 
@@ -151,6 +148,7 @@ class PostContentTest implements PostTestUtils {
         @DisplayName("다른 클래스 인스턴스로 거짓 반환")
         void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
+            //noinspection AssertBetweenInconvertibleTypes
             assertNotEquals(testPostContent, testPostId);
         }
 
