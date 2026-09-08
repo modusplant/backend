@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DataResponseTest {
-    @SuppressWarnings("DataFlowIssue")
     @Test
     @DisplayName("메시지가 null일 때 예외 반환")
     void testToString_givenNullMessage_willThrowException() {

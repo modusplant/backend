@@ -41,6 +41,7 @@ class PendingFileServiceTest {
         pendingFileService.trackPendingFiles(fileKeys);
 
         // then
+        //noinspection unchecked
         ArgumentCaptor<List<PendingFileEntity>> captor = ArgumentCaptor.forClass(List.class);
         verify(pendingFileJpaRepository).saveAll(captor.capture());
         List<PendingFileEntity> saved = captor.getValue();

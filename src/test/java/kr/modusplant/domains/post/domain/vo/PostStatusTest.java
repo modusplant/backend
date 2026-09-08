@@ -107,7 +107,8 @@ class PostStatusTest implements PostTestUtils {
             PostStatus draftStatus = PostStatus.draft();
 
             // when & then
-            assertNotEquals(draftStatus, testPostId);
+            //noinspection AssertBetweenInconvertibleTypes
+            assertNotEquals(testPostId, draftStatus);
         }
 
         @Test

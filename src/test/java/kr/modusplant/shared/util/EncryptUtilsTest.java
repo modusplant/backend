@@ -11,11 +11,8 @@ class EncryptUtilsTest {
     @Test
     @DisplayName("null 입력 시 예외 반환")
     void testEncryptWithSha256_givenNull_willThrowException() {
-        // given
-        String input = null;
-
-        // when & then
-        assertThatThrownBy(() -> EncryptUtils.encryptWithSha256(input))
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> EncryptUtils.encryptWithSha256(null))
                 .isInstanceOf(NullPointerException.class);
     }
 

@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
     private final RefreshTokenJpaRepository refreshTokenJpaRepository = mock(RefreshTokenJpaRepository.class);
+    @SuppressWarnings("unused")
     private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
 
     private MemberEntity memberEntity;
@@ -46,7 +47,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
@@ -61,7 +62,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
@@ -75,7 +76,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
@@ -125,6 +126,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
     void testDeleteByExpiredAtBefore_givenExpiredAt_willDeleteRefreshToken() {
         // given
         LocalDateTime now = LocalDateTime.now();
+        @SuppressWarnings("unused")
         RefreshTokenEntity expiredToken = RefreshTokenEntity.builder()
                 .member(memberEntity)
                 .refreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3w")
@@ -140,6 +142,6 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
         // then
         List<RefreshTokenEntity> remainingTokens = refreshTokenJpaRepository.findAll();
         assertThat(remainingTokens.size()).isEqualTo(1);
-        assertThat(remainingTokens.get(0).getExpiredAt()).isAfter(now);
+        assertThat(remainingTokens.getFirst().getExpiredAt()).isAfter(now);
     }
 }

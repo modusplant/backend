@@ -85,10 +85,10 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
             // then
             assertThat(result).hasSize(1);
-            assertThat(result.get(0).filename()).isEqualTo(TEST_IMAGE_JPG_FILENAME);
-            assertThat(result.get(0).uploadUrl()).isEqualTo(TEST_IMAGE_JPG_PRESIGNED_URL);
-            assertThat(result.get(0).fileKey()).matches(FILE_KEY_REGEX);
-            assertThat(result.get(0).fileKey()).contains("/image/");
+            assertThat(result.getFirst().filename()).isEqualTo(TEST_IMAGE_JPG_FILENAME);
+            assertThat(result.getFirst().uploadUrl()).isEqualTo(TEST_IMAGE_JPG_PRESIGNED_URL);
+            assertThat(result.getFirst().fileKey()).matches(FILE_KEY_REGEX);
+            assertThat(result.getFirst().fileKey()).contains("/image/");
         }
 
         @Test
@@ -160,11 +160,8 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         @Test
         @DisplayName("텍스트·파일 순서 처리 시 JsonNode 반환")
         void testGenerateContentJson_givenTextAndFiles_willReturnJsonNode() throws IOException {
-            // given
-            List<FileOrder> files = allMediaFilesOrder; // [imageJpg(1), videoMp4(2)]
-
-            // when
-            ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, files, TEST_IMAGE_JPG_FILENAME);
+            // given & when
+            ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, allMediaFilesOrder, TEST_IMAGE_JPG_FILENAME);
             JsonNode result = record.content();
 
             // then - text(order=0), image(order=1), video(order=2)
@@ -321,6 +318,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         @DisplayName("파일 순서가 1부터 시작하지 않거나 연속적이지 않을 때 예외 반환")
         void testGenerateContentJson_givenNonSequentialOrder_willThrowException() {
             // given
+            @SuppressWarnings("DataFlowIssue")
             List<FileOrder> order0Files = List.of(
                     new FileOrder(0, TEST_IMAGE_JPG_FILENAME, TEST_IMAGE_JPG_FILE_KEY)
             );

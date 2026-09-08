@@ -232,11 +232,10 @@ class PostTest implements PostTestUtils {
         void testUpdateDraft_givenInvalidStatus_willThrowException() {
             // given
             Post post = createPublishedPost();
-            PostContent postContent = testPostContent;
 
             // when & then
             assertThrows(InvalidValueException.class, () ->
-                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
+                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, testPostContent));
         }
     }
 
@@ -400,7 +399,8 @@ class PostTest implements PostTestUtils {
         @Test
         @DisplayName("다른 클래스 인스턴스로 거짓 반환")
         void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
-            assertNotEquals(createDraftPost(), testPostId);
+            //noinspection AssertBetweenInconvertibleTypes
+            assertNotEquals(testPostId, createDraftPost());
         }
 
         @Test

@@ -68,8 +68,9 @@ class PostIdTest {
         void testEquals_givenNullOrDifferentClass_willReturnFalse() {
             PostId id = PostId.generate();
 
-            assertNotEquals(id, null);
-            assertNotEquals(id, "string-id");
+            assertNotEquals(null, id);
+            //noinspection AssertBetweenInconvertibleTypes
+            assertNotEquals("string-id", id);
         }
     }
 }
