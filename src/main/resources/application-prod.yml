@@ -36,6 +36,12 @@ security:
   debug:
     enabled: false
 
+# Monitoring
+management:
+  tracing:
+    sampling:
+      probability: 0.1
+
 # Scheduler
 scheduler:
   sync-interval-ms : 300000           # 5분
