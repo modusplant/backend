@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# on-bash-failure.sh — PostToolUseFailure(Bash) hook.
+# respond-to-bash-failure.sh — PostToolUseFailure(Bash) hook.
 #
 # On every failed Bash tool call: pop a Windows toast via wsl-notify-send.exe
 # and append a structured record to
