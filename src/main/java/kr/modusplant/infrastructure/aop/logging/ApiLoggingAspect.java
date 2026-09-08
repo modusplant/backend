@@ -27,7 +27,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Slf4j
 public class ApiLoggingAspect {
     private static final ThreadLocal<Long> THREAD_ID = new ThreadLocal<>();
-    private static final long SLOW_API_THRESHOLD_MS = 500;
 
     @Around("within(@org.springframework.web.bind.annotation.RestController *)")
     public Object traceApiCall(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -51,9 +50,6 @@ public class ApiLoggingAspect {
 
             log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms",
                     getCurrentTraceId(), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
-            if (durationInMs > SLOW_API_THRESHOLD_MS) {
-                log.warn("[SLOW API] traceId={} | duration:{}ms", getCurrentTraceId(), durationFormatted);
-            }
 
             return result;
         } finally {
