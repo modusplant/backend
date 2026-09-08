@@ -87,6 +87,6 @@ Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comm
 
 Detailed working rules live under `.claude/`:
 
-- `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob: `domains/comment`, `domains/member`, `domains/search`, `infrastructure/security`, `infrastructure/monitor`, and `db/migration` (+ `build.gradle`, `application*.yml`).
-- `.claude/documents/*.md` — `test-architecture-convention.md` plus per-domain test profiles (`test-domain-profiles-<domain>.md`); loaded by the `test-single-domain` skill.
+- `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob: `domains/comment`, `domains/member`, `domains/search`, `infrastructure/security`, `infrastructure/monitor`, `db/migration` (+ `build.gradle`, `application*.yml`), and `test-architecture-details.md` across the whole `src/test/**` tree.
+- `.claude/documents/*.md` — per-domain test profiles (`test-domain-profiles-<domain>.md`), consumed by the `test-single-domain` skill.
 - `.claude/skills/*/SKILL.md` — task workflows: `test-single-domain`, `adapt-to-code-change`, `configure-docker-environment`, `resolve-error-with-stack-trace`, `report-performance-optimization`.
