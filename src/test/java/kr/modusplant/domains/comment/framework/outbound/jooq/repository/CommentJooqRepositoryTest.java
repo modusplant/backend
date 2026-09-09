@@ -101,6 +101,45 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
+    @DisplayName("게시글의 식별자로 댓글 읽기 모델 목록 가져오기 - 루트는 최신순, 답글은 오래된 순")
+    void testFindByPost_givenValidPostId_willOrderRootsNewestAndRepliesOldest() {
+        // given: MockDataProvider does not execute ORDER BY / JOIN, so assert the ordering
+        // contract against the generated SQL text instead of the returned row order
+        Field<String> profileImage = DSL.field("profile_image", String.class);
+        Field<String> nickname = DSL.field("nickname", String.class);
+        Field<String> path = DSL.field("path", String.class);
+        Field<String> content = DSL.field("content", String.class);
+        Field<Integer> likeCount = DSL.field("like_count", Integer.class);
+        Field<Boolean> isLiked = DSL.field("is_liked", Boolean.class);
+        Field<LocalDateTime> createdAt = DSL.field("created_at", LocalDateTime.class);
+        Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
+        Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
+
+        String[] capturedSql = new String[1];
+        MockDataProvider provider = ctx -> {
+            capturedSql[0] = ctx.sql().toLowerCase();
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record9<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime>> result =
+                    dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt);
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        repository.findByPost(testPostId, testAuthorWithUuid);
+
+        // then
+        String sql = capturedSql[0];
+        assertThat(sql).contains("root_comment");
+        assertThat(sql).contains("not like");
+        int orderByIndex = sql.indexOf("order by");
+        assertThat(orderByIndex).isGreaterThanOrEqualTo(0);
+        String orderByClause = sql.substring(orderByIndex);
+        assertThat(orderByClause).contains("desc");
+        assertThat(orderByClause).contains("asc");
+    }
+
+    @Test
     @DisplayName("같은 부모 아래 형제 댓글들의 마지막 세그먼트 중 가장 큰 값 반환")
     void testFindMaximumSiblingPathOrder_givenSiblingComments_willReturnHighestOrdinal() {
         // given

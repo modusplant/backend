@@ -31,6 +31,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final DSLContext dsl;
     private final CommPost commPost = CommPost.COMM_POST;
     private final CommComment commComment = CommComment.COMM_COMMENT;
+    private final CommComment rootComment = CommComment.COMM_COMMENT.as("root_comment");
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
@@ -58,8 +59,18 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(likeJoinCondition)
+                .leftJoin(rootComment).on(
+                        rootComment.POST_ULID.eq(commComment.POST_ULID)
+                                .and(rootComment.PATH.notLike("%.%"))
+                                .and(commComment.PATH.eq(rootComment.PATH)
+                                        .or(commComment.PATH.like(rootComment.PATH.concat(".%")))))
                 .where(commComment.POST_ULID.eq(postId.getValue()))
-                .orderBy(commComment.CREATED_AT.desc())
+                .orderBy(
+                        rootComment.CREATED_AT.desc(),
+                        rootComment.PATH.asc(),
+                        DSL.field(commComment.PATH.like("%.%")).asc(), // 루트 행 → 답글 행
+                        commComment.CREATED_AT.asc(),
+                        commComment.PATH.asc())
                 .fetch(record -> new CommentOfPostReadModel(
                         record.getValue(memberProf.IMAGE_PATH),
                         record.getValue(siteMember.NICKNAME),
