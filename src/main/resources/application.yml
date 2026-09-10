@@ -102,7 +102,19 @@ management:
     web:
       exposure:
         include: "health,info,prometheus"
+  opentelemetry:
+    resource-attributes:
+      service.namespace: ${spring.application.name}
+      deployment.environment.name: ${app.deployment-environment}
+      service.instance.id: modusplant-be # 단일 컨테이너
+  otlp:
+    tracing:
+      endpoint: http://otel-collector:4317
+      transport: grpc
   metrics:
+    tags:
+      service_name: ${spring.application.name}
+      deployment_environment: ${app.deployment-environment}
     enable:
       tomcat: true
     distribution:

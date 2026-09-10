@@ -14,6 +14,7 @@ server:
 
 # Application
 app:
+  deployment-environment: dev
   semaphore:
     datasource:
       allowed-connection-size: 12
