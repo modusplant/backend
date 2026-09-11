@@ -1,11 +1,7 @@
----
-paths:
-  - "src/main/resources/logback-spring.xml"
-  - "src/main/resources/application*.yml"
-  - "docker-compose*.yml"
----
+# Observability Tagging Architecture
 
-# Observability Tagging Conventions
+Architecture reference for how the backend's identity and correlation values reach the external
+monitoring stack; consumed on demand.
 
 Applies to the identity and correlation tags the backend emits on traces, logs, and metrics, and
 to how the monitoring stack (OpenTelemetry Collector, Tempo, Loki via Promtail, Prometheus,
