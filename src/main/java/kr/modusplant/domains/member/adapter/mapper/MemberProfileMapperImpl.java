@@ -36,13 +36,6 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
                         memberProfile.getMemberProfileIntroduction().getValue(),
                         memberProfile.getNickname().getValue());
             }
-        } else if (version == 2) {
-            String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
-            return new MemberProfileResponseWithImageUrl(
-                    memberProfile.getMemberId().getValue(),
-                    imagePath,
-                    memberProfile.getMemberProfileIntroduction().getValue(),
-                    memberProfile.getNickname().getValue());
         } else if (version == 3) {
             String imagePath = memberProfile.getMemberProfileImage().getMemberProfileImagePath().getValue();
             return new MemberProfileResponseWithImagePath(

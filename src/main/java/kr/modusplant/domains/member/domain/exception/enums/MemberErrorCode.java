@@ -28,7 +28,6 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_REPORT_IMAGE(HttpStatus.BAD_REQUEST.value(), "empty_report_image", "보고서 이미지가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_BYTES(HttpStatus.BAD_REQUEST.value(), "empty_report_image_bytes", "보고서 이미지 바이트 값이 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "empty_report_image_file_name", "보고서 이미지 파일명이 비어 있습니다. "),
-    EMPTY_REPORT_IMAGE_NUMBER(HttpStatus.BAD_REQUEST.value(), "empty_report_image_number", "보고서 이미지 개수가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_report_image_path", "보고서 이미지 경로가 비어 있습니다. "),
     EMPTY_REPORT_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_report_page_size", "보고서 페이지 크기가 비어 있습니다. "),
     EMPTY_REPORT_TIME(HttpStatus.BAD_REQUEST.value(), "empty_report_time", "보고 시각이 비어 있습니다. "),

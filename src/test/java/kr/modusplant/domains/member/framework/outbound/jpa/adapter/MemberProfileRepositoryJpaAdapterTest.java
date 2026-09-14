@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,7 @@ class MemberProfileRepositoryJpaAdapterTest implements
     private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = Mockito.mock(MemberProfileJpaRepository.class);
-    private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
+    private final MemberProfileJpaMapperImpl memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository);
     private final MemberProfileRepositoryJpaAdapter memberProfileRepositoryJpaAdapter = new MemberProfileRepositoryJpaAdapter(pendingFileService, memberProfileJpaMapper, memberProfileJpaRepository);
 
     @Test
@@ -89,11 +88,10 @@ class MemberProfileRepositoryJpaAdapterTest implements
                 MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
         given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false, true);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
@@ -112,11 +110,10 @@ class MemberProfileRepositoryJpaAdapterTest implements
                 MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").build();
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
         given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true, true);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
@@ -135,12 +132,11 @@ class MemberProfileRepositoryJpaAdapterTest implements
                 MemberProfileEntity.builder().member(updatedMemberEntity).introduction("abcIntroduction").imagePath(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH).build();
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(memberProfileEntity));
         given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
         willDoNothing().given(pendingFileService).untrackPendingFiles(any());
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, true);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true, true);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, true);
 
         // then
         assertThat(result.getNickname().getValue()).isEqualTo("abcNickname");
@@ -149,8 +145,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
     }
 
     @Test
-    @DisplayName("needsToReturnImageBytes가 false로 update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
-    void testUpdate_givenNeedsToReturnImageBytesFalse_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
+    @DisplayName("update 실행 시 이미지 다운로드 없이 MemberProfile 반환")
+    void testUpdate_givenEntity_willReturnMemberProfileWithoutDownloadingImage() throws IOException {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntityWithUuid();
         MemberProfileEntity memberProfileEntity = createMemberProfileBasicUserEntityBuilder().member(memberEntity).build();
@@ -161,8 +157,8 @@ class MemberProfileRepositoryJpaAdapterTest implements
         given(memberProfileJpaRepository.save(updatedMemberProfileEntity)).willReturn(updatedMemberProfileEntity);
 
         // when
-        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity, false);
-        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false, false);
+        MemberProfile updatedMemberProfile = memberProfileJpaMapper.toMemberProfile(updatedMemberProfileEntity);
+        MemberProfile result = memberProfileRepositoryJpaAdapter.update(updatedMemberProfile, false);
 
         // then
         assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
