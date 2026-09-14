@@ -133,46 +133,6 @@ public class MemberRestController {
     }
 
     @Operation(
-            summary = "회원 프로필 덮어쓰기 API - v1",
-            description = "회원 프로필을 덮어씁니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-    @PutMapping(value = "/v1/members/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> overrideMemberProfile_v1(
-            @Parameter(
-                    description = "갱신할 회원의 프로필 이미지",
-                    schema = @Schema(type = "string", format = "binary")
-            )
-            @RequestPart(name = "image", required = false)
-            MultipartFile image,
-
-            @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
-            @RequestPart(name = "introduction", required = false)
-            String introduction,
-
-            @Parameter(
-                    description = "갱신할 회원의 닉네임",
-                    example = "NewPlayer",
-                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
-            )
-            @RequestPart(name = "nickname")
-            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
-            @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
-            String nickname,
-
-            @Parameter(hidden = true)
-            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
-            @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) throws IOException {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(
-                        memberController.overrideProfile(
-                                new MemberProfileOverrideRecord_V1(memberId, introduction, image, nickname))));
-    }
-
-    @Operation(
             summary = "회원 프로필 이미지 준비 API - v2",
             description = "회원 프로필 이미지를 저장하기 위해 파일 키와 스토리지 URL을 만들어 냅니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
@@ -200,45 +160,6 @@ public class MemberRestController {
                 .body(DataResponse.ok(
                         memberController.prepareMemberProfileImage(
                                 new MemberProfileImagePrepareRecord_V2(memberId, filename, contentType))));
-    }
-
-    @Operation(
-            summary = "회원 프로필 덮어쓰기 API - v2",
-            description = "회원 프로필을 덮어씁니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-    @PutMapping(value = "/v2/members/profile")
-    public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> overrideMemberProfile_v2(
-            @Parameter(
-                    description = "갱신할 회원의 프로필 이미지 파일 키(코드상에서의 이미지 경로)",
-                    example = "member/2ca57394-03ba-4eb8-a63c-74ae0771cd4a/profile/image.png"
-            )
-            @RequestParam(required = false)
-            String fileKey,
-
-            @Parameter(description = "갱신할 회원의 프로필 소개", example = "프로필 소개")
-            @RequestParam(required = false)
-            String introduction,
-
-            @Parameter(
-                    description = "갱신할 회원의 닉네임",
-                    example = "NewPlayer",
-                    schema = @Schema(type = "string", pattern = REGEX_NICKNAME)
-            )
-            @NotBlank(message = "회원 닉네임이 비어 있습니다. ")
-            @Pattern(regexp = REGEX_NICKNAME, message = "회원 닉네임 서식이 올바르지 않습니다. ")
-            String nickname,
-
-            @Parameter(hidden = true)
-            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
-            @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) throws IOException {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .cacheControl(CacheControl.noStore().mustRevalidate().cachePrivate())
-                .body(DataResponse.ok(
-                        memberController.overrideProfile(
-                                new MemberProfileOverrideRecord_V2(memberId, introduction, fileKey, nickname))));
     }
 
     @Operation(
@@ -433,43 +354,6 @@ public class MemberRestController {
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
         memberController.unlikeComment(new MemberCommentUnlikeRecord(memberId, postUlid, path));
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
-    @Operation(
-            summary = "건의 및 버그 제보 API - v1",
-            description = "건의 사항 또는 버그를 제보합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-    @PostMapping(value = "/v1/report/proposal-or-bug", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<DataResponse<Void>> reportProposalOrBug_v1(
-            @Parameter(description = "보고서 제목", example = "제보합니다!")
-            @RequestParam
-            String title,
-
-            @Parameter(description = "보고서 내용", example = "이런 건의 사항을 드립니다.")
-            @RequestParam
-            String content,
-
-            @Parameter(
-                    description = "제보 관련 이미지",
-                    schema = @Schema(type = "string", format = "binary")
-            )
-            @RequestPart(name = "image", required = false)
-            List<MultipartFile> images,
-
-            @Parameter(description = "보고서 이미지 개수", example = "3")
-            @RequestParam(required = false)
-            @Max(value = 3, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
-            @Min(value = 1, message = "보고서 이미지 개수는 1부터 3까지의 값이어야 합니다. ")
-            Integer imageNumber,
-
-            @Parameter(hidden = true)
-            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
-            @AuthenticationPrincipal(expression = "uuid")
-            UUID memberId) throws IOException {
-        memberController.reportProposalOrBug(
-                new ProposalOrBugReportRecord_V1(memberId, title, content, images, imageNumber));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 
