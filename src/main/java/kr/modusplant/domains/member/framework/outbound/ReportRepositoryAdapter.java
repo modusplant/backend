@@ -76,7 +76,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
     }
 
     @Override
-    public void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport, int version) {
+    public void reportProposalOrBug(MemberId memberId, ProposalOrBugReport proposalOrBugReport) {
         String reportId = proposalOrBugReport.getReportId().getValue();
         String title = proposalOrBugReport.getReportTitle().getValue();
         String content = proposalOrBugReport.getReportContent().getValue();
@@ -105,9 +105,7 @@ public class ReportRepositoryAdapter implements ReportRepository {
                         .image(imageList)
                         .build());
 
-        if (version == 2) {
-            pendingFileService.untrackPendingFiles(imagePaths);
-        }
+        pendingFileService.untrackPendingFiles(imagePaths);
     }
 
     @Override

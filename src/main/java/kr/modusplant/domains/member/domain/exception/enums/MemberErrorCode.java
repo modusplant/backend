@@ -28,7 +28,6 @@ public enum MemberErrorCode implements ErrorCode {
     EMPTY_REPORT_IMAGE(HttpStatus.BAD_REQUEST.value(), "empty_report_image", "보고서 이미지가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_BYTES(HttpStatus.BAD_REQUEST.value(), "empty_report_image_bytes", "보고서 이미지 바이트 값이 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "empty_report_image_file_name", "보고서 이미지 파일명이 비어 있습니다. "),
-    EMPTY_REPORT_IMAGE_NUMBER(HttpStatus.BAD_REQUEST.value(), "empty_report_image_number", "보고서 이미지 개수가 비어 있습니다. "),
     EMPTY_REPORT_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "empty_report_image_path", "보고서 이미지 경로가 비어 있습니다. "),
     EMPTY_REPORT_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_report_page_size", "보고서 페이지 크기가 비어 있습니다. "),
     EMPTY_REPORT_TIME(HttpStatus.BAD_REQUEST.value(), "empty_report_time", "보고 시각이 비어 있습니다. "),
@@ -38,7 +37,6 @@ public enum MemberErrorCode implements ErrorCode {
 
     INVALID_MEMBER_PROFILE_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_file_name", "회원 프로필 이미지 파일명의 서식이 올바르지 않습니다. "),
     INVALID_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_path", "회원 프로필 이미지 경로의 서식이 올바르지 않습니다. "),
-    INVALID_MEMBER_PROFILE_OVERRIDE_VERSION(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_override_version", "회원 프로필 오버라이드 버전이 올바르지 않습니다. "),
     INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_member_id", "사용자 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_report_id", "보고서 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_report_image_file_name", "보고서 이미지 파일명의 서식이 올바르지 않습니다. "),
