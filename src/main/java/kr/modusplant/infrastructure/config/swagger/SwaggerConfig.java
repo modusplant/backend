@@ -43,10 +43,6 @@ public class SwaggerConfig {
                                 new License().name("MIT License").url("https://github.com/modusplant/backend/blob/develop/LICENSE")
                         )
                 )
-                .addServersItem(new Server() // 운영 서버 정보 설정
-                        .url("https://app.modusplant.kr") // 운영 서버 링크
-                        .description("Prod Server")
-                )
                 .addServersItem(new Server() // 개발 서버 정보 설정
                         .url("https://kormap.ddnsfree.com") // 개발 서버 링크
                         .description("Dev Server")  // 개발 서버 설명
