@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -38,6 +39,9 @@ import org.springframework.validation.Validator;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.time.Duration;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -220,14 +224,31 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // TODO: 요청 가능한 서비스 및 메서드를 명시할 것.
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    @Profile({"local", "dev"})
+    public CorsConfigurationSource localDevCorsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOriginPattern("*");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);
+        config.setMaxAge(Duration.ofMinutes(10));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
+    }
+
+    @Bean
+    @Profile("prod")
+    public CorsConfigurationSource prodCorsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of("https://modusplant.kr", "https://www.modusplant.kr"));
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        config.setAllowCredentials(true);
+        config.setMaxAge(Duration.ofHours(1));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -3,6 +3,7 @@ package kr.modusplant.infrastructure.config.aws;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -46,9 +47,6 @@ public class S3Config {
     @Value("${cloud.wasabi.s3.connection-acquisition-timeout}")
     private Integer connectionAcquisitionTimeout;
 
-    @Value("${spring.profiles.active:local}")
-    private String profile;
-
     @Value("${minio.public-endpoint:#{null}}")
     private String devPublicEndpoint;
 
@@ -76,13 +74,25 @@ public class S3Config {
     }
 
     @Bean
-    public S3Presigner s3Presigner() {
+    @Profile({"local", "prod"})
+    public S3Presigner localProdS3Presigner() {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
-        String presignEndpoint = "dev".equals(profile) && devPublicEndpoint != null
-                ? devPublicEndpoint
-                : endpoint;
         return S3Presigner.builder()
-                .endpointOverride(URI.create(presignEndpoint))
+                .endpointOverride(URI.create(endpoint))
+                .region(Region.of(region))
+                .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(true)
+                        .build())
+                .build();
+    }
+
+    @Bean
+    @Profile("dev")
+    public S3Presigner devS3Presigner() {
+        AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
+        return S3Presigner.builder()
+                .endpointOverride(URI.create(devPublicEndpoint))
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
                 .serviceConfiguration(S3Configuration.builder()
