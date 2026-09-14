@@ -89,7 +89,6 @@ member/
 
 **Repository Ports** (`usecase/port/repository/`):
 - Parameters and return types use only domain VOs/Aggregates — no JPA entities or jOOQ records
-- Exception: a method may accept a trailing primitive `int version` parameter to select version-conditional behavior in its adapter implementation
 
 **Records** (`usecase/record/`):
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
@@ -100,7 +99,7 @@ member/
 **Response DTOs** (`usecase/response/`):
 - Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
 - Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
-- When a mapper method returns a different concrete response record depending on version, the candidate records implement a shared empty marker interface placed under `response/supers/`; the mapper declares that interface as its return type, and each call site casts the result back to the concrete type it expects
+- When a mapper method returns a different concrete response record depending on a parameter, the candidate records implement a shared empty marker interface placed under `response/supers/`; the mapper declares that interface as its return type, and each call site casts the result back to the concrete type it expects
 
 **Read Models** (`usecase/model/read/`):
 - Java records optimized for specific views (e.g. abuse-report/proposal dashboards); direct targets of jOOQ query mapping

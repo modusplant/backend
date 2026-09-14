@@ -6,7 +6,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareRespons
 import kr.modusplant.domains.member.usecase.response.supers.MemberProfileResponse;
 
 public interface MemberProfileMapper {
-    MemberProfileResponse toMemberProfileResponse(MemberProfile member, int version);
+    MemberProfileResponse toMemberProfileResponse(MemberProfile member, boolean needsToReturnStorageUrl);
 
     MemberProfilePrepareResponse toMemberProfilePrepareResponse(MemberProfileImagePath imagePath, String storageUrl);
 }

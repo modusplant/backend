@@ -37,7 +37,6 @@ public enum MemberErrorCode implements ErrorCode {
 
     INVALID_MEMBER_PROFILE_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_file_name", "회원 프로필 이미지 파일명의 서식이 올바르지 않습니다. "),
     INVALID_MEMBER_PROFILE_IMAGE_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_image_path", "회원 프로필 이미지 경로의 서식이 올바르지 않습니다. "),
-    INVALID_MEMBER_PROFILE_OVERRIDE_VERSION(HttpStatus.BAD_REQUEST.value(), "invalid_member_profile_override_version", "회원 프로필 오버라이드 버전이 올바르지 않습니다. "),
     INVALID_MEMBER_ID(HttpStatus.BAD_REQUEST.value(), "invalid_member_id", "사용자 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_report_id", "보고서 식별자의 서식이 올바르지 않습니다. "),
     INVALID_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "invalid_report_image_file_name", "보고서 이미지 파일명의 서식이 올바르지 않습니다. "),

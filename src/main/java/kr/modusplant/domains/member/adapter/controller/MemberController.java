@@ -79,7 +79,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
-        return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
+        return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, true);
     }
 
     @Transactional(readOnly = true)
@@ -127,7 +127,7 @@ public class MemberController {
 
         return (MemberProfileResponseWithImagePath)
                 memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, true), 3);
+                        memberProfileRepository.update(memberProfile, true), false);
     }
 
     public void likePost(MemberPostLikeRecord record) {
