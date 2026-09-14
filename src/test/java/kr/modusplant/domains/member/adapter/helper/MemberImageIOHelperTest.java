@@ -1,6 +1,5 @@
 package kr.modusplant.domains.member.adapter.helper;
 
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V1;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
@@ -9,28 +8,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.util.List;
 
-import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
-import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGES;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGES_WITH_NULL;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_CONTENT_TYPE;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1;
-import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileImagePathTestUtils.testMemberProfileImagePath;
-import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
 import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyMemberProfileImagePathTestUtils.testEmptyMemberProfileImagePath;
 import static kr.modusplant.domains.member.common.util.domain.vo.nullobject.EmptyReportImagePathTestUtils.testEmptyReportImagePath;
-import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,19 +33,6 @@ class MemberImageIOHelperTest {
     private final MemberImageIOHelper memberImageIOHelper = new MemberImageIOHelper(amazonS3Service, pendingFileService);
 
     @Test
-    @DisplayName("uploadImage를 통해 회원 프로필 이미지 업로드")
-    void testUploadImage_givenMemberProfileImage_willReturnImagePath() throws IOException {
-        // given
-        willDoNothing().given(amazonS3Service).uploadFile(any(), any());
-
-        // when
-        String imagePath = memberImageIOHelper.uploadImage(testMemberId, testMemberProfileOverrideRecordV1);
-
-        // then
-        assertThat(imagePath).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
-    }
-
-    @Test
     @DisplayName("issueStorageUrl을 통해 회원 프로필 이미지 업로드 URL 발급")
     void testIssueStorageUrl_givenImagePathAndContentType_willReturnStorageUrl() {
         // given
@@ -71,20 +45,6 @@ class MemberImageIOHelperTest {
         // then
         assertThat(storageUrl).isEqualTo(MEMBER_PROFILE_BASIC_USER_IMAGE_STORAGE_URL);
         verify(pendingFileService, times(1)).trackPendingFiles(List.of(testMemberProfileImagePath.getValue()));
-    }
-
-    @Test
-    @DisplayName("uploadImage를 통해 보고서 이미지 업로드")
-    void testUploadImage_givenReportImage_willReturnImagePath() throws IOException {
-        // given
-        willDoNothing().given(amazonS3Service).uploadFile(any(), any());
-
-        // when
-        List<String> imagePaths = memberImageIOHelper.uploadImage(
-                testMemberId, testReportId, TEST_REPORT_IMAGES);
-
-        // then
-        assertThat(imagePaths).isEqualTo(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATHS);
     }
 
     @Test
@@ -162,30 +122,4 @@ class MemberImageIOHelperTest {
         verify(pendingFileService, never()).trackPendingFiles(any());
     }
 
-    @Test
-    @DisplayName("이미지가 없는 데이터로 uploadImage를 통해 null 반환")
-    void testUploadImage_givenNullMemberProfileImage_willReturnNull() throws IOException {
-        // given
-        MemberProfileOverrideRecord_V1 record = new MemberProfileOverrideRecord_V1(
-                MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, null, MEMBER_BASIC_USER_NICKNAME);
-
-        // when
-        String imagePath = memberImageIOHelper.uploadImage(testMemberId, record);
-
-        // then
-        assertThat(imagePath).isNull();
-        verify(amazonS3Service, never()).uploadFile(any(), any());
-    }
-
-    @Test
-    @DisplayName("null이 포함된 보고서 이미지 리스트로 uploadImage를 통해 null을 제외한 이미지 경로 반환")
-    void testUploadImage_givenReportImagesContainingNull_willReturnImagePathsWithoutNull() throws IOException {
-        // when
-        List<String> imagePaths = memberImageIOHelper.uploadImage(
-                testMemberId, testReportId, TEST_REPORT_IMAGES_WITH_NULL);
-
-        // then
-        assertThat(imagePaths).containsExactly(TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_PATH_1);
-        verify(amazonS3Service, times(1)).uploadFile(any(), any());
-    }
 }

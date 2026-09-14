@@ -15,7 +15,6 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberProfileIm
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithNullImagePath;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithNullImageUrl;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,23 +46,6 @@ class MemberProfileMapperImplTest implements MemberProfileTestUtils {
 
         // then
         verify(amazonS3Service, never()).generateS3SrcUrl(any());
-    }
-
-    @Test
-    @DisplayName("버전 2와 이미지 경로가 있을 때 toMemberProfileResponse로 응답 반환")
-    void testToMemberProfileResponse_givenVersion2AndImagePath_willReturnResponse() {
-        // when
-        assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfile(), 2)).isEqualTo(testMemberProfileResponseWithImageUrlV2);
-
-        // then
-        verify(amazonS3Service, never()).generateS3SrcUrl(any());
-    }
-
-    @Test
-    @DisplayName("버전 2와 이미지 경로가 없을 때 toMemberProfileResponse로 응답 반환")
-    void testToMemberProfileResponse_givenVersion2AndNoImagePath_willReturnResponse() {
-        // when & then
-        assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfileWithoutImage(), 2)).isEqualTo(testMemberProfileResponseWithNullImageUrl);
     }
 
     @Test
