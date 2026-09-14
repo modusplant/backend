@@ -16,6 +16,8 @@ import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.*;
 
 public class MonitorServiceTest {
@@ -32,15 +34,19 @@ public class MonitorServiceTest {
     class PerformBusinessLogicTest {
 
         @Test
-        @DisplayName("true와 함께 호출 시 성공 메시지 반환")
-        void testPerformBusinessLogic_givenTrue_willReturnSuccessMessage() {
+        @DisplayName("true 입력 시 문자열 반환")
+        void testPerformBusinessLogic_givenTrue_willReturnString() {
+            // given & when
             String result = monitorService.performBusinessLogic(true);
+
+            // then
             assertThat(result).isEqualTo("Business logic executed successfully!");
         }
 
         @Test
-        @DisplayName("false와 함께 호출 시 예외 발생")
+        @DisplayName("false 입력 시 예외 반환")
         void testPerformBusinessLogic_givenFalse_willThrowException() {
+            // given & when & then
             assertThatThrownBy(() -> monitorService.performBusinessLogic(false))
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Exception occurred during the business logic execution");
@@ -52,8 +58,8 @@ public class MonitorServiceTest {
     class MonitorRedisHelperTest {
 
         @Test
-        @DisplayName("정상 호출 시 성공 메시지 반환")
-        void testMonitorRedisHelper_givenNormalState_willReturnSuccessMessage() {
+        @DisplayName("정상 상태에서 문자열 반환")
+        void testMonitorRedisHelper_givenNormalState_willReturnString() {
             // when
             String result = monitorService.monitorRedisHelper();
 
@@ -69,13 +75,13 @@ public class MonitorServiceTest {
         }
 
         @Test
-        @DisplayName("RedisHelper 가동 실패 시 예외 발생")
+        @DisplayName("RedisHelper 실패 시 예외 반환")
         void testMonitorRedisHelper_givenRedisHelperFailure_willThrowException() {
             // given
-            doThrow(new RuntimeException("Redis failure"))
-                    .when(redisHelper).setString(eq("test-redis-key"), any());
+            willThrow(new RuntimeException("Redis failure"))
+                    .given(redisHelper).setString(eq("test-redis-key"), any());
 
-            // when + then
+            // when & then
             assertThatThrownBy(() -> monitorService.monitorRedisHelper())
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Exception occurred during testing the Redis storage");
@@ -87,11 +93,11 @@ public class MonitorServiceTest {
     class MonitorAmazonS3Test {
 
         @Test
-        @DisplayName("정상 응답 시 성공 메시지 반환")
-        void testMonitorAmazonS3_givenNormalResponse_willReturnSuccessMessage() {
+        @DisplayName("정상 응답에서 문자열 반환")
+        void testMonitorAmazonS3_givenNormalResponse_willReturnString() {
             // given
-            when(s3Client.headBucket(any(HeadBucketRequest.class)))
-                    .thenReturn(HeadBucketResponse.builder().build());
+            given(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .willReturn(HeadBucketResponse.builder().build());
 
             // when
             String result = monitorService.monitorAmazonS3();
@@ -101,26 +107,26 @@ public class MonitorServiceTest {
         }
 
         @Test
-        @DisplayName("S3Exception 발생 시 예외 발생")
+        @DisplayName("S3Exception 시 예외 반환")
         void testMonitorAmazonS3_givenS3Exception_willThrowException() {
             // given
-            when(s3Client.headBucket(any(HeadBucketRequest.class)))
-                    .thenThrow(S3Exception.builder().message("Not Found").statusCode(404).build());
+            given(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .willThrow(S3Exception.builder().message("Not Found").statusCode(404).build());
 
-            // when + then
+            // when & then
             assertThatThrownBy(() -> monitorService.monitorAmazonS3())
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Wasabi health check failed!");
         }
 
         @Test
-        @DisplayName("요청 중 예외 발생 시 예외 발생")
+        @DisplayName("요청 실패 시 예외 반환")
         void testMonitorAmazonS3_givenRequestFailure_willThrowException() {
             // given
-            when(s3Client.headBucket(any(HeadBucketRequest.class)))
-                    .thenThrow(SdkClientException.create("Connection refused"));
+            given(s3Client.headBucket(any(HeadBucketRequest.class)))
+                    .willThrow(SdkClientException.create("Connection refused"));
 
-            // when + then
+            // when & then
             assertThatThrownBy(() -> monitorService.monitorAmazonS3())
                     .isInstanceOf(RuntimeException.class)
                     .hasMessageContaining("Exception occurred during testing the Amazon S3 storage!");

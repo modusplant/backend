@@ -11,10 +11,12 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static kr.modusplant.shared.framework.redis.RedisKeys.MEMBER_SEARCH_HISTORY_PREFIX;
+import static kr.modusplant.shared.framework.redis.RedisKeys.generateRedisKeyWithEqualCase;
+
 @Repository
 @RequiredArgsConstructor
 public class SearchPostHistoryRedisRepository implements SearchPostHistoryRepository {
-    private static final String KEY_FORMAT = "searchHistory:member:%s";
     private static final int MAX_HISTORY = 20;
     private static final long TTL_DAYS = 30;
 
@@ -69,7 +71,7 @@ public class SearchPostHistoryRedisRepository implements SearchPostHistoryReposi
     }
 
     private String generatedKey(UUID memberUuid) {
-        return KEY_FORMAT.formatted(memberUuid);
+        return generateRedisKeyWithEqualCase(MEMBER_SEARCH_HISTORY_PREFIX, memberUuid);
     }
 
 }

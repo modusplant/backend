@@ -15,7 +15,7 @@ class NotificationActionTest {
     class ActionTypeCheckTests {
 
         @Test
-        @DisplayName("POST_LIKED 액션은 게시글 관련 액션으로 판별된다")
+        @DisplayName("POST_LIKED일 때 참 반환")
         void testIsPostRelatedAction_givenPostLiked_willReturnTrue() {
             NotificationAction action = NotificationAction.create(NotificationActionType.POST_LIKED);
             assertTrue(action.isPostRelatedAction());
@@ -23,7 +23,7 @@ class NotificationActionTest {
         }
 
         @Test
-        @DisplayName("댓글/답글 관련 액션들은 댓글 관련 액션으로 판별된다")
+        @DisplayName("댓글 관련 액션일 때 참 반환")
         void testIsCommentRelatedAction_givenCommentActions_willReturnTrue() {
             assertTrue(NotificationAction.create(NotificationActionType.COMMENT_ADDED).isCommentRelatedAction());
             assertTrue(NotificationAction.create(NotificationActionType.COMMENT_LIKED).isCommentRelatedAction());
@@ -33,10 +33,10 @@ class NotificationActionTest {
 
     @Nested
     @DisplayName("액션 타입 생성 테스트")
-    class createTest {
+    class CreateTest {
 
         @Test
-        @DisplayName("NotificationAction 생성")
+        @DisplayName("유효한 값으로 NotificationAction 반환")
         void testCreate_givenValidValue_willReturnNotificationAction() {
             // when
             NotificationAction postLikeNotificationAction = NotificationAction.create(NotificationActionType.POST_LIKED);
@@ -52,7 +52,7 @@ class NotificationActionTest {
         }
 
         @Test
-        @DisplayName("null 액션 생성 시 EmptyValueException 발생")
+        @DisplayName("null 액션일 때 예외 반환")
         void testCreate_givenNull_willThrowException() {
             assertThrows(EmptyValueException.class, () -> NotificationAction.create(null));
         }
@@ -63,8 +63,8 @@ class NotificationActionTest {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("액션 타입이 같으면 equals는 true를 반환한다")
-        void useEqual_givenSameActionType_willReturnTrue() {
+        @DisplayName("액션 타입이 같을 때 참 반환")
+        void testEquals_givenSameActionType_willReturnTrue() {
             NotificationAction action1 = NotificationAction.create(NotificationActionType.POST_LIKED);
             NotificationAction action2 = NotificationAction.create(NotificationActionType.POST_LIKED);
 
@@ -73,8 +73,8 @@ class NotificationActionTest {
         }
 
         @Test
-        @DisplayName("액션 타입이 다르면 equals는 false를 반환한다")
-        void useEqual_givenDifferentActionType_willReturnFalse() {
+        @DisplayName("액션 타입이 다를 때 거짓 반환")
+        void testEquals_givenDifferentActionType_willReturnFalse() {
             NotificationAction action1 = NotificationAction.create(NotificationActionType.POST_LIKED);
             NotificationAction action2 = NotificationAction.create(NotificationActionType.COMMENT_ADDED);
 

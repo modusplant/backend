@@ -117,7 +117,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("유효한 댓글 id와 내용으로 댓글 갱신")
-    public void testUpdate_givenValidCommentIdAndContent_willSaveCommentWithNewContent() {
+    public void testUpdateContent_givenValidCommentIdAndContent_willSaveCommentWithNewContent() {
         // given
         CommentEntity beforeUpdate = createCommentEntityBuilder()
                 .content("content before updating.")
@@ -127,7 +127,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(commentRepository.save(afterUpdate)).willReturn(null);
 
         // when
-        jpaAdapter.update(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent()));
+        jpaAdapter.updateContent(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent()));
 
         // then
         verify(commentRepository, times(1)).findById(TEST_COMMENT_ID);
@@ -136,7 +136,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신")
-    public void testUpdate_givenInvalidCommentIdAndContent_willThrowError() {
+    public void testUpdateContent_givenInvalidCommentIdAndContent_willThrowError() {
         // given
         CommentEntity afterUpdate = createCommentEntityBuilder().build();
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());
@@ -144,7 +144,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
         // when
         NotFoundEntityException ex = assertThrows(
-                NotFoundEntityException.class, () -> jpaAdapter.update(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent())));
+                NotFoundEntityException.class, () -> jpaAdapter.updateContent(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent())));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);

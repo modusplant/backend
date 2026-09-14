@@ -12,6 +12,7 @@ import kr.modusplant.infrastructure.jwt.framework.outbound.redis.AccessTokenRedi
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
+import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -63,18 +66,6 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     private String rawAccessToken;
     private Claims accessTokenClaims;
 
-//    @RestController
-//    static class TestController {
-//        @GetMapping("/api/test/user")
-//        public String mockCommentRegister() {
-//            System.out.println("!!---- mock test controller.");
-//            return "ok";
-//        }
-//
-//        @PostMapping("/api/test/admin")
-//        public String userPath() { return "ok"; }
-//    }
-
     @BeforeEach
     void setUp() {
         rawAccessToken = "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
@@ -86,8 +77,8 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     }
 
     @Test
-    @DisplayName("사용자의 역할이 유효한 경우 요청 진행")
-    public void testCommentApiWithRole_givenMatchingRole_willReturnSuccessResponse() throws Exception {
+    @DisplayName("일치하는 역할로 정상 응답 반환")
+    public void testAuthorize_givenMatchingRole_willReturnOkResponse() throws Exception {
         // given
         given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
         given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
@@ -105,20 +96,19 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
     }
 
     @Test
-    @DisplayName("사용자의 역할이 무효한 경우 에러 발생")
-    public void testMonitorApiWithRole_givenMismatchingRole_willReturnErrorResponse() throws Exception {
-//        // given
-//        given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
-//        given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
-//        given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
-//
-//        // when
-//        mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
-//                .header("Authorization", rawAccessToken)
-//                )
-//                .andExpect(status().is(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))
-//                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))
-//                .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
-//                .andExpect(jsonPath("$.message").value(SecurityErrorCode.ACCESS_DENIED.getMessage()));
+    @DisplayName("불일치하는 역할로 에러 응답 반환")
+    public void testAuthorize_givenMismatchingRole_willReturnErrorResponse() throws Exception {
+        // given
+        given(tokenRedisRepository.isBlacklisted(rawAccessToken.substring(7))).willReturn(false);
+        given(tokenProvider.validateToken(rawAccessToken.substring(7))).willReturn(true);
+        given(tokenProvider.getClaimsFromToken(rawAccessToken.substring(7))).willReturn(accessTokenClaims);
+
+        // when & then
+        mockMvc.perform(get("/api/admin/v1/monitor/monitor-success")
+                        .header("Authorization", rawAccessToken))
+                .andExpect(status().is(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))
+                .andExpect(jsonPath("$.status").value(SecurityErrorCode.ACCESS_DENIED.getHttpStatus()))
+                .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
+                .andExpect(jsonPath("$.message").value(SecurityErrorCode.ACCESS_DENIED.getMessage()));
     }
 }

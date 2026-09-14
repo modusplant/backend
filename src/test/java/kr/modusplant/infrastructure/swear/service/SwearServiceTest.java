@@ -22,8 +22,8 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("욕설이 섞인 문자열을 필터링하여 반환함")
-    public void testFilterText_givenStringWithSwear_willReturnFilteredString() {
+    @DisplayName("욕설 포함 문자열로 문자열 반환")
+    public void testFilterSwear_givenStringWithSwear_willReturnString() {
         // given & when
         String result = service.filterSwear("애1미야");
 
@@ -32,8 +32,8 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("빈 문자열을 그대로 반환함")
-    public void testFilterText_givenBlankString_willReturnString() {
+    @DisplayName("빈 문자열로 문자열 반환")
+    public void testFilterSwear_givenBlankString_willReturnString() {
         // given & when
         String result = service.filterSwear(" ");
 
@@ -42,8 +42,8 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("null 을 그대로 반환함")
-    public void testFilterText_givenNull_willReturnNull() {
+    @DisplayName("null로 null 반환")
+    public void testFilterSwear_givenNull_willReturnNull() {
         // given & when
         String result = service.filterSwear(null);
 
@@ -52,7 +52,7 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("문자열에 욕설이 있으면 true 를 반환함")
+    @DisplayName("욕설 포함 문자열로 참 반환")
     public void testIsSwearContained_givenStringWithSwear_willReturnTrue() {
         // given & when
         boolean result = service.isSwearContained("애미야");
@@ -62,7 +62,7 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("빈 문자열이면 false 를 반환함")
+    @DisplayName("빈 문자열로 거짓 반환")
     public void testIsSwearContained_givenEmptyString_willReturnFalse() {
         // given & when
         boolean result = service.isSwearContained(" ");
@@ -72,7 +72,7 @@ public class SwearServiceTest implements SwearEntityTestUtils {
     }
 
     @Test
-    @DisplayName("null 이면 false 를 반환함")
+    @DisplayName("null로 거짓 반환")
     public void testIsSwearContained_givenNull_willReturnFalse() {
         // given & when
         boolean result = service.isSwearContained(null);

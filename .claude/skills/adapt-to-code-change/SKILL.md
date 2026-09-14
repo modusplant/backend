@@ -25,6 +25,7 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md, plus any file under @.claude/rules/.
 - Not associated with any domain:
   - Docker-related (e.g. @docker-compose.yml): @.claude/skills/configure-docker-environment/SKILL.md only.
+  - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/rules/observability-tagging-details.md only.
 
 # Update Strategy
 

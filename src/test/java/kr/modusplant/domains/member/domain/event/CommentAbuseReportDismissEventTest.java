@@ -20,13 +20,13 @@ class CommentAbuseReportDismissEventTest {
     class CreateTest {
 
         @Test
-        @DisplayName("유효한 파라미터로 객체 생성 성공")
-        void testCreate_givenValidParameters_willReturnEvent() {
+        @DisplayName("유효한 파라미터로 CommentAbuseReportDismissEvent 반환")
+        void testCreate_givenValidParameters_willReturnCommentAbuseReportDismissEvent() {
             assertNotNull(testCommentAbuseReportDismissEvent);
         }
 
         @Test
-        @DisplayName("postUlid가 비어 있을 때 오류 발생")
+        @DisplayName("postUlid가 비어 있을 때 예외 반환")
         void testCreate_givenBlankPostUlid_willThrowException() {
             // given & when
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
@@ -37,7 +37,7 @@ class CommentAbuseReportDismissEventTest {
         }
 
         @Test
-        @DisplayName("path가 비어 있을 때 오류 발생")
+        @DisplayName("path가 비어 있을 때 예외 반환")
         void testCreate_givenBlankPath_willThrowException() {
             // given & when
             InvalidValueException exception = assertThrows(InvalidValueException.class, () ->

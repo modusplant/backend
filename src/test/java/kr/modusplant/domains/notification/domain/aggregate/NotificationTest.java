@@ -18,7 +18,7 @@ class NotificationTest implements NotificationTestUtils {
     class CreateTests {
 
         @Test
-        @DisplayName("모든 파라미터가 유효할 때 Notification을 성공적으로 생성한다")
+        @DisplayName("유효한 파라미터로 Notification 반환")
         void testCreate_givenValidParameters_willReturnNotification() {
             // given
             LocalDateTime now = LocalDateTime.now();
@@ -38,7 +38,7 @@ class NotificationTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("필수 파라미터가 null일 때 EmptyValueException을 발생시킨다")
+        @DisplayName("필수 파라미터가 null일 때 예외 반환")
         void testCreate_givenNullParameters_willThrowException() {
             // given
             LocalDateTime now = LocalDateTime.now();
@@ -53,7 +53,7 @@ class NotificationTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("댓글 관련 액션인데 commentPath가 null이면 EmptyValueException을 발생시킨다")
+        @DisplayName("댓글 액션인데 commentPath가 null일 때 예외 반환")
         void testCreate_givenCommentActionWithNullPath_willThrowException() {
             // given
             LocalDateTime now = LocalDateTime.now();
@@ -69,7 +69,7 @@ class NotificationTest implements NotificationTestUtils {
     class CreateInitialTests {
 
         @Test
-        @DisplayName("성공적으로 초기 Notification 객체를 생성한다 (ID는 null, 시간은 현재시간)")
+        @DisplayName("유효한 파라미터로 초기 Notification 반환")
         void testCreateInitial_givenValidParameters_willReturnNotification() {
             // when
             Notification notification = Notification.createInitial(testRecipientId, testActor, testNotificationActionPostLiked, testNotificationStatusUnread, testPostId, null, testPostContentPreview);
@@ -87,8 +87,8 @@ class NotificationTest implements NotificationTestUtils {
     class FunctionTests {
 
         @Test
-        @DisplayName("read() 메서드 호출 시 상태가 읽음으로 변경된다")
-        void testRead_willChangeStatusToRead() {
+        @DisplayName("읽음 처리 활동 수행")
+        void testRead_givenUnreadNotification_willProcessAction() {
             // given
             Notification notification = createPostLikedUnreadNotification(LocalDateTime.now());
 
@@ -100,7 +100,7 @@ class NotificationTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("생성일이 30일 이전이면 isExpired가 true를 반환한다")
+        @DisplayName("30일 이전 생성일일 때 참 반환")
         void testIsExpired_givenOldNotification_willReturnTrue() {
             // given
             Notification oldNotification = createPostLikedReadNotification(LocalDateTime.now().minusDays(31));
@@ -110,7 +110,7 @@ class NotificationTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("생성일이 30일 이내이면 isExpired가 false를 반환한다")
+        @DisplayName("30일 이내 생성일일 때 거짓 반환")
         void testIsExpired_givenRecentNotification_willReturnFalse() {
             // given
             Notification recentNotification = createPostLikedReadNotification(LocalDateTime.now().minusDays(10));
@@ -125,8 +125,8 @@ class NotificationTest implements NotificationTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("NotificationId가 같으면 같은 객체로 판단한다")
-        void useEqual_givenSameId_willReturnTrue() {
+        @DisplayName("동일 NotificationId일 때 참 반환")
+        void testEquals_givenSameId_willReturnTrue() {
             LocalDateTime now = LocalDateTime.now();
             Notification n1 = createPostLikedReadNotification(now);
             Notification n2 = createPostLikedReadNotification(now);
@@ -136,8 +136,8 @@ class NotificationTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("NotificationId가 다르면 다른 객체로 판단한다")
-        void useEqual_givenDifferentId_willReturnFalse() {
+        @DisplayName("다른 NotificationId일 때 거짓 반환")
+        void testEquals_givenDifferentId_willReturnFalse() {
             // given
             Notification n1 = createPostLikedReadNotification(LocalDateTime.now());
             NotificationId notificationId2 = NotificationId.create("71K59D7R5ZT51X9HVZXGK4A6WN");

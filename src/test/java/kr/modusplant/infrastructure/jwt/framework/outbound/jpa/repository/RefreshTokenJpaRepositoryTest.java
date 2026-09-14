@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
     private final RefreshTokenJpaRepository refreshTokenJpaRepository = mock(RefreshTokenJpaRepository.class);
+    @SuppressWarnings("unused")
     private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
 
     private MemberEntity memberEntity;
@@ -36,8 +37,8 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
 
     @Test
-    @DisplayName("uuid로 refresh token 정보 찾기")
-    void testFindByUuid_givenUuid_willReturnRefreshToken() {
+    @DisplayName("uuid로 Optional 반환")
+    void testFindByUuid_givenUuid_willReturnOptional() {
         // given
         given(refreshTokenJpaRepository.findByUuid(refreshTokenEntity.getUuid())).willReturn(Optional.of(refreshTokenEntity));
 
@@ -46,12 +47,12 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
-    @DisplayName("member와 device id로 refresh token 정보 찾기")
-    void testFindByMemberAndRefreshToken_givenMemberAndRefreshToken_willReturnRefreshToken() {
+    @DisplayName("member와 refresh token으로 Optional 반환")
+    void testFindByMemberAndRefreshToken_givenMemberAndRefreshToken_willReturnOptional() {
         // given
         given(refreshTokenJpaRepository.findByMemberAndRefreshToken(memberEntity, refreshTokenEntity.getRefreshToken()))
                 .willReturn(Optional.of(refreshTokenEntity));
@@ -61,12 +62,12 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
-    @DisplayName("refresh token으로 refresh token 정보 찾기")
-    void testFindByRefreshToken_givenRefreshToken_willReturnRefreshToken() {
+    @DisplayName("refresh token으로 Optional 반환")
+    void testFindByRefreshToken_givenRefreshToken_willReturnOptional() {
         // given
         given(refreshTokenJpaRepository.findByRefreshToken(refreshTokenEntity.getRefreshToken()))
                 .willReturn(Optional.of(refreshTokenEntity));
@@ -75,12 +76,12 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
 
         // then
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(refreshTokenEntity);
+        assertThat(result.orElseThrow()).isEqualTo(refreshTokenEntity);
     }
 
     @Test
-    @DisplayName("uuid로 refresh token 삭제")
-    void testDeleteByUuid_givenUuid_willDelete() {
+    @DisplayName("uuid로 refresh token 삭제 활동 수행")
+    void testDeleteByUuid_givenUuid_willDeleteRefreshToken() {
         // given
         UUID uuid = refreshTokenEntity.getUuid();
         willDoNothing().given(refreshTokenJpaRepository).deleteByUuid(uuid);
@@ -95,7 +96,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
     }
 
     @Test
-    @DisplayName("uuid로 refresh token 존재 여부 확인")
+    @DisplayName("uuid로 참 반환")
     void testExistsByUuid_givenUuid_willReturnTrue() {
         // given
         given(refreshTokenJpaRepository.existsByUuid(refreshTokenEntity.getUuid())).willReturn(true);
@@ -108,7 +109,7 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
     }
 
     @Test
-    @DisplayName("refresh token값으로 refresh token 정보가 DB에 존재하는지 확인")
+    @DisplayName("refresh token으로 참 반환")
     void testExistsByRefreshToken_givenRefreshToken_willReturnTrue() {
         // given
         given(refreshTokenJpaRepository.existsByRefreshToken(refreshTokenEntity.getRefreshToken())).willReturn(true);
@@ -121,10 +122,11 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
     }
 
     @Test
-    @DisplayName("만료시간이 지난 refresh token 삭제")
-    void testDeleteByExpiredAtBeforeTest_givenExpiredAt_willDelete() {
+    @DisplayName("만료된 refresh token 삭제 활동 수행")
+    void testDeleteByExpiredAtBefore_givenExpiredAt_willDeleteRefreshToken() {
         // given
         LocalDateTime now = LocalDateTime.now();
+        @SuppressWarnings("unused")
         RefreshTokenEntity expiredToken = RefreshTokenEntity.builder()
                 .member(memberEntity)
                 .refreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyIn0.sFzQWkpK8HG2xKcI1vNH3oW7nIO9QaX3ghTkfT2Yq3w")
@@ -140,6 +142,6 @@ class RefreshTokenJpaRepositoryTest implements RefreshTokenEntityTestUtils {
         // then
         List<RefreshTokenEntity> remainingTokens = refreshTokenJpaRepository.findAll();
         assertThat(remainingTokens.size()).isEqualTo(1);
-        assertThat(remainingTokens.get(0).getExpiredAt()).isAfter(now);
+        assertThat(remainingTokens.getFirst().getExpiredAt()).isAfter(now);
     }
 }

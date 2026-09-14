@@ -24,7 +24,7 @@
       "Bash(docker compose logs*)",
       "Bash(docker compose config*)",
 
-      "Edit(/claude/logs/**)",
+      "Edit(/.claude/logs/**)",
 
       "Read(/src/main/resources/application-local.yml)",
       "Read(/docker-compose.override.yml)",
@@ -34,24 +34,14 @@
       "Read(~/.claude/skills/**)"
     ],
     "ask": [
-      "Bash(docker exec*)",
-      "Bash(docker run*)",
-
-      "Bash(docker compose exec*)"
     ],
     "deny": [
       "Bash(rm -rf **/src/**)",
 
-      "Bash(git push origin main*)",
-      "Bash(git push origin develop*)",
+      "Bash(git push*)",
 
-      "Bash(docker rm*)",
-      "Bash(docker rmi*)",
-
-      "Bash(docker compose up*)",
-      "Bash(docker compose down*)",
-
-      "Read(**/.gradle/**)",
+      "Read(/.gradle/**)",
+      "Read(/.idea/**)",
       "Read(**/.settings/**)",
       "Read(/src/main/resources/application-secrets.yml)",
 

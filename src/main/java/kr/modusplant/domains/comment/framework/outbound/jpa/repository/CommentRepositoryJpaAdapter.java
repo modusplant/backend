@@ -37,14 +37,14 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
         PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getValue())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
         CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
-        if(commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getValue(), comment.getPath().getValue()))) {
+        if (commentRepository.existsById(new CommentCompositeKey(comment.getPostId().getValue(), comment.getPath().getValue()))) {
             throw new InvalidValueException(CommentErrorCode.EXIST_COMMENT, "comment");
         }
         commentRepository.save(commentEntity);
     }
 
     @Override
-    public void update(PostId postId, CommentPath path, CommentContent content) {
+    public void updateContent(PostId postId, CommentPath path, CommentContent content) {
         CommentCompositeKey id = CommentCompositeKey.builder()
                 .post(postId.getValue())
                 .path(path.getValue())

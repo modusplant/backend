@@ -35,7 +35,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
     @DisplayName("register로 사이트 회원 약관 등록")
     class RegisterSiteMemberTermTest {
         @Test
-        @DisplayName("중복되지 않는 회원 아이디로 register 성공")
+        @DisplayName("중복되지 않는 회원 아이디로 응답 반환")
         void testRegister_givenValidRequest_willReturnResponse() {
             // given
             given(siteMemberTermRepository.isIdExist(any())).willReturn(false);
@@ -46,7 +46,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
         }
 
         @Test
-        @DisplayName("이미 등록된 회원 약관으로 register 시 오류 발생")
+        @DisplayName("이미 등록된 회원 약관일 때 예외 반환")
         void testRegister_givenAlreadyExistedSiteMemberTerm_willThrowException() {
             // given
             given(siteMemberTermRepository.isIdExist(any())).willReturn(true);
@@ -64,7 +64,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
     @DisplayName("update로 사이트 회원 약관 수정")
     class UpdateSiteMemberTermTest {
         @Test
-        @DisplayName("존재하는 회원 약관으로 update 성공")
+        @DisplayName("존재하는 회원 약관으로 응답 반환")
         void testUpdate_givenValidRequest_willReturnResponse() {
             // given
             given(siteMemberTermRepository.findById(any())).willReturn(Optional.of(createSiteMemberTerm()));
@@ -75,7 +75,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 회원 아이디로 update 시 오류 발생")
+        @DisplayName("존재하지 않는 회원 아이디일 때 예외 반환")
         void testUpdate_givenNotFoundSiteMemberTermId_willThrowException() {
             // given
             given(siteMemberTermRepository.findById(any())).willReturn(Optional.empty());
@@ -90,20 +90,23 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
     }
 
     @Test
-    @DisplayName("delete로 사이트 회원 약관 삭제")
-    void testDelete_givenValidSiteMemberTermId_willDelete() {
+    @DisplayName("유효한 사이트 회원 약관 ID로 활동 수행")
+    void testDelete_givenValidSiteMemberTermId_willProcessAction() {
         // given
         willDoNothing().given(siteMemberTermRepository).deleteById(any());
 
-        // when & then (예외 없이 실행됨을 확인)
+        // when
         siteMemberTermController.delete(testSiteMemberTermId);
+
+        // then
+        Mockito.verify(siteMemberTermRepository).deleteById(testSiteMemberTermId);
     }
 
     @Nested
     @DisplayName("getSiteMemberTerm으로 사이트 회원 약관 조회")
     class GetSiteMemberTermTest {
         @Test
-        @DisplayName("존재하는 사이트 회원 약관 조회")
+        @DisplayName("유효한 ID로 응답 반환")
         void testGetSiteMemberTerm_givenValidId_willReturnResponse() {
             // given
             given(siteMemberTermRepository.findById(any())).willReturn(Optional.of(createSiteMemberTerm()));
@@ -113,7 +116,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 사이트 회원 약관 조회 시 오류 발생")
+        @DisplayName("존재하지 않는 사이트 회원 약관 조회 시 예외 반환")
         void testGetSiteMemberTerm_givenNotFoundId_willThrowException() {
             // given
             given(siteMemberTermRepository.findById(any())).willReturn(Optional.empty());
@@ -128,7 +131,7 @@ class SiteMemberTermControllerTest implements SiteMemberTermTestUtils {
     }
 
     @Test
-    @DisplayName("getSiteMemberTermList로 사이트 회원 약관 목록 조회")
+    @DisplayName("사이트 회원 약관이 존재할 때 응답 목록 반환")
     void testGetSiteMemberTermList_givenTermsExist_willReturnResponseList() {
         // given
         given(siteMemberTermRepository.findAll()).willReturn(List.of(createSiteMemberTerm()));

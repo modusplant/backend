@@ -82,3 +82,14 @@ Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comm
 - `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled
 - `dev` / `prod`: deployed environments; secrets injected via AWS SSM Parameter Store
 - `secrets` is always included; it supplies sensitive values (DB credentials, keys, etc.) and is not tracked in the repository
+
+## Convention & Skill Docs
+
+Detailed working rules live under `.claude/`:
+
+- `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
+- `.claude/documents/*.md` — on-demand reference docs: 
+  - per-domain test profiles (`test-domain-profiles-<domain>.md`, consumed by the `test-single-domain` skill)
+  - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
+  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
+- `.claude/skills/*/SKILL.md` — task workflows: `test-single-domain`, `adapt-to-code-change`, `configure-docker-environment`, `resolve-error-with-stack-trace`, `report-performance-optimization`.

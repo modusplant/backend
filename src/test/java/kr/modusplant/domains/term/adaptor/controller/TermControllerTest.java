@@ -30,7 +30,7 @@ class TermControllerTest implements TermTestUtils {
     private final TermController termController = new TermController(termMapper, termRepository);
 
     @Test
-    @DisplayName("register로 약관 등록")
+    @DisplayName("유효한 요청으로 응답 반환")
     void testRegister_givenValidRequest_willReturnResponse() {
         // given
         given(termRepository.save(any())).willReturn(createTerm());
@@ -43,7 +43,7 @@ class TermControllerTest implements TermTestUtils {
     @DisplayName("update로 약관 수정")
     class UpdateTermTest {
         @Test
-        @DisplayName("존재하는 약관으로 update 성공")
+        @DisplayName("존재하는 약관으로 응답 반환")
         void testUpdate_givenValidRequest_willReturnResponse() {
             // given
             given(termRepository.findById(any())).willReturn(Optional.of(createTerm()));
@@ -54,7 +54,7 @@ class TermControllerTest implements TermTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 약관으로 update 시 오류 발생")
+        @DisplayName("존재하지 않는 약관일 때 예외 반환")
         void testUpdate_givenNotFoundTermId_willThrowException() {
             // given
             given(termRepository.findById(any())).willReturn(Optional.empty());
@@ -69,20 +69,23 @@ class TermControllerTest implements TermTestUtils {
     }
 
     @Test
-    @DisplayName("delete로 약관 삭제")
-    void testDelete_givenValidTermId_willDelete() {
+    @DisplayName("유효한 약관 ID로 활동 수행")
+    void testDelete_givenValidTermId_willProcessAction() {
         // given
         willDoNothing().given(termRepository).deleteById(any());
 
-        // when & then (예외 없이 실행됨을 확인)
+        // when
         termController.delete(testTermId);
+
+        // then
+        Mockito.verify(termRepository).deleteById(testTermId);
     }
 
     @Nested
     @DisplayName("getTerm으로 약관 조회")
     class GetTermTest {
         @Test
-        @DisplayName("존재하는 약관 조회")
+        @DisplayName("유효한 약관 ID로 응답 반환")
         void testGetTerm_givenValidTermId_willReturnResponse() {
             // given
             given(termRepository.findById(any())).willReturn(Optional.of(createTerm()));
@@ -92,7 +95,7 @@ class TermControllerTest implements TermTestUtils {
         }
 
         @Test
-        @DisplayName("존재하지 않는 약관 조회 시 오류 발생")
+        @DisplayName("존재하지 않는 약관 조회 시 예외 반환")
         void testGetTerm_givenNotFoundTermId_willThrowException() {
             // given
             given(termRepository.findById(any())).willReturn(Optional.empty());
@@ -107,7 +110,7 @@ class TermControllerTest implements TermTestUtils {
     }
 
     @Test
-    @DisplayName("getTermList로 약관 목록 조회")
+    @DisplayName("약관이 존재할 때 응답 목록 반환")
     void testGetTermList_givenTermsExist_willReturnResponseList() {
         // given
         given(termRepository.findAll()).willReturn(List.of(createTerm()));

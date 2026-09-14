@@ -20,56 +20,56 @@ class UlidIdGeneratorTest {
     private static final Pattern ULID_PATTERN = Pattern.compile("^[0123456789ABCDEFGHJKMNPQRSTVWXYZ]{26}$", Pattern.CASE_INSENSITIVE);
 
     @Nested
-    @DisplayName("UlidIdGenerator가 올바른 형식의 ULID를 생성")
-    class GenerateUlidTest {
+    @DisplayName("generate 메서드 테스트")
+    class GenerateTest {
         @Test
-        @DisplayName("UlidIdGenerator가 generate()로 올바른 형식의 ULID를 생성")
-        void generateUlid_givenGenerateWithNoParam_willReturnUlid() {
-            // Given & When
+        @DisplayName("매개변수 없이 문자열 반환")
+        void testGenerate_givenNoParam_willReturnString() {
+            // given & when
             String ulid = generator.generate();
 
-            // Then
+            // then
             assertTrue(ULID_PATTERN.matcher(ulid).matches());
         }
 
         @Test
-        @DisplayName("UlidIdGenerator가 generate(4개의 매개변수)로 올바른 형식의 ULID를 생성")
-        void generateUlid_givenGenerateWithFourParams_willReturnUlid() {
-            // Given & When
+        @DisplayName("4개 매개변수로 문자열 반환")
+        void testGenerate_givenFourParams_willReturnString() {
+            // given & when
             String ulid = generator.generate(null, null, null, EventType.INSERT);
 
-            // Then
+            // then
             assertTrue(ULID_PATTERN.matcher(ulid).matches());
         }
     }
 
     @Test
-    @DisplayName("UlidIdGenerator가 고유한 ULID를 생성")
-    void generateUlid_givenValidGenerator_willReturnUniqueUlid() {
-        // Given
+    @DisplayName("다회 호출 시 문자열 반환")
+    void testGenerate_givenManyInvocations_willReturnString() {
+        // given
         int count = 10000;
 
-        // When
+        // when
         String[] ulids = new String[count];
         for (int i = 0; i < count; i++) {
-            ulids[i] = generator.generate(null, null,null,EventType.INSERT);
+            ulids[i] = generator.generate(null, null, null, EventType.INSERT);
         }
 
-        // Then
+        // then
         long distinctCount = Arrays.stream(ulids).distinct().count();
         assertEquals(count, distinctCount);
     }
 
     @Test
-    @DisplayName("UlidIdGenerator가 시간 순서에 따르는 ULID를 생성")
-    void generateUlid_givenValidGenerator_willReturnTimeOrderedUlid() {
+    @DisplayName("순차 호출 시 문자열 반환")
+    void testGenerate_givenSequentialInvocations_willReturnString() {
         // given
         int count = 5;
         List<String> ulids = new ArrayList<>();
 
         // when
         for (int i = 0; i < count; i++) {
-            String ulid = generator.generate(null, null,null,EventType.INSERT);
+            String ulid = generator.generate(null, null, null, EventType.INSERT);
             ulids.add(ulid);
         }
 
@@ -86,8 +86,8 @@ class UlidIdGeneratorTest {
     }
 
     @Test
-    @DisplayName("UlidIdGenerator가 멀티스레드 환경에서도 고유한 ULID를 생성")
-    void generateUlidInMultiThread_givenValidGenerator_willReturnUlid() throws ExecutionException, InterruptedException {
+    @DisplayName("멀티스레드 호출 시 문자열 반환")
+    void testGenerate_givenMultiThreadedInvocations_willReturnString() throws ExecutionException, InterruptedException {
         // given
         int repeatCount;
         int ulidCount;

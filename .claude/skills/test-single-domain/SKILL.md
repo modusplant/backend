@@ -13,9 +13,8 @@ disallowed-tools: Write(/src/main/**) Edit(/src/main/**)
 
 # Loading the Domain Profile
 
-Locate the section matching $DOMAIN_NAME in @.claude/documents/test-domain-profiles.md 
-and use its fields everywhere those terms are referenced below. 
-If no section exists yet for $DOMAIN_NAME, check if @.claude/rules/domain-$DOMAIN_NAME-details.md file is present.
+Read @.claude/documents/test-domain-profiles-$DOMAIN_NAME.md and use its fields everywhere those terms are referenced below.
+If that file does not exist, check if @.claude/rules/domain-$DOMAIN_NAME-details.md file is present.
 If the file exists, derive these facts yourself from @.claude/rules/domain-$DOMAIN_NAME-details.md 
 and the domain's actual @src/main / @src/test package layout, applying the same classification rules, then proceed.
 If the file doesn't exist, instantly terminate the skill and guide the user to create Rule file first.
@@ -38,10 +37,12 @@ Regardless of the scope above, never generate tests for:
 
 # Test Architecture & Strategy
 
-!`cat ${CLAUDE_PROJECT_DIR}/.claude/documents/test-architecture-convention.md`
+!`cat ${CLAUDE_PROJECT_DIR}/.claude/rules/test-architecture-details.md`
 
 Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjustments from its profile:
 
+- **ErrorCode class:** exception assertions in $DOMAIN_NAME tests check `getErrorCode()` against
+  the enum named under $DOMAIN_NAME's `ErrorCode class` in its profile.
 - **Pure-Unit-Test path exceptions:** the paths listed under $DOMAIN_NAME's `Pure-Unit-Test path
   exceptions` may use a real Spring context / `TestEntityManager` / real DB instead of a pure POJO test.
 - **jOOQ repository test policy:** classes under $DOMAIN_NAME's `framework/outbound/jooq/repository`
@@ -56,7 +57,7 @@ Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjust
 
 # Test Utility (`TestUtils`) Convention
 
-Follow the TestUtils convention from `test-architecture-convention.md` above, applied to $DOMAIN_NAME:
+Follow the TestUtils convention from `test-architecture-details.md` above, applied to $DOMAIN_NAME:
 
 - **Parameter Sources:** reuse constant fields from $DOMAIN_NAME's own `common/constant` path, plus
   every path listed under $DOMAIN_NAME's `TestUtils shared constant paths` in its profile. If missing, create them.

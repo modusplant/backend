@@ -14,9 +14,9 @@ class NotificationStatusTest implements NotificationTestUtils {
 
     @Nested
     @DisplayName("NotificationStatus create 테스트")
-    class createTests {
+    class CreateTests {
         @Test
-        @DisplayName("유효한 NotificationStatusType으로 객체를 생성한다")
+        @DisplayName("유효한 StatusType으로 NotificationStatus 반환")
         void testCreate_givenValidStatusType_willReturnNotificationStatus() {
             // given
             NotificationStatusType statusType = NotificationStatusType.READ;
@@ -31,7 +31,7 @@ class NotificationStatusTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("statusType이 null인 경우 EmptyValueException을 던진다")
+        @DisplayName("statusType이 null일 때 예외 반환")
         void testCreate_givenNull_willThrowException() {
             // when & then
             EmptyValueException exception = assertThrows(EmptyValueException.class,
@@ -44,10 +44,10 @@ class NotificationStatusTest implements NotificationTestUtils {
 
     @Nested
     @DisplayName("NotificationStatus read/unread 테스트")
-    class readUnreadTests {
+    class ReadUnreadTests {
 
         @Test
-        @DisplayName("read() 메서드로 읽음 상태를 생성한다")
+        @DisplayName("read()로 NotificationStatus 반환")
         void testRead_givenNoParameter_willReturnNotificationStatus() {
             // when
             NotificationStatus status = NotificationStatus.read();
@@ -59,7 +59,7 @@ class NotificationStatusTest implements NotificationTestUtils {
         }
 
         @Test
-        @DisplayName("unread() 메서드로 안읽음 상태를 생성한다")
+        @DisplayName("unread()로 NotificationStatus 반환")
         void testUnread_givenNoParameter_willReturnNotificationStatus() {
             // when
             NotificationStatus status = NotificationStatus.unread();
@@ -76,23 +76,23 @@ class NotificationStatusTest implements NotificationTestUtils {
     class EqualsAndHashCodeTests {
 
         @Test
-        @DisplayName("같은 객체에 대한 equals 호출")
-        void useEqual_givenSameObject_willReturnTrue() {
+        @DisplayName("같은 객체로 참 반환")
+        void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             assertEquals(testNotificationStatusUnread, testNotificationStatusUnread);
             assertEquals(testNotificationStatusUnread.hashCode(), testNotificationStatusUnread.hashCode());
         }
 
         @Test
-        @DisplayName("다른 클래스의 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectOfDifferentClass_willReturnFalse() {
+        @DisplayName("다른 클래스 인스턴스로 거짓 반환")
+        void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
             assertNotEquals(testNotificationStatusUnread, testNotificationId);
         }
 
         @Test
-        @DisplayName("다른 상태를 갖는 인스턴스에 대한 equals 호출")
-        void useEqual_givenObjectContainingDifferentProperty_willReturnFalse() {
+        @DisplayName("다른 상태일 때 거짓 반환")
+        void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
             assertNotEquals(testNotificationStatusUnread, NotificationStatus.read());
             assertNotEquals(testNotificationStatusRead, NotificationStatus.unread());
