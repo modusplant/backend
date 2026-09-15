@@ -89,18 +89,17 @@ member/
 
 **Repository Ports** (`usecase/port/repository/`):
 - Parameters and return types use only domain VOs/Aggregates — no JPA entities or jOOQ records
-- Exception: a method may accept a trailing primitive `int version` parameter to select version-conditional behavior in its adapter implementation
 
 **Records** (`usecase/record/`):
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
 - Adapter converts raw types to domain VOs; naming: `*GetRecord`, `*OverrideRecord`, `*LikeRecord`, etc.
-- When an operation has multiple coexisting API versions, the record is suffixed accordingly (e.g. `*OverrideRecord_V1`, `*OverrideRecord_V2`) instead of one record serving every version
+- When an operation has multiple coexisting API versions, the record is suffixed accordingly (e.g. `*FooRecord_V1`, `*FooRecord_V2`) instead of one record serving every version
 - Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON) and `framework/outbound/jooq/record/` (jOOQ params)
 
 **Response DTOs** (`usecase/response/`):
 - Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
 - Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
-- When a mapper method returns a different concrete response record depending on version, the candidate records implement a shared empty marker interface placed under `response/supers/`; the mapper declares that interface as its return type, and each call site casts the result back to the concrete type it expects
+- When a mapper method returns a different concrete response record depending on a parameter, the candidate records implement a shared empty marker interface placed under `response/supers/`; the mapper declares that interface as its return type, and each call site casts the result back to the concrete type it expects
 
 **Read Models** (`usecase/model/read/`):
 - Java records optimized for specific views (e.g. abuse-report/proposal dashboards); direct targets of jOOQ query mapping
@@ -141,7 +140,7 @@ member/
 - Naming mirrors the adapter Controller it delegates to, with a `*RestController` suffix (e.g. `MemberRestController`, `MemberAdminRestController`)
 - Admin endpoints: `@PreAuthorize("hasAuthority('ADMIN')")`
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
-- Multiple API versions of one operation coexist as separate methods on the same controller: the class-level `@RequestMapping` carries no version, each `@GetMapping`/`@PostMapping`/etc. embeds its own `/v{n}/` path segment, and the method name takes a matching `_v{n}` suffix (e.g. `overrideMemberProfile_v1`, `overrideMemberProfile_v2`)
+- Multiple API versions of one operation coexist as separate methods on the same controller: the class-level `@RequestMapping` carries no version, each `@GetMapping`/`@PostMapping`/etc. embeds its own `/v{n}/` path segment, and the method name takes a matching `_v{n}` suffix (e.g. `fooBar_v1`, `fooBar_v2`)
 - `consumes = MediaType.MULTIPART_FORM_DATA_VALUE` is declared only when the method binds an actual `MultipartFile`/`List<MultipartFile>` via `@RequestPart`; endpoints taking only `String`/`List<String>` params use plain `@RequestParam` with no `consumes` override
 
 **HTTP Cache** (`framework/inbound/web/cache/`):

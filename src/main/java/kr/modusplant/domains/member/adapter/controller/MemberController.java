@@ -35,7 +35,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class MemberController {
         memberValidationHelper.validateIfMemberProfileExists(memberId);
 
         MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
-        return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, 1);
+        return (MemberProfileResponseWithImageUrl) memberProfileMapper.toMemberProfileResponse(memberProfile, true);
     }
 
     @Transactional(readOnly = true)
@@ -92,34 +91,6 @@ public class MemberController {
         return new MemberRoleResponse(role.name());
     }
 
-    public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V1 record) throws IOException {
-        MemberId memberId = MemberId.fromUuid(record.id());
-        Nickname memberNickname = Nickname.create(record.nickname());
-        validateBeforeOverrideProfile(memberId, memberNickname);
-
-        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
-        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
-
-        MultipartFile image = record.image();
-        String newImagePath = null;
-        byte[] newImageBytes = null;
-        if (!(image == null)) {
-            newImagePath = memberImageIOHelper.uploadImage(memberId, record);
-            newImageBytes = image.getBytes();
-        }
-        MemberProfileImage memberProfileImage = MemberProfileImage.create(
-                MemberProfileImagePath.create(newImagePath),
-                MemberProfileImageBytes.create(newImageBytes)
-        );
-        MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
-        memberProfile = MemberProfile.create(memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-
-        return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, false, true), 1);
-    }
-
     public MemberProfilePrepareResponse prepareMemberProfileImage(MemberProfileImagePrepareRecord_V2 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         MemberProfileImageFileName memberProfileImageFileName = MemberProfileImageFileName.create(record.filename());
@@ -128,35 +99,13 @@ public class MemberController {
         MemberProfile existingMemberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
         memberImageIOHelper.deleteImage(existingMemberProfile.getMemberProfileImage());
         existingMemberProfile.clearImage();
-        memberProfileRepository.update(existingMemberProfile, false, false);
+        memberProfileRepository.update(existingMemberProfile, false);
 
         MemberProfileImagePath memberProfileImagePath =
                 MemberProfileImagePath.create(memberId, memberProfileImageFileName);
         return memberProfileMapper.toMemberProfilePrepareResponse(
                 memberProfileImagePath,
                 memberImageIOHelper.issueStorageUrl(memberProfileImagePath, record.contentType()));
-    }
-
-    public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V2 record) throws IOException {
-        MemberId memberId = MemberId.fromUuid(record.id());
-        Nickname memberNickname = Nickname.create(record.nickname());
-        MemberProfileImage memberProfileImage = MemberProfileImage.create(
-                MemberProfileImagePath.create(record.fileKey()),
-                MemberProfileImageBytes.create(null)
-        );
-        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
-
-        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
-        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
-
-        MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
-        memberProfile = MemberProfile.create(
-                memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
-
-        return (MemberProfileResponseWithImageUrl)
-                memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, true, false), 2);
     }
 
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
@@ -178,7 +127,7 @@ public class MemberController {
 
         return (MemberProfileResponseWithImagePath)
                 memberProfileMapper.toMemberProfileResponse(
-                        memberProfileRepository.update(memberProfile, true, false), 3);
+                        memberProfileRepository.update(memberProfile, true), false);
     }
 
     public void likePost(MemberPostLikeRecord record) {
@@ -254,49 +203,6 @@ public class MemberController {
         }
     }
 
-    public void reportProposalOrBug(ProposalOrBugReportRecord_V1 record) throws IOException {
-        MemberId memberId = MemberId.fromUuid(record.memberId());
-        ReportId reportId = ReportId.generate();
-        ReportTitle reportTitle = ReportTitle.create(record.title());
-        ReportContent reportContent = ReportContent.create(record.content());
-        List<MultipartFile> images = record.images();
-        Integer imageNumber = record.imageNumber();
-        validateBeforeReportProposalOrBug(memberId, images, imageNumber);
-
-        List<ProposalOrBugReportImage> proposalOrBugReportImages;
-        if (imageNumber == null) {
-            proposalOrBugReportImages = List.of();
-        } else {
-            List<ProposalOrBugReportImageFileName> proposalOrBugReportImageFileNames =
-                    images.stream()
-                            .map(element ->
-                                    ProposalOrBugReportImageFileName.create(
-                                            element.getOriginalFilename()))
-                            .toList();
-
-            List<ReportImagePath> reportImagePaths =
-                    memberImageIOHelper.uploadImage(memberId, reportId, images)
-                            .stream()
-                            .map(ReportImagePath::create).toList();
-
-            proposalOrBugReportImages = new ArrayList<>();
-            for (int i = 0; i < imageNumber; i++){
-                proposalOrBugReportImages.add(
-                        ProposalOrBugReportImage.create(
-                                reportImagePaths.get(i),
-                                proposalOrBugReportImageFileNames.get(i),
-                                ReportImageBytes.create(null)));
-            }
-        }
-
-        reportRepository.reportProposalOrBug(
-                memberId,
-                ProposalOrBugReport.create(
-                        reportId, reportTitle, reportContent, proposalOrBugReportImages
-                ),
-                1);
-    }
-
     public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         List<String> filenames = record.filenames();
@@ -340,8 +246,7 @@ public class MemberController {
 
         reportRepository.reportProposalOrBug(
                 memberId,
-                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages),
-                2);
+                ProposalOrBugReport.create(reportId, reportTitle, reportContent, proposalOrBugReportImages));
     }
 
     public void reportPostAbuse(PostAbuseReportRecord record) {
@@ -385,17 +290,6 @@ public class MemberController {
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
     }
 
-    private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname) {
-        memberValidationHelper.validateIfMemberExists(memberId);
-        if (swearService.isSwearContained(nickname.getValue())) {
-            throw new SwearContainedException();
-        }
-        Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
-        if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
-            throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
-        }
-    }
-
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
         if (swearService.isSwearContained(nickname.getValue())) {
@@ -429,15 +323,6 @@ public class MemberController {
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", activitySubjectPostId.getValue());
-        }
-    }
-
-    private void validateBeforeReportProposalOrBug(MemberId memberId, List<MultipartFile> images, Integer imageNumber) {
-        memberValidationHelper.validateIfMemberExists(memberId);
-        if ((images == null && imageNumber != null) || (images != null && imageNumber == null)) {
-            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
-        } else if (images != null && images.size() != imageNumber) {
-            throw new InvalidValueException(MISMATCHED_REPORT_IMAGE_SIZE, List.of("images", "imageNumber"));
         }
     }
 

@@ -11,7 +11,6 @@ import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberProfileJpaMapper;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
-import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -25,16 +24,12 @@ import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNorm
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 class MemberProfileJpaMapperImplTest implements
         MemberTestUtils, MemberProfileTestUtils,
         MemberEntityTestUtils, MemberProfileEntityTestUtils {
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
-    private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
-    private final MemberProfileJpaMapper memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository, amazonS3Service);
+    private final MemberProfileJpaMapper memberProfileJpaMapper = new MemberProfileJpaMapperImpl(memberJpaRepository);
 
     @Test
     @DisplayName("toMemberProfileEntity로 엔터티 반환")
@@ -53,29 +48,14 @@ class MemberProfileJpaMapperImplTest implements
     }
 
     @Test
-    @DisplayName("needsImageBytes가 true로 toMemberProfile로 회원 반환")
-    void testToMemberProfile_givenNeedsImageBytesTrue_willReturnMemberProfile() throws IOException {
-        // given & when
-        given(amazonS3Service.downloadFile(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_BYTES);
-
-        MemberProfile result = memberProfileJpaMapper.toMemberProfile(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build(), true);
-
-        // then
-        assertThat(result).isEqualTo(createMemberProfile());
-        verify(amazonS3Service, times(1)).downloadFile(any());
-    }
-
-    @Test
-    @DisplayName("needsImageBytes가 false로 toMemberProfile로 이미지 바이트가 없는 회원 반환")
-    void testToMemberProfile_givenNeedsImageBytesFalse_willReturnMemberProfile() throws IOException {
+    @DisplayName("toMemberProfile로 이미지 바이트가 없는 회원 반환")
+    void testToMemberProfile_givenEntity_willReturnMemberProfile() throws IOException {
         // given & when
         MemberProfile result = memberProfileJpaMapper.toMemberProfile(
-                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build(), false);
+                createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntityWithUuid()).build());
 
         // then
         assertThat(result.getMemberProfileImage().getMemberProfileImageBytes().getValue()).isNull();
-        verify(amazonS3Service, never()).downloadFile(any());
     }
 
     @Test
@@ -86,7 +66,7 @@ class MemberProfileJpaMapperImplTest implements
                         .member(createMemberBasicUserEntityWithUuid())
                         .imagePath(null)
                         .introduction(null)
-                        .build(), true))
+                        .build()))
                 .isEqualTo(MemberProfile.create(
                         testMemberId,
                         EmptyMemberProfileImage.create(),
