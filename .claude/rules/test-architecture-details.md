@@ -21,9 +21,8 @@ task-specific workflow supplies explicit path exceptions for the area under test
 exceptions, every class — services, adapters, controllers, mappers, value objects, entities — is
 a pure POJO test.
 
-**Path exception:** `infrastructure/security/component/**` uses `@SpringBootTest` +
-`@MockitoBean` — there is no pure-POJO way to exercise the actual `SecurityFilterChain` (JWT
-filter, exception translation, authorization decisions) end-to-end.
+**Path exception:** `infrastructure/security/component/**` — see
+@.claude/documents/test-infra-security-feature.md for the specific context/mocking strategy.
 
 ---
 

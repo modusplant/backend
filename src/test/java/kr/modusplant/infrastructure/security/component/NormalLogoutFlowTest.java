@@ -2,10 +2,13 @@ package kr.modusplant.infrastructure.security.component;
 
 import jakarta.servlet.http.Cookie;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
-import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -14,17 +17,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SecurityOnlyContext
+@SpringBootTest
+@AutoConfigureMockMvc
 public class NormalLogoutFlowTest {
 
-    private final MockMvc mockMvc;
-    private final TokenService tokenService;
-
     @Autowired
-    public NormalLogoutFlowTest(MockMvc mockMvc, TokenService tokenService) {
-        this.mockMvc = mockMvc;
-        this.tokenService = tokenService;
-    }
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private final TokenService tokenService = Mockito.mock(TokenService.class);
 
     @Test
     @DisplayName("refresh token으로 로그아웃 성공 핸들러 호출 활동 수행")

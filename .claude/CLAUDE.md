@@ -90,6 +90,7 @@ Detailed working rules live under `.claude/`:
 - `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
 - `.claude/documents/*.md` — on-demand reference docs: 
   - per-domain test features (`test-domain-<domain>-feature.md`, consumed by the `test-single-domain` skill)
+  - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; referenced directly from `test-architecture-details.md`, not consumed by `test-single-domain`)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
   - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
 - `.claude/skills/*/SKILL.md` — task workflows: `test-single-domain`, `reflect-code-change-into-document`, `configure-docker-environment`, `resolve-error-with-stack-trace`, `report-performance-optimization`.
