@@ -130,6 +130,28 @@ public class MemberController {
                         memberProfileRepository.update(memberProfile, true), false);
     }
 
+    public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V4 record) throws IOException {
+        MemberId memberId = MemberId.fromUuid(record.id());
+        Nickname memberNickname = Nickname.create(record.nickname());
+        MemberProfileImage memberProfileImage = MemberProfileImage.create(
+                MemberProfileImagePath.create(record.fileKey()),
+                MemberProfileImageBytes.create(null)
+        );
+        validateBeforeOverrideProfile(memberId, memberNickname, memberProfileImage);
+
+        MemberProfile memberProfile = memberProfileRepository.getByIdWithoutImageBytes(memberId);
+        memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
+
+        MemberProfileIntroduction memberProfileIntroduction =
+                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+        memberProfile = MemberProfile.create(
+                memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
+
+        return (MemberProfileResponseWithImageUrl)
+                memberProfileMapper.toMemberProfileResponse(
+                        memberProfileRepository.update(memberProfile, true), true);
+    }
+
     public void likePost(MemberPostLikeRecord record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         ActivitySubjectPostId activitySubjectPostId = ActivitySubjectPostId.create(record.postUlid());
