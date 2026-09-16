@@ -326,6 +326,31 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     // ---------- delete ----------
 
     @Test
+    @DisplayName("유효한 요청으로 댓글 삭제 시 setCommentAsDeleted 호출됨")
+    void testDelete_givenValidRequest_willCallSetCommentAsDeleted() {
+        // given
+        String commentPath = "1.2";
+
+        // when
+        controller.delete(TEST_POST_ULID, commentPath);
+
+        // then
+        then(commandRepository).should(times(1))
+                .setCommentAsDeleted(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
+    }
+
+    @Test
+    @DisplayName("delete는 queryRepository 의존성을 호출하지 않음")
+    void testDelete_willOnlyInteractWithCommandRepository() {
+        // when
+        controller.delete(TEST_POST_ULID, "1");
+
+        // then
+        then(commandRepository).should(times(1)).setCommentAsDeleted(any(), any());
+        then(queryRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
     @DisplayName("유효한 삭제 요청 시 검증 위임 후 삭제 처리하는 활동 수행")
     void testDelete_givenValidRequest_willProcessAction() {
         // given
