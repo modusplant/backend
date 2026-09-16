@@ -147,10 +147,12 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultChain(HttpSecurity http,
+                                            @Qualifier("corsConfigurationSource")
+                                            CorsConfigurationSource corsConfigurationSource) throws Exception {
         http
                 .securityMatcher("/api/**")
-                .cors(Customizer.withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .addFilterBefore(securityExceptionHandlingFilter(), LogoutFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
@@ -226,6 +228,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile({"local", "dev"})
+    @Qualifier("corsConfigurationSource")
     public CorsConfigurationSource localDevCorsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOriginPattern("*");
@@ -242,6 +245,7 @@ public class SecurityConfig {
 
     @Bean
     @Profile("prod")
+    @Qualifier("corsConfigurationSource")
     public CorsConfigurationSource prodCorsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("https://modusplant.kr", "https://www.modusplant.kr"));
