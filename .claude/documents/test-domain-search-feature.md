@@ -1,4 +1,4 @@
-# Test Domain Profile: search
+# Test Domain Search - Feature
 
 The Group A / Group B lists below are relative to
 `src/main/java/kr/modusplant/domains/search/` and mirrored 1:1 under

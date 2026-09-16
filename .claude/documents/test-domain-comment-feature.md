@@ -1,4 +1,4 @@
-# Test Domain Profile: comment
+# Test Domain Comment - Feature
 
 The Group A / Group B lists below are relative to
 `src/main/java/kr/modusplant/domains/comment/` and mirrored 1:1 under

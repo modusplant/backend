@@ -1,4 +1,4 @@
-# Test Domain Profile: member
+# Test Domain Member - Feature
 
 The Group A / Group B lists below are relative to
 `src/main/java/kr/modusplant/domains/member/` and mirrored 1:1 under
