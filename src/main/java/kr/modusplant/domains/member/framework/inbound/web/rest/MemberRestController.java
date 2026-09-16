@@ -24,6 +24,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -81,6 +82,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/v1/members/profile")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> getMemberProfile(
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
@@ -125,6 +127,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @GetMapping(value = "/v1/members/role")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<MemberRoleResponse>> getMemberRole(
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
@@ -142,6 +145,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v2/members/profile/issue-file-key")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<MemberProfilePrepareResponse>> prepareMemberProfileImage_v2(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지 이름",
@@ -172,6 +176,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping(value = "/v3/members/profile")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<MemberProfileResponseWithImagePath>> overrideMemberProfile_v3(
             @Parameter(
                     description = "갱신할 회원의 프로필 이미지 파일 키(코드상에서의 이미지 경로)",
@@ -211,6 +216,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/v1/members/like/communication/post/{postUlid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> likeCommunicationPost(
             @Parameter(
                     description = "좋아요를 누를 게시글의 식별자",
@@ -234,6 +240,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/v1/members/like/communication/post/{postUlid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationPost(
             @Parameter(
                     description = "좋아요를 취소할 게시글의 식별자",
@@ -257,6 +264,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/v1/members/bookmark/communication/post/{postUlid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> bookmarkCommunicationPost(
             @Parameter(
                     description = "북마크를 누를 게시글의 식별자",
@@ -280,6 +288,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/v1/members/bookmark/communication/post/{postUlid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> cancelCommunicationPostBookmark(
             @Parameter(
                     description = "북마크를 취소할 게시글의 식별자",
@@ -303,6 +312,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/v1/members/like/communication/post/{postUlid}/path/{path}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> likeCommunicationComment(
             @Parameter(
                     description = "좋아요를 누를 댓글의 게시글 식별자",
@@ -335,6 +345,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/v1/members/like/communication/post/{postUlid}/path/{path}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> unlikeCommunicationComment(
             @Parameter(
                     description = "좋아요를 취소할 댓글의 게시글 식별자",
@@ -367,6 +378,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v2/report/proposal-or-bug/issue-file-key")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<ProposalOrBugReportPrepareResponse>> prepareProposalOrBugReportImage_v2(
             @Parameter(
                     description = "갱신할 건의 및 버그 제보 이미지 이름 목록",
@@ -399,6 +411,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v2/report/proposal-or-bug")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> reportProposalOrBug_v2(
             @Parameter(description = "보고서 제목", example = "제보합니다!")
             @RequestParam
@@ -431,6 +444,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v1/report/abuse/post/")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> reportPostAbuse(
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
@@ -445,6 +459,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v1/report/abuse/post/{postUlid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> reportPostAbuse(
             @Parameter(
                     description = "신고할 게시글의 식별자",
@@ -469,6 +484,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v1/report/abuse/post//path/{path}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
             @Parameter(
                     description = "신고할 댓글의 경로",
@@ -492,6 +508,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping(value = "/v1/report/abuse/post/{postUlid}/path/{path}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> reportCommentAbuse(
             @Parameter(
                     description = "신고할 댓글이 달린 게시글의 식별자",
@@ -524,6 +541,7 @@ public class MemberRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping("/v1/members")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> withdrawMember(
             @RequestBody @Valid
             MemberWithdrawRequest request,

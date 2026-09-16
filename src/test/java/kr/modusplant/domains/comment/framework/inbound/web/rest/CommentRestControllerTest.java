@@ -24,14 +24,17 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -113,7 +116,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // when
         ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
-                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince);
+                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
@@ -133,7 +136,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // when
         ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
-                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince);
+                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -151,10 +154,18 @@ public class CommentRestControllerTest implements PostIdTestUtils,
         given(controller.gatherByAuthor(any(UUID.class), any())).willReturn(null);
 
         // when
-        restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 2, 10, null, null);
+        restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 2, 10, null, null, MEMBER_BASIC_USER_UUID);
 
         // then
         then(controller).should(times(1)).gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(1, 10));
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 댓글 조회 시 예외 반환")
+    void testGatherByAuthor_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, null, null, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test

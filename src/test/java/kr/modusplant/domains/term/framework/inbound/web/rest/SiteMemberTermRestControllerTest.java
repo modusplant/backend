@@ -11,14 +11,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermCreateRequestTestUtils.testSiteMemberTermCreateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermUpdateRequestTestUtils.testSiteMemberTermUpdateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.response.SiteMemberTermResponseTestUtils.testSiteMemberTermResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -40,11 +43,19 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<SiteMemberTermResponse>> responseEntity =
-                siteMemberTermRestController.registerSiteMemberTerm(testSiteMemberTermCreateRequest);
+                siteMemberTermRestController.registerSiteMemberTerm(testSiteMemberTermCreateRequest, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+        assertThat(String.valueOf(responseEntity.getBody())).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 사이트 회원 약관 등록 시 예외 반환")
+    void testRegisterSiteMemberTerm_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> siteMemberTermRestController.registerSiteMemberTerm(testSiteMemberTermCreateRequest, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -55,11 +66,19 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<SiteMemberTermResponse>> responseEntity =
-                siteMemberTermRestController.updateSiteMemberTerm(testSiteMemberTermUpdateRequest);
+                siteMemberTermRestController.updateSiteMemberTerm(testSiteMemberTermUpdateRequest, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+        assertThat(String.valueOf(responseEntity.getBody())).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 사이트 회원 약관 수정 시 예외 반환")
+    void testUpdateSiteMemberTerm_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> siteMemberTermRestController.updateSiteMemberTerm(testSiteMemberTermUpdateRequest, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -70,10 +89,18 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<Void>> responseEntity =
-                siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_BASIC_USER_UUID);
+                siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 사이트 회원 약관 삭제 시 예외 반환")
+    void testDeleteSiteMemberTerm_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -84,11 +111,19 @@ class SiteMemberTermRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<SiteMemberTermResponse>> responseEntity =
-                siteMemberTermRestController.getSiteMemberTerm(MEMBER_BASIC_USER_UUID);
+                siteMemberTermRestController.getSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+        assertThat(String.valueOf(responseEntity.getBody())).isEqualTo(DataResponse.ok(testSiteMemberTermResponse).toString());
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 사이트 회원 약관 조회 시 예외 반환")
+    void testGetSiteMemberTerm_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> siteMemberTermRestController.getSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -103,6 +138,6 @@ class SiteMemberTermRestControllerTest {
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody().toString()).isEqualTo(DataResponse.ok(List.of(testSiteMemberTermResponse)).toString());
+        assertThat(String.valueOf(responseEntity.getBody())).isEqualTo(DataResponse.ok(List.of(testSiteMemberTermResponse)).toString());
     }
 }

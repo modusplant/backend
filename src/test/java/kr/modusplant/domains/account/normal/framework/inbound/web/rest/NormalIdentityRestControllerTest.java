@@ -12,12 +12,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class NormalIdentityRestControllerUnitTest implements
+public class NormalIdentityRestControllerTest implements
         RefreshTokenEntityTestUtils, NormalSignUpRequestTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
 
@@ -45,10 +48,18 @@ public class NormalIdentityRestControllerUnitTest implements
     public void testModifyEmail_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response =
-                restController.modifyEmail(MEMBER_BASIC_USER_UUID, testEmailModificationRequest);
+                restController.modifyEmail(MEMBER_BASIC_USER_UUID, testEmailModificationRequest, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 이메일 갱신 시 예외 반환")
+    public void testModifyEmail_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> restController.modifyEmail(MEMBER_BASIC_USER_UUID, testEmailModificationRequest, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -56,10 +67,18 @@ public class NormalIdentityRestControllerUnitTest implements
     public void testModifyPassword_givenValidRequest_willReturnSuccess() {
         // given & when
         ResponseEntity<DataResponse<Void>> response =
-                restController.modifyPassword(MEMBER_BASIC_USER_UUID, testPasswordModificationRequest);
+                restController.modifyPassword(MEMBER_BASIC_USER_UUID, testPasswordModificationRequest, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 비밀번호 갱신 시 예외 반환")
+    public void testModifyPassword_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> restController.modifyPassword(MEMBER_BASIC_USER_UUID, testPasswordModificationRequest, MEMBER_BASIC_ADMIN_UUID));
     }
 
 }

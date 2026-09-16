@@ -15,6 +15,7 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Validated
 @SecurityRequirement(name = "Authorization")
+@PreAuthorize("isAuthenticated()")
 public class SocialIdentityLinkRestController {
 
     private final SocialIdentityLinkController socialIdentityLinkController;

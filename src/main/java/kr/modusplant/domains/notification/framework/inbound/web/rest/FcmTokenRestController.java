@@ -10,6 +10,7 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,7 @@ public class FcmTokenRestController {
             description = "FCM 토큰을 등록합니다."
     )
     @PostMapping("/token")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> registerFcmToken(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 

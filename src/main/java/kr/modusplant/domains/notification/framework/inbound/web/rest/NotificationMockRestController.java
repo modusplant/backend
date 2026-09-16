@@ -13,6 +13,7 @@ import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @SecurityRequirement(name = "Authorization")
 @Profile({"local", "dev"})
+@PreAuthorize("isAuthenticated()")
 public class NotificationMockRestController {
 
     private final NotificationMockController notificationMockController;
@@ -41,7 +43,7 @@ public class NotificationMockRestController {
             @RequestParam
             NotificationActionType action,
 
-            @Parameter(schema = @Schema(description = "알림 발생 액션의 게시글 ID", example = ""))
+            @Parameter(schema = @Schema(description = "알림 발생 액션의 게시글 ID"))
             @RequestParam(name = "postId")
             @NotBlank
             String postUlid,

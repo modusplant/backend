@@ -20,6 +20,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -104,6 +106,7 @@ public class CommentRestController {
             description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
     @GetMapping("/member/auth/{uuid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> gatherByAuthor(
             @Parameter(schema = @Schema(
                     description = "댓글을 작성한 사용자의 식별자",
@@ -133,8 +136,13 @@ public class CommentRestController {
 
             @Parameter(hidden = true)
             @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
-            String ifModifiedSince
+            String ifModifiedSince,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID callerUuid
     ) {
+        SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
         CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
@@ -152,6 +160,7 @@ public class CommentRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> register(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -168,6 +177,7 @@ public class CommentRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @PutMapping("/update")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> updateContent(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -183,6 +193,7 @@ public class CommentRestController {
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> delete(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 

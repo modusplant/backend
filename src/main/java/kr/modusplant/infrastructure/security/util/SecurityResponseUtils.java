@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import java.io.IOException;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SecurityResponseUtils {
+public final class SecurityResponseUtils {
 
     public static void writeResponse(HttpServletResponse response, int status, String body) throws IOException {
         response.setStatus(status);

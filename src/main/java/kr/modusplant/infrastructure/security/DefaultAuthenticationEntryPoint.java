@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.infrastructure.security.exception.BusinessAuthenticationException;
-import kr.modusplant.infrastructure.security.util.SecurityLogger;
+import kr.modusplant.infrastructure.security.util.SecurityLoggerUtils;
 import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +31,7 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
                             .of(businessAuthEx.getErrorCode()))
             );
         } else {
-            SecurityLogger.logUnknownException(authEx);
+            SecurityLoggerUtils.logUnknownException(authEx);
             SecurityResponseUtils.writeResponse(
                     response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                     objectMapper.writeValueAsString(DataResponse

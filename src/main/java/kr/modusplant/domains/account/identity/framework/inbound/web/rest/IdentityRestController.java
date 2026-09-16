@@ -7,9 +7,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.domains.account.identity.adapter.controller.IdentityController;
 import kr.modusplant.domains.account.identity.usecase.response.IdentityAuthResponse;
+import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -27,6 +30,7 @@ public class IdentityRestController {
             description = "회원의 식별자에 맞는 계정의 인증 정보를 제공합니다."
     )
     @GetMapping("/v1/members/{id}/auth-info")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<IdentityAuthResponse>> getAuthInfo(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
@@ -34,8 +38,13 @@ public class IdentityRestController {
             )
             @PathVariable("id")
             @NotNull(message = "사용자의 식별자 값이 비어 있습니다")
-            UUID memberUuid
+            UUID memberUuid,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID callerUuid
     ) {
+        SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
         IdentityAuthResponse response = controller.getAuthInfo(memberUuid);
         return ResponseEntity.ok(DataResponse.ok(response));
     }

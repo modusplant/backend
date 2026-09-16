@@ -111,4 +111,17 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
                 .andExpect(jsonPath("$.code").value(SecurityErrorCode.ACCESS_DENIED.getCode()))
                 .andExpect(jsonPath("$.message").value(SecurityErrorCode.ACCESS_DENIED.getMessage()));
     }
+
+    @Test
+    @DisplayName("인증 정보 없이 요청 시 인증 실패 응답 반환")
+    public void testAuthorize_givenNoAuthentication_willReturnErrorResponse() throws Exception {
+        // when & then
+        mockMvc.perform(post("/api/v1/communication/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCommentRegisterRequest)).characterEncoding("UTF-8"))
+                .andExpect(status().is(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus()))
+                .andExpect(jsonPath("$.status").value(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus()))
+                .andExpect(jsonPath("$.code").value(SecurityErrorCode.AUTHENTICATION_FAILED.getCode()))
+                .andExpect(jsonPath("$.message").value(SecurityErrorCode.AUTHENTICATION_FAILED.getMessage()));
+    }
 }

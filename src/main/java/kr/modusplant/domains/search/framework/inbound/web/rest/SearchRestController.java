@@ -19,6 +19,7 @@ import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -104,6 +105,7 @@ public class SearchRestController {
             description = "키워드를 통한 게시글 목록 검색 시에 입력한 게시글 검색 기록 목록을 조회합니다. "
     )
     @GetMapping("/posts/history")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<List<String>>> getSearchHistory(
             @Parameter(schema = @Schema(description = "검색 기록 개수", example = "10", minimum = "1", maximum = "20"))
             @RequestParam
@@ -123,6 +125,7 @@ public class SearchRestController {
             description = "게시글 검색 기록 목록에서 검색 기록을 단건 삭제합니다."
     )
     @DeleteMapping("/posts/history/{keyword}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> removeSearchKeyword(
             @Parameter(schema = @Schema(description = "키워드", example = "벌레"))
             @PathVariable
@@ -142,6 +145,7 @@ public class SearchRestController {
             description = "게시글 검색 기록 목록에서 모든 검색 기록을 삭제합니다."
     )
     @DeleteMapping("/posts/history")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> removeAllSearchHistory(
             @Parameter(hidden = true)
             @NotNull(message = "회원 ID를 찾을 수 없습니다. ")

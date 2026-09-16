@@ -24,6 +24,7 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -105,6 +106,7 @@ public class PostRestController {
             description = "편집/관리를 위해 게시글 식별자로 특정 컨텐츠 게시글 데이터만 조회합니다. 조회수 증가 및 조회 기록은 남지 않습니다."
     )
     @GetMapping("/{postId}/data")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<?>> getPostDataByUlid(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -123,6 +125,7 @@ public class PostRestController {
             description = "파일 업로드를 위한 Presigned URL을 생성하고 제공합니다."
     )
     @PostMapping("/upload-urls")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<List<PostFileUploadUrlResponse>>> getUploadUrls(
             @RequestBody
             List<@Valid PostFileUploadRequest> fileUploadInfo
@@ -136,6 +139,7 @@ public class PostRestController {
             description = "컨텐츠 게시글을 작성합니다."
     )
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> insertPost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -157,6 +161,7 @@ public class PostRestController {
             description = "특정 컨텐츠 게시글을 수정합니다."
     )
     @PutMapping(value = "/{postId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> updatePost(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -184,6 +189,7 @@ public class PostRestController {
             description = "특정 컨텐츠 게시글을 삭제합니다."
     )
     @DeleteMapping("/{postId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> removePostByUlid(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -266,6 +272,7 @@ public class PostRestController {
             description = "로그인한 회원의 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -288,6 +295,7 @@ public class PostRestController {
             description = "로그인한 회원의 임시저장된 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/me/drafts")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<DraftPostResponse>>> getDraftPostsByMember(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -310,6 +318,7 @@ public class PostRestController {
             description = "마이페이지에서 최근에 본 게시글 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/me/history")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getRecentViewPostsByMember(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -332,6 +341,7 @@ public class PostRestController {
             description = "마이페이지에서 좋아요한 게시글 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/me/likes")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getLikedPostsByMember(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -354,6 +364,7 @@ public class PostRestController {
             description = "마이페이지에서 북마크한 게시글 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/me/bookmarks")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getBookmarkedPostsByMember(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
