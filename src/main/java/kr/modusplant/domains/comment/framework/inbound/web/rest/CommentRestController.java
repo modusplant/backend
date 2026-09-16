@@ -182,6 +182,36 @@ public class CommentRestController {
             description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
+    @DeleteMapping("/post/{ulid}/path/{path}")
+    public ResponseEntity<DataResponse<Void>> delete(
+            @Parameter(
+                    schema = @Schema(
+                            description = "댓글이 등록된 게시글의 식별자",
+                            example = "01JY3PPG5YJ41H7BPD0DSQW2RD"
+                    )
+            )
+            @PathVariable
+            String ulid,
+
+            @Parameter(
+                    schema = @Schema(
+                            description = "댓글이 위치한 경로",
+                            pattern = "^\\d+(?:\\.\\d+)*$",
+                            example = "4.8.12"
+                    )
+            )
+            @PathVariable
+            String path
+    ) {
+        controller.delete(ulid, path);
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "식별자로 컨텐츠 댓글 제거 API",
+            description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
     @DeleteMapping
     public ResponseEntity<DataResponse<Void>> delete(
             @AuthenticationPrincipal DefaultUserDetails userDetails,

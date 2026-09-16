@@ -97,6 +97,10 @@ public class CommentController {
         commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
     }
 
+    public void delete(String postUlid, String commentPath) {
+        commandRepository.setCommentAsDeleted(PostId.create(postUlid), CommentPath.create(commentPath));
+    }
+
     public void delete(CommentDeleteRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
