@@ -108,7 +108,7 @@ comment/
 
 **Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
-- Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` additionally requires the caller to be the comment's author via the helper's ownership check, while `delete` calls no validation helper and performs no ownership check
+- Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
@@ -127,7 +127,7 @@ comment/
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
 - Extracts auth via `@AuthenticationPrincipal` (may nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
-- `register` and `updateContent` accept `@AuthenticationPrincipal` and forward the caller's UUID for a downstream ownership/authorization check; `delete` takes only path variables and requires no authentication
+- `register`, `updateContent`, and `delete` accept `@AuthenticationPrincipal` and forward the caller's UUID for a downstream ownership/authorization check
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
 
