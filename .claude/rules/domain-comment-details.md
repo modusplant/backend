@@ -57,10 +57,10 @@ comment/
 
 **Value Object** (`domain/vo/`):
 - `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, blank, regex, or length)
-- May expose an additional `createNullable(...)` factory that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
+- May expose an additional nullable-tolerant factory (e.g. `createWithNullableUuid(...)`) that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
-- Status VOs wrap a backing enum and expose named convenience factories (e.g. `setAsValid()`, `setAsDeleted()`) alongside the raw `create(String)` factory
+- Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
 - `@RequiredArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory with internal validation of required fields
@@ -93,13 +93,13 @@ comment/
 - Accepts a lazily-evaluated fallback supplier so the implementation reads the database only when its own state is cold
 
 **Mapper Port** (`usecase/port/mapper/`):
-- Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping; implemented by a handwritten (non-generated) adapter class
+- Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping, including converting a paginated read model's zero-based page index to a one-based index for API consumers; implemented by a handwritten (non-generated) adapter class
 
 **Request DTOs** (`usecase/request/`):
 - Java records carrying Bean Validation annotations (e.g. `@NotBlank`) and Swagger `@Schema` documentation; deserialized directly from external input
 
 **Response DTOs** (`usecase/response/`):
-- Java records; a generic paginated wrapper carries the page/size/total metadata plus a method to convert a zero-based page index to a one-based index for API consumers
+- Java records; a generic paginated wrapper carries the page/size/total metadata
 - Field types: Java primitives, String, boolean, LocalDateTime
 
 ---
@@ -108,7 +108,7 @@ comment/
 
 **Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
-- Delegates cross-aggregate precondition checks to a dedicated validation helper; operations that modify an existing record additionally require the caller to be its author
+- Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` additionally requires the caller to be the comment's author via the helper's ownership check, while `delete` calls no validation helper and performs no ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
@@ -127,7 +127,7 @@ comment/
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
 - Extracts auth via `@AuthenticationPrincipal` (may nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
-- Endpoints that mutate an existing record forward the authenticated principal for a downstream ownership check
+- `register` and `updateContent` accept `@AuthenticationPrincipal` and forward the caller's UUID for a downstream ownership/authorization check; `delete` takes only path variables and requires no authentication
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
 
