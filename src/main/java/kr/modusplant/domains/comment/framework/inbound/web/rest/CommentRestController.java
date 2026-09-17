@@ -187,12 +187,15 @@ public class CommentRestController {
     }
 
     @Operation(
-            summary = "식별자로 컨텐츠 댓글 제거 API",
+            summary = "컨텐츠 댓글 제거 API",
             description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
     @DeleteMapping("/post/{ulid}/path/{path}")
-    public ResponseEntity<DataResponse<Void>> delete(
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DataResponse<Void>> deleteComment(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(
                     schema = @Schema(
                             description = "댓글이 등록된 게시글의 식별자",
@@ -210,9 +213,8 @@ public class CommentRestController {
                     )
             )
             @PathVariable
-            String path
-    ) {
-        controller.delete(ulid, path);
+            String path) {
+        controller.delete(ulid, path, userDetails.getUuid());
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

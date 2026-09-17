@@ -335,7 +335,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         then(commandRepository).should(times(1))
-                .setCommentAsDeleted(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
+                .deleteComment(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
     }
 
     @Test
@@ -345,7 +345,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         controller.delete(TEST_POST_ULID, "1");
 
         // then
-        then(commandRepository).should(times(1)).setCommentAsDeleted(any(), any());
+        then(commandRepository).should(times(1)).deleteComment(any(), any());
         then(queryRepository).shouldHaveNoInteractions();
     }
 }

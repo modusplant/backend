@@ -96,8 +96,13 @@ public class CommentController {
         commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
     }
 
-    public void delete(String postUlid, String commentPath) {
-        commandRepository.setCommentAsDeleted(PostId.create(postUlid), CommentPath.create(commentPath));
+    public void delete(String postUlid, String commentPath, UUID authorId) {
+        PostId postIdVo = PostId.create(postUlid);
+        CommentPath commentPathVO = CommentPath.create(commentPath);
+        Author author = Author.create(authorId);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postIdVo, commentPathVO, author);
+
+        commandRepository.deleteComment(PostId.create(postUlid), CommentPath.create(commentPath));
     }
 
     private void validateIfParentCommentExists(PostId postId, CommentPath path) {

@@ -199,12 +199,12 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
-    public void testDelete_givenValidPathAndUlid_willReturnResponseEntity() {
+    public void testDeleteComment_Comment_givenValidPathAndUlid_willReturnResponseEntity() {
         // given
         doNothing().when(controller).delete(TEST_POST_ULID, "1");
 
         // when
-        ResponseEntity<DataResponse<Void>> result = restController.delete(TEST_POST_ULID, "1");
+        ResponseEntity<DataResponse<Void>> result = restController.deleteComment(TEST_POST_ULID, "1");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
