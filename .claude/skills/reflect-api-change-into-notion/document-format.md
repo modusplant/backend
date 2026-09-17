@@ -26,6 +26,7 @@ Every endpoint page is a flat sequence of top-level (`H1`) sections in this orde
 ## 요청 바디
 ## 요청 파라미터
 ### 쿼리 파라미터
+### 경로 변수
 ## 요청 예시
 
 # 응답
@@ -67,6 +68,6 @@ When a page's existing content doesn't match this skeleton, apply structural cha
 
 - Merge same-target sections under different names into the canonical name (e.g. an `인증` fact written as a bullet under `요청 헤더`, `응답 예시(성공)`, or a bare `응답(성공)` `H1` all fold into the canonical heading listed above).
 - Convert list-based failure catalogs (numbered list + JSON per item) into the `응답(실패) 종류` table — same causes/codes/messages, table form only.
-- Rename table columns and values to the canonical names (e.g. `Null 허용 여부` → `필수 여부`; `` `required`/`optional` `` → `필수`/`선택`) without changing which parameters are actually required.
-- Do not force genuinely different content into one shape: a body-based endpoint and a query-parameter-based endpoint use different sub-sections (`요청 바디` vs `쿼리 파라미터`) because they describe different things, not because of inconsistent formatting.
+- Rename table columns and values to the canonical names (e.g. `Null 허용 여부` → `필수 여부`; `required`/`optional` → `필수`/`선택`) without changing which parameters are actually required.
+- Do not force genuinely different content into one shape: a body-based endpoint and a query-parameter-based endpoint use different subsections (`요청 바디` vs `쿼리 파라미터`) because they describe different things, not because of inconsistent formatting.
 - A page with only a single failure example and no distinct list of causes is left as a single `응답(실패)` example with no `응답(실패) 종류` table — do not invent a cause description that isn't already stated verbatim on the page.
