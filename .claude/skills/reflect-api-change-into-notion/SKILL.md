@@ -128,22 +128,20 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 # Workflow
 
-1. Resolve Target Classes (cascade above) → apply the Watched API Surface filter → run the
-   Termination checks.
+1. Resolve Target Classes → apply the Watched API Surface filter → run the Termination checks.
 2. Write exactly one `detected-change/detected_<RUN_ID>.md` covering every remaining class.
 3. For every Notion page touched by those classes (per the mapping table), write one
    `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md`, derived only from the detected-change
    file just written in step 2.
 4. Only when explicitly asked to reconcile Notion this run: for each affected page, take its
-   latest reflected-change file (by `RUN_ID`, not by filesystem mtime) and apply it per the
-   "Notion Update Procedure" below.
+   latest reflected-change file by `RUN_ID` and apply it per the "Notion Update Procedure" below.
 
 # Notion Update Procedure
 
-- Locate each target page by searching inside its named database first — never guess or reuse a
-  page URL from a prior run without re-confirming it still resolves to the same page.
-- Fetch the page's current content before editing. `document-format.md` defines the *expected
-  shape*; it is never a substitute for checking the page's actual current content.
+- Locate each target page by searching inside Notion's named database first — never guess or reuse a
+  page URL from a prior run.
+- Fetch the page's current content before editing. `document-format.md` is never a substitute for 
+  checking the page's actual current content.
 - Apply only what the reflected-change file's `## Notion Content` + `## Edit Instructions` specify.
   Use `document-format.md`'s Reconciliation Rules for any structural (non-factual) adjustments
   needed to fit the existing page into the canonical skeleton.
