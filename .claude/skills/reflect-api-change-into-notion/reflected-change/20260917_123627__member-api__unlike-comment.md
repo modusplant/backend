@@ -20,10 +20,3 @@ Change Summary: add the previously-undocumented `postUlid`/`path` path variables
 
 - `postUlid`/`path` rows ← detected-change fact: "`unlikeCommunicationComment` (`DELETE .../post/{postUlid}/path/{path}`): same two path variables as above [likeCommunicationComment]."
 - Description text ← the method's own `@Parameter` descriptions for `postUlid` and `path`.
-
-## Edit Instructions
-
-1. Fetch the existing page for this endpoint inside the `회원 API` Notion database — search by
-   title/route, never assume a cached page URL.
-2. If `## 요청 파라미터` is absent, insert it; insert `### 경로 변수` under it with the table above.
-3. Touch no other section on the page.

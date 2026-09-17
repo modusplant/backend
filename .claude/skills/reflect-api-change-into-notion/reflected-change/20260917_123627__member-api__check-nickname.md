@@ -19,10 +19,3 @@ Change Summary: add the previously-undocumented `nickname` path variable as a ca
 
 - `nickname` row ← detected-change fact: "`checkExistedMemberNickname` (`GET /api/v1/members/check/nickname/{nickname}`): path variable `nickname` — `@PathVariable(required = false) @NotBlank @Pattern(regexp = REGEX_NICKNAME)`, type `String`."
 - Description text ← the method's own `@Parameter(description = "중복을 확인하려는 회원의 닉네임", ...)`.
-
-## Edit Instructions
-
-1. Fetch the existing page for this endpoint inside the `회원 API` Notion database — search by
-   title/route, never assume a cached page URL.
-2. If `## 요청 파라미터` is absent, insert it; insert `### 경로 변수` under it with the table above.
-3. Touch no other section on the page.

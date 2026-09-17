@@ -21,13 +21,3 @@ Change Summary: add a brand-new `## 요청 파라미터` section (currently abse
 
 - `postUlid` row ← detected-change fact: "`gatherByPost` (`GET /api/v1/communication/comments/post/{ulid}`): path variable bound to method parameter `postUlid` — `@PathVariable(required = false, value = \"ulid\") @NotBlank`, type `String` (ULID). The method has no query parameters."
 - Description text ← the method's own Javadoc (`@param postUlid 댓글이 등록된 게시글의 식별자입니다.`) and `@Parameter(description = "해당 댓글이 달린 게시글의 식별자", ...)`.
-
-## Edit Instructions
-
-1. Fetch the existing page for this endpoint inside the `소통 댓글 API` Notion database — search
-   by title/route, never assume a cached page URL.
-2. Insert a new `## 요청 파라미터` H1... actually H2 heading (per `document-format.md`'s skeleton,
-   positioned after `## 요청 바디`/`## 요청 헤더` and before `## 요청 예시`, both absent or present
-   as applicable on this page), with `### 경로 변수` beneath it and the table above.
-3. Do not add a `### 쿼리 파라미터` subsection — this endpoint has no query parameters.
-4. Touch no other section on the page.

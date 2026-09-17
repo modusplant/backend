@@ -108,6 +108,9 @@ Target Notion Database: <literal Korean DB name>
 Target Notion Page: <page title>
 Notion Page State: <Existing (fetch before editing) | New (create)>
 Change Summary: <one sentence>
+Note: <optional, one line — only when this page's apply procedure deviates from "Notion Update
+  Procedure" below, e.g. an already-present-but-empty heading, or existing content to leave
+  untouched unless redundant>
 
 ## Notion Content
 
@@ -117,13 +120,6 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 ## Provenance
 
 - <each fact above> ← detected-change fact: <the specific bullet it came from>
-
-## Edit Instructions
-
-1. Fetch the existing page for this endpoint inside database `<db-slug>`'s Notion database —
-   search by title/route, never assume a cached page URL.
-2. <insert/replace steps, naming the exact heading anchor>
-3. Touch no other section on the page.
 ```
 
 # Workflow
@@ -133,18 +129,19 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 3. For every Notion page touched by those classes (per the mapping table), write one
    `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md`, derived only from the detected-change
    file just written in step 2.
-4. Only when explicitly asked to reconcile Notion this run: for each affected page, take its
-   latest reflected-change file by `RUN_ID` and apply it per the "Notion Update Procedure" below.
+4. For each affected page, take its latest reflected-change file by `RUN_ID` and apply it per the
+   "Notion Update Procedure" below.
 
 # Notion Update Procedure
 
-- Locate each target page by searching inside Notion's named database first — never guess or reuse a
-  page URL from a prior run.
-- Fetch the page's current content before editing. `document-format.md` is never a substitute for 
-  checking the page's actual current content.
-- Apply only what the reflected-change file's `## Notion Content` + `## Edit Instructions` specify.
-  Use `document-format.md`'s Reconciliation Rules for any structural (non-factual) adjustments
-  needed to fit the existing page into the canonical skeleton.
+- Locate each target page by searching inside its named Notion database first — never guess or
+  reuse a page URL from a prior run.
+- Fetch the page's current content before editing; `document-format.md` never substitutes for the
+  actual current content.
+- Insert or replace only what `## Notion Content` specifies, positioned per `document-format.md`'s
+  skeleton order; touch no other section. Use `document-format.md`'s Reconciliation Rules for any
+  structural (non-factual) adjustments needed to fit the existing page into the canonical skeleton.
+- Follow any exception in the reflected-change file's `Note:` field, if present.
 - Never write a fact into Notion that isn't traceable through the reflected-change file's
   `## Provenance` section back to a `detected-change` bullet.
 

@@ -6,6 +6,7 @@ Target Notion Database: 일반 인증 인가 API
 Target Notion Page: 일반 계정 이메일 수정 (`NormalIdentityRestController.modifyEmail`'s `@Operation` summary "일반 회원의 이메일 수정 API" — confirm exact title via `notion-search` before editing)
 Notion Page State: Existing (fetch before editing)
 Change Summary: replace the `id` path variable's current representation (a URL comment inside the request-body code block) with a canonical `### 경로 변수` table.
+Note: leave the existing request-body URL comment as-is unless it duplicates the new table — remove only the redundant comment line if so.
 
 ## Notion Content
 
@@ -19,17 +20,3 @@ Change Summary: replace the `id` path variable's current representation (a URL c
 
 - `id` row ← detected-change fact: "`modifyEmail` (`POST /api/v1/members/{id}/modify/email`): path variable `id` bound to method parameter `memberUuid` — `@PathVariable(\"id\") @NotNull`, type `UUID`."
 - Description text ← the method's own `@Parameter(schema = @Schema(description = "회원의 식별자", ...))`.
-
-## Edit Instructions
-
-1. Fetch the existing page for this endpoint inside the `일반 인증 인가 API` Notion database —
-   search by title/route, never assume a cached page URL.
-2. If `## 요청 파라미터` is absent, insert it; insert `### 경로 변수` under it with the table above.
-   Insert it before the existing `## 요청 바디` section's body table per `document-format.md`'s
-   skeleton order (`요청 파라미터` precedes `요청 예시` but the exact position relative to an
-   already-present `요청 바디` section should follow the skeleton's declared order: `인증` →
-   `요청 헤더` → `요청 바디` → `요청 파라미터` → `요청 예시`).
-3. Leave the existing request-body code block's URL comment as-is unless it duplicates the new
-   table's information in a way that would violate `document-format.md`'s no-duplication rule — if
-   so, remove only the redundant URL comment line, not the rest of the code block.
-4. Touch no other section on the page.
