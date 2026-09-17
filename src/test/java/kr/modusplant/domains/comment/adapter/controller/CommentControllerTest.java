@@ -15,7 +15,6 @@ import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -348,38 +347,5 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // then
         then(commandRepository).should(times(1)).setCommentAsDeleted(any(), any());
         then(queryRepository).shouldHaveNoInteractions();
-    }
-
-    @Test
-    @DisplayName("유효한 삭제 요청 시 검증 위임 후 삭제 처리하는 활동 수행")
-    void testDelete_givenValidRequest_willProcessAction() {
-        // given
-        CommentDeleteRequest request = new CommentDeleteRequest(TEST_POST_ULID, "1.2");
-
-        // when
-        controller.delete(request, MEMBER_BASIC_USER_UUID);
-
-        // then
-        then(validationHelper).should(times(1)).validateIfAuthorCanWriteCommentWithinPost(
-                PostId.create(TEST_POST_ULID), CommentPath.create("1.2"), Author.create(MEMBER_BASIC_USER_UUID));
-        then(commandRepository).should(times(1)).setCommentAsDeleted(
-                PostId.create(TEST_POST_ULID), CommentPath.create("1.2"));
-    }
-
-    @Test
-    @DisplayName("작성자 본인이 아닌 사용자가 삭제 요청 시 예외 반환")
-    void testDelete_givenAuthorIsNotWriter_willThrowException() {
-        // given
-        CommentDeleteRequest request = new CommentDeleteRequest(TEST_POST_ULID, "1.2");
-        doThrow(new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "comment", "1.2"))
-                .when(validationHelper).validateIfAuthorCanWriteCommentWithinPost(any(), any(), any());
-
-        // when
-        NotAccessibleException ex = assertThrows(NotAccessibleException.class,
-                () -> controller.delete(request, MEMBER_BASIC_USER_UUID));
-
-        // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR);
-        then(commandRepository).should(never()).setCommentAsDeleted(any(), any());
     }
 }

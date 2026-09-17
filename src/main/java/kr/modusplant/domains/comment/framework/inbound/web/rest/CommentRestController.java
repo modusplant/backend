@@ -13,7 +13,6 @@ import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -214,22 +213,6 @@ public class CommentRestController {
             String path
     ) {
         controller.delete(ulid, path);
-        return ResponseEntity.ok().body(DataResponse.ok());
-    }
-
-    @Operation(
-            summary = "식별자로 컨텐츠 댓글 제거 API",
-            description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
-            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
-    )
-    @DeleteMapping
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<DataResponse<Void>> delete(
-            @AuthenticationPrincipal DefaultUserDetails userDetails,
-
-            @RequestBody @Valid
-            CommentDeleteRequest deleteRequest) {
-        controller.delete(deleteRequest, userDetails.getUuid());
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

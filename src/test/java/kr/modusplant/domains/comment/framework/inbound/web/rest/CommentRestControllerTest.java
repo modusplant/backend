@@ -2,7 +2,6 @@ package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.common.util.usecase.request.CommentDeleteRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
@@ -43,7 +42,7 @@ import static org.mockito.Mockito.times;
 
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
-        CommentUpdateRequestTestUtils, CommentDeleteRequestTestUtils, MemberIdTestUtils,
+        CommentUpdateRequestTestUtils, MemberIdTestUtils,
         CommentPageResponseTestUtils {
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
@@ -210,20 +209,5 @@ public class CommentRestControllerTest implements PostIdTestUtils,
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         then(controller).should(times(1)).delete(TEST_POST_ULID, "1");
-    }
-
-    @Test
-    @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
-    public void testDelete_givenValidDeleteRequest_willReturnResponseEntity() {
-        // given
-        DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
-        doNothing().when(controller).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
-
-        // when
-        ResponseEntity<DataResponse<Void>> result = restController.delete(userDetails, testCommentDeleteRequest);
-
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(controller).should(times(1)).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
     }
 }
