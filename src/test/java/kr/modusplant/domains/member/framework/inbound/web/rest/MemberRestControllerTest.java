@@ -51,6 +51,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV3;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV4;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
@@ -60,6 +61,7 @@ import static kr.modusplant.domains.member.common.util.usecase.request.MemberWit
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV4;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
@@ -193,6 +195,21 @@ class MemberRestControllerTest implements MemberTestUtils {
         assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
         assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImagePathV3).toString());
+    }
+
+    @Test
+    @DisplayName("overrideMemberProfile V4로 응답 반환")
+    void testOverrideMemberProfileV4_givenValidParameters_willReturnResponse() throws IOException {
+        // given
+        given(memberController.overrideProfile(testMemberProfileOverrideRecordV4)).willReturn(testMemberProfileResponseWithImageUrlV4);
+
+        // when
+        ResponseEntity<DataResponse<MemberProfileResponseWithImageUrl>> memberResponseEntity = memberRestController.overrideMemberProfile_v4(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(memberResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(memberResponseEntity.getHeaders().getCacheControl()).isEqualTo(CacheControl.noStore().mustRevalidate().cachePrivate().getHeaderValue());
+        assertThat(Objects.requireNonNull(memberResponseEntity.getBody()).toString()).isEqualTo(DataResponse.ok(testMemberProfileResponseWithImageUrlV4).toString());
     }
 
     @Test

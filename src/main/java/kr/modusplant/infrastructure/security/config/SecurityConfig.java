@@ -42,12 +42,51 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    /**
+     * 인증이 필요 없는(permit-all) 엔드포인트.
+     */
+    public static final Map<HttpMethod, List<String>> PUBLIC_ENDPOINTS = Map.of(
+            HttpMethod.GET, List.of(
+                    "/api/v1/terms",
+                    "/api/v1/communication/primary-categories",
+                    "/api/v1/communication/primary-categories/**",
+                    "/api/v1/search/plant/korean-name",
+                    "/api/v1/communication/comments/post/**",
+                    "/api/v1/members/check/nickname/**",
+                    "/api/v1/search/posts",
+                    "/api/v1/communication/posts/**",
+                    "/actuator/prometheus"
+            ),
+            HttpMethod.POST, List.of(
+                    "/api/members/register",
+                    "/api/auth/login",
+                    "/api/auth/logout",
+                    "/api/members/verify-email/send",
+                    "/api/members/verify-email",
+                    "/api/auth/reset-password-request/send",
+                    "/api/auth/reset-password-request/verify/email",
+                    "/api/auth/reset-password-request/verify/input",
+                    "/api/auth/token/refresh",
+                    "/api/v1/local/auth/social-login/**",
+                    "/api/v1/auth/social-login/**",
+                    "/api/v1/auth/social-signup",
+                    "/api/v1/auth/social-link"
+            ),
+            HttpMethod.DELETE, List.of(
+                    "/api/v1/auth/social-connect"
+            ),
+            HttpMethod.PATCH, List.of(
+                    "/api/v1/communication/posts/*/views"
+            )
+    );
 
     @Value("${security.debug.enabled}")
     private Boolean debugEnabled;
@@ -157,54 +196,12 @@ public class SecurityConfig {
                 .addFilterBefore(securityExceptionHandlingFilter(), LogoutFilter.class)
                 .addFilterBefore(emailPasswordAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
-                // TODO: @PreAuthorize 기반 방안을 고민하고, anyRequest를 authenticated()로 수정할 것.
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/api/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers(
-                                "/api/v1/communication/posts/me/**",
-                                "/api/v1/communication/posts/search-history/**",
-                                "/api/v1/notifications",
-                                "/api/v1/notifications/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/members/profile",
-                                "/api/v1/members/role",
-                                "/api/v1/communication/posts/*/data",
-                                "/api/v1/search/posts/history").authenticated()
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/v1/report/proposal-or-bug",
-                                "/api/v1/report/abuse/post/*",
-                                "/api/v1/report/abuse/post/*/path/**",
-                                "/api/v2/members/profile/issue-file-key",
-                                "/api/v2/report/proposal-or-bug/issue-file-key",
-                                "/api/v2/report/proposal-or-bug",
-                                "/api/v1/communication/posts",
-                                "/api/v1/communication/posts/upload-urls",
-                                "/api/v1/members/social/**",
-                                "/api/v1/local/members/social/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT,
-                                "/api/v1/members/profile",
-                                "/api/v1/members/like/communication/post/*",
-                                "/api/v1/members/like/communication/post/*/path/**",
-                                "/api/v1/members/bookmark/communication/post/**",
-                                "/api/v2/members/profile",
-                                "/api/v1/communication/posts/*").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/v1/members/like/communication/post/*",
-                                "/api/v1/members/bookmark/communication/post/**",
-                                "/api/v1/members/like/communication/post/*/path/**",
-                                "/api/v1/communication/posts/*",
-                                "/api/v1/search/posts/history/*").authenticated()
-                        .requestMatchers(HttpMethod.DELETE,
-                                "/api/v1/members/like/communication/post/**").authenticated()
-                        .requestMatchers(HttpMethod.GET,
-                                "/api/v1/members/check/nickname/**",
-                                "/api/v1/communication/posts/**",
-                                "/api/v1/search/posts").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/api/v1/communication/posts/*/views").permitAll()
-                        .requestMatchers("/actuator/prometheus").permitAll()
-                        .anyRequest().permitAll()
-                )
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/admin/**").hasAuthority("ADMIN");
+                    PUBLIC_ENDPOINTS.forEach((httpMethod, patterns) ->
+                            auth.requestMatchers(httpMethod, patterns.toArray(new String[0])).permitAll());
+                    auth.anyRequest().authenticated();
+                })
                 .authenticationProvider(siteMemberAuthProvider())
                 .logout(logout -> logout
                         .logoutUrl("/api/auth/logout")

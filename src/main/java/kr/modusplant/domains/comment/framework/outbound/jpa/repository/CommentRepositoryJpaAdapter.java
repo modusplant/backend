@@ -58,7 +58,7 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     }
 
     @Override
-    public void setCommentAsDeleted(PostId postId, CommentPath path) {
+    public void deleteComment(PostId postId, CommentPath path) {
         CommentCompositeKey id = CommentCompositeKey.builder()
                 .post(postId.getValue())
                 .path(path.getValue())

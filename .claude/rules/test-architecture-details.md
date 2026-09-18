@@ -21,6 +21,9 @@ task-specific workflow supplies explicit path exceptions for the area under test
 exceptions, every class — services, adapters, controllers, mappers, value objects, entities — is
 a pure POJO test.
 
+**Path exception:** `infrastructure/security/component/**` — see
+@.claude/documents/test-infra-security-feature.md for the specific context/mocking strategy.
+
 ---
 
 ## 2. Mocking Strategy

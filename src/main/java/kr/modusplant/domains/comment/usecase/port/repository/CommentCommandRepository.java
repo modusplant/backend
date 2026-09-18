@@ -11,5 +11,5 @@ public interface CommentCommandRepository {
 
     void updateContent(PostId postId, CommentPath path, CommentContent content);
 
-    void setCommentAsDeleted(PostId postId, CommentPath path);
+    void deleteComment(PostId postId, CommentPath path);
 }

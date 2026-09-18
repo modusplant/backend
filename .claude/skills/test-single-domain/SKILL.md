@@ -11,9 +11,9 @@ disallowed-tools: Write(/src/main/**) Edit(/src/main/**)
 
 - If the $DOMAIN_NAME isn't one predefined domain name, instantly terminate the skill and give the user what happened.
 
-# Loading the Domain Profile
+# Loading the Domain Feature
 
-Read @.claude/documents/test-domain-profiles-$DOMAIN_NAME.md and use its fields everywhere those terms are referenced below.
+Read @.claude/documents/test-domain-$DOMAIN_NAME-feature.md and use its fields everywhere those terms are referenced below.
 If that file does not exist, check if @.claude/rules/domain-$DOMAIN_NAME-details.md file is present.
 If the file exists, derive these facts yourself from @.claude/rules/domain-$DOMAIN_NAME-details.md 
 and the domain's actual @src/main / @src/test package layout, applying the same classification rules, then proceed.
@@ -33,20 +33,20 @@ Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
   - Classes that contain only constructors
-  - Any classes listed under $DOMAIN_NAME's `Excluded-classes additions` in its profile
+  - Any classes listed under $DOMAIN_NAME's `Excluded-classes additions` in its feature
 
 # Test Architecture & Strategy
 
 !`cat ${CLAUDE_PROJECT_DIR}/.claude/rules/test-architecture-details.md`
 
-Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjustments from its profile:
+Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjustments from its feature:
 
 - **ErrorCode class:** exception assertions in $DOMAIN_NAME tests check `getErrorCode()` against
-  the enum named under $DOMAIN_NAME's `ErrorCode class` in its profile.
+  the enum named under $DOMAIN_NAME's `ErrorCode class` in its feature.
 - **Pure-Unit-Test path exceptions:** the paths listed under $DOMAIN_NAME's `Pure-Unit-Test path
   exceptions` may use a real Spring context / `TestEntityManager` / real DB instead of a pure POJO test.
 - **jOOQ repository test policy:** classes under $DOMAIN_NAME's `framework/outbound/jooq/repository`
-  follow whichever policy $DOMAIN_NAME's profile names:
+  follow whichever policy $DOMAIN_NAME's feature names:
     - `excluded` — do not generate a test for these classes at all.
     - `integration-test` — use `@SpringBootTest` with a real `DSLContext` and seeded test data (via
       a test data helper); do not mock `DSLContext`. Only genuinely time-dependent behavior (e.g.
@@ -60,8 +60,8 @@ Apply the Pure Unit Test baseline above, with these $DOMAIN_NAME-specific adjust
 Follow the TestUtils convention from `test-architecture-details.md` above, applied to $DOMAIN_NAME:
 
 - **Parameter Sources:** reuse constant fields from $DOMAIN_NAME's own `common/constant` path, plus
-  every path listed under $DOMAIN_NAME's `TestUtils shared constant paths` in its profile. If missing, create them.
-- **Group A (fields) target paths:** the paths listed under $DOMAIN_NAME's `Group A` in its profile.
-- **Group B (methods) target paths:** the paths listed under $DOMAIN_NAME's `Group B` in its profile.
+  every path listed under $DOMAIN_NAME's `TestUtils shared constant paths` in its feature. If missing, create them.
+- **Group A (fields) target paths:** the paths listed under $DOMAIN_NAME's `Group A` in its feature.
+- **Group B (methods) target paths:** the paths listed under $DOMAIN_NAME's `Group B` in its feature.
 
 Only look up a target path if actually needed for the test at hand.

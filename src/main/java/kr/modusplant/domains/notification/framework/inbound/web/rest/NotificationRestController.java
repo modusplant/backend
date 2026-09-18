@@ -16,6 +16,7 @@ import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +31,7 @@ import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
 @RequiredArgsConstructor
 @Validated
 @SecurityRequirement(name = "Authorization")
+@PreAuthorize("isAuthenticated()")
 public class NotificationRestController {
     private final NotificationController notificationController;
 

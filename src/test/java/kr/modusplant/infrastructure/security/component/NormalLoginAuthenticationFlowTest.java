@@ -8,16 +8,19 @@ import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.infrastructure.security.DefaultUserDetailsService;
 import kr.modusplant.infrastructure.security.common.util.NormalLoginRequestTestUtils;
 import kr.modusplant.infrastructure.security.common.util.SiteMemberUserDetailsTestUtils;
-import kr.modusplant.infrastructure.security.context.SecurityOnlyContext;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.FilterChainProxy;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Optional;
@@ -29,29 +32,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SecurityOnlyContext
+@SpringBootTest
+@AutoConfigureMockMvc
 @Slf4j
 public class NormalLoginAuthenticationFlowTest implements
         SiteMemberUserDetailsTestUtils, NormalLoginRequestTestUtils, MemberEntityTestUtils {
 
-    private final MockMvc mockMvc;
-    private final ObjectMapper objectMapper;
-    private final FilterChainProxy filterChainProxy;
-    private final DefaultUserDetailsService defaultUserDetailsService;
-    private final TokenService tokenService;
-    private final MemberJpaRepository memberRepository;
-    private final PasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    public NormalLoginAuthenticationFlowTest(MockMvc mockMvc, ObjectMapper objectMapper, FilterChainProxy filterChainProxy, DefaultUserDetailsService defaultUserDetailsService, TokenService tokenService, MemberJpaRepository memberRepository, @Qualifier("bcryptPasswordEncoder") PasswordEncoder bCryptPasswordEncoder) {
-        this.mockMvc = mockMvc;
-        this.objectMapper = objectMapper;
-        this.filterChainProxy = filterChainProxy;
-        this.defaultUserDetailsService = defaultUserDetailsService;
-        this.tokenService = tokenService;
-        this.memberRepository = memberRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private FilterChainProxy filterChainProxy;
+
+    @Autowired
+    @Qualifier("bcryptPasswordEncoder")
+    private PasswordEncoder bCryptPasswordEncoder;
+
+    @MockitoBean
+    private final DefaultUserDetailsService defaultUserDetailsService = Mockito.mock(DefaultUserDetailsService.class);
+
+    @MockitoBean
+    private final TokenService tokenService = Mockito.mock(TokenService.class);
+
+    @MockitoBean
+    private final MemberJpaRepository memberRepository = Mockito.mock(MemberJpaRepository.class);
 
     @Test
     @DisplayName("보안 필터 체인 등록 활동 수행")

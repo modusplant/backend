@@ -13,7 +13,6 @@ import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
-import kr.modusplant.domains.comment.usecase.request.CommentDeleteRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
@@ -97,17 +96,13 @@ public class CommentController {
         commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
     }
 
-    public void delete(String postUlid, String commentPath) {
-        commandRepository.setCommentAsDeleted(PostId.create(postUlid), CommentPath.create(commentPath));
-    }
-
-    public void delete(CommentDeleteRequest request, UUID authorId) {
-        PostId postId = PostId.create(request.postId());
-        CommentPath path = CommentPath.create(request.path());
+    public void delete(String postUlid, String commentPath, UUID authorId) {
+        PostId postIdVo = PostId.create(postUlid);
+        CommentPath commentPathVO = CommentPath.create(commentPath);
         Author author = Author.create(authorId);
-        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postId, path, author);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postIdVo, commentPathVO, author);
 
-        commandRepository.setCommentAsDeleted(postId, path);
+        commandRepository.deleteComment(PostId.create(postUlid), CommentPath.create(commentPath));
     }
 
     private void validateIfParentCommentExists(PostId postId, CommentPath path) {

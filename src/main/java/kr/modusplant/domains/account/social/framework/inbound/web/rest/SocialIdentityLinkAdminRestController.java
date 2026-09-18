@@ -9,6 +9,7 @@ import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLin
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Validated
 @SecurityRequirement(name = "Authorization")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class SocialIdentityLinkAdminRestController {
     private final SocialIdentityLinkAdminController socialIdentityLinkAdminController;
 

@@ -153,13 +153,13 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("존재하는 댓글 id로 삭제 처리 시 markAsDeleted 후 저장됨")
-    public void testSetCommentAsDeleted_givenExistingComment_willMarkAsDeletedAndSave() {
+    public void testDeleteComment_givenExistingComment_willMarkAndSave() {
         // given
         CommentEntity commentEntity = createCommentEntityBuilder().build();
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.of(commentEntity));
 
         // when
-        jpaAdapter.setCommentAsDeleted(PostIdTestUtils.testPostId, testCommentPath);
+        jpaAdapter.deleteComment(PostIdTestUtils.testPostId, testCommentPath);
 
         // then
         assertThat(commentEntity.getIsDeleted()).isTrue();
@@ -168,12 +168,12 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("존재하지 않는 댓글 id로 삭제 처리 시 아무 동작도 하지 않음")
-    public void testSetCommentAsDeleted_givenNonExistentComment_willDoNothing() {
+    public void testDeleteComment_givenNonExistentComment_willDoNothing() {
         // given
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());
 
         // when
-        jpaAdapter.setCommentAsDeleted(PostIdTestUtils.testPostId, testCommentPath);
+        jpaAdapter.deleteComment(PostIdTestUtils.testPostId, testCommentPath);
 
         // then
         verify(commentRepository, never()).save(org.mockito.ArgumentMatchers.any());

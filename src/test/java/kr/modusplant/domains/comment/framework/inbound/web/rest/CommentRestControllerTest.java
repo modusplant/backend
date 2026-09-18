@@ -2,7 +2,6 @@ package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
-import kr.modusplant.domains.comment.common.util.usecase.request.CommentDeleteRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
@@ -24,14 +23,17 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -40,7 +42,7 @@ import static org.mockito.Mockito.times;
 
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
-        CommentUpdateRequestTestUtils, CommentDeleteRequestTestUtils, MemberIdTestUtils,
+        CommentUpdateRequestTestUtils, MemberIdTestUtils,
         CommentPageResponseTestUtils {
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
@@ -113,7 +115,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // when
         ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
-                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince);
+                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
@@ -133,7 +135,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
         // when
         ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
-                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince);
+                restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -151,10 +153,18 @@ public class CommentRestControllerTest implements PostIdTestUtils,
         given(controller.gatherByAuthor(any(UUID.class), any())).willReturn(null);
 
         // when
-        restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 2, 10, null, null);
+        restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 2, 10, null, null, MEMBER_BASIC_USER_UUID);
 
         // then
         then(controller).should(times(1)).gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(1, 10));
+    }
+
+    @Test
+    @DisplayName("본인이 아닌 회원의 댓글 조회 시 예외 반환")
+    void testGatherByAuthor_givenNonSelfCaller_willThrowException() {
+        // given & when & then
+        assertThrows(AccessDeniedException.class,
+                () -> restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, null, null, MEMBER_BASIC_ADMIN_UUID));
     }
 
     @Test
@@ -189,30 +199,16 @@ public class CommentRestControllerTest implements PostIdTestUtils,
 
     @Test
     @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
-    public void testDelete_givenValidPathAndUlid_willReturnResponseEntity() {
-        // given
-        doNothing().when(controller).delete(TEST_POST_ULID, "1");
-
-        // when
-        ResponseEntity<DataResponse<Void>> result = restController.delete(TEST_POST_ULID, "1");
-
-        // then
-        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(controller).should(times(1)).delete(TEST_POST_ULID, "1");
-    }
-
-    @Test
-    @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
-    public void testDelete_givenValidDeleteRequest_willReturnResponseEntity() {
+    public void testDeleteComment_givenValidPathAndUlid_willReturnResponseEntity() {
         // given
         DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
-        doNothing().when(controller).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
+        doNothing().when(controller).delete(TEST_POST_ULID, "1", MEMBER_BASIC_USER_UUID);
 
         // when
-        ResponseEntity<DataResponse<Void>> result = restController.delete(userDetails, testCommentDeleteRequest);
+        ResponseEntity<DataResponse<Void>> result = restController.deleteComment(userDetails, TEST_POST_ULID, "1");
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
-        then(controller).should(times(1)).delete(testCommentDeleteRequest, MEMBER_BASIC_USER_UUID);
+        then(controller).should(times(1)).delete(TEST_POST_ULID, "1", MEMBER_BASIC_USER_UUID);
     }
 }

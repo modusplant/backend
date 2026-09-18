@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.modusplant.infrastructure.security.DefaultAuthenticationEntryPoint;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
-import kr.modusplant.infrastructure.security.util.SecurityLogger;
+import kr.modusplant.infrastructure.security.util.SecurityLoggerUtils;
 import kr.modusplant.infrastructure.security.util.SecurityResponseUtils;
 import kr.modusplant.shared.exception.BusinessException;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
@@ -58,7 +58,7 @@ public class SecurityExceptionHandlingFilter extends OncePerRequestFilter {
     }
 
     private void writeGeneralErrorResponse(HttpServletResponse response, Exception ex) throws IOException {
-        SecurityLogger.logUnknownException(ex);
+        SecurityLoggerUtils.logUnknownException(ex);
         SecurityResponseUtils.writeResponse(
                 response, SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus(),
                 objectMapper.writeValueAsString(DataResponse

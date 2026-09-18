@@ -1,5 +1,5 @@
 ---
-name: adapt-to-code-change
+name: reflect-code-change-into-document
 description: This skill applies the follow-up actions required in response to code changes.
 disable-model-invocation: true
 disallowed-tools: Write(/src/**) Edit(/src/**)

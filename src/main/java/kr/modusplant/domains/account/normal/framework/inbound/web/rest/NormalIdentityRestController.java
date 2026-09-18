@@ -11,10 +11,13 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.infrastructure.security.models.NormalLoginRequest;
+import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,6 +51,7 @@ public class NormalIdentityRestController {
             description = "사용자의 식별자, 현재 이메일, 새로운 이메일로 사용자의 이메일을 갱신합니다."
     )
     @PostMapping("/api/v1/members/{id}/modify/email")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> modifyEmail(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
@@ -58,8 +62,13 @@ public class NormalIdentityRestController {
             UUID memberUuid,
 
             @RequestBody @Valid
-            EmailModificationRequest request
+            EmailModificationRequest request,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID callerUuid
     ) {
+        SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
         controller.modifyEmail(memberUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());
@@ -70,6 +79,7 @@ public class NormalIdentityRestController {
             description = "사용자의 식별자, 새로운 비밀번호로 사용자의 비밀번호를 갱신합니다."
     )
     @PostMapping("/api/v1/members/{id}/modify/password")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> modifyPassword(
             @Parameter(schema = @Schema(
                     description = "회원의 식별자",
@@ -80,8 +90,13 @@ public class NormalIdentityRestController {
             UUID memberUuid,
 
             @RequestBody @Valid
-            PasswordModificationRequest request
+            PasswordModificationRequest request,
+
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID callerUuid
     ) {
+        SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
         controller.modifyPassword(memberUuid, request);
 
         return ResponseEntity.ok(DataResponse.ok());

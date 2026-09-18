@@ -33,11 +33,13 @@ import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V3;
+import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V4;
 import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportImagePrepareRecord_V2;
 import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V2;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
+import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
@@ -92,6 +94,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.MemberPost
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileGetRecordTestUtils.testMemberProfileGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileImagePrepareRecord_V2TestUtils.testMemberProfileImagePrepareRecordV2;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV3;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberProfileOverrideRecordTestUtils.testMemberProfileOverrideRecordV4;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberRoleGetRecordTestUtils.testMemberRoleGetRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberWithdrawalRecordTestUtils.testKakaoMemberWithdrawalRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseReportRecordTestUtils.testPostAbuseReportRecord;
@@ -100,6 +103,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV4;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
@@ -478,6 +482,108 @@ class MemberControllerTest implements
         // when & then
         NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
                 NotFoundFileKeyOnS3Exception.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
+        assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
+    }
+
+    @Test
+    @DisplayName("파일 키를 포함해서 존재하는 모든 데이터로 overrideProfile V4로 프로필 덮어쓰기")
+    void testOverrideProfileV4_givenExistedData_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = createMemberProfile();
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberProfileRepository.update(any(), eq(true))).willReturn(memberProfile);
+        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+
+        // when
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(testMemberProfileOverrideRecordV4);
+
+        // then
+        assertThat(memberProfileResponseWithImageUrl).isEqualTo(testMemberProfileResponseWithImageUrlV4);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
+        verify(memberProfileRepository, times(1)).update(any(), eq(true));
+    }
+
+    @Test
+    @DisplayName("파일 키가 없는 데이터로 overrideProfile V4로 프로필 덮어쓰기")
+    void testOverrideProfileV4_givenNullFileKey_willReturnResponse() throws IOException {
+        // given
+        MemberProfile memberProfile = MemberProfile.create(testMemberId, EmptyMemberProfileImage.create(), EmptyMemberProfileIntroduction.create(), testNormalUserNickname);
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+        given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
+        willDoNothing().given(memberImageIOHelper).deleteImage(any());
+        given(memberProfileRepository.update(any(), eq(true))).willReturn(memberProfile);
+
+        // when
+        MemberProfileResponseWithImageUrl memberProfileResponseWithImageUrl = memberController.overrideProfile(
+                new MemberProfileOverrideRecord_V4(MEMBER_BASIC_USER_UUID, null, null, MEMBER_BASIC_USER_NICKNAME));
+
+        // then
+        assertThat(memberProfileResponseWithImageUrl.id()).isEqualTo(MEMBER_BASIC_USER_UUID);
+        assertThat(memberProfileResponseWithImageUrl.imageUrl()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.introduction()).isEqualTo(null);
+        assertThat(memberProfileResponseWithImageUrl.nickname()).isEqualTo(MEMBER_BASIC_USER_NICKNAME);
+        verify(memberImageIOHelper, times(1)).deleteImage(memberProfile.getMemberProfileImage());
+        verify(memberProfileRepository, times(1)).update(any(), eq(true));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 아이디로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
+    void testValidateMemberIdAndNicknameBeforeOverrideProfileV4_givenNotFoundId_willThrowException() {
+        // given
+        willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+    }
+
+    @Test
+    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
+    void testValidateThatHasSwearV4_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(true);
+
+        // when & then
+        SwearContainedException swearContainedException = assertThrows(
+                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
+        assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
+    }
+
+    @Test
+    @DisplayName("이미 존재하는 닉네임으로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
+    void testValidateV4_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
+
+        // when & then
+        ExistsEntityException existsEntityException = assertThrows(
+                ExistsEntityException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
+        assertThat(existsEntityException.getErrorCode()).isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 이미지 경로로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
+    void testValidateThatImagePathNotExistsV4_willThrowException() {
+        // given
+        willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+        given(swearService.isSwearContained(any())).willReturn(false);
+        given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
+        willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExistsInStorage(any());
+
+        // when & then
+        NotFoundFileKeyOnS3Exception notFoundFileKeyOnS3Exception = assertThrows(
+                NotFoundFileKeyOnS3Exception.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
         assertThat(notFoundFileKeyOnS3Exception.getErrorCode()).isEqualTo(AWSErrorCode.NOT_FOUND_FILE_KEY_ON_S3);
     }
 

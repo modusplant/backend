@@ -15,7 +15,7 @@ public enum EmailIdentityErrorCode implements ErrorCode {
     INVALID_EMAIL_VERIFY_CODE(HttpStatus.FORBIDDEN.value(), "invalid_email_verify_code", "이메일의 검증 코드가 올바르지 않습니다"),
     INVALID_EMAIL_VERIFY_LINK(HttpStatus.BAD_REQUEST.value(), "invalid_email_verify_link","유효하지 않거나 만료된 링크입니다"),
     ALREADY_REGISTERED_GOOGLE_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_google_email", "이미 구글 소셜 회원으로 가입된 이메일입니다"),
-    ALREADY_REGISTERED_KAKAO_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_kako_email", "이미 카카오 소셜 회원으로 가입된 이메일입니다"),
+    ALREADY_REGISTERED_KAKAO_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_kakao_email", "이미 카카오 소셜 회원으로 가입된 이메일입니다"),
     ALREADY_REGISTERED_BASIC_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_basic_email", "이미 일반회원으로 가입된 이메일입니다"),
     ALREADY_REGISTERED_BASIC_GOOGLE_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_basic_google_email", "이미 일반회원(구글 연동)으로 가입된 이메일입니다"),
     ALREADY_REGISTERED_BASIC_KAKAO_EMAIL(HttpStatus.CONFLICT.value(), "already_registered_basic_kakao_email", "이미 일반회원(카카오 연동)으로 가입된 이메일입니다")

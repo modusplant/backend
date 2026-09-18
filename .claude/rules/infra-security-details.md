@@ -28,6 +28,7 @@ security/
 
 **Config** (`config/`):
 - A single `@Configuration` class assembles one `SecurityFilterChain` bean plus its supporting beans (password encoders, authentication manager, providers, handlers, filters, CORS source)
+- The profile-specific `CorsConfigurationSource` beans share a `@Qualifier("corsConfigurationSource")` qualifier; the filter chain bean injects that qualifier explicitly
 
 **Filter** (`filter/`):
 - Extend `OncePerRequestFilter` for cross-cutting, always-run concerns (JWT parsing/verification, chain-wide exception translation), or `AbstractAuthenticationProcessingFilter` for a filter dedicated to intercepting one login endpoint
@@ -49,7 +50,7 @@ security/
 - Naming describes the specific business condition (`Banned*`, `Inactive*`, `DisabledByLinking*`, `BadCredential*`, `AccountState*`)
 
 **Util** (`util/`):
-- Static-only helper classes with a private constructor; naming suffix `Logger` / `*Utils`
+- Static-only helper classes with a private constructor; naming suffix `*Utils`
 
 ---
 
@@ -85,8 +86,15 @@ One `SecurityFilterChain` is registered, scoped to a single API path prefix. A r
 2. **JWT authentication filter** — opportunistically authenticates every request carrying a bearer token: validates the token, checks a blacklist, and populates the security context when valid. Requests without a token, or with an invalid one, either proceed unauthenticated or raise an exception that is caught by step 1.
 3. **Login processing filter** — matches only the dedicated login endpoint. Deserializes and validates the login request, then delegates credential verification to the authentication manager, which resolves to the custom authentication provider and, in turn, the custom user details service. The outcome is routed to a dedicated success or failure handler that writes the response body (and, on success, issues tokens).
 4. **Standard Spring Security filters** take over afterward:
-   - An authorization filter enforces path-based access rules, grouped by intent (admin-only routes, authenticated-only routes, and public/permit-all routes) rather than by literal endpoint list.
+   - An authorization filter denies by default (`anyRequest().authenticated()`), carving out two path-based exceptions ahead of it: admin-only routes (`hasAuthority('ADMIN')`) and the static `SecurityConfig.PUBLIC_ENDPOINTS` map (permit-all, keyed by `HttpMethod`). 
+   - Every non-public endpoint additionally carries an explicit method-security annotation (`@PreAuthorize`/`@PostAuthorize`/`@Secured`) rather than relying solely on the path-based default; a reflection-based test (`EndpointAuthorizationCoverageTest`, no Spring context) fails the build if a `@RestController` endpoint has neither a method-security annotation nor a `PUBLIC_ENDPOINTS` entry.
    - A logout filter, matched to a dedicated logout endpoint, delegates token revocation to the custom logout handler and response writing to the custom logout success handler.
    - The exception-translation stage falls back to the same custom entry point and access-denied handler used in step 1, so error response shape stays consistent whether an exception is caught early by the custom filter or later by the standard chain.
 
 The chain is stateless (no HTTP session) and CSRF-disabled, consistent with a bearer-token-only API.
+
+---
+
+## 5. Self-Ownership Checks
+
+`SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid)` is a static helper (throws `AccessDeniedException` on mismatch) that REST controllers call directly to enforce that a caller only accesses their own resource, complementing the path- and method-level authorization described above.

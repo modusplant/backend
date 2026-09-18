@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +79,7 @@ public class LocalSocialIdentityRestController {
     @Operation(summary = "로컬환경 소셜 연동 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 연동을 수행합니다")
     @PostMapping("/local/members/social/{provider}")
     @SecurityRequirement(name = "Authorization")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> linkSocialAccount(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 
@@ -96,6 +98,7 @@ public class LocalSocialIdentityRestController {
     @Operation(summary = "로컬환경 소셜 연동 해제 API", description = "카카오/구글 인가코드를 받아 소셜 인증 및 연동 해제를 수행합니다")
     @PostMapping("/local/members/social/{provider}/unlink")
     @SecurityRequirement(name = "Authorization")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> unlinkSocialAccount(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
 

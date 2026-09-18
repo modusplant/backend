@@ -9,10 +9,13 @@ import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermCreateRequest;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermUpdateRequest;
 import kr.modusplant.domains.term.usecase.response.SiteMemberTermResponse;
+import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,36 +32,51 @@ public class SiteMemberTermRestController {
 
     @Operation(summary = "사이트 회원 약관 등록 API", description = "사이트 회원 약관을 등록합니다.")
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<SiteMemberTermResponse>> registerSiteMemberTerm(
-            @RequestBody @Valid SiteMemberTermCreateRequest request) {
+            @RequestBody @Valid SiteMemberTermCreateRequest request,
+            @AuthenticationPrincipal(expression = "uuid") UUID callerUuid) {
+        SecurityAssertionUtils.requireSelf(callerUuid, request.uuid());
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(siteMemberTermController.register(request)));
     }
 
     @Operation(summary = "사이트 회원 약관 수정 API", description = "사이트 회원 약관을 수정합니다.")
     @PutMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<SiteMemberTermResponse>> updateSiteMemberTerm(
-            @RequestBody @Valid SiteMemberTermUpdateRequest request) {
+            @RequestBody @Valid SiteMemberTermUpdateRequest request,
+            @AuthenticationPrincipal(expression = "uuid") UUID callerUuid) {
+        SecurityAssertionUtils.requireSelf(callerUuid, request.uuid());
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(siteMemberTermController.update(request)));
     }
 
     @Operation(summary = "사이트 회원 약관 삭제 API", description = "사이트 회원 약관을 삭제합니다.")
     @DeleteMapping("/{uuid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> deleteSiteMemberTerm(
-        @PathVariable @NotNull UUID uuid) {
+        @PathVariable @NotNull UUID uuid,
+        @AuthenticationPrincipal(expression = "uuid") UUID callerUuid) {
+        SecurityAssertionUtils.requireSelf(callerUuid, uuid);
         siteMemberTermController.delete(SiteMemberTermId.fromUuid(uuid));
         return ResponseEntity.status(HttpStatus.OK).body(DataResponse.ok());
     }
 
     @Operation(summary = "사이트 회원 약관 조회 API", description = "사이트 회원 약관을 조회합니다.")
     @GetMapping("/{uuid}")
-    public ResponseEntity<DataResponse<SiteMemberTermResponse>> getSiteMemberTerm(@PathVariable @NotNull UUID uuid) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DataResponse<SiteMemberTermResponse>> getSiteMemberTerm(
+            @PathVariable @NotNull UUID uuid,
+            @AuthenticationPrincipal(expression = "uuid") UUID callerUuid) {
+        SecurityAssertionUtils.requireSelf(callerUuid, uuid);
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(siteMemberTermController.getSiteMemberTerm(SiteMemberTermId.fromUuid(uuid))));
     }
+
     @Operation(summary = "사이트 회원 약관 목록조회 API", description = "사이트 회원 약관 목록을 조회합니다.")
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<DataResponse<List<SiteMemberTermResponse>>> getSiteMemberTermList() {
         return ResponseEntity.status(HttpStatus.OK).body(
                 DataResponse.ok(siteMemberTermController.getSiteMemberTermList()));
