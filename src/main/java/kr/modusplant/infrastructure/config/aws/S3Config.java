@@ -1,9 +1,10 @@
 package kr.modusplant.infrastructure.config.aws;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Primary;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
@@ -17,6 +18,9 @@ import java.time.Duration;
 
 @Configuration
 public class S3Config {
+    @Value("${spring.profiles.active}")
+    private String profile;
+
     @Value("${cloud.wasabi.s3.endpoint}")
     private String endpoint;
 
@@ -50,6 +54,9 @@ public class S3Config {
     @Value("${minio.public-endpoint:#{null}}")
     private String devPublicEndpoint;
 
+    @Value("${minio.upload-endpoint:#{null}}")
+    private String uploadEndpoint;
+
     @Bean
     public S3Client s3Client() {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey,secretKey);
@@ -74,25 +81,24 @@ public class S3Config {
     }
 
     @Bean
-    @Profile({"local", "prod"})
-    public S3Presigner localProdS3Presigner() {
-        AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
-        return S3Presigner.builder()
-                .endpointOverride(URI.create(endpoint))
-                .region(Region.of(region))
-                .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(true)
-                        .build())
-                .build();
+    @Primary
+    public S3Presigner s3Presigner() {
+        String targetEndpoint = profile.equals("dev") ? devPublicEndpoint : endpoint;
+        return buildS3Presigner(targetEndpoint);
     }
 
     @Bean
-    @Profile("dev")
-    public S3Presigner devS3Presigner() {
+    @Qualifier("uploadS3Presigner")
+    public S3Presigner uploadS3Presigner() {
+        String targetEndpoint = uploadEndpoint != null ? uploadEndpoint
+                : profile.equals("dev") ? devPublicEndpoint : endpoint;
+        return buildS3Presigner(targetEndpoint);
+    }
+
+    private S3Presigner buildS3Presigner(String targetEndpoint) {
         AwsBasicCredentials basicCredentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Presigner.builder()
-                .endpointOverride(URI.create(devPublicEndpoint))
+                .endpointOverride(URI.create(targetEndpoint))
                 .region(Region.of(region))
                 .credentialsProvider(StaticCredentialsProvider.create(basicCredentials))
                 .serviceConfiguration(S3Configuration.builder()

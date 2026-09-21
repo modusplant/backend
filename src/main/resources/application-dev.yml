@@ -37,15 +37,15 @@ security:
   debug:
     enabled: true
 
+# MinIO
+minio:
+  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
+
 # Monitoring
 management:
   tracing:
     sampling:
       probability: 1.0
-
-# MinIO
-minio:
-  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
 
 # Scheduler
 scheduler:

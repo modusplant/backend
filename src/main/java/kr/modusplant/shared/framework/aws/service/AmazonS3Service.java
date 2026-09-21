@@ -3,8 +3,8 @@ package kr.modusplant.shared.framework.aws.service;
 import kr.modusplant.shared.enums.ImageContentType;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,10 +25,18 @@ import java.util.stream.Collectors;
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INPUT_OUT_OF_RANGE;
 
 @Service
-@RequiredArgsConstructor
 public class AmazonS3Service {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
+    private final S3Presigner uploadS3Presigner;
+
+    public AmazonS3Service(S3Client s3Client,
+                           S3Presigner s3Presigner,
+                           @Qualifier("uploadS3Presigner") S3Presigner uploadS3Presigner) {
+        this.s3Client = s3Client;
+        this.s3Presigner = s3Presigner;
+        this.uploadS3Presigner = uploadS3Presigner;
+    }
 
     @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
@@ -91,8 +99,8 @@ public class AmazonS3Service {
         }
     }
 
-    public String generateS3SrcUrl(String fileKey) {
-        if(profile.equals("dev")){
+    public String generateGetPresignedUrl(String fileKey) {
+        if (profile.equals("dev")){
             return String.format("%s/%s/%s", devPublicEndpoint, bucket, fileKey);
         }
         return getPresignedUrl(fileKey);
@@ -107,7 +115,6 @@ public class AmazonS3Service {
                 .build();
 
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
-
         return presignedRequest.url().toString();
     }
 
@@ -125,7 +132,7 @@ public class AmazonS3Service {
                         .contentType(contentType))
                 .build();
 
-        PresignedPutObjectRequest presignedPutObjectRequest = s3Presigner.presignPutObject(presignRequest);
+        PresignedPutObjectRequest presignedPutObjectRequest = uploadS3Presigner.presignPutObject(presignRequest);
         return presignedPutObjectRequest.url().toString();
     }
 
