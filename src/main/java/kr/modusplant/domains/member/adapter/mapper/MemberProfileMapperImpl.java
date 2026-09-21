@@ -29,7 +29,7 @@ public class MemberProfileMapperImpl implements MemberProfileMapper {
             } else {
                 return new MemberProfileResponseWithImageUrl(
                         memberProfile.getMemberId().getValue(),
-                        amazonS3Service.generateS3SrcUrl(imagePath),
+                        amazonS3Service.generateGetPresignedUrl(imagePath),
                         memberProfile.getMemberProfileIntroduction().getValue(),
                         memberProfile.getNickname().getValue());
             }

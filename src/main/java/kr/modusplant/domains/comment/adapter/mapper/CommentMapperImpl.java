@@ -32,7 +32,7 @@ public class CommentMapperImpl implements CommentMapper {
     @Override
     public CommentOfPostResponse toCommentOfPostResponse(CommentOfPostReadModel readModel) {
         return new CommentOfPostResponse(
-                readModel.profileImage() == null ? null : fileService.generateS3SrcUrl(readModel.profileImage()),
+                readModel.profileImage() == null ? null : fileService.generateGetPresignedUrl(readModel.profileImage()),
                 readModel.nickname(), readModel.path(), readModel.content(), readModel.likeCount(),
                 readModel.isLiked(), readModel.createdAt(), readModel.updatedAt(), readModel.isDeleted()
         );

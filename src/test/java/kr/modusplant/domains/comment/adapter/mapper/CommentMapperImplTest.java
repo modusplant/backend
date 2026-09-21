@@ -31,7 +31,7 @@ public class CommentMapperImplTest implements
     @DisplayName("프로필 이미지가 있는 읽기 모델을 응답으로 변환")
     public void testToCommentOfPostResponse_givenProfileImagePresent_willReturnResponseWithS3Url() {
         // given
-        given(fileService.generateS3SrcUrl(testCommentOfPostReadModel.profileImage())).willReturn("https://s3/profile.png");
+        given(fileService.generateGetPresignedUrl(testCommentOfPostReadModel.profileImage())).willReturn("https://s3/profile.png");
 
         // when
         CommentOfPostResponse result = mapper.toCommentOfPostResponse(testCommentOfPostReadModel);
@@ -63,7 +63,7 @@ public class CommentMapperImplTest implements
 
         // then
         assertThat(result.profileImagePath()).isNull();
-        then(fileService).should(times(0)).generateS3SrcUrl(org.mockito.ArgumentMatchers.any());
+        then(fileService).should(times(0)).generateGetPresignedUrl(org.mockito.ArgumentMatchers.any());
     }
 
     @Test
