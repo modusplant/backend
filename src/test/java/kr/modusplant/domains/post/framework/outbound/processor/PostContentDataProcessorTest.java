@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -159,7 +158,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
         @Test
         @DisplayName("텍스트·파일 순서 처리 시 JsonNode 반환")
-        void testGenerateContentJson_givenTextAndFiles_willReturnJsonNode() throws IOException {
+        void testGenerateContentJson_givenTextAndFiles_willReturnJsonNode() {
             // given & when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, allMediaFilesOrder, TEST_IMAGE_JPG_FILENAME);
             JsonNode result = record.content();
@@ -189,7 +188,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
         @Test
         @DisplayName("섞인 순서 정렬 시 JsonNode 반환")
-        void testGenerateContentJson_givenFilesWithMixedOrder_willReturnJsonNode() throws IOException {
+        void testGenerateContentJson_givenFilesWithMixedOrder_willReturnJsonNode() {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(null, mixedOrder, TEST_IMAGE_JPG_FILENAME);
             JsonNode result = record.content();
@@ -204,7 +203,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
         @Test
         @DisplayName("이미지 없을 때 JsonNode 반환")
-        void testGenerateContentJson_givenNoImageFiles_willReturnJsonNode() throws IOException {
+        void testGenerateContentJson_givenNoImageFiles_willReturnJsonNode() {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, onlyVideoFileOrder, null);
 
@@ -214,7 +213,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
         @Test
         @DisplayName("텍스트만 있을 때 JsonNode 반환")
-        void testGenerateContentJson_givenTextOnly_willReturnJsonNode() throws IOException {
+        void testGenerateContentJson_givenTextOnly_willReturnJsonNode() {
             // when
             ContentProcessRecord record = postContentDataProcessor.generateContentJson(TEST_POST_CONTENT_TEXT, null, null);
 
@@ -227,7 +226,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
         @Test
         @DisplayName("5000자 정확히 입력 시 JsonNode 반환")
-        void testGenerateContentJson_givenTextExactly5000Chars_willReturnJsonNode() throws IOException {
+        void testGenerateContentJson_givenTextExactly5000Chars_willReturnJsonNode() {
             // given
             String exactText = "a".repeat(5000);
 
@@ -369,11 +368,11 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     class testConvertFileSrcToFullFileSrc {
         @Test
         @DisplayName("저장 경로를 전체 경로로 변환한 ArrayNode 반환")
-        void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNode() throws IOException {
+        void testConvertFileSrcToFullFileSrc_givenJsonContent_willReturnArrayNode() {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
-            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateGetPresignedUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             JsonNode result = postContentDataProcessor.convertFileSrcToFullFileSrc(content);
@@ -396,11 +395,11 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     class testConvertFileSrcToFullFileSrcWithFileKey {
         @Test
         @DisplayName("fileKey 포함 ArrayNode 반환")
-        void testConvertFileSrcToFullFileSrcWithFileKey_givenJsonContent_willReturnArrayNode() throws IOException {
+        void testConvertFileSrcToFullFileSrcWithFileKey_givenJsonContent_willReturnArrayNode() {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
-            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateGetPresignedUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             JsonNode result = postContentDataProcessor.convertFileSrcToFullFileSrcWithFileKey(content);
@@ -427,7 +426,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         void testConvertToPreview_givenTextAndThumbnail_willReturnArrayNode() {
             // given
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
-            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateGetPresignedUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             ArrayNode result = postContentDataProcessor.convertToPreview(TEST_POST_CONTENT_TEXT_AND_IMAGE, TEST_POST_CONTENT_TEXT_AND_IMAGE_THUMBNAIL_KEY);
@@ -445,7 +444,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
             assertThat(imageNode.has(DATA)).isFalse();
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
 
-            verify(amazonS3Service).generateS3SrcUrl(anyString());
+            verify(amazonS3Service).generateGetPresignedUrl(anyString());
         }
 
         @Test
@@ -461,7 +460,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
             assertThat(textNode.get(TYPE).asText()).isEqualTo(PostFileType.TEXT.getValue());
             assertThat(textNode.has(DATA)).isTrue();
 
-            verify(amazonS3Service, never()).generateS3SrcUrl(anyString());
+            verify(amazonS3Service, never()).generateGetPresignedUrl(anyString());
         }
 
         @Test
@@ -469,7 +468,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
         void testConvertToPreview_givenThumbnailOnly_willReturnArrayNode() {
             // given
             String fullSrcUrl = BASIC_PATH + TEST_IMAGE_JPG_FILE_KEY;
-            given(amazonS3Service.generateS3SrcUrl(anyString())).willReturn(fullSrcUrl);
+            given(amazonS3Service.generateGetPresignedUrl(anyString())).willReturn(fullSrcUrl);
 
             // when
             ArrayNode result = postContentDataProcessor.convertToPreview(TEST_POST_CONTENT_IMAGE_AND_VIDEO, TEST_POST_CONTENT_IMAGE_AND_VIDEO_THUMBNAIL_KEY);
@@ -483,7 +482,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
             assertThat(imageNode.get(SRC).asText()).isEqualTo(fullSrcUrl);
             assertThat(imageNode.has(DATA)).isFalse();
 
-            verify(amazonS3Service).generateS3SrcUrl(anyString());
+            verify(amazonS3Service).generateGetPresignedUrl(anyString());
         }
 
         @Test
@@ -494,7 +493,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
 
             // then
             assertThat(result).isEmpty();
-            verify(amazonS3Service, never()).generateS3SrcUrl(anyString());
+            verify(amazonS3Service, never()).generateGetPresignedUrl(anyString());
         }
     }
 
@@ -503,7 +502,7 @@ class PostContentDataProcessorTest implements PostRequestTestUtils, PostFileUplo
     class testDeleteFiles {
         @Test
         @DisplayName("저장 경로로 파일 삭제 활동 수행")
-        void testDeleteFiles_givenJsonContent_willDeleteFiles() throws IOException {
+        void testDeleteFiles_givenJsonContent_willDeleteFiles() {
             // given
             JsonNode content = postContentDataProcessor.generateContentJson(null, onlyImageFilesOrder, TEST_IMAGE_JPG_FILENAME).content();
             doNothing().when(amazonS3Service).deleteFile(anyString());

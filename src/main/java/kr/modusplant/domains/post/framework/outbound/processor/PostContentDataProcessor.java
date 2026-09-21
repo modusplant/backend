@@ -14,6 +14,7 @@ import kr.modusplant.domains.post.usecase.record.ContentProcessRecord;
 import kr.modusplant.domains.post.usecase.request.FileOrder;
 import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 import kr.modusplant.domains.post.usecase.response.PostFileUploadUrlResponse;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.exception.FileLimitExceededException;
 import kr.modusplant.shared.exception.InvalidFileInputException;
 import kr.modusplant.shared.exception.UnsupportedFileException;
@@ -22,10 +23,8 @@ import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.generator.RandomUlidGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
-import kr.modusplant.infrastructure.file.service.PendingFileService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -69,7 +68,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         return result;
     }
 
-    public ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename) throws IOException {
+    public ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename) {
         // contentText : 글자수 초과하는지 확인
         // contentFiles : order 값 검증(1부터인지 순차적인지), 파일타입 검증, 파일명 중복 검증
         // thunmbnailFilename이 실제로 filename에 존재하는지, image 타입인지
@@ -130,7 +129,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
             if (node.has(SRC)) {
                 String fileKey = objectNode.get(SRC).asText();
                 objectNode.remove(SRC);
-                String src = amazonS3Service.generateS3SrcUrl(fileKey);
+                String src = amazonS3Service.generateGetPresignedUrl(fileKey);
                 if (includeFileKey) {
                     objectNode.put(FILE_KEY, fileKey);
                 }
@@ -157,7 +156,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         if (thumbnailPath != null && !thumbnailPath.isBlank()) {
             ObjectNode thumbnailNode = objectMapper.createObjectNode();
             thumbnailNode.put(TYPE, PostFileType.IMAGE.getValue());
-            thumbnailNode.put(SRC, amazonS3Service.generateS3SrcUrl(thumbnailPath));
+            thumbnailNode.put(SRC, amazonS3Service.generateGetPresignedUrl(thumbnailPath));
             newArray.add(thumbnailNode);
         }
 
@@ -219,7 +218,7 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
     }
 
     public String getS3SrcUrl(String fileKey) {
-        return amazonS3Service.generateS3SrcUrl(fileKey);
+        return amazonS3Service.generateGetPresignedUrl(fileKey);
     }
 
     /* 파일 검증 - 업로드용 presigned url 생성 */

@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
 class AmazonS3ServiceTest {
     private S3Client s3Client;
     private S3Presigner s3Presigner;
+    private S3Presigner uploadS3Presigner;
     private AmazonS3Service amazonS3Service;
 
     private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "https://test-endpoint";
@@ -41,7 +42,8 @@ class AmazonS3ServiceTest {
     void setUp() {
         s3Client = mock(S3Client.class);
         s3Presigner = mock(S3Presigner.class);
-        amazonS3Service = new AmazonS3Service(s3Client, s3Presigner);
+        uploadS3Presigner = mock(S3Presigner.class);
+        amazonS3Service = new AmazonS3Service(s3Client, s3Presigner, uploadS3Presigner);
         ReflectionTestUtils.setField(amazonS3Service, "bucket", BUCKET_NAME);
         if (System.getenv("DEV_PUBLIC_ENDPOINT") != null) {
             ReflectionTestUtils.setField(amazonS3Service, "profile", "dev");
@@ -134,7 +136,7 @@ class AmazonS3ServiceTest {
 
     @Test
     @DisplayName("파일 키로 문자열 반환")
-    void testGenerateS3SrcUrl_givenFileKey_willReturnString() throws Exception {
+    void testGenerateGetPresignedUrl_givenFileKey_willReturnString() throws Exception {
         // given
         String fileKey = "test-file-key";
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
@@ -143,7 +145,7 @@ class AmazonS3ServiceTest {
         given(s3Presigner.presignGetObject(any(GetObjectPresignRequest.class))).willReturn(mockPresignedRequest);
 
         // when
-        String result = amazonS3Service.generateS3SrcUrl(fileKey);
+        String result = amazonS3Service.generateGetPresignedUrl(fileKey);
 
         // then
         assertThat(result).isEqualTo(expected);
@@ -161,14 +163,15 @@ class AmazonS3ServiceTest {
         String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
         PresignedPutObjectRequest mockPresignedRequest = mock(PresignedPutObjectRequest.class);
         given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
-        given(s3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
+        given(uploadS3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
 
         // when
         String result = amazonS3Service.generatePutPresignedUrl(fileKey, contentType);
 
         // then
         assertThat(result).isEqualTo(expected);
-        verify(s3Presigner, times(1)).presignPutObject(any(PutObjectPresignRequest.class));
+        verify(uploadS3Presigner, times(1)).presignPutObject(any(PutObjectPresignRequest.class));
+        verify(s3Presigner, never()).presignPutObject(any(PutObjectPresignRequest.class));
     }
 
     @Test

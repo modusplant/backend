@@ -29,7 +29,7 @@ class MemberProfileMapperImplTest implements MemberProfileTestUtils {
     @DisplayName("저장소 URL 반환이 필요하고 이미지 경로가 있을 때 toMemberProfileResponse로 응답 반환")
     void testToMemberProfileResponse_givenNeedsToReturnStorageUrlTrueAndImagePath_willReturnResponse() {
         // given
-        given(amazonS3Service.generateS3SrcUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
+        given(amazonS3Service.generateGetPresignedUrl(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_URL);
 
         // when & then
         assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfile(), true)).isEqualTo(testMemberProfileResponseWithImageUrlV1);
@@ -42,7 +42,7 @@ class MemberProfileMapperImplTest implements MemberProfileTestUtils {
         assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfileWithoutImage(), true)).isEqualTo(testMemberProfileResponseWithNullImageUrl);
 
         // then
-        verify(amazonS3Service, never()).generateS3SrcUrl(any());
+        verify(amazonS3Service, never()).generateGetPresignedUrl(any());
     }
 
     @Test
@@ -52,7 +52,7 @@ class MemberProfileMapperImplTest implements MemberProfileTestUtils {
         assertThat(memberProfileMapper.toMemberProfileResponse(createMemberProfile(), false)).isEqualTo(testMemberProfileResponseWithImagePathV3);
 
         // then
-        verify(amazonS3Service, never()).generateS3SrcUrl(any());
+        verify(amazonS3Service, never()).generateGetPresignedUrl(any());
     }
 
     @Test
