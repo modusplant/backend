@@ -1,34 +1,41 @@
 ---
 name: reflect-code-change-into-test
-description: This file provides strict guidance on creating, modifying, and deleting tests for a single domain or infrastructure area, given as an argument (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
-arguments: [AREA_NAME]
-argument-hint: [area-name]
+description: This file provides strict guidance on creating, modifying, and deleting tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
 disable-model-invocation: true
 disallowed-tools: Write(/src/main/**) Edit(/src/main/**)
 ---
 
-# Resolving the Target Area
+# Target Classes
 
-- Predefined domain names: `account` (including its sub-domains `email`, `identity`, `normal`, `social`), `comment`, `member`, `notification`, `post`, `search`, `term`.
-- Predefined infrastructure area names: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `swear`.
-- If $AREA_NAME matches a domain name, set $AREA_KIND to `domain`. If it matches an infrastructure area name, set $AREA_KIND to `infra`.
-- If $AREA_NAME isn't one predefined domain or infrastructure area name, instantly terminate the skill and give the user what happened.
+- Primary: every `.java` class not yet pushed to the remote — the union of:
+  - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
+  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
+- Termination: if the union is empty, terminate the skill immediately.
+
+# Resolving Target Areas
+
+- For each Target Class, match its path against `domains/$AREA_NAME/` (using the `account`
+  sub-domain path mapping where applicable) or `infrastructure/$AREA_NAME/` to resolve its
+  `$AREA_NAME`; set `$AREA_KIND` to `domain` or `infra` accordingly.
+- Any Target Class whose path matches neither pattern is dropped from processing; report it by
+  name as unmatched.
+- Group the remaining classes into one bucket per resolved `($AREA_NAME, $AREA_KIND)` pair.
+  Process each bucket in turn as described below — batched per area, so the Area Feature,
+  Excluded Classes, Test Architecture & Strategy, and TestUtils steps run once per bucket and
+  cover every class in it.
+- Termination: if every Target Class was dropped as unmatched, terminate the skill immediately
+  and report the full unmatched list.
 
 # Loading the Area Feature
+
+For each resolved `$AREA_NAME`/`$AREA_KIND` bucket:
 
 Read @.claude/documents/test-$AREA_KIND-$AREA_NAME-feature.md and use its fields everywhere those terms are referenced below.
 If that file does not exist, check if @.claude/rules/$AREA_KIND-$AREA_NAME-details.md file is present.
 If the file exists, derive these facts yourself from @.claude/rules/$AREA_KIND-$AREA_NAME-details.md
 and the area's actual @src/main / @src/test package layout, applying the same classification rules, then proceed.
-If the file doesn't exist, instantly terminate the skill and guide the user to create Rule file first.
-
-# Target Classes
-
-- Primary: classes created, modified, or deleted since the previous session, if it belongs to the $AREA_NAME area (under `domains/$AREA_NAME/` for $AREA_KIND `domain`, or `infrastructure/$AREA_NAME/` for $AREA_KIND `infra`).
-- Fallback - 1: If no $AREA_NAME classes were modified in the previous session, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and find the $AREA_NAME classes within its output.
-- Fallback - 2: if that also yields nothing, run `git diff --name-only HEAD~1 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and find the $AREA_NAME classes within its output.
-- Fallback - 3: if that also yields nothing, run `git diff --name-only HEAD~2 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and find the $AREA_NAME classes within its output.
-- Termination: if no result was found, terminate the skill immediately.
+If neither file exists, skip this bucket entirely: report which area and which of its classes were
+skipped, and guide the user to create its Rule file first. Continue with the remaining buckets.
 
 # Excluded Classes
 
@@ -36,13 +43,13 @@ Regardless of the scope above, never generate tests for:
   - Enum classes
   - Exception classes
   - Classes that contain only constructors
-  - Any classes listed under $AREA_NAME's `Excluded-classes additions` in its feature
+  - Any classes listed under the bucket's $AREA_NAME's `Excluded-classes additions` in its feature
 
 # Test Architecture & Strategy
 
 !`cat ${CLAUDE_PROJECT_DIR}/.claude/rules/test-architecture-details.md`
 
-Apply the Pure Unit Test baseline above, with these $AREA_NAME-specific adjustments from its feature:
+Apply the Pure Unit Test baseline above, with each bucket's $AREA_NAME-specific adjustments from its feature:
 
 - **ErrorCode class:** exception assertions in $AREA_NAME tests check `getErrorCode()` against
   the enum named under $AREA_NAME's `ErrorCode class` in its feature.
@@ -62,7 +69,7 @@ Apply the Pure Unit Test baseline above, with these $AREA_NAME-specific adjustme
 
 # Test Utility (`TestUtils`) Convention
 
-Follow the TestUtils convention from `test-architecture-details.md` above, applied to $AREA_NAME:
+Follow the TestUtils convention from `test-architecture-details.md` above, applied to each bucket's $AREA_NAME:
 
 - **Parameter Sources:** reuse constant fields from $AREA_NAME's own `common/constant` path, plus
   every path listed under $AREA_NAME's `TestUtils shared constant paths` in its feature. If missing, create them.
@@ -70,3 +77,10 @@ Follow the TestUtils convention from `test-architecture-details.md` above, appli
 - **Group B (methods) target paths:** the paths listed under $AREA_NAME's `Group B` in its feature.
 
 Only look up a target path if actually needed for the test at hand.
+
+# Summary
+
+After processing every bucket, report:
+  - Per processed area: which classes got tests created, modified, or deleted.
+  - Skipped areas (missing feature/rule file) and the classes left unprocessed within them.
+  - Unmatched classes dropped during Resolving Target Areas.
