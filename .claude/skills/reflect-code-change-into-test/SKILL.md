@@ -1,5 +1,5 @@
 ---
-name: test-single-area
+name: reflect-code-change-into-test
 description: This file provides strict guidance on creating, modifying, and deleting tests for a single domain or infrastructure area, given as an argument (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
 arguments: [AREA_NAME]
 argument-hint: [area-name]

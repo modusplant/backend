@@ -14,7 +14,7 @@ disallowed-tools: Write(/src/**) Edit(/src/**)
 
 # Workflow
 
-1. Invoke `test-single-area` with `$AREA_NAME`.
+1. Invoke `reflect-code-change-into-test` with `$AREA_NAME`.
 2. Invoke `reflect-code-change-into-document`.
 3. Invoke `reflect-api-change-into-notion`.
 
