@@ -89,9 +89,9 @@ Detailed working rules live under `.claude/`:
 
 - `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
 - `.claude/documents/*.md` — on-demand reference docs: 
-  - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `test-single-area` skill)
+  - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `reflect-code-change-into-test` skill)
   - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; also referenced directly from `test-architecture-details.md`)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
   - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
   - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
-- `.claude/skills/*/SKILL.md` — task workflows: `test-single-area`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `configure-docker-environment`, `resolve-error-with-stack-trace`, `report-performance-optimization`.
+- `.claude/skills/*/SKILL.md` — task workflows: `reflect-code-change-into-test`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `guide-docker-environment-configuration`, `resolve-error-with-stack-trace`, `report-performance-optimization`.

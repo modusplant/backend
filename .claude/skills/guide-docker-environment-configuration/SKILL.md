@@ -1,5 +1,5 @@
 ---
-name: configure-docker-environment
+name: guide-docker-environment-configuration
 description: Guides the high-level architecture of how Docker builds and deploys the Spring Boot backend across environments — local, dev, and prod.
 ---
 
