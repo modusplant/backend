@@ -1,7 +1,6 @@
 ---
 name: reflect-code-change-into-test
 description: This file provides strict guidance on creating, modifying, and deleting tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
-disable-model-invocation: true
 disallowed-tools: Write(/src/main/**) Edit(/src/main/**)
 ---
 
@@ -84,3 +83,8 @@ After processing every bucket, report:
   - Per processed area: which classes got tests created, modified, or deleted.
   - Skipped areas (missing feature/rule file) and the classes left unprocessed within them.
   - Unmatched classes dropped during Resolving Target Areas.
+
+# Hard Constraints
+
+- Never invoke this skill on your own initiative; only run it when invoked by
+  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.

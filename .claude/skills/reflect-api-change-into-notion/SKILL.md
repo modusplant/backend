@@ -1,7 +1,6 @@
 ---
 name: reflect-api-change-into-notion
 description: Detects API-relevant codebase changes in the member/comment/search domains and the security-related auth surface, then produces and applies Notion-ready edit instructions for the corresponding API-specification documents.
-disable-model-invocation: true
 allowed-tools: Write(.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/detected-change/**) Write(.claude/skills/reflect-api-change-into-notion/reflected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/reflected-change/**)
 disallowed-tools: Write(/src/**) Edit(/src/**) Write(.claude/skills/reflect-api-change-into-notion/SKILL.md) Edit(.claude/skills/reflect-api-change-into-notion/SKILL.md) Write(.claude/skills/reflect-api-change-into-notion/document-format.md) Edit(.claude/skills/reflect-api-change-into-notion/document-format.md)
 ---
@@ -145,6 +144,8 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 # Hard Constraints
 
+- Never invoke this skill on your own initiative; only run it when invoked by
+  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.
 - English-only in this skill's own files; Korean is permitted only where a literal string must
   round-trip exactly into/out of Notion (headings, column names, `필수`/`선택`, example values).
 - Never fabricate a fact not present in the actual source code or the current Notion page content.
