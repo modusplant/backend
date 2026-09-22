@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
@@ -41,6 +43,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +79,6 @@ public class SecurityConfig {
                     "/api/auth/reset-password-request/verify/email",
                     "/api/auth/reset-password-request/verify/input",
                     "/api/auth/token/refresh",
-                    "/api/v1/local/auth/social-login/**",
                     "/api/v1/auth/social-login/**",
                     "/api/v1/auth/social-signup",
                     "/api/v1/auth/social-link"
@@ -85,6 +88,15 @@ public class SecurityConfig {
             ),
             HttpMethod.PATCH, List.of(
                     "/api/v1/communication/posts/*/views"
+            )
+    );
+
+    /**
+     * local 프로필에서만 permit-all로 병합되는 엔드포인트.
+     */
+    public static final Map<HttpMethod, List<String>> LOCAL_PUBLIC_ENDPOINTS = Map.of(
+            HttpMethod.POST, List.of(
+                    "/api/v1/local/auth/social-login/**"
             )
     );
 
@@ -100,6 +112,7 @@ public class SecurityConfig {
     private final MemberJpaRepository memberRepository;
     private final Validator validator;
     private final AccessTokenRedisRepository tokenRedisRepository;
+    private final Environment environment;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -185,6 +198,20 @@ public class SecurityConfig {
         return new SecurityExceptionHandlingFilter(objectMapper, defaultAuthenticationEntryPoint());
     }
 
+    private Map<HttpMethod, List<String>> resolvePublicEndpoints() {
+        if (!environment.acceptsProfiles(Profiles.of("local"))) {
+            return PUBLIC_ENDPOINTS;
+        }
+        Map<HttpMethod, List<String>> newMap = new HashMap<>(PUBLIC_ENDPOINTS);
+        LOCAL_PUBLIC_ENDPOINTS.forEach((httpMethod, patterns) ->
+                newMap.merge(httpMethod, patterns, (original, added) -> {
+                    List<String> newList = new ArrayList<>(original);
+                    newList.addAll(added);
+                    return newList;
+                }));
+        return newMap;
+    }
+
     @Bean
     public SecurityFilterChain defaultChain(HttpSecurity http,
                                             @Qualifier("corsConfigurationSource")
@@ -198,7 +225,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(http), EmailPasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/admin/**").hasAuthority("ADMIN");
-                    PUBLIC_ENDPOINTS.forEach((httpMethod, patterns) ->
+                    resolvePublicEndpoints().forEach((httpMethod, patterns) ->
                             auth.requestMatchers(httpMethod, patterns.toArray(new String[0])).permitAll());
                     auth.anyRequest().authenticated();
                 })

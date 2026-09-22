@@ -33,10 +33,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Every {@code @RestController} endpoint must carry an explicit authorization decision: either a
  * method-security annotation ({@code @PreAuthorize}/{@code @PostAuthorize}/{@code @Secured}) or an
- * entry in {@link SecurityConfig#PUBLIC_ENDPOINTS}. This is a pure reflection/classpath-scan test
- * (no Spring context) that fails the build the moment a new endpoint is added without either,
- * instead of silently falling back to whatever {@code SecurityConfig.defaultChain()}'s default happens
- * to be.
+ * entry in {@link SecurityConfig#PUBLIC_ENDPOINTS} or {@link SecurityConfig#LOCAL_PUBLIC_ENDPOINTS}.
+ * This is a pure reflection/classpath-scan test (no Spring context, so {@code @Profile} is not
+ * evaluated) that fails the build the moment a new endpoint is added without either, instead of
+ * silently falling back to whatever {@code SecurityConfig.defaultChain()}'s default happens to be.
  */
 class EndpointAuthorizationCoverageTest {
 
@@ -66,7 +66,8 @@ class EndpointAuthorizationCoverageTest {
 
         assertThat(uncovered)
                 .as("These endpoints have neither a @PreAuthorize/@PostAuthorize/@Secured annotation "
-                        + "nor an entry in SecurityConfig.PUBLIC_ENDPOINTS. Add one or the other.")
+                        + "nor an entry in SecurityConfig.PUBLIC_ENDPOINTS or LOCAL_PUBLIC_ENDPOINTS. "
+                        + "Add one or the other.")
                 .isEmpty();
     }
 
@@ -161,7 +162,11 @@ class EndpointAuthorizationCoverageTest {
     }
 
     private static boolean isPublic(HttpMethod httpMethod, String path) {
-        List<String> patterns = SecurityConfig.PUBLIC_ENDPOINTS.get(httpMethod);
+        return matchesAny(SecurityConfig.PUBLIC_ENDPOINTS.get(httpMethod), path)
+                || matchesAny(SecurityConfig.LOCAL_PUBLIC_ENDPOINTS.get(httpMethod), path);
+    }
+
+    private static boolean matchesAny(List<String> patterns, String path) {
         return patterns != null && patterns.stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, path));
     }
 
