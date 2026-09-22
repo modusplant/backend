@@ -5,7 +5,8 @@ import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLin
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.exception.UnsupportedSocialProviderException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
@@ -14,16 +15,14 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 public class MemberSocialTranslator {
-    @Value("${spring.profiles.active}")
-    private String activeProfile;
-
     private boolean isLocal;
 
     private final SocialIdentityLinkController socialIdentityLinkController;
+    private final Environment environment;
 
     @PostConstruct
     public void initIsLocal() {
-        isLocal = activeProfile.equals("local");
+        isLocal = environment.acceptsProfiles(Profiles.of("local"));
     }
 
     public String getSocialAccessToken(String authCode, String authProvider) {

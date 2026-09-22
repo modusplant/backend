@@ -6,13 +6,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 import static kr.modusplant.infrastructure.jwt.constant.CookieName.REFRESH_TOKEN_COOKIE_NAME;
 import static kr.modusplant.infrastructure.jwt.constant.CookieName.TEMP_TOKEN_COOKIE_NAME;
 
 
 /**
  * JWT 쿠키 제공 Provider
- *
+ * <p>
  * 기능 : JWT를 쿠키로 제공
  */
 @Service
@@ -27,19 +29,18 @@ public class JwtCookieProvider {
                 .httpOnly(true)
                 .secure(true)
                 .path("/")
-                .maxAge(refreshDuration)
+                .maxAge(TimeUnit.MILLISECONDS.toSeconds(refreshDuration))
                 .sameSite("Lax")
                 .build();
         return refreshCookie.toString();
     }
 
     public String generateTempTokenCookieAsString(String tempToken, long durationMs) {
-
         ResponseCookie tempCookie = ResponseCookie.from(TEMP_TOKEN_COOKIE_NAME, tempToken)
                 .httpOnly(true)
                 .secure(true)
                 .path("/api/v1/auth")
-                .maxAge(durationMs)
+                .maxAge(TimeUnit.MILLISECONDS.toSeconds(durationMs))
                 .sameSite("Lax")
                 .build();
         return tempCookie.toString();
