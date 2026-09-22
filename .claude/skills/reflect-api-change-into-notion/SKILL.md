@@ -16,11 +16,10 @@ disallowed-tools: Write(/src/**) Edit(/src/**) Write(.claude/skills/reflect-api-
 
 # Target Classes
 
-- Primary: classes created, modified, or deleted since the previous session.
-- Fallback - 1: if no such classes exist, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and use its output instead.
-- Fallback - 2: if that also yields nothing, run `git diff --name-only HEAD~1 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and use its output instead.
-- Fallback - 3: if that also yields nothing, run `git diff --name-only HEAD~2 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and use its output instead.
-- Termination: if no result was found, terminate the skill immediately.
+- Primary: every `.java` class not yet pushed to the remote — the union of:
+  - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
+  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
+- Termination: if the union is empty, terminate the skill immediately.
 
 # Watched API Surface
 
@@ -74,7 +73,6 @@ no "what to change in Notion" language. One `##` block per changed class:
 
 Run ID: <RUN_ID>
 Detected At: <ISO 8601 timestamp>
-Target-Class Resolution: <Primary | Fallback-1 | Fallback-2 | Fallback-3>
 Target Classes: <comma-separated class simple names>
 
 ## <fully-qualified class name>

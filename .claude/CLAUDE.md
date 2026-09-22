@@ -67,7 +67,15 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
                #   outbound/redis    → Redis cache services
 ```
 
-Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comment`, `member`, `notification`, `post`, `search`, `term`.
+### Predefined Domain & Infrastructure Area Names
+
+- Domains: `email`, `identity`, `normal-identity`, `social-identity` (all part of the larger `account` domain), `comment`, `member`, `notification`, `post`, `search`, `term`.
+- Path mapping for the `account` domain, where the domain name differs from its directory name:
+  - `email` → `domains/account/email/`
+  - `identity` → `domains/account/identity/`
+  - `normal-identity` → `domains/account/normal/`
+  - `social-identity` → `domains/account/social/`
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `swear` (all under `infrastructure/<area>/`).
 
 ### Key Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
