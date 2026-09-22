@@ -1,9 +1,19 @@
 ---
 name: reflect-api-change-into-notion
 description: Detects API-relevant codebase changes in the member/comment/search domains and the security-related auth surface, then produces and applies Notion-ready edit instructions for the corresponding API-specification documents.
-allowed-tools: Write(.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/detected-change/**) Write(.claude/skills/reflect-api-change-into-notion/reflected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/reflected-change/**)
-disallowed-tools: Write(/src/**) Edit(/src/**) Write(.claude/skills/reflect-api-change-into-notion/SKILL.md) Edit(.claude/skills/reflect-api-change-into-notion/SKILL.md) Write(.claude/skills/reflect-api-change-into-notion/document-format.md) Edit(.claude/skills/reflect-api-change-into-notion/document-format.md)
 ---
+
+# Frontmatter Substitution
+
+- Allowed tools: `Write(.claude/skills/reflect-api-change-into-notion/detected-change/**)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/detected-change/**)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/reflected-change/**)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/reflected-change/**)`.
+- Disallowed tools: `Write(/src/**)`, `Edit(/src/**)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/SKILL.md)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/SKILL.md)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/document-format.md)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/document-format.md)`.
 
 # Preconditions
 
