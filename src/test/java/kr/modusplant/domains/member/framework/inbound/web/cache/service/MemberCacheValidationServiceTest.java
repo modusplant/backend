@@ -1,10 +1,9 @@
-package kr.modusplant.infrastructure.cache.service;
+package kr.modusplant.domains.member.framework.inbound.web.cache.service;
 
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
-import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;

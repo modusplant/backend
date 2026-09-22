@@ -1,8 +1,8 @@
 ---
 name: postprocess-main-code-change
 description: Runs the required post-processing workflow after code changes under src/main/ — single-domain tests, then doc reflection, then Notion API-spec reflection — strictly in this order.
-arguments: [DOMAIN_NAME]
-argument-hint: [domain-name]
+arguments: [AREA_NAME]
+argument-hint: [area-name]
 disable-model-invocation: true
 disallowed-tools: Write(/src/**) Edit(/src/**)
 ---
@@ -14,7 +14,7 @@ disallowed-tools: Write(/src/**) Edit(/src/**)
 
 # Workflow
 
-1. Invoke `test-single-domain` with `$DOMAIN_NAME`.
+1. Invoke `test-single-area` with `$AREA_NAME`.
 2. Invoke `reflect-code-change-into-document`.
 3. Invoke `reflect-api-change-into-notion`.
 
