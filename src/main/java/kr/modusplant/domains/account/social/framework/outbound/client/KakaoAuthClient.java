@@ -61,8 +61,8 @@ public class KakaoAuthClient implements SocialAuthClient {
 
         MultiValueMap<String,String> formData = new LinkedMultiValueMap<>();
         Map.of(
-                "code",code,
-                "client_id",KAKAO_API_KEY,
+                "code", code,
+                "client_id", KAKAO_API_KEY,
                 "redirect_uri", redirectUri,
                 "grant_type", "authorization_code"
         ).forEach(formData::add);
