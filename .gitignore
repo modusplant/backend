@@ -4,6 +4,7 @@
 /.claude/logs/
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/resolve-error-with-stack-trace/result
+/.claude/skills/visualize-docker-container-dependency/result
 /.claude/skills/write-portfolio/
 /.claude/skills/write-personal-statement/
 
