@@ -24,6 +24,8 @@
       "Bash(docker compose logs*)",
       "Bash(docker compose config -q)",
 
+      "Bash(python3 .claude/skills/visualize-docker-container-dependency/scripts/build_graph.py*)",
+
       "Edit(/.claude/logs/**)",
 
       "Read(/src/main/resources/application-local.yml)",
