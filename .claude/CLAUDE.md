@@ -102,4 +102,4 @@ Detailed working rules live under `.claude/`:
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
   - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
   - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
-- `.claude/skills/*/SKILL.md` — task workflows: `reflect-code-change-into-test`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `guide-docker-environment-configuration`, `resolve-error-with-stack-trace`, `report-performance-optimization`.
+- `.claude/skills/*/SKILL.md` — task workflows: `reflect-code-change-into-test`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `guide-docker-environment-configuration`, `resolve-error-with-stack-trace`, `report-performance-optimization`, `visualize-docker-container-dependency`.
