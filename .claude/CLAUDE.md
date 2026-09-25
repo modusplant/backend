@@ -67,7 +67,15 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
                #   outbound/redis    → Redis cache services
 ```
 
-Domains: `account` (sub-domains: `email`, `identity`, `normal`, `social`), `comment`, `member`, `notification`, `post`, `search`, `term`.
+### Predefined Domain & Infrastructure Area Names
+
+- Domains: `email`, `identity`, `normal-identity`, `social-identity` (all part of the larger `account` domain), `comment`, `member`, `notification`, `post`, `search`, `term`.
+- Path mapping for the `account` domain, where the domain name differs from its directory name:
+  - `email` → `domains/account/email/`
+  - `identity` → `domains/account/identity/`
+  - `normal-identity` → `domains/account/normal/`
+  - `social-identity` → `domains/account/social/`
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `swear` (all under `infrastructure/<area>/`).
 
 ### Key Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
@@ -89,8 +97,9 @@ Detailed working rules live under `.claude/`:
 
 - `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
 - `.claude/documents/*.md` — on-demand reference docs: 
-  - per-domain test features (`test-domain-<domain>-feature.md`, consumed by the `test-single-domain` skill)
-  - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; referenced directly from `test-architecture-details.md`, not consumed by `test-single-domain`)
+  - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `reflect-code-change-into-test` skill)
+  - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; also referenced directly from `test-architecture-details.md`)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
   - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
-- `.claude/skills/*/SKILL.md` — task workflows: `test-single-domain`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `configure-docker-environment`, `resolve-error-with-stack-trace`, `report-performance-optimization`.
+  - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
+- `.claude/skills/*/SKILL.md` — task workflows: `reflect-code-change-into-test`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `guide-docker-environment-configuration`, `resolve-error-with-stack-trace`, `report-performance-optimization`, `visualize-docker-container-dependency`.

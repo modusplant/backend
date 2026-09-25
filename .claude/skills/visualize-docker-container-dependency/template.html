@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Docker depends_on Tree</title>
+<style>
+  body { margin: 0; padding: 24px; font-family: Helvetica, Arial, sans-serif; color: #263238; background: #ffffff; }
+  h1 { margin: 0 0 4px; font-size: 20px; }
+  .meta { margin: 0 0 16px; color: #607d8b; font-size: 13px; }
+  .graph { overflow: auto; border: 1px solid #cfd8dc; border-radius: 8px; padding: 12px; }
+  .graph svg { max-width: 100%; height: auto; }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px 0; font-size: 13px; }
+  .legend span::before { content: ""; display: inline-block; width: 28px; margin-right: 6px; vertical-align: middle; border-top-width: 2px; }
+  .healthy::before { border-top: 2px solid #2e7d32; }
+  .completed::before { border-top: 3px solid #1565c0; }
+  .started::before { border-top: 2px dashed #424242; }
+  .optional::before { border-top: 2px solid #9e9e9e; }
+  .undefined::before { border-top: 2px dashed #c62828; }
+  h2 { font-size: 15px; margin: 16px 0 6px; }
+  ul { margin: 0; padding-left: 20px; font-size: 13px; }
+</style>
+</head>
+<body>
+<h1>Docker depends_on Tree</h1>
+<p class="meta">Generated {{GENERATED_AT}} · {{SUMMARY}} · Arrow direction: dependent → dependency</p>
+<div class="legend">
+  <span class="healthy">service_healthy</span>
+  <span class="completed">service_completed_successfully</span>
+  <span class="started">service_started</span>
+  <span class="optional">required: false</span>
+  <span class="undefined">undefined target</span>
+</div>
+<div class="graph">{{SVG}}</div>
+<h2>Warnings</h2>
+<ul>{{WARNINGS}}</ul>
+</body>
+</html>

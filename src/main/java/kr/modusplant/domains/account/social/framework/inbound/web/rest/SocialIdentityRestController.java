@@ -62,7 +62,7 @@ public class SocialIdentityRestController {
             }
             case SocialPendingResult pending -> {
                 String tempToken = tempTokenHelper.generateTempToken(pending, durationMs);
-                cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken,durationMs);
+                cookie = jwtCookieProvider.generateTempTokenCookieAsString(tempToken, durationMs);
                 loginResponse = switch (pending) {
                     case NeedSignupResult r -> SocialLoginResponse.needSignup(r.email(), r.nickname());
                     case NeedLinkResult r -> SocialLoginResponse.needLink(r.email(), r.nickname());

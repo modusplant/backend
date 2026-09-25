@@ -1,6 +1,7 @@
 package kr.modusplant.domains.account.social.framework.inbound.web.rest;
 
 import kr.modusplant.domains.account.social.adapter.controller.SocialIdentityLinkAdminController;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,12 +10,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
+import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class SocialIdentityLinkAdminRestControllerTest {
+    @SuppressWarnings("unused")
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
+
     private final SocialIdentityLinkAdminController adminController = Mockito.mock(SocialIdentityLinkAdminController.class);
     private final SocialIdentityLinkAdminRestController adminRestController = new SocialIdentityLinkAdminRestController(adminController);
     

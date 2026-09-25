@@ -2,11 +2,11 @@
   "permissions": {
     "defaultMode": "plan",
     "allow": [
-      "Bash(./gradlew build*)",
-      "Bash(./gradlew bootRun*)",
-      "Bash(./gradlew test*)",
-      "Bash(./gradlew --version)",
-      "Bash(./gradlew compileJava*)",
+      "Bash(/gradlew build*)",
+      "Bash(/gradlew bootRun*)",
+      "Bash(/gradlew test*)",
+      "Bash(/gradlew --version)",
+      "Bash(/gradlew compileJava*)",
 
       "Bash(rm -rf ./build/test-results/**)",
 
@@ -22,7 +22,9 @@
       "Bash(docker compose ps*)",
       "Bash(docker compose ls*)",
       "Bash(docker compose logs*)",
-      "Bash(docker compose config*)",
+      "Bash(docker compose config -q)",
+
+      "Bash(python3 .claude/skills/visualize-docker-container-dependency/scripts/build_graph.py*)",
 
       "Edit(/.claude/logs/**)",
 
@@ -39,6 +41,8 @@
       "Bash(rm -rf **/src/**)",
 
       "Bash(git push*)",
+
+      "Bash(docker compose config)",
 
       "Read(/.gradle/**)",
       "Read(/.idea/**)",

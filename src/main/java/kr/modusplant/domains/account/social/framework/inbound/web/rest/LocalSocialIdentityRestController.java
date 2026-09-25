@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Validated
-@Profile({"local", "dev"})
+@Profile({"local"})
 public class LocalSocialIdentityRestController {
 
     private final SocialIdentityController socialIdentityController;

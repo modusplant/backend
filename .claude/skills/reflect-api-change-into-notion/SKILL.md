@@ -1,26 +1,35 @@
 ---
 name: reflect-api-change-into-notion
 description: Detects API-relevant codebase changes in the member/comment/search domains and the security-related auth surface, then produces and applies Notion-ready edit instructions for the corresponding API-specification documents.
-disable-model-invocation: true
-allowed-tools: Write(.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/detected-change/**) Write(.claude/skills/reflect-api-change-into-notion/reflected-change/**) Edit(.claude/skills/reflect-api-change-into-notion/reflected-change/**)
-disallowed-tools: Write(/src/**) Edit(/src/**) Write(.claude/skills/reflect-api-change-into-notion/SKILL.md) Edit(.claude/skills/reflect-api-change-into-notion/SKILL.md) Write(.claude/skills/reflect-api-change-into-notion/document-format.md) Edit(.claude/skills/reflect-api-change-into-notion/document-format.md)
 ---
+
+# Frontmatter Substitution
+
+- Allowed tools: `Write(.claude/skills/reflect-api-change-into-notion/detected-change/**)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/detected-change/**)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/reflected-change/**)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/reflected-change/**)`,
+  `Bash(rm .claude/skills/reflect-api-change-into-notion/detected-change/detected_*.md)`.
+- Disallowed tools: `Write(/src/**)`, `Edit(/src/**)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/SKILL.md)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/SKILL.md)`,
+  `Write(.claude/skills/reflect-api-change-into-notion/document-format.md)`,
+  `Edit(.claude/skills/reflect-api-change-into-notion/document-format.md)`.
 
 # Preconditions
 
 - This skill only reads source under `src/main/java/` and only writes under its own
   `detected-change/` and `reflected-change/` subdirectories, plus Notion pages via the Notion MCP
-  tools. It never edits application code.
+  tools.
 - `@.claude/skills/reflect-api-change-into-notion/document-format.md` is the finalized, canonical
   Notion page shape. Treat it as read-only — only reference it when composing `## Notion Content` blocks below.
 
 # Target Classes
 
-- Primary: classes created, modified, or deleted since the previous session.
-- Fallback - 1: if no such classes exist, run `git status --porcelain | awk '{print $NF}' | grep '\.java$'` and use its output instead.
-- Fallback - 2: if that also yields nothing, run `git diff --name-only HEAD~1 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and use its output instead.
-- Fallback - 3: if that also yields nothing, run `git diff --name-only HEAD~2 HEAD | grep '\.java$' | awk -F/ '{print $NF}' | sed 's/\.java$//'` and use its output instead.
-- Termination: if no result was found, terminate the skill immediately.
+- Primary: every `.java` class not yet pushed to the remote — the union of:
+  - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
+  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
+- Termination: if the union is empty, terminate the skill immediately.
 
 # Watched API Surface
 
@@ -63,7 +72,8 @@ Cross-cutting (applies to every row above, not owned by a single one):
 # Detected-Change File Format
 
 Path: `detected-change/detected_<RUN_ID>.md`, where `RUN_ID = YYYYMMDD_HHmmss` (from `date +%Y%m%d_%H%M%S`
-at the moment the run starts). Files accumulate — never overwrite a prior run's file. On a
+at the moment the run starts). Files accumulate — never overwrite a prior run's file — except for
+the same-run pruning and discard defined in the Workflow section's Coverage Check step. On a
 same-second collision, append `_2`, `_3`, ... to `RUN_ID`.
 
 Content is **pure codebase fact** — no Notion database/page names, no target-format vocabulary,
@@ -74,7 +84,6 @@ no "what to change in Notion" language. One `##` block per changed class:
 
 Run ID: <RUN_ID>
 Detected At: <ISO 8601 timestamp>
-Target-Class Resolution: <Primary | Fallback-1 | Fallback-2 | Fallback-3>
 Target Classes: <comma-separated class simple names>
 
 ## <fully-qualified class name>
@@ -89,7 +98,9 @@ Target Classes: <comma-separated class simple names>
   <short excerpt, only the lines the facts above refer to>
   ```
 
-Necessary-only: omit any class/section with no actual change; never restate unchanged facts.
+Necessary-only: omit any class/section with no actual change; never restate unchanged facts. A
+class section present at initial write may still be removed afterward by the Workflow's Coverage
+Check step, once it's confirmed to have zero Notion-observable impact.
 
 # Reflected-Change File Format
 
@@ -97,7 +108,9 @@ Path: `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md` — one file per No
 `<RUN_ID>` **must equal** the `detected-change` file's `RUN_ID` it was derived from — this is the
 only linkage between the two directories. Never derive a reflected-change file from any `detected-change` 
 file other than the one matching its own `RUN_ID`, and never apply to Notion a reflected-change file 
-that isn't the latest for its `<db-slug>__<page-slug>` pair.
+that isn't the latest for its `<db-slug>__<page-slug>` pair. Every `## Provenance` entry must name
+its source class by fully-qualified name — the Workflow's Coverage Check step checks per-class
+coverage against these citations.
 
 ```markdown
 # Reflected Notion Change — <RUN_ID>
@@ -119,7 +132,7 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 ## Provenance
 
-- <each fact above> ← detected-change fact: <the specific bullet it came from>
+- <each fact above> ← `<fully-qualified class name>`: <the specific bullet it came from>
 ```
 
 # Workflow
@@ -129,7 +142,14 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 3. For every Notion page touched by those classes (per the mapping table), write one
    `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md`, derived only from the detected-change
    file just written in step 2.
-4. For each affected page, take its latest reflected-change file by `RUN_ID` and apply it per the
+4. Coverage Check — for every class section (`##` block) in the detected-change file, check
+   whether any reflected-change file written in step 3 cites that class's fully-qualified name in
+   its `## Provenance`:
+   - A class section with zero citations produced no Notion-observable change this run: edit it
+     out of the detected-change file and drop the class from the file's `Target Classes` line.
+   - If this empties the detected-change file of every class section, delete the file via the
+     scoped `rm` and terminate the run — do not proceed to step 5.
+5. For each affected page, take its latest reflected-change file by `RUN_ID` and apply it per the
    "Notion Update Procedure" below.
 
 # Notion Update Procedure
@@ -147,6 +167,10 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 # Hard Constraints
 
+- Never invoke this skill on your own initiative; only run it when invoked by
+  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.
+- Coverage is enforced per Workflow step 4: every class section in a detected-change file must be
+  traceable, by fully-qualified name, to a reflected-change file's Provenance.
 - English-only in this skill's own files; Korean is permitted only where a literal string must
   round-trip exactly into/out of Notion (headings, column names, `필수`/`선택`, example values).
 - Never fabricate a fact not present in the actual source code or the current Notion page content.
@@ -154,6 +178,4 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
   follows its exact schema above — consistency is required within each directory, not across them.
 - Every reflected-change file is self-contained: it must be understandable and appliable without
   re-reading the detected-change file, beyond citing it for provenance.
-- Scope is limited to the 6 databases and the domains/packages named in the mapping table above —
-  never extend to `domains/post`, `domains/notification`, `domains/term`, or
-  `domains/account/social/**`.
+- Scope is limited to the 6 databases and domains/packages named in the "Codebase → Notion Mapping" table.
