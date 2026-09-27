@@ -1,11 +1,8 @@
 ---
 name: reflect-code-change-into-document
 description: This skill applies the follow-up actions required in response to code changes.
+disallowed-tools: Edit(/src/**)
 ---
-
-# Frontmatter Substitution
-
-- Disallowed tools: `Write(/src/**)`, `Edit(/src/**)`.
 
 # Detailed Action Items
 

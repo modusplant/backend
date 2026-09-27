@@ -2,7 +2,6 @@
 name: postprocess-main-code-change
 description: Runs the required post-processing workflow after code changes under src/main/ — per-area batched tests, then doc reflection, then Notion API-spec reflection — strictly in this order.
 disable-model-invocation: true
-disallowed-tools: Write(/src/**) Edit(/src/**)
 ---
 
 # Preconditions
