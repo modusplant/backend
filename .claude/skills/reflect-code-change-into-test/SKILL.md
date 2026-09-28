@@ -1,11 +1,8 @@
 ---
 name: reflect-code-change-into-test
 description: This file provides strict guidance on creating, modifying, and deleting tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
+disallowed-tools: Edit(/src/main/**)
 ---
-
-# Frontmatter Substitution
-
-- Disallowed tools: `Write(/src/main/**)`, `Edit(/src/main/**)`.
 
 # Target Classes
 

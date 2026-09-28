@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notion API Reflection Workflow</title>
+<style>
+  /* ===== shared workflow-diagram block (keep identical across skills) ===== */
+  :root {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-alt: #f9fafb;
+    --border: #dfe3e8;
+    --text: #1f2430;
+    --text-muted: #5c6470;
+    --accent: #2f6fed;
+    --accent-soft: #eaf1ff;
+    --read: #2f6fed;
+    --read-soft: #eaf1ff;
+    --write: #1f8a4c;
+    --write-soft: #e6f5ec;
+    --ext: #8a4fd6;
+    --ext-soft: #f2eafd;
+    --stop: #c73a3a;
+    --stop-soft: #fdecec;
+    --branch: #b7791f;
+    --branch-soft: #fdf4e3;
+    --line: #c3cad4;
+    --code-bg: #eef0f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161c;
+      --surface: #1b1e27;
+      --surface-alt: #20242f;
+      --border: #2c303c;
+      --text: #e7e9ee;
+      --text-muted: #9aa1ad;
+      --accent: #6c9bff;
+      --accent-soft: #202b45;
+      --read: #6c9bff;
+      --read-soft: #1d2740;
+      --write: #4dc37f;
+      --write-soft: #173024;
+      --ext: #b48cff;
+      --ext-soft: #2a2140;
+      --stop: #ef6a6a;
+      --stop-soft: #3a1c1f;
+      --branch: #e0a542;
+      --branch-soft: #33280f;
+      --line: #3a4050;
+      --code-bg: #262a36;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161c; --surface: #1b1e27; --surface-alt: #20242f; --border: #2c303c;
+    --text: #e7e9ee; --text-muted: #9aa1ad; --accent: #6c9bff; --accent-soft: #202b45;
+    --read: #6c9bff; --read-soft: #1d2740; --write: #4dc37f; --write-soft: #173024;
+    --ext: #b48cff; --ext-soft: #2a2140; --stop: #ef6a6a; --stop-soft: #3a1c1f;
+    --branch: #e0a542; --branch-soft: #33280f; --line: #3a4050; --code-bg: #262a36;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--bg); }
+  body {
+    margin: 0 auto; padding: 32px 16px 40px; max-width: 920px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Helvetica, Arial, sans-serif;
+    font-size: 15px; line-height: 1.55; color: var(--text); background: var(--bg);
+  }
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em;
+    background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere;
+  }
+  .page-head { margin-bottom: 20px; }
+  .page-head .kicker { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); }
+  .page-head h1 { margin: 4px 0 6px; font-size: 24px; line-height: 1.25; }
+  .page-head .role { margin: 0 0 10px; font-size: 16px; color: var(--text); }
+  .page-head .source { margin: 0; font-size: 13px; color: var(--text-muted); }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 0 0 24px; padding: 10px 14px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px; font-size: 13px; color: var(--text-muted);
+  }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+  .legend .l-step { background: var(--accent); border-radius: 50%; }
+  .legend .l-read { background: var(--read-soft); border: 2px solid var(--read); }
+  .legend .l-write { background: var(--write-soft); border: 2px solid var(--write); }
+  .legend .l-ext { background: var(--ext-soft); border: 2px solid var(--ext); }
+  .legend .l-stop { background: var(--stop-soft); border: 2px solid var(--stop); }
+  .legend .l-branch { background: var(--branch-soft); border: 2px solid var(--branch); }
+  .legend .l-loop { border: 2px dashed var(--text-muted); }
+
+  .flow { list-style: none; margin: 0; padding: 0; }
+  .step { position: relative; padding: 0 0 22px 52px; }
+  .step::before {
+    content: ""; position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: var(--line);
+  }
+  .flow > .step:last-child { padding-bottom: 0; }
+  .flow > .step:last-child::before { display: none; }
+  .badge {
+    position: absolute; left: 0; top: 0; width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent); color: #fff; font-weight: 700; font-size: 15px;
+  }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px 14px; }
+  .card h3 { margin: 4px 0 4px; font-size: 17px; line-height: 1.3; }
+  .card > p { margin: 0 0 8px; color: var(--text-muted); }
+  .card > p:last-child { margin-bottom: 0; }
+
+  .docs { display: flex; flex-direction: column; gap: 6px; margin: 10px 0 0; }
+  .doc {
+    display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: baseline;
+    padding: 7px 10px; border-radius: 8px; border-left: 4px solid; font-size: 13.5px;
+  }
+  .doc .tag { font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .doc .path { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; overflow-wrap: anywhere; }
+  .doc .what { grid-column: 2; color: var(--text-muted); }
+  .doc.read { background: var(--read-soft); border-color: var(--read); }
+  .doc.read .tag { color: var(--read); }
+  .doc.write { background: var(--write-soft); border-color: var(--write); }
+  .doc.write .tag { color: var(--write); }
+  .doc.ext { background: var(--ext-soft); border-color: var(--ext); }
+  .doc.ext .tag { color: var(--ext); }
+
+  .stop, .branch, .note {
+    margin: 10px 0 0; padding: 8px 12px; border-radius: 8px; font-size: 14px; border: 1px solid;
+  }
+  .stop { background: var(--stop-soft); border-color: var(--stop); }
+  .stop::before { content: "■ Terminate — "; font-weight: 700; color: var(--stop); }
+  .stop.skip::before { content: "■ Skip — "; }
+  .branch { background: var(--branch-soft); border-color: var(--branch); }
+  .branch > strong:first-child { color: var(--branch); }
+  .branch ol, .branch ul { margin: 6px 0 0; padding-left: 20px; }
+  .branch li { margin: 2px 0; }
+  .note { background: var(--surface-alt); border-color: var(--border); color: var(--text-muted); }
+
+  .loop {
+    position: relative; margin: 0 0 22px 0; padding: 30px 14px 14px; border: 2px dashed var(--line); border-radius: 14px;
+  }
+  .loop > .loop-label {
+    position: absolute; top: -12px; left: 14px; padding: 2px 10px; border-radius: 999px;
+    background: var(--bg); border: 2px dashed var(--line); font-size: 13px; font-weight: 600; color: var(--text-muted);
+  }
+  .loop + .step, .flow > .loop:last-child { margin-bottom: 0; }
+
+  details.more { margin: 10px 0 0; }
+  details.more summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--accent); }
+  table.mini { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 13.5px; }
+  table.mini th, table.mini td { text-align: left; padding: 5px 8px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.mini th { color: var(--text-muted); font-weight: 600; }
+  .table-wrap { overflow-x: auto; }
+
+  .page-foot { margin-top: 28px; padding-top: 14px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-muted); }
+  .page-foot h2 { margin: 0 0 6px; font-size: 14px; color: var(--text); }
+  .page-foot ul { margin: 0; padding-left: 20px; }
+
+  html.embedded body { padding: 16px 16px 20px; max-width: none; }
+  html.embedded .legend, html.embedded .page-foot, html.embedded .page-head .source { display: none; }
+  html.embedded .page-head h1 { font-size: 20px; }
+
+  @media (max-width: 520px) {
+    body { font-size: 14.5px; }
+    .step { padding-left: 44px; }
+    .step::before { left: 14px; top: 30px; }
+    .badge { width: 30px; height: 30px; font-size: 14px; }
+    .doc { grid-template-columns: 1fr; }
+    .doc .what { grid-column: 1; }
+    .loop { padding: 28px 10px 10px; }
+  }
+  /* ===== end shared block ===== */
+</style>
+</head>
+<body>
+<header class="page-head">
+  <p class="kicker">Skill workflow</p>
+  <h1>reflect-api-change-into-notion</h1>
+  <p class="role">Detects API-relevant changes in the member, comment, and search domains and in the auth surface, then writes and applies edits to the matching Notion API-spec pages.</p>
+  <p class="source">Skill file: <code>.claude/skills/reflect-api-change-into-notion/SKILL.md</code>. That file is the source of truth; this page is a human-oriented view of it.</p>
+</header>
+
+<div class="legend" aria-label="Legend">
+  <span><i class="l-step"></i>Step, in run order</span>
+  <span><i class="l-read"></i>Document read</span>
+  <span><i class="l-write"></i>File written</span>
+  <span><i class="l-ext"></i>External system</span>
+  <span><i class="l-stop"></i>Terminate or skip</span>
+  <span><i class="l-branch"></i>Branch or fallback</span>
+  <span><i class="l-loop"></i>Repeated per item</span>
+</div>
+
+<ol class="flow">
+  <li class="step">
+    <span class="badge">1</span>
+    <div class="card">
+      <h3>Resolve Target Classes</h3>
+      <p>Collect every <code>.java</code> class not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
+      <div class="stop">The combined list is empty.</div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">2</span>
+    <div class="card">
+      <h3>Filter to the watched API surface</h3>
+      <p>Keep only classes listed in the skill's <em>Codebase → Notion Mapping</em> table: REST controllers, responses, adapter controllers, aggregates, entities, VOs, ErrorCodes, and <code>SecurityConfig</code>. Everything else is dropped, e.g. <code>domains/post/**</code>, <code>domains/notification/**</code>, and <code>domains/account/social/**</code>.</p>
+      <div class="docs">
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/SKILL.md</span><span class="what">"Codebase → Notion Mapping" table: which classes feed which Notion database.</span></div>
+      </div>
+      <details class="more">
+        <summary>Watched Notion databases (6)</summary>
+        <div class="table-wrap">
+          <table class="mini">
+            <thead><tr><th>Notion DB (under <code>API 명세</code>)</th><th>db-slug</th><th>REST controller</th></tr></thead>
+            <tbody>
+              <tr><td><code>회원 API</code></td><td><code>member-api</code></td><td><code>MemberRestController</code></td></tr>
+              <tr><td><code>어드민 API</code></td><td><code>admin-api</code></td><td><code>MemberAdminRestController</code></td></tr>
+              <tr><td><code>소통 댓글 API</code></td><td><code>comment-api</code></td><td><code>CommentRestController</code></td></tr>
+              <tr><td><code>검색 API</code></td><td><code>search-api</code></td><td><code>SearchRestController</code></td></tr>
+              <tr><td><code>인증 인가 API(일반과 소셜에 국한되지 않음)</code></td><td><code>auth-common-api</code></td><td><code>IdentityRestController</code></td></tr>
+              <tr><td><code>일반 인증 인가 API</code></td><td><code>auth-normal-api</code></td><td><code>NormalIdentityRestController</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+      <div class="stop">No classes remain. The dropped classes are reported with reasons, and no file is written.</div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">3</span>
+    <div class="card">
+      <h3>Write the detected-change file</h3>
+      <p>Write one file per run, with one section per remaining class. It holds <strong>pure codebase facts</strong>: change kind, layer, facts, and a code excerpt. Notion vocabulary is not allowed. <code>RUN_ID</code> = <code>YYYYMMDD_HHmmss</code> at run start. Files from earlier runs are kept.</p>
+      <div class="docs">
+        <div class="doc write"><span class="tag">Write</span><span class="path">.claude/skills/reflect-api-change-into-notion/detected-change/detected_&lt;RUN_ID&gt;.md</span><span class="what">What changed in the code this run.</span></div>
+      </div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">4</span>
+    <div class="card">
+      <h3>Write reflected-change files, one per Notion page</h3>
+      <p>For each affected Notion page, derive the exact Notion content to add or replace, using <em>only</em> the detected-change file with the same <code>RUN_ID</code>. Every fact cites its source class in <code>## Provenance</code>.</p>
+      <div class="docs">
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/detected-change/detected_&lt;RUN_ID&gt;.md</span><span class="what">The only allowed input: the file written in step 3.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/document-format.md</span><span class="what">Canonical Notion page shape: headings, table columns, and <code>필수</code>/<code>선택</code> wording.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">src/main/java/kr/modusplant/infrastructure/security/config/SecurityConfig.java</span><span class="what">Source of truth for every endpoint's <code>## 인증</code> value, across all 6 databases.</span></div>
+        <div class="doc write"><span class="tag">Write</span><span class="path">.claude/skills/reflect-api-change-into-notion/reflected-change/&lt;RUN_ID&gt;__&lt;db-slug&gt;__&lt;page-slug&gt;.md</span><span class="what">Self-contained, Notion-ready edit for one page.</span></div>
+      </div>
+      <div class="note">The shared <code>RUN_ID</code> is the only link between a <code>detected-change/</code> file and its <code>reflected-change/</code> files.</div>
+      <details class="more">
+        <summary>How <code>## 인증</code> is derived</summary>
+        <div class="branch">
+          <ol>
+            <li>In <code>PUBLIC_ENDPOINTS</code>, and the handler still reads <code>@AuthenticationPrincipal</code> for optional personalization → <code>&gt; **선택(Optional)**</code></li>
+            <li>In <code>PUBLIC_ENDPOINTS</code>, with no optional read → omit <code>## 인증</code></li>
+            <li>Otherwise (<code>anyRequest().authenticated()</code>) → <code>&gt; **필수(Required)**</code></li>
+            <li>Also under <code>/api/admin/**</code> → note the extra <code>ADMIN</code> authority</li>
+          </ol>
+        </div>
+      </details>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">5</span>
+    <div class="card">
+      <h3>Coverage Check</h3>
+      <p>For each class section in the detected-change file, check that at least one reflected-change file cites that class by fully qualified name in its <code>## Provenance</code>.</p>
+      <div class="branch"><strong>A class with zero citations</strong> had no visible effect on Notion. It is removed from the detected-change file and from its <code>Target Classes</code> line.</div>
+      <div class="stop">The detected-change file is now empty. It is deleted via the scoped <code>rm</code>, and nothing is applied to Notion.</div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">6</span>
+    <div class="card">
+      <h3>Apply to Notion</h3>
+      <p>For each affected page, take its <strong>latest</strong> reflected-change file by <code>RUN_ID</code>. Search the named database for the page, fetch its current content, then insert or replace only what <code>## Notion Content</code> specifies. Nothing else on the page is changed.</p>
+      <div class="docs">
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/reflected-change/&lt;RUN_ID&gt;__&lt;db-slug&gt;__&lt;page-slug&gt;.md</span><span class="what">The edit to apply, plus any exception in its <code>Note:</code> field.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/document-format.md</span><span class="what">Skeleton order and Reconciliation Rules for where the content goes.</span></div>
+        <div class="doc ext"><span class="tag">Notion MCP</span><span class="path">API 명세 › &lt;Notion DB&gt; › &lt;page&gt;</span><span class="what">The live API-spec page: found by search, fetched first, then edited.</span></div>
+      </div>
+    </div>
+  </li>
+</ol>
+
+<footer class="page-foot">
+  <h2>Guardrails</h2>
+  <ul>
+    <li>Runs only when invoked by <code>.claude/skills/postprocess-main-code-change/SKILL.md</code>, never on its own initiative.</li>
+    <li>Writes only under its own <code>detected-change/</code> and <code>reflected-change/</code> directories, plus Notion pages. Its <code>SKILL.md</code> and <code>document-format.md</code> are read-only.</li>
+    <li>Every fact written to Notion must trace back through <code>## Provenance</code> to the actual source code. No fact is ever invented.</li>
+  </ul>
+</footer>
+
+<script>
+  (function () {
+    if (window.self === window.top) return;
+    document.documentElement.classList.add('embedded');
+    function send() {
+      window.parent.postMessage({ type: 'wf-height', h: Math.ceil(document.body.getBoundingClientRect().height) }, '*');
+    }
+    window.addEventListener('load', send);
+    document.addEventListener('toggle', send, true);
+    if ('ResizeObserver' in window) new ResizeObserver(send).observe(document.body);
+  })();
+</script>
+</body>
+</html>

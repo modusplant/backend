@@ -1,11 +1,8 @@
 ---
 name: reflect-code-change-into-document
 description: This skill applies the follow-up actions required in response to code changes.
+disallowed-tools: Edit(/src/**)
 ---
-
-# Frontmatter Substitution
-
-- Disallowed tools: `Write(/src/**)`, `Edit(/src/**)`.
 
 # Detailed Action Items
 
@@ -26,7 +23,7 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md, plus any file under @.claude/documents/ or @.claude/rules/ relevant to that area.
 - Not associated with any domain:
   - Docker-related (e.g. @docker-compose.yml): @.claude/skills/guide-docker-environment-configuration/SKILL.md only.
-  - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/rules/observability-tagging-details.md only.
+  - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/documents/observability-tagging-architecture.md only.
 
 # Update Strategy
 

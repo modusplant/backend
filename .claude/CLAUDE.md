@@ -103,3 +103,8 @@ Detailed working rules live under `.claude/`:
   - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
   - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
 - `.claude/skills/*/SKILL.md` — task workflows: `reflect-code-change-into-test`, `reflect-code-change-into-document`, `reflect-api-change-into-notion`, `postprocess-main-code-change`, `guide-docker-environment-configuration`, `resolve-error-with-stack-trace`, `report-performance-optimization`, `visualize-docker-container-dependency`.
+- `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md` (present for `postprocess-main-code-change` and its three invoked skills; the `postprocess-main-code-change` one embeds the other three). Never read it — `SKILL.md` is canonical.
+
+## Precaution
+
+- **Accumulated:** During a turn, `allowed-tools` / `disallowed-tools` will be accumulated as the skill invokes other skills, which may cause unexpected permission errors.
