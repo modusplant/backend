@@ -2,6 +2,8 @@ package kr.modusplant.shared.kernel;
 
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,6 +23,8 @@ public class Nickname {
             throw new EmptyValueException(KernelErrorCode.EMPTY_NICKNAME, "nickname");
         } else if (!PATTERN_NICKNAME.matcher(value).matches()) {
             throw new InvalidValueException(KernelErrorCode.INVALID_NICKNAME_FORMAT, "nickname");
+        } else if (SwearHolder.getStaticSwearWords().stream().anyMatch(value::contains)) {
+            throw new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname");
         }
         return new Nickname(value);
     }

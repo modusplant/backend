@@ -7,6 +7,8 @@ import kr.modusplant.domains.account.normal.common.util.usecase.request.Password
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class NormalIdentityRestControllerTest implements
         RefreshTokenEntityTestUtils, NormalSignUpRequestTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
     private final NormalIdentityController controller = Mockito.mock(NormalIdentityController.class);
     private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();

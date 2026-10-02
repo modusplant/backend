@@ -1,12 +1,12 @@
-package kr.modusplant.infrastructure.swear.enums;
+package kr.modusplant.shared.enums;
 
 import lombok.Getter;
 
 @Getter
 public enum SwearType {
-    SEXUAL("sexual"),
+    GENERAL("general"),
     FAMILY("family"),
-    GENERAL("general");
+    SEXUAL("sexual");
 
     private final String value;
 

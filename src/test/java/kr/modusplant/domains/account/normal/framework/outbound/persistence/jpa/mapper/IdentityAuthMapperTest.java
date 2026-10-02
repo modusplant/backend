@@ -5,6 +5,8 @@ import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.Memb
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.MemberTermEntityTestUtils;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,6 +18,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class IdentityAuthMapperTest implements MemberAuthEntityTestUtils,
         MemberEntityTestUtils, MemberTermEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final NormalIdentityAuthJpaMapper mapper = new NormalIdentityAuthJpaMapperImpl();
 
     @Test
