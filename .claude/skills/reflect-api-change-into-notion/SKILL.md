@@ -15,10 +15,15 @@ disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) 
 
 # Target Classes
 
-- Primary: every `.java` class not yet pushed to the remote — the union of:
-  - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
-  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
-- Termination: if the union is empty, terminate the skill immediately.
+- Primary: every `.java` class under `src/main/java/` not yet pushed to the remote — the union of:
+  - uncommitted changes: `git status --porcelain -- 'src/main/java/*.java'` (staged, unstaged, and untracked)
+  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- 'src/main/java/*.java'`
+- Affected: every `src/main/java/` class that uses a Primary class (found per Primary class with
+  `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose API-observable behavior the
+  change reaches — e.g. a new exception now thrown through it. A deleted Primary class is searched
+  by its old name, and the lookup runs before the Watched API Surface filter, so a Primary class
+  outside the mapping table still seeds it. Affected classes are Target Classes too.
+- Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Watched API Surface
 
@@ -77,7 +82,7 @@ Target Classes: <comma-separated class simple names>
 
 ## <fully-qualified class name>
 
-- Change Kind: <Added | Modified | Deleted | Pre-existing gap (not a code change)>
+- Change Kind: <Added | Modified | Deleted | Affected (uses a changed class) | Pre-existing gap (not a code change)>
 - Layer: <RestController | Response | Controller | Aggregate | Entity | VO | ErrorCode | SecurityConfig>
 - Domain/Package: <e.g. domains.comment>
 - Facts:
