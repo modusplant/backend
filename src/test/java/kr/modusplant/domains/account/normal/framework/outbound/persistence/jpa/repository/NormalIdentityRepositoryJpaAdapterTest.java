@@ -16,6 +16,8 @@ import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.Memb
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
 import kr.modusplant.domains.term.framework.outbound.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +34,9 @@ import static org.mockito.Mockito.times;
 
 public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestUtils,
         MemberAuthEntityTestUtils, MemberTermEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberAuthJpaRepository authJpaRepository = Mockito.mock(MemberAuthJpaRepository.class);
     private final MemberTermJpaRepository termJpaRepository = Mockito.mock(MemberTermJpaRepository.class);

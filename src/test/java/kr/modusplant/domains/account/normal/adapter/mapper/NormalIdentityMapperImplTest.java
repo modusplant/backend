@@ -5,6 +5,8 @@ import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTest
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityMapperImplTest implements NormalCredentialsTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
     private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl(encoder);

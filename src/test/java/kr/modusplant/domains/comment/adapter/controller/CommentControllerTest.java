@@ -19,9 +19,9 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
-import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import org.junit.jupiter.api.DisplayName;
@@ -55,10 +55,10 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     private final CommentCommandRepository commandRepository = Mockito.mock(CommentCommandRepository.class);
     private final CommentCacheRepository cacheRepository = Mockito.mock(CommentCacheRepository.class);
     private final CommentValidationHelper validationHelper = Mockito.mock(CommentValidationHelper.class);
-    private final SwearService swearService = Mockito.mock(SwearService.class);
+    private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
     private final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, queryRepository,
-            commandRepository, cacheRepository, validationHelper, swearService, publisher);
+            commandRepository, cacheRepository, validationHelper, swearHolder, publisher);
 
     // ---------- gatherByPost ----------
 
@@ -212,7 +212,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearService.filterSwear(content)).willReturn(content);
+        given(swearHolder.filterSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -238,7 +238,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
-        given(swearService.filterSwear(content)).willReturn(content);
+        given(swearHolder.filterSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -257,13 +257,13 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", rawContent);
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearService.filterSwear(rawContent)).willReturn(filteredContent);
+        given(swearHolder.filterSwear(rawContent)).willReturn(filteredContent);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(swearService).should(times(1)).filterSwear(rawContent);
+        then(swearHolder).should(times(1)).filterSwear(rawContent);
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
         assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(filteredContent));
@@ -276,7 +276,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearService.filterSwear("content")).willReturn("content");
+        given(swearHolder.filterSwear("content")).willReturn("content");
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);

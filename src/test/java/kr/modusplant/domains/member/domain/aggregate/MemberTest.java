@@ -4,6 +4,8 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MemberTest implements MemberTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     @DisplayName("null 값으로 create 호출")
     @Test
     void testCreate_givenNullToOneOfFourParameters_willThrowException() {

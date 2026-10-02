@@ -16,6 +16,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProf
 import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
 import kr.modusplant.domains.term.framework.outbound.jpa.repository.MemberTermJpaRepository;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class SocialIdentityRepositoryJpaAdapterTest implements SocialMemberProfileTestUtils, AgreedTermsTestUtils, MemberEntityTestUtils, MemberAuthEntityTestUtils, MemberTermEntityTestUtils, MemberProfileEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final MemberJpaRepository memberJpaRepository = mock(MemberJpaRepository.class);
     private final MemberAuthJpaRepository memberAuthJpaRepository = mock(MemberAuthJpaRepository.class);
     private final MemberProfileJpaRepository memberProfileJpaRepository = mock(MemberProfileJpaRepository.class);
