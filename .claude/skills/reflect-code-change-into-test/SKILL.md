@@ -6,10 +6,15 @@ disallowed-tools: Edit(/src/main/**)
 
 # Target Classes
 
-- Primary: every `.java` class not yet pushed to the remote — the union of:
-  - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
-  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
-- Termination: if the union is empty, terminate the skill immediately.
+- Primary: every `.java` class under `src/main/java/` not yet pushed to the remote — the union of:
+  - uncommitted changes: `git status --porcelain -- 'src/main/java/*.java'` (staged, unstaged, and untracked)
+  - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- 'src/main/java/*.java'`
+- Affected: every `src/main/java/` class that uses a Primary class (found per Primary class with
+  `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose behavior or tests the change
+  reaches — e.g. a new exception now thrown through it, or a replaced dependency it injects. A
+  deleted Primary class is searched by its old name, and a Primary class later dropped as unmatched
+  still seeds this lookup. Affected classes are Target Classes too.
+- Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Resolving Target Areas
 
@@ -80,7 +85,7 @@ Only look up a target path if actually needed for the test at hand.
 # Summary
 
 After processing every bucket, report:
-  - Per processed area: which classes got tests created, modified, or deleted.
+  - Per processed area: which classes (marked Primary or Affected) got tests created, modified, or deleted.
   - Skipped areas (missing feature/rule file) and the classes left unprocessed within them.
   - Unmatched classes dropped during Resolving Target Areas.
 

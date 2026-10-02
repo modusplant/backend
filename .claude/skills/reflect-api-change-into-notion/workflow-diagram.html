@@ -192,8 +192,10 @@
     <span class="badge">1</span>
     <div class="card">
       <h3>Resolve Target Classes</h3>
-      <p>Collect every <code>.java</code> class not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
-      <div class="stop">The combined list is empty.</div>
+      <p><strong>Primary:</strong> collect every <code>.java</code> class under <code>src/main/java/</code> not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
+      <p><strong>Affected:</strong> add every <code>src/main/java/</code> class that uses a Primary class (<code>git grep -lw '&lt;SimpleName&gt;' -- 'src/main/java/*.java'</code>) and whose API-observable behavior the change reaches. Deleted classes are searched by their old name.</p>
+      <div class="note">Primary and Affected classes together are the Target Classes.</div>
+      <div class="stop">The Primary list is empty.</div>
     </div>
   </li>
 
@@ -201,7 +203,7 @@
     <span class="badge">2</span>
     <div class="card">
       <h3>Filter to the watched API surface</h3>
-      <p>Keep only classes listed in the skill's <em>Codebase → Notion Mapping</em> table: REST controllers, responses, adapter controllers, aggregates, entities, VOs, ErrorCodes, and <code>SecurityConfig</code>. Everything else is dropped, e.g. <code>domains/post/**</code>, <code>domains/notification/**</code>, and <code>domains/account/social/**</code>.</p>
+      <p>Runs after the Affected lookup, so a Primary class outside the table can still bring in its users. Keep only classes listed in the skill's <em>Codebase → Notion Mapping</em> table: REST controllers, responses, adapter controllers, aggregates, entities, VOs, ErrorCodes, and <code>SecurityConfig</code>. Everything else is dropped, e.g. <code>domains/post/**</code>, <code>domains/notification/**</code>, and <code>domains/account/social/**</code>.</p>
       <div class="docs">
         <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/SKILL.md</span><span class="what">"Codebase → Notion Mapping" table: which classes feed which Notion database.</span></div>
       </div>
@@ -229,7 +231,7 @@
     <span class="badge">3</span>
     <div class="card">
       <h3>Write the detected-change file</h3>
-      <p>Write one file per run, with one section per remaining class. It holds <strong>pure codebase facts</strong>: change kind, layer, facts, and a code excerpt. Notion vocabulary is not allowed. <code>RUN_ID</code> = <code>YYYYMMDD_HHmmss</code> at run start. Files from earlier runs are kept.</p>
+      <p>Write one file per run, with one section per remaining class. It holds <strong>pure codebase facts</strong>: change kind (an Affected class is marked <code>Affected (uses a changed class)</code>), layer, facts, and a code excerpt. Notion vocabulary is not allowed. <code>RUN_ID</code> = <code>YYYYMMDD_HHmmss</code> at run start. Files from earlier runs are kept.</p>
       <div class="docs">
         <div class="doc write"><span class="tag">Write</span><span class="path">.claude/skills/reflect-api-change-into-notion/detected-change/detected_&lt;RUN_ID&gt;.md</span><span class="what">What changed in the code this run.</span></div>
       </div>

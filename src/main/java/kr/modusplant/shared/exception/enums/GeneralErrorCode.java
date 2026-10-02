@@ -26,8 +26,7 @@ public enum GeneralErrorCode implements ErrorCode {
     MISMATCH_INPUT_TYPE(HttpStatus.BAD_REQUEST.value(), "mismatch_input_type", "입력값의 타입이 올바르지 않습니다"),
     SWEAR_CONTAINED_NICKNAME(HttpStatus.BAD_REQUEST.value(), "swear_contained_nickname", "닉네임에 비속어가 포함되어 있습니다"),
     UNEXPECTED_INPUT(HttpStatus.BAD_REQUEST.value(), "unexpected_input", "서버가 알 수 없는 입력값이 발견되었습니다"),
-    UNSUPPORTED_FILE(HttpStatus.FORBIDDEN.value(), "unsupported_file", "지원되지 않는 파일 타입입니다"),
-    ;
+    UNSUPPORTED_FILE(HttpStatus.FORBIDDEN.value(), "unsupported_file", "지원되지 않는 파일 타입입니다");
 
     private final int httpStatus;
     private final String code;
