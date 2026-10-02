@@ -17,6 +17,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
@@ -37,6 +39,9 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,
         AuthorTestUtils, CommentTestUtils, CommentPathTestUtils,
         CommentEntityTestUtils, CommentCompositeKeyTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final MemberJpaRepository memberRepository = Mockito.mock(MemberJpaRepository.class);
     private final CommentJpaRepository commentRepository = Mockito.mock(CommentJpaRepository.class);
     private final PostJpaRepository postRepository = Mockito.mock(PostJpaRepository.class);

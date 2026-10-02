@@ -33,7 +33,7 @@ Pattern: `V<major>.<minor>.<patch>__Description_With_Underscores.sql`
 
 - Version is a 3-part dotted, semver-style number — never timestamp-based.
 - Double underscore (`__`) separates the version from the description.
-- The description is `Capitalized_Snake_Case`, starting with a verb: `Create`, `Alter`, `Add`, `Remove`, `Insert`, `Delete`, `Rename`, `Migrate`.
+- The description is `Capitalized_Snake_Case`, starting with a verb that names the migration's action (e.g. `Create`, `Alter`, `Add`, `Remove`, `Insert`, `Delete`, `Rename`, `Migrate`); any other verb may be adopted as needed.
 - Examples: `V0.2.0__Migrate_category_uuid_to_serial.sql`, `V0.12.0__Create_site_member_withdraw_table.sql`, `V1.3.1__Insert_common_code.sql`.
 
 **Baseline exception**: `B0.0.0__Create_initial_table.sql` uses Flyway's `B` (baseline) prefix instead of `V`.

@@ -3,6 +3,8 @@ package kr.modusplant.domains.account.social.adapter.controller;
 import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.SocialActionRequiredException;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,6 +17,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class SocialIdentityLinkAdminControllerTest {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityLinkAdminController adminController =
             new SocialIdentityLinkAdminController(socialIdentityRepository);

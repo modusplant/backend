@@ -6,14 +6,18 @@ disallowed-tools: Edit(/src/**)
 
 # Detailed Action Items
 
-- Update the documentation corresponding to each changed class.
+- Update the documentation corresponding to each Target Class.
 
 # Target Classes
 
-- Primary: every `.java` class not yet pushed to the remote — the union of:
+- Primary: every `.java` class not yet pushed to the remote, under both `src/main/` and `src/test/` — the union of:
   - uncommitted changes: `git status --porcelain -- '*.java'` (staged, unstaged, and untracked)
   - committed-but-unpushed changes: `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- '*.java'`
-- Termination: if the union is empty, terminate the skill immediately.
+- Affected: every `src/main/java/` class that uses a Primary `src/main/` class (found per class with
+  `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose documented behavior the change
+  reaches — e.g. a new exception now thrown through it, or a replaced dependency it injects. A
+  deleted Primary class is searched by its old name. Affected classes are Target Classes too.
+- Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Document Mapping per Class
 

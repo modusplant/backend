@@ -32,11 +32,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V3;
-import kr.modusplant.domains.member.usecase.record.MemberProfileOverrideRecord_V4;
-import kr.modusplant.domains.member.usecase.record.MemberWithdrawalRecord;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportImagePrepareRecord_V2;
-import kr.modusplant.domains.member.usecase.record.ProposalOrBugReportRecord_V2;
+import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
@@ -44,17 +40,17 @@ import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareR
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
-import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
-import kr.modusplant.infrastructure.swear.exception.enums.SwearErrorCode;
-import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
@@ -101,9 +97,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.PostAbuseR
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportImagePrepareRecord_V2TestUtils.testProposalOrBugReportImagePrepareRecord_V2;
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV4;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.*;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
@@ -123,6 +117,8 @@ class MemberControllerTest implements
         MemberProfileEntityTestUtils, PostEntityTestUtils, CommentEntityTestUtils,
         ProposalBugReportEntityTestUtils, PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils {
     @SuppressWarnings("unused")
+    private final SwearHolder testSwearHolder = SwearHolderTestUtils.createSwearHolder();
+    @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     @SuppressWarnings("unused")
     private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
@@ -132,7 +128,7 @@ class MemberControllerTest implements
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final TokenService tokenService = Mockito.mock(TokenService.class);
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
-    private final SwearService swearService = Mockito.mock(SwearService.class);
+    private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
@@ -147,7 +143,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearService, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -391,7 +387,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(swearHolder.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
@@ -448,12 +444,14 @@ class MemberControllerTest implements
     void testValidateThatHasSwearV3_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(true);
+        MemberProfileOverrideRecord_V3 recordWithSwear = new MemberProfileOverrideRecord_V3(
+                testMemberProfileOverrideRecordV3.id(), testMemberProfileOverrideRecordV3.introduction(),
+                testMemberProfileOverrideRecordV3.fileKey(), "나쁜" + SwearHolderTestUtils.testSwearWords.getFirst());
 
         // when & then
-        SwearContainedException swearContainedException = assertThrows(
-                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
-        assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
+        InvalidValueException invalidValueException = assertThrows(
+                InvalidValueException.class, () -> memberController.overrideProfile(recordWithSwear));
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
     }
 
     @Test
@@ -461,7 +459,6 @@ class MemberControllerTest implements
     void testValidateV3_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
 
         // when & then
@@ -475,7 +472,6 @@ class MemberControllerTest implements
     void testValidateThatImagePathNotExistsV3_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExistsInStorage(any());
 
@@ -492,7 +488,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(swearService.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(swearHolder.filterSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
@@ -550,12 +546,14 @@ class MemberControllerTest implements
     void testValidateThatHasSwearV4_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(true);
+        MemberProfileOverrideRecord_V4 recordWithSwear = new MemberProfileOverrideRecord_V4(
+                testMemberProfileOverrideRecordV4.id(), testMemberProfileOverrideRecordV4.introduction(),
+                testMemberProfileOverrideRecordV4.fileKey(), "나쁜" + SwearHolderTestUtils.testSwearWords.getFirst());
 
         // when & then
-        SwearContainedException swearContainedException = assertThrows(
-                SwearContainedException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
-        assertThat(swearContainedException.getErrorCode()).isEqualTo(SwearErrorCode.SWEAR_CONTAINED);
+        InvalidValueException invalidValueException = assertThrows(
+                InvalidValueException.class, () -> memberController.overrideProfile(recordWithSwear));
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
     }
 
     @Test
@@ -563,7 +561,6 @@ class MemberControllerTest implements
     void testValidateV4_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.of(Member.create(MemberId.generate(), testMemberActiveStatus, testNormalUserNickname)));
 
         // when & then
@@ -577,7 +574,6 @@ class MemberControllerTest implements
     void testValidateThatImagePathNotExistsV4_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        given(swearService.isSwearContained(any())).willReturn(false);
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
         willThrow(new NotFoundFileKeyOnS3Exception()).given(memberImageIOHelper).validateIfImageExistsInStorage(any());
 

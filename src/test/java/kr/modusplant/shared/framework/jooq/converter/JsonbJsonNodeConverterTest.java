@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.infrastructure.config.jackson.JacksonConfig;
+import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import org.jooq.JSONB;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class JsonbJsonNodeConverterTest {
     private final ObjectMapper objectMapper = JacksonConfig.objectMapper();
+    private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper);
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
     private final String string = """
             {"test": "test"}

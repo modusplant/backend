@@ -192,8 +192,10 @@
     <span class="badge">1</span>
     <div class="card">
       <h3>Resolve Target Classes</h3>
-      <p>Collect every <code>.java</code> class not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
-      <div class="stop">The combined list is empty.</div>
+      <p><strong>Primary:</strong> collect every <code>.java</code> class under <code>src/main/</code> and <code>src/test/</code> not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
+      <p><strong>Affected:</strong> add every <code>src/main/java/</code> class that uses a Primary class (<code>git grep -lw '&lt;SimpleName&gt;' -- 'src/main/java/*.java'</code>) and whose documented behavior the change reaches. Deleted classes are searched by their old name.</p>
+      <div class="note">Primary and Affected classes together are the Target Classes.</div>
+      <div class="stop">The Primary list is empty.</div>
     </div>
   </li>
 

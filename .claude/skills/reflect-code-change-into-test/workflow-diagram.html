@@ -192,8 +192,10 @@
     <span class="badge">1</span>
     <div class="card">
       <h3>Resolve Target Classes</h3>
-      <p>Collect every <code>.java</code> class not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
-      <div class="stop">The combined list is empty.</div>
+      <p><strong>Primary:</strong> collect every <code>.java</code> class under <code>src/main/java/</code> not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
+      <p><strong>Affected:</strong> add every <code>src/main/java/</code> class that uses a Primary class (<code>git grep -lw '&lt;SimpleName&gt;' -- 'src/main/java/*.java'</code>) and whose behavior or tests the change reaches. Deleted classes are searched by their old name.</p>
+      <div class="note">Primary and Affected classes together are the Target Classes.</div>
+      <div class="stop">The Primary list is empty.</div>
     </div>
   </li>
 
@@ -205,7 +207,7 @@
       <div class="docs">
         <div class="doc read"><span class="tag">Read</span><span class="path">.claude/CLAUDE.md</span><span class="what">Area names and the <code>account</code> sub-domain path mapping (e.g. <code>normal-identity</code> → <code>domains/account/normal/</code>).</span></div>
       </div>
-      <div class="note">Classes matching neither pattern are dropped and reported as unmatched.</div>
+      <div class="note">Classes matching neither pattern are dropped and reported as unmatched. An unmatched Primary class still seeds the Affected lookup in step 1.</div>
       <div class="stop">Every class was dropped as unmatched.</div>
     </div>
   </li>

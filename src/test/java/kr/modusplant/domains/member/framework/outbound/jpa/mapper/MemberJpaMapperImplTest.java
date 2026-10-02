@@ -4,6 +4,8 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberJpaMapper;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +16,9 @@ import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNorm
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberJpaMapperImplTest implements MemberTestUtils, MemberEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final MemberJpaMapper memberJpaMapper = new MemberJpaMapperImpl();
 
     @Test

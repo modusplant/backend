@@ -22,6 +22,8 @@ import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import org.junit.jupiter.api.DisplayName;
@@ -40,6 +42,9 @@ import static org.mockito.Mockito.*;
 
 class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
         AgreedTermsTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);

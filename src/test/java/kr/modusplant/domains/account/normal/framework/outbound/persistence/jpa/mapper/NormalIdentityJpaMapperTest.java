@@ -2,6 +2,8 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.
 
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +14,9 @@ import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityJpaMapperTest {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final NormalIdentityJpaMapper mapper = new NormalIdentityJpaMapperImpl();
 
     @Test

@@ -4,6 +4,8 @@ import kr.modusplant.domains.account.normal.common.util.domain.vo.AgreedTermVers
 import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
@@ -15,6 +17,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SignUpDataTest implements SignUpDataTestUtils, EmailTestUtils, PasswordTestUtils,
         NicknameTestUtils, AgreedTermVersionTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
     @Test
     @DisplayName("null 값으로 회원가입 정보 생성")
