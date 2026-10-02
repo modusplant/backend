@@ -17,8 +17,8 @@ import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
-import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -41,7 +41,7 @@ public class CommentController {
     private final CommentCommandRepository commandRepository;
     private final CommentCacheRepository cacheRepository;
     private final CommentValidationHelper commentValidationHelper;
-    private final SwearService swearService;
+    private final SwearHolder swearHolder;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class CommentController {
         CommentPath reservedPath = optionalReservedPath.get();
 
         Comment comment = Comment.create(
-                postId, reservedPath, author, CommentContent.create(swearService.filterSwear(request.content())));
+                postId, reservedPath, author, CommentContent.create(swearHolder.filterSwear(request.content())));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(

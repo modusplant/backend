@@ -20,6 +20,8 @@ import kr.modusplant.infrastructure.jwt.provider.JwtCookieProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -38,6 +40,9 @@ import static org.mockito.Mockito.verify;
 
 
 class SocialIdentityRestControllerTest implements SocialAuthRequestTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils, SocialSignUpRequestTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final SocialIdentityController socialIdentityController = mock(SocialIdentityController.class);
     private final TokenService tokenService = mock(TokenService.class);

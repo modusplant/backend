@@ -20,12 +20,11 @@ import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
-import kr.modusplant.infrastructure.swear.exception.SwearContainedException;
-import kr.modusplant.infrastructure.swear.service.SwearService;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -53,7 +52,7 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
     private final TokenService tokenService;
-    private final SwearService swearService;
+    private final SwearHolder swearHolder;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
     private final MemberProfileMapper memberProfileMapper;
@@ -121,7 +120,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
@@ -143,7 +142,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearService.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
@@ -314,9 +313,6 @@ public class MemberController {
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
         memberValidationHelper.validateIfMemberExists(memberId);
-        if (swearService.isSwearContained(nickname.getValue())) {
-            throw new SwearContainedException();
-        }
         Optional<Member> emptyOrMember = memberRepository.getByNickname(nickname);
         if (emptyOrMember.isPresent() && !emptyOrMember.orElseThrow().getMemberId().equals(memberId)) {
             throw new ExistsEntityException(KernelErrorCode.EXISTS_NICKNAME, "nickname");

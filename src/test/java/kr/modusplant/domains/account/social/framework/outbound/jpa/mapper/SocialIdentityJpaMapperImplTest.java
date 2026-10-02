@@ -13,6 +13,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileE
 import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.MemberTermEntityTestUtils;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SocialIdentityJpaMapperImplTest implements MemberEntityTestUtils, MemberAuthEntityTestUtils, MemberProfileEntityTestUtils, MemberTermEntityTestUtils,
         SocialMemberProfileTestUtils, AgreedTermsTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final SocialIdentityJpaMapper socialIdentityJpaMapper = new SocialIdentityJpaMapperImpl();
 
     @Test

@@ -16,6 +16,7 @@ public enum GeneralErrorCode implements ErrorCode {
     FILE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST.value(), "file_limit_exceeded", "파일 개수 또는 크기 제한을 초과했습니다"),
     FILE_LOAD_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR.value(), "file_load_failure", "파일을 불러오는 데 실패했습니다"),
     GENERIC_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "internal_server_error", "서버에 문제가 발생했습니다"),
+    HOLDER_NOT_INITIALIZED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "holder_not_initialized", "홀더가 초기화되지 않았습니다"),
     INCORRECT_ALGORITHM(HttpStatus.INTERNAL_SERVER_ERROR.value(), "incorrect_algorithm", "알고리즘이 올바르지 않습니다"),
     INPUT_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "input_out_of_range", "입력값이 범위를 벗어났습니다"),
     INVALID_FILE_INPUT(HttpStatus.BAD_REQUEST.value(), "invalid_file_input", "파일 입력이 올바르지 않습니다"),
@@ -23,6 +24,7 @@ public enum GeneralErrorCode implements ErrorCode {
     INVALID_STATE(HttpStatus.CONFLICT.value(), "invalid_state", "리소스의 상태가 유효하지 않습니다"),
     MALFORMED_INPUT(HttpStatus.BAD_REQUEST.value(), "malformed_input", "입력값의 형식이 올바르지 않습니다"),
     MISMATCH_INPUT_TYPE(HttpStatus.BAD_REQUEST.value(), "mismatch_input_type", "입력값의 타입이 올바르지 않습니다"),
+    SWEAR_CONTAINED_NICKNAME(HttpStatus.BAD_REQUEST.value(), "swear_contained_nickname", "닉네임에 비속어가 포함되어 있습니다"),
     UNEXPECTED_INPUT(HttpStatus.BAD_REQUEST.value(), "unexpected_input", "서버가 알 수 없는 입력값이 발견되었습니다"),
     UNSUPPORTED_FILE(HttpStatus.FORBIDDEN.value(), "unsupported_file", "지원되지 않는 파일 타입입니다");
 

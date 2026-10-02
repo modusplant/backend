@@ -13,6 +13,8 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +29,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 class SocialIdentityLinkControllerTest implements SocialMemberProfileTestUtils, SocialAuthRequestTestUtils, SocialUserInfoTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
