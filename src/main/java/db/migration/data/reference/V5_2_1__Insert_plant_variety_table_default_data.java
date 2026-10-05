@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
  * <ol>
  *   <li>엑셀 지수 표기로 깨진 코드 복원</li>
  *   <li>엑셀로 인해 유실된 코드 앞자리 0 복원</li>
- *   <li>중분류코드와 소분류코드의 접두어 불일치 교정</li>
+ *   <li>중분류코드와 소분류코드의 접두어 간 불일치 교정</li>
  *   <li>품종명에서 괄호 문자열 제거</li>
  *   <li>품종명으로 기능할 수 없는 레코드 제외</li>
  *   <li>대표 중분류코드가 아닌 레코드 제외 (1:1 대응 규칙 2)</li>
@@ -84,7 +84,8 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
             "0635", // 야자 (대표 2636)
             "2197", // 튜울립 (대표 2537)
             "1605", // 피마자 (대표 19T2)
-            "2802"); // 허브 (대표 26G6)
+            "2802"  // 허브 (대표 26G6)
+    );
 
     /*
      * [단계 7] 하나의 중분류코드에 존재하는 여러 중분류명을 하나로 통일하거나 분리하기 위해 설정한 중분류명 (중분류코드 → 중분류명)
@@ -117,30 +118,45 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
 
     @Override
     public void migrate(Context context) throws Exception {
-        List<PlantVarietyRow> rows = readRows();
+        // [준비] Iterator 확보
+        CsvMapper csvMapper = new CsvMapper();
+        CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
+
+        InputStream is = getClass().getResourceAsStream("/csv/standard_item_code_001.csv");
+
+        MappingIterator<PlantVarietyRow> iterator = csvMapper.readerFor(PlantVarietyRow.class)
+                .with(csvSchema)
+                .readValues(is);
+
+        List<PlantVarietyRow> csvRows = iterator.readAll();
 
         // [단계 1~2] 레코드별 코드 형식 복원
-        for (PlantVarietyRow row : rows) {
-            row.recoverCodes();
+        for (PlantVarietyRow row : csvRows) {
+            row.recoverBrokenCodes();
             row.padCodes();
         }
 
-        // [단계 3] 접두어 불일치 교정 (교정 기준은 접두어가 일치하는 레코드의 중분류코드별 중분류명)
-        Map<String, Set<String>> middleCategoryNamesByCode = new HashMap<>();
-        for (PlantVarietyRow row : rows) {
-            if (row.hasMatchingCodePrefix()) {
-                middleCategoryNamesByCode.computeIfAbsent(row.middle_category_code, code -> new HashSet<>())
+        // [단계 3] 중분류코드 - 소분류코드 간 불일치 교정
+        Map<String, Set<String>> pairedMiddleCategoryCodesAndNames = new HashMap<>();
+
+        // 중분류코드 - 중분류명 키 - 값 쌍 저장(하나의 중분류코드에 여러 중분류명이 가능함)
+        for (PlantVarietyRow row : csvRows) {
+            if (row.variety_code.startsWith(row.middle_category_code)) {
+                pairedMiddleCategoryCodesAndNames
+                        .computeIfAbsent(row.middle_category_code, code -> new HashSet<>())
                         .add(row.middle_category_name);
             }
         }
-        for (PlantVarietyRow row : rows) {
-            row.correctCodePrefix(middleCategoryNamesByCode);
+
+        // 전채 csv 행에 걸쳐 중분류코드 - 소분류코드 간 불일치 식별 및 수정
+        for (PlantVarietyRow row : csvRows) {
+            row.correctMismatchWithMiddleCategoryCodeAndVarietyCode(pairedMiddleCategoryCodesAndNames);
         }
 
-        Map<String, PlantVarietyRow> rowsByVarietyName = new LinkedHashMap<>();
-        for (PlantVarietyRow row : rows) {
-            // [단계 4]
-            row.removeParenthesesFromVarietyName();
+        Map<String, PlantVarietyRow> pairedVarietyNamesAndRows = new LinkedHashMap<>();
+        for (PlantVarietyRow row : csvRows) {
+            // [단계 4] 품종명에서 괄호 문자열 제거
+            row.variety_name = PATTERN_PARENTHESES.matcher(row.variety_name).replaceAll("");
 
             // [단계 5], [단계 6]
             if (row.isNotFunctionalAsVarietyName() || row.hasNonRepresentativeMiddleCategoryCode()) {
@@ -154,27 +170,15 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
             row.assignIndependentMiddleCategoryCode();
 
             // [단계 9] 품종명이 중복되는 경우 소분류코드가 사전순으로 가장 작은 레코드만 유지
-            rowsByVarietyName.merge(row.variety_name, row,
-                    (existing, incoming) -> existing.variety_code.compareTo(incoming.variety_code) <= 0 ? existing : incoming);
+            pairedVarietyNamesAndRows.merge(row.variety_name, row,
+                    (existing, incoming) ->
+                            existing.variety_code.compareTo(incoming.variety_code) <= 0 ? existing : incoming);
         }
 
-        insertRows(context, rowsByVarietyName.values());
+        insertRows(context, pairedVarietyNamesAndRows.values());
     }
 
-    private List<PlantVarietyRow> readRows() throws Exception {
-        CsvMapper csvMapper = new CsvMapper();
-        CsvSchema csvSchema = CsvSchema.emptySchema().withHeader();
-
-        InputStream is = getClass().getResourceAsStream("/csv/standard_item_code_001.csv");
-
-        MappingIterator<PlantVarietyRow> iterator = csvMapper.readerFor(PlantVarietyRow.class)
-                .with(csvSchema)
-                .readValues(is);
-
-        return iterator.readAll();
-    }
-
-    private static void insertRows(Context context, Collection<PlantVarietyRow> rows) throws Exception {
+    private void insertRows(Context context, Collection<PlantVarietyRow> rows) throws Exception {
         String sql = """
                 INSERT INTO plant_variety (\
                 variety_code,
@@ -211,23 +215,22 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
 
         /*
          * [단계 1] 엑셀 지수 표기로 깨진 코드 복원
-         * 엑셀은 "2403E3"을 2403×10³으로 해석하여 "2.40E+06"으로 변환하므로, "E" 뒤의 숫자는 지수에서 역산함
-         * (E 뒤의 숫자 = 지수 - (중분류코드 숫자의 자릿수 - 1)), 가수는 반올림된 3자리이므로 앞 4자리는 중분류코드에서 가져옴
-         * - 중분류코드: 소분류코드의 앞 4자리 (예: "2.60E+09" → "26E8", 소분류코드 "26E801"은 숫자로 해석되지 않아 유지됨)
-         * - 소분류코드(4자리 중분류코드): 중분류코드 + "E" + (지수 - 3) (예: 2403의 "2.40E+06" → "2403E3")
+         * - 소분류코드(4자리 중분류코드): 중분류코드 + "E" + (지수 - 3)
+         *      (예: 2403의 "2.40E+06" → "2403E3")
          * - 소분류코드(앞자리 0이 유실된 3자리 중분류코드): "0" + 중분류코드 + "E" + (지수 - 2)
-         *   (예: 604의 "6.04E+03" → "0604E1", 같은 중분류의 다른 소분류코드 "0604D9" 형식을 따름)
+         *      (예: 604의 "6.04E+03" → "0604E1", 같은 중분류의 다른 소분류코드 "0604D9" 형식을 따름)
          */
-        private void recoverCodes() {
+        private void recoverBrokenCodes() {
             if (PATTERN_SCIENTIFIC_NOTATION.matcher(middle_category_code).matches()) {
-                middle_category_code = variety_code.substring(0, 4);
+                middle_category_code = variety_code.substring(0, MIDDLE_CATEGORY_CODE_LENGTH);
             }
-            Matcher matcher = PATTERN_SCIENTIFIC_NOTATION.matcher(variety_code);
-            if (matcher.matches()) {
-                int exponent = Integer.parseInt(matcher.group(1));
-                variety_code = middle_category_code.length() == 4 ?
-                        middle_category_code + "E" + (exponent - 3) :
-                        "0" + middle_category_code + "E" + (exponent - 2);
+            Matcher varietyCodeMatcher = PATTERN_SCIENTIFIC_NOTATION.matcher(variety_code);
+            if (varietyCodeMatcher.matches()) {
+                int exponent = Integer.parseInt(varietyCodeMatcher.group(1));
+                variety_code =
+                        "0".repeat(MIDDLE_CATEGORY_CODE_LENGTH - middle_category_code.length()) +
+                                middle_category_code + "E" +
+                                (MIDDLE_CATEGORY_CODE_LENGTH - middle_category_code.length() + exponent - 3);
             }
         }
 
@@ -236,43 +239,24 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
          * - 중분류코드는 4자리, 소분류코드는 6자리가 되도록 앞에 0을 채움 (예: "604" → "0604", "60401" → "060401")
          */
         private void padCodes() {
-            middle_category_code = padWithZeros(middle_category_code, MIDDLE_CATEGORY_CODE_LENGTH);
-            variety_code = padWithZeros(variety_code, VARIETY_CODE_LENGTH);
-        }
-
-        private static String padWithZeros(String code, int length) {
-            return "0".repeat(length - code.length()) + code;
-        }
-
-        // [단계 3] 소분류코드의 앞 4자리가 중분류코드와 일치하는지 판별
-        private boolean hasMatchingCodePrefix() {
-            return variety_code.startsWith(middle_category_code);
+            middle_category_code =
+                    "0".repeat(MIDDLE_CATEGORY_CODE_LENGTH - middle_category_code.length()) + middle_category_code;
+            variety_code = "0".repeat(VARIETY_CODE_LENGTH - variety_code.length()) + variety_code;
         }
 
         /*
          * [단계 3] 소분류코드의 앞 4자리가 중분류코드와 다른 레코드 교정
-         * 1. 소분류코드 접두어에 해당하는 중분류명이 레코드의 중분류명과 같은 경우: 중분류코드가 잘못된 것으로 보고 중분류코드를 접두어로 변경
-         *    (예: 중분류코드 "2403"(국화(스프레이)), 중분류명 "카네이션(스탠다드)", 소분류코드 "2427A8" → 중분류코드 "2427"(카네이션(스탠다드)))
-         *    (예: 중분류코드 "0679", 중분류명 "구스베리", 소분류코드 "067802" → 중분류코드 "0678"(구스베리))
-         * 2. 그 외의 경우: 소분류코드가 잘못된 것으로 보고 소분류코드의 접두어를 중분류코드로 변경
-         *    (예: 중분류코드 "1209"(마늘), 소분류코드 "130933"(접두어 1309: 방울양배추) → "120933", 같은 중분류의 "120932" 다음 번호)
-         *    (예: 중분류코드 "0902"(호박), 소분류코드 "060296"(접두어 0602: 배) → "090296", 같은 중분류의 "090297" 앞 번호)
          */
-        private void correctCodePrefix(Map<String, Set<String>> middleCategoryNamesByCode) {
-            if (hasMatchingCodePrefix()) {
+        private void correctMismatchWithMiddleCategoryCodeAndVarietyCode(Map<String, Set<String>> pairedMiddleCategoryCodesAndNames) {
+            if (variety_code.startsWith(middle_category_code)) {
                 return;
             }
-            String prefix = variety_code.substring(0, MIDDLE_CATEGORY_CODE_LENGTH);
-            if (middleCategoryNamesByCode.get(prefix).contains(middle_category_name)) {
-                middle_category_code = prefix;
-            } else {
+            String expectedMiddleCategoryCode = variety_code.substring(0, MIDDLE_CATEGORY_CODE_LENGTH);
+            if (pairedMiddleCategoryCodesAndNames.get(expectedMiddleCategoryCode).contains(middle_category_name)) { // 기대되는 중분류코드가 유효할 때
+                middle_category_code = expectedMiddleCategoryCode;
+            } else { // 기대되는 중분류코드가 유효하지 않아서 기존 중분류코드를 쓰는 게 합리적일 때
                 variety_code = middle_category_code + variety_code.substring(MIDDLE_CATEGORY_CODE_LENGTH);
             }
-        }
-
-        // [단계 4] 품종명에서 괄호 문자열 제거
-        private void removeParenthesesFromVarietyName() {
-            variety_name = PATTERN_PARENTHESES.matcher(variety_name).replaceAll("");
         }
 
         /*
@@ -285,15 +269,15 @@ public class V5_2_1__Insert_plant_variety_table_default_data extends BaseJavaMig
          *    중분류명과 같지 않은 한 글자 품종명(예: "봉", "킹"), 단 식물명으로 기능하는 한 글자 품종명은 유지
          */
         private boolean isNotFunctionalAsVarietyName() {
-            String name = variety_name;
-            return name.startsWith("기타") || name.contains("혼합")
-                    || major_category_name.equals("식물성단미사료") || name.startsWith("캔들") || name.contains("부작")
+            return variety_name.startsWith("기타") || variety_name.startsWith("캔들")
+                    || (variety_name.startsWith("건") && !NON_PROCESSED_VARIETY_NAMES.contains(variety_name))
+                    || variety_name.contains("혼합") || variety_name.contains("부작") || variety_name.contains("말랭이")
+                    || variety_name.endsWith("수액") || variety_name.endsWith("종자")
+                    || (variety_name.length() == 1 && !variety_name.equals(middle_category_name) && !SINGLE_SYLLABLE_VARIETY_NAMES.contains(variety_name))
+                    || !PATTERN_HANGUL.matcher(variety_name).find()
+                    || PROCESSED_VARIETY_NAMES.contains(variety_name)
                     || PROCESSED_MIDDLE_CATEGORY_NAMES.contains(middle_category_name)
-                    || (name.startsWith("건") && !NON_PROCESSED_VARIETY_NAMES.contains(name))
-                    || name.contains("말랭이") || name.endsWith("수액") || name.endsWith("종자")
-                    || PROCESSED_VARIETY_NAMES.contains(name)
-                    || !PATTERN_HANGUL.matcher(name).find()
-                    || (name.length() == 1 && !name.equals(middle_category_name) && !SINGLE_SYLLABLE_VARIETY_NAMES.contains(name));
+                    || major_category_name.equals("식물성단미사료");
         }
 
         // [단계 6] 대표 중분류코드가 아닌 중분류코드의 레코드인지 판별
