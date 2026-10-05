@@ -14,7 +14,7 @@ disable-model-invocation: true
 - **Domain Name Resolution:** `[domainName]` and `[DomainName]` are dynamically resolved from $0.
   - **[domainName]:** lowercase/camelCase form of $0 (e.g., $0 = `member` → `member`; $0 = `search` → `search`).
   - **[DomainName]:** Capitalized/PascalCase form of $0 (e.g., $0 = `member` → `Member`; $0 = `search` → `Search`).
-- **Method Name Resolution:** `[methodName]` is dynamically resolved from $1 (e.g., $1 = `searchPlantKoreanNameByKeyword` → `searchPlantKoreanNameByKeyword`).
+- **Method Name Resolution:** `[methodName]` is dynamically resolved from $1 (e.g., $1 = `searchPlantNameByKeyword` → `searchPlantNameByKeyword`).
 - **Target Controller:** @src/main/java/kr/modusplant/domains/[domainName]/framework/inbound/web/rest/[DomainName]RestController.java
 - **Multiple Method Matches:** If [methodName] matches multiple methods within the target REST Controller, all matching methods must be targeted for analysis.
 

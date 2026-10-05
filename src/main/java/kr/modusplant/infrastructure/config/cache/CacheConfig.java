@@ -21,8 +21,11 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static kr.modusplant.jooq.Tables.PLANT;
+import static kr.modusplant.jooq.Tables.PLANT_VARIETY;
 
 @Configuration
 @EnableCaching
@@ -46,14 +49,24 @@ public class CacheConfig {
     }
 
     @Bean
-    @Qualifier("plantKoreanNameCaffeineCacheManager")
+    @Qualifier("plantNameCaffeineCacheManager")
     public CacheManager caffeineCacheManager(DSLContext dslContext) {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCacheNames(List.of("transliteratedPlantKoreanNamesCache"));
+        cacheManager.setCacheNames(List.of("transliteratedPlantNamesCache"));
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
-                        .initialCapacity(15000)
-                        .maximumSize(20000)
+                        .maximumWeight(40000)
+                        .weigher((Object key, Object value) -> {
+                            if (value instanceof List<?> list) {
+                                return list.size();
+                            } else if (value instanceof Map<?, ?> map) {
+                                return map.size();
+                            } else if (value instanceof Set<?> set) {
+                                return set.size();
+                            } else {
+                                return 1;
+                            }
+                        })
                         .softValues()
                         .recordStats());
         cacheManager.setCacheLoader(
@@ -63,11 +76,12 @@ public class CacheConfig {
     }
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
-        log.info("[PostgreSQL] Loading all the Korean names from the plant table");
+        log.info("[PostgreSQL] Loading all the plant names from the plant and plant_variety tables");
         Transliterator transliterator = Icu4jUtils.getAnyNFDTransliterator();
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
                 .where(PLANT.KOREAN_NAME.isNotNull())
+                .union(dslContext.select(PLANT_VARIETY.VARIETY_NAME).from(PLANT_VARIETY))
                 .fetchInto(String.class)
                 .stream()
                 .map(transliterator::transliterate)

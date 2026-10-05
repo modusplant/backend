@@ -15,27 +15,27 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.CACHE_NOT_IN
 
 @Component
 public class SearchPlantCaffeineCache implements SearchPlantCache {
-    private LoadingCache<String, List<String>> transliteratedPlantKoreanNamesCache;
+    private LoadingCache<String, List<String>> transliteratedPlantNamesCache;
     private final CacheManager cacheManager;
-    private final String KOREAN_NAMES_CACHE_NAME = "KOREAN_NAMES";
+    private final String PLANT_NAMES_CACHE_NAME = "PLANT_NAMES";
 
-    public SearchPlantCaffeineCache(@Qualifier("plantKoreanNameCaffeineCacheManager") CacheManager cacheManager) {
+    public SearchPlantCaffeineCache(@Qualifier("plantNameCaffeineCacheManager") CacheManager cacheManager) {
         this.cacheManager = cacheManager;
     }
 
-    @SuppressWarnings({"unchecked", "ResultOfMethodCallIgnored"})
+    @SuppressWarnings({"unchecked"})
     @PostConstruct
     public void initializeLoadingCache() {
-        Cache transliteratedCache = cacheManager.getCache("transliteratedPlantKoreanNamesCache");
+        Cache transliteratedCache = cacheManager.getCache("transliteratedPlantNamesCache");
         if (transliteratedCache == null) {
-            throw new NotFoundValueException(CACHE_NOT_INITIALIZED, "transliteratedPlantKoreanNamesCache");
+            throw new NotFoundValueException(CACHE_NOT_INITIALIZED, "transliteratedPlantNamesCache");
         }
-        transliteratedPlantKoreanNamesCache = (LoadingCache<String, List<String>>) transliteratedCache.getNativeCache();
-        transliteratedPlantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
+        transliteratedPlantNamesCache = (LoadingCache<String, List<String>>) transliteratedCache.getNativeCache();
+        transliteratedPlantNamesCache.get(PLANT_NAMES_CACHE_NAME);
     }
 
     @Override
-    public List<String> getTransliteratedKoreanNames() {
-        return transliteratedPlantKoreanNamesCache.get(KOREAN_NAMES_CACHE_NAME);
+    public List<String> getTransliteratedPlantNames() {
+        return transliteratedPlantNamesCache.get(PLANT_NAMES_CACHE_NAME);
     }
 }
