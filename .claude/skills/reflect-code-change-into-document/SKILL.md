@@ -16,7 +16,8 @@ disallowed-tools: Edit(/src/**)
 - Affected: every `src/main/java/` class that uses a Primary `src/main/` class (found per class with
   `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose documented behavior the change
   reaches — e.g. a new exception now thrown through it, or a replaced dependency it injects. A
-  deleted Primary class is searched by its old name. Affected classes are Target Classes too.
+  deleted Primary class is searched by its old name. Affected classes are Target Classes too. This
+  repository-wide `git grep` lookup is permitted.
 - Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Document Mapping per Class
