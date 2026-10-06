@@ -1,8 +1,8 @@
 ---
 name: reflect-flyway-change-into-external-source
 description: Detects unpushed Flyway migration and JPA entity changes, then reflects their table-column and default-value facts into the Confluence `테이블 정의서` pages.
-allowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-result/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/naming-convention.md) Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md)
-disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/SKILL.md) Edit(/src/**)
+allowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-result/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md) Bash(python3 .claude/skills/reflect-flyway-change-into-external-source/scripts/glossary.py*)
+disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/SKILL.md) Edit(/src/**) Read(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**)
 ---
 
 # Preconditions
@@ -10,12 +10,14 @@ disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-sourc
 - This skill only reads Flyway migrations, JPA entity classes, their referenced constant classes,
   git metadata, and, only to choose the page for a table absent from the Table Index, the code
   that uses the table's entity (controllers and repositories). It only writes under its own
-  `confluence-result/`, to its own `naming-convention.md` and `confluence-structure.md`, and to
-  the Confluence pages listed in `confluence-structure.md` via the Atlassian MCP tools.
+  `confluence-result/`, to its own `glossary/` (through `scripts/glossary.py`) and
+  `confluence-structure.md`, and to the Confluence pages listed in `confluence-structure.md` via
+  the Atlassian MCP tools.
 - @.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md is the
   canonical page locator, section skeleton, and placement rule set.
 - @.claude/skills/reflect-flyway-change-into-external-source/naming-convention.md is the
-  canonical Korean-label glossary and rendering rule set.
+  canonical rendering rule set and the usage reference of `scripts/glossary.py`, the only access
+  path to the Korean-label glossary under `glossary/`.
 
 # Target Sources
 
@@ -102,14 +104,14 @@ Render every value per `naming-convention.md`'s Rendering Rules.
      report it in a separate section of the final report;
    - migration defect (the migration contradicts the history) → apply nothing, write no result
      file, report the defect, and terminate.
-   For every column or table without a glossary entry in `naming-convention.md`, draft its Korean
-   label from the glossary's tokens and patterns.
+   Run `scripts/glossary.py lookup` for every table and column in the edit, then `draft` for each
+   `MISSING` one, and complete each draft candidate's unresolved fragments.
 6. Show the user the full edit per page — every added, changed, or removed row and section, and
    every drafted Korean label marked as drafted — and get explicit approval via AskUserQuestion.
    Apply nothing that was not approved; on rejection, adjust per the user's answer and ask again.
 7. Apply each approved page edit with `updateConfluencePage` in `html` content format, carrying
    over the fetched content for everything outside the edit.
-8. Add every approved new Korean label to `naming-convention.md`'s Glossary, and every newly
+8. Register every approved new Korean label with `scripts/glossary.py add`, and add every newly
    placed or removed table to `confluence-structure.md`'s Table Index.
 9. Write the result files (see Result File Format).
 
@@ -134,5 +136,7 @@ Path: `confluence-result/<RUN_ID>__<source-stem>__<page-slug>.md`, an empty file
 - Preserve each page's existing format: heading style, table shape, column order, row order,
   section order, and separators.
 - Never fabricate a fact not present in the actual source files or the current Confluence content.
+- Never read, search, or edit `glossary/` directly (Read/Edit tools, or any other means);
+  use only `scripts/glossary.py`.
 - English-only in this skill's own files; Korean is permitted only where a literal string must
   round-trip exactly into/out of Confluence.
