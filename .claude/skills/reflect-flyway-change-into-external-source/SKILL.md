@@ -85,11 +85,12 @@ Render every value per `naming-convention.md`'s Rendering Rules.
 
 - Never derive `## 세부 사항`, the `도메인` column, or any other section.
 - Termination: if every derived change is skipped as already reflected, terminate without
-  writing a result file. State which sources were dropped and why.
+  appending a result line. State which sources were dropped and why.
 
 # Workflow
 
-1. Resolve Target Sources and run the Target Sources Termination check.
+1. Record the run start time with `date -Iseconds`, then resolve Target Sources and run the
+   Target Sources Termination check.
 2. Run Change Derivation for each Target Source.
 3. Locate each table's page through `confluence-structure.md`'s Table Index. For a table absent
    from the index, use its Prefix Map; if no prefix matches, propose a page per the Prefix Map's
@@ -102,8 +103,8 @@ Render every value per `naming-convention.md`'s Rendering Rules.
    of its table (`git grep -lw '<table>'` over the migration pathspecs, in Flyway version order):
    - document error (the page departs from the history) → leave the change out of the edit and
      report it in a separate section of the final report;
-   - migration defect (the migration contradicts the history) → apply nothing, write no result
-     file, report the defect, and terminate.
+   - migration defect (the migration contradicts the history) → apply nothing, append no result
+     line, report the defect, and terminate.
    Run `scripts/glossary.py lookup` for every table and column in the edit, then `draft` for each
    `MISSING` one, and complete each draft candidate's unresolved fragments.
 6. Show the user the full edit per page — every added, changed, or removed row and section, and
@@ -113,19 +114,27 @@ Render every value per `naming-convention.md`'s Rendering Rules.
    over the fetched content for everything outside the edit.
 8. Register every approved new Korean label with `scripts/glossary.py add`, and add every newly
    placed or removed table to `confluence-structure.md`'s Table Index.
-9. Write the result files (see Result File Format).
+9. Append the result lines (see Result Log Format).
 
-# Result File Format
+# Result Log Format
 
-Path: `confluence-result/<RUN_ID>__<source-stem>__<page-slug>.md`, an empty file.
+Path: `confluence-result/confluence-result-<YY>-<MM>.txt`, an append-only log, where `<YY>` and
+`<MM>` are the two-digit year and month of the run start time. Create the file if it is missing.
 
-- `RUN_ID = YYYYMMDD_HHmmss` (from `date +%Y%m%d_%H%M%S` at the moment the run starts). On a
-  same-second collision, append `_2`, `_3`, ... to `RUN_ID`.
-- `<source-stem>`: the migration's file name without extension (e.g.
-  `V5.2.0__Create_plant_variety_table`), or the entity's simple class name (e.g. `PostEntity`).
+One line per (Target Source, page) pair whose edit was applied successfully, with three
+tab-separated fields:
+
+```
+<run-start-time><TAB><source-file-name><TAB><page-slug>
+```
+
+- `<run-start-time>`: the time recorded in Workflow step 1 (e.g. `2026-10-07T11:23:17+09:00`),
+  identical on every line of a run.
+- `<source-file-name>`: the Target Source's simple file name with its extension (e.g.
+  `V5.2.0__Create_plant_variety_table.sql`, `V5_2_1__Insert_plant_variety_table_default_data.java`,
+  `PostEntity.java`); it distinguishes a Flyway migration from a JPA entity.
 - `<page-slug>`: the page's slug from `confluence-structure.md`.
-- Write one file per (Target Source, page) pair whose edit was applied successfully. Files
-  accumulate; never overwrite or delete a prior run's file.
+- Only append; never rewrite or remove an existing line.
 
 # Hard Constraints
 

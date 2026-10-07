@@ -276,10 +276,12 @@
     <h3>reflect-flyway-change-into-external-source</h3>
     <p>Reflects unpushed Flyway migration and JPA entity changes into the main column tables and <code>디폴트 처리되는 컬럼</code> sections of the Confluence <code>테이블 정의서</code> pages.</p>
     <div class="docs">
-      <div class="doc read"><span class="tag">Read</span><span class="path">src/main/resources/db/migration/**, src/main/java/db/migration/**, **/jpa/entity/*Entity.java</span><span class="what">Unpushed changes; schema replayed per touched table</span></div>
-      <div class="doc read"><span class="tag">Read</span><span class="path">confluence-structure.md, naming-convention.md</span><span class="what">Page locator, placement rules, Korean-label glossary</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">src/main/resources/db/migration/**, src/main/java/db/migration/**, **/jpa/entity/*Entity.java</span><span class="what">Unpushed changes, each reflected as it is</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">confluence-structure.md, naming-convention.md</span><span class="what">Page locator, placement rules, rendering rules</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">scripts/glossary.py lookup / draft</span><span class="what">Korean labels; <code>glossary/</code> is never read directly</span></div>
       <div class="doc ext"><span class="tag">Confluence</span><span class="path">테이블 정의서(…)</span><span class="what">Edited only after the user approves the full per-page edit</span></div>
-      <div class="doc write"><span class="tag">Write</span><span class="path">confluence-result/&lt;RUN_ID&gt;__&lt;source-stem&gt;__&lt;page-slug&gt;.md</span><span class="what">One empty file per applied (source, page) pair</span></div>
+      <div class="doc write"><span class="tag">Write</span><span class="path">scripts/glossary.py add, confluence-structure.md</span><span class="what">Approved new Korean labels; Table Index</span></div>
+      <div class="doc write"><span class="tag">Write</span><span class="path">confluence-result/confluence-result-&lt;YY&gt;-&lt;MM&gt;.txt</span><span class="what">One appended line per applied (source, page) pair: run start time, source file name, page slug</span></div>
     </div>
     <div class="stop skip">No unpushed migration or entity change, or none that changes a rendered section.</div>
   </div>
