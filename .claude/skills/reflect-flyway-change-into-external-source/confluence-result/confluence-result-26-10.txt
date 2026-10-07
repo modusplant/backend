@@ -1,0 +1,2 @@
+2026-10-07T11:30:03+09:00	V5.2.0__Create_plant_variety_table.sql	environment-and-plant
+2026-10-07T11:30:03+09:00	V5.2.2__Alter_add_created_at_and_updated_at_to_plant_variety.sql	environment-and-plant
