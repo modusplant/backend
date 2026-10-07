@@ -4,8 +4,8 @@ import kr.modusplant.domains.search.common.constant.SearchStringConstant;
 import kr.modusplant.domains.search.domain.exception.enums.SearchErrorCode;
 import kr.modusplant.domains.search.usecase.model.read.SearchPlantNameReadModel;
 import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
-import kr.modusplant.domains.search.usecase.port.transliterator.SearchTransliterator;
 import kr.modusplant.domains.search.usecase.record.SearchPlantNameRecord;
+import kr.modusplant.infrastructure.transliterate.UnicodeTransliterator;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
@@ -27,19 +27,19 @@ import static org.mockito.Mockito.verify;
 class SearchPlantControllerTest {
 
     private final SearchPlantCache searchPlantCache = Mockito.mock(SearchPlantCache.class);
-    private final SearchTransliterator searchTransliterator = Mockito.mock(SearchTransliterator.class);
+    private final UnicodeTransliterator unicodeTransliterator = Mockito.mock(UnicodeTransliterator.class);
     private final JaroWinklerSimilarity jaroWinklerSimilarity = Mockito.mock(JaroWinklerSimilarity.class);
     private final SearchPlantController searchPlantController =
-            new SearchPlantController(searchPlantCache, searchTransliterator, jaroWinklerSimilarity);
+            new SearchPlantController(searchPlantCache, unicodeTransliterator, jaroWinklerSimilarity);
 
     @Test
     @DisplayName("유효한 키워드로 searchPlantNameByKeyword 호출 시 식물명 목록 반환")
     void testSearchPlantNameByKeyword_givenMatchingKeyword_willReturnReadModelList() {
         // given
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
         given(searchPlantCache.getTransliteratedPlantNames()).willReturn(List.of(TEST_SEARCH_PLANT_NFD_NAME));
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_1);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
 
         // when
         List<SearchPlantNameReadModel> result =
@@ -50,15 +50,15 @@ class SearchPlantControllerTest {
         assertThat(result.getFirst().plantName()).isEqualTo(TEST_SEARCH_PLANT_NAME);
         assertThat(result.getFirst().similarity()).isEqualTo(TEST_SEARCH_KEYWORD_SIMILARITY_1);
 
-        verify(searchTransliterator).separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD);
-        verify(searchTransliterator).combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME);
+        verify(unicodeTransliterator).separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD);
+        verify(unicodeTransliterator).combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME);
     }
 
     @Test
     @DisplayName("비어있는 캐시로 searchPlantNameByKeyword 호출 시 빈 목록 반환")
     void testSearchPlantNameByKeyword_givenEmptyCache_willReturnEmptyList() {
         // given
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
         given(searchPlantCache.getTransliteratedPlantNames()).willReturn(Collections.emptyList());
 
         // when
@@ -74,12 +74,12 @@ class SearchPlantControllerTest {
     void testSearchPlantNameByKeyword_givenMultipleNamesAndSizeOne_willReturnTopMatch() {
         // given
         SearchPlantNameRecord record = new SearchPlantNameRecord(TEST_SEARCH_KEYWORD, 1);
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
         given(searchPlantCache.getTransliteratedPlantNames()).willReturn(List.of(TEST_SEARCH_PLANT_OTHER_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME));
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_0_8);
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_1);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_OTHER_NAME);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_OTHER_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
 
         // when
         List<SearchPlantNameReadModel> result = searchPlantController.searchPlantNameByKeyword(record);
@@ -95,12 +95,12 @@ class SearchPlantControllerTest {
     void testSearchPlantNameByKeyword_givenMultipleNamesAndSizeTwo_willReturnDescendingOrderList() {
         // given
         SearchPlantNameRecord record = new SearchPlantNameRecord(TEST_SEARCH_KEYWORD, 2);
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
         given(searchPlantCache.getTransliteratedPlantNames()).willReturn(List.of(TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME));
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_1);
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_0_8);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_OTHER_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_OTHER_NAME);
 
         // when
         List<SearchPlantNameReadModel> result = searchPlantController.searchPlantNameByKeyword(record);
@@ -116,11 +116,11 @@ class SearchPlantControllerTest {
     void testSearchPlantNameByKeyword_givenSimilarityLowerThan0_8_willReturnListIgnoringThatResult() {
         // given
         SearchPlantNameRecord record = new SearchPlantNameRecord(TEST_SEARCH_KEYWORD, 2);
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
         given(searchPlantCache.getTransliteratedPlantNames()).willReturn(List.of(TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME));
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_1);
         given(jaroWinklerSimilarity.apply(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME, TEST_SEARCH_PLANT_OTHER_NFD_NAME)).willReturn(TEST_SEARCH_KEYWORD_SIMILARITY_0_6);
-        given(searchTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
+        given(unicodeTransliterator.combineKoreanIntoConsonantAndVowel(TEST_SEARCH_PLANT_NFD_NAME)).willReturn(TEST_SEARCH_PLANT_NAME);
 
         // when
         List<SearchPlantNameReadModel> result = searchPlantController.searchPlantNameByKeyword(record);
@@ -134,7 +134,7 @@ class SearchPlantControllerTest {
     @DisplayName("음절 분리 결과가 공백인 키워드로 searchPlantNameByKeyword 호출 시 예외 발생")
     void testSearchPlantNameByKeyword_givenBlankTransliteratedKeyword_willThrowException() {
         // given
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn("   ");
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn("   ");
 
         // when
         EmptyValueException exception = assertThrows(EmptyValueException.class,
@@ -149,7 +149,7 @@ class SearchPlantControllerTest {
     void testSearchPlantNameByKeyword_givenNullSize_willThrowException() {
         // given
         SearchPlantNameRecord record = new SearchPlantNameRecord(TEST_SEARCH_KEYWORD, null);
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
 
         // when
         EmptyValueException exception = assertThrows(EmptyValueException.class,
@@ -164,7 +164,7 @@ class SearchPlantControllerTest {
     void testSearchPlantNameByKeyword_givenSizeOutOfRange_willThrowException() {
         // given
         SearchPlantNameRecord record = new SearchPlantNameRecord(TEST_SEARCH_KEYWORD, 51);
-        given(searchTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
+        given(unicodeTransliterator.separateKoreanIntoConsonantAndVowel(TEST_SEARCH_KEYWORD)).willReturn(SearchStringConstant.TEST_SEARCH_PLANT_NFD_NAME);
 
         // when
         InvalidValueException exception = assertThrows(InvalidValueException.class,
