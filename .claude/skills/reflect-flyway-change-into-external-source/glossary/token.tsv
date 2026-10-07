@@ -1,0 +1,30 @@
+token	scope	korean
+site_member		사이트 회원
+memb		회원
+member		회원
+comm		소통
+post		게시글
+comment		댓글
+pri_cate		1차 항목
+seco_cate		2차 항목
+archive		아카이브
+like		좋아요
+bookmark		북마크
+abu_rep		신고
+abuse_report		신고
+dashboard		대시보드
+prop_bug_rep		건의 및 버그 제보
+prof		프로필
+withdraw		탈퇴
+term		약관
+notification		알림
+plant		식물
+info		정보
+photo		사진
+space		공간
+code		코드
+group		그룹
+file		파일
+token		토큰
+auth	table	인증
+auth	column	인가

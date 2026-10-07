@@ -170,7 +170,7 @@
 </style>
 <style>
   /* ===== assembler-only styles ===== */
-  .strip { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 8px; }
+  .strip { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; align-items: stretch; gap: 8px; }
   .strip .node {
     display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px;
     background: var(--surface); border: 1px solid var(--border); text-decoration: none; color: var(--text);
@@ -203,8 +203,8 @@
 <header class="page-head">
   <p class="kicker">Skill workflow · orchestrator</p>
   <h1>postprocess-main-code-change</h1>
-  <p class="role">Runs the required post-processing after code changes under <code>src/main/</code>: tests first, then docs, then Notion API specs, strictly in that order.</p>
-  <p class="source">Skill file: <code>.claude/skills/postprocess-main-code-change/SKILL.md</code>. That file is the source of truth; this page is a human-oriented view of it. Each step below embeds that skill's own <code>workflow-diagram.html</code>.</p>
+  <p class="role">Runs the required post-processing after code changes under <code>src/main/</code>: tests first, then docs, then Notion API specs, then Confluence table definitions, strictly in that order.</p>
+  <p class="source">Skill file: <code>.claude/skills/postprocess-main-code-change/SKILL.md</code>. That file is the source of truth; this page is a human-oriented view of it. Steps 1–3 embed that skill's own <code>workflow-diagram.html</code>; step 4 is summarized inline.</p>
 </header>
 
 <div class="legend" aria-label="Legend">
@@ -223,11 +223,15 @@
   <li><a class="node" href="#stage-2"><span class="num">2</span><strong>reflect-code-change-into-document</strong><span class="sub">Reflect changes into Claude docs</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
   <li><a class="node" href="#stage-3"><span class="num">3</span><strong>reflect-api-change-into-notion</strong><span class="sub">Reflect API changes into Notion</span></a></li>
+  <li class="arrow" aria-hidden="true">→</li>
+  <li><a class="node" href="#stage-4"><span class="num">4</span><strong>reflect-flyway-change-into-external-source</strong><span class="sub">Reflect schema changes into Confluence</span></a></li>
 </ol>
 <ul class="rules">
-  <li>This skill does no work itself. It only invokes the three skills through the Skill tool, in the conversation it runs in, never as a forked or background subagent. Each step's findings carry forward into the next.</li>
+  <li>This skill does no work itself. It only invokes the four skills through the Skill tool, in the conversation it runs in, never as a forked or background subagent. Each step's findings carry forward into the next.</li>
   <li>Each step starts only after the previous one finishes.</li>
-  <li>If any step terminates early, the chain stops there. The report names the step and the reason, so the user can re-run it manually.</li>
+  <li>If a step terminates because its target set is empty (including after its own scope filter), it is skipped and the chain continues with the next step.</li>
+  <li>If a step terminates early for any other reason, the chain stops there.</li>
+  <li>The report names every skipped or stopped step and the reason, so the user can re-run it manually.</li>
 </ul>
 
 <section class="stage" id="stage-1">
@@ -238,7 +242,8 @@
 <div class="handoff">
   <span class="down" aria-hidden="true">↓</span>
   <span class="ok">Step 1 finished → start step 2</span>
-  <div class="stop">Step 1 terminated early. Steps 2 and 3 do not run.</div>
+  <div class="stop skip">Step 1 had an empty target set. Step 2 starts.</div>
+  <div class="stop">Step 1 terminated early for another reason. Steps 2–4 do not run.</div>
 </div>
 
 <section class="stage" id="stage-2">
@@ -249,12 +254,37 @@
 <div class="handoff">
   <span class="down" aria-hidden="true">↓</span>
   <span class="ok">Step 2 finished → start step 3</span>
-  <div class="stop">Step 2 terminated early. Step 3 does not run.</div>
+  <div class="stop skip">Step 2 had an empty target set. Step 3 starts.</div>
+  <div class="stop">Step 2 terminated early for another reason. Steps 3 and 4 do not run.</div>
 </div>
 
 <section class="stage" id="stage-3">
   <div class="stage-head"><span class="num">3</span><h2>Notion API-spec reflection</h2><a href="../reflect-api-change-into-notion/workflow-diagram.html" target="_blank" rel="noopener">Open standalone ↗</a></div>
   <div class="frame"><iframe class="wf" src="../reflect-api-change-into-notion/workflow-diagram.html" title="reflect-api-change-into-notion workflow"></iframe></div>
+</section>
+
+<div class="handoff">
+  <span class="down" aria-hidden="true">↓</span>
+  <span class="ok">Step 3 finished → start step 4</span>
+  <div class="stop skip">Step 3 had an empty target set. Step 4 starts.</div>
+  <div class="stop">Step 3 terminated early for another reason. Step 4 does not run.</div>
+</div>
+
+<section class="stage" id="stage-4">
+  <div class="stage-head"><span class="num">4</span><h2>Confluence table-definition reflection</h2></div>
+  <div class="card">
+    <h3>reflect-flyway-change-into-external-source</h3>
+    <p>Reflects unpushed Flyway migration and JPA entity changes into the main column tables and <code>디폴트 처리되는 컬럼</code> sections of the Confluence <code>테이블 정의서</code> pages.</p>
+    <div class="docs">
+      <div class="doc read"><span class="tag">Read</span><span class="path">src/main/resources/db/migration/**, src/main/java/db/migration/**, **/jpa/entity/*Entity.java</span><span class="what">Unpushed changes, each reflected as it is</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">confluence-structure.md, naming-convention.md</span><span class="what">Page locator, placement rules, rendering rules</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">scripts/glossary.py lookup / draft</span><span class="what">Korean labels; <code>glossary/</code> is never read directly</span></div>
+      <div class="doc ext"><span class="tag">Confluence</span><span class="path">테이블 정의서(…)</span><span class="what">Edited only after the user approves the full per-page edit</span></div>
+      <div class="doc write"><span class="tag">Write</span><span class="path">scripts/glossary.py add, confluence-structure.md</span><span class="what">Approved new Korean labels; Table Index</span></div>
+      <div class="doc write"><span class="tag">Write</span><span class="path">confluence-result/confluence-result-&lt;YY&gt;-&lt;MM&gt;.txt</span><span class="what">One appended line per applied (source, page) pair: run start time, source file name, page slug</span></div>
+    </div>
+    <div class="stop skip">No unpushed migration or entity change, or none that changes a rendered section.</div>
+  </div>
 </section>
 
 <footer class="page-foot">

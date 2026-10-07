@@ -1,0 +1,10 @@
+pattern	korean
+<x>_id	<x> 식별자
+<x>_uuid	<x> 식별자
+<x>_ulid	<x> 식별자
+is_<x>	<x> 여부
+<x>_count	<x> 수
+<x>_at	<x> 시점
+<x>_custom	<x> 직접 입력값
+<x>_code	<x> 코드
+<x>_path	<x> 경로

@@ -22,7 +22,8 @@ disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) 
   `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose API-observable behavior the
   change reaches — e.g. a new exception now thrown through it. A deleted Primary class is searched
   by its old name, and the lookup runs before the Watched API Surface filter, so a Primary class
-  outside the mapping table still seeds it. Affected classes are Target Classes too.
+  outside the mapping table still seeds it. Affected classes are Target Classes too. This
+  repository-wide `git grep` lookup is permitted.
 - Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Watched API Surface

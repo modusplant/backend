@@ -13,7 +13,8 @@ disallowed-tools: Edit(/src/main/**)
   `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose behavior or tests the change
   reaches — e.g. a new exception now thrown through it, or a replaced dependency it injects. A
   deleted Primary class is searched by its old name, and a Primary class later dropped as unmatched
-  still seeds this lookup. Affected classes are Target Classes too.
+  still seeds this lookup. Affected classes are Target Classes too. This repository-wide `git grep`
+  lookup is permitted.
 - Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Resolving Target Areas

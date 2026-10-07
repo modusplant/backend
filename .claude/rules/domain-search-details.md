@@ -23,7 +23,6 @@ search/
  │   ├─ port/repository/              # Repository port interfaces
  │   ├─ port/mapper/                  # Domain → DTO mapper interfaces
  │   ├─ port/cache/                   # Cache port interfaces
- │   ├─ port/transliterator/          # Transliteration port interfaces
  │   ├─ record/                       # Data-transfer records (REST Controller → adapter)
  │   ├─ response/                     # Response DTOs (Java records)
  │   └─ model/read/                   # Read models for jOOQ query mapping
@@ -38,7 +37,6 @@ search/
          │   └─ mapper/supers/        # Shared base jOOQ mapper interfaces
          ├─ jpa/repository/           # Spring Data JPA interfaces for condition/lookup queries
          ├─ caffeine/                 # In-memory cache implementations of usecase/port/cache/
-         ├─ icu4j/                    # Transliteration implementations of usecase/port/transliterator/
          └─ redis/                    # Redis-backed repositories (e.g. search history)
 ```
 
@@ -74,9 +72,6 @@ search/
 
 **Cache Ports** (`usecase/port/cache/`):
 - Abstracts a cache lookup/store operation over domain VOs; implemented in `framework/outbound/caffeine/`
-
-**Transliterator Ports** (`usecase/port/transliterator/`):
-- Abstracts a text-transliteration operation; implemented in `framework/outbound/icu4j/`
 
 **Records** (`usecase/record/`):
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (String, Integer, etc.)
@@ -115,7 +110,5 @@ search/
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; Spring Data JPA interface used for condition/lookup queries against a JPA-managed table
 
 **Cache Adapter** (`framework/outbound/caffeine/`) — `@Component`; implements a `usecase/port/cache/` interface with an in-memory Caffeine cache
-
-**Transliterator Adapter** (`framework/outbound/icu4j/`) — `@Component`; implements a `usecase/port/transliterator/` interface using ICU4J
 
 **Redis Repository** (`framework/outbound/redis/`) — `@Repository`; reads/writes Redis directly (e.g. recording and retrieving search history) without an intervening usecase port
