@@ -32,7 +32,7 @@ Tables in page order, as they currently appear on each page.
 | `member`                | `site_member`, `site_member_auth`, `site_member_term`, `site_member_prof`, `site_member_withdraw`                                |
 | `post`                  | `comm_pri_cate`, `comm_seco_cate`, `comm_post`, `comm_post_archive`, `comm_post_like`, `comm_post_bookmark`, `comm_post_abu_rep` |
 | `admin-activity`        | `comm_post_abuse_report_dashboard`, `comm_comment_abuse_report_dashboard`                                                        |
-| `environment-and-plant` | `plant`, `plant_space`, `plant_info`, `plant_info_photo`                                                                         |
+| `environment-and-plant` | `plant`, `plant_variety`, `plant_space`, `plant_info`, `plant_info_photo`                                                        |
 | `user-activity`         | `comm_comment`, `comm_comment_like`, `comm_comment_abu_rep`, `prop_bug_rep`                                                      |
 | `server-function`       | `refresh_token`, `fcm_token`, `comm_notification`, `pending_file`                                                                |
 | `policy-implementation` | `term`, `swear`, `prop_bug_rep_archive`, `common_code_group`, `common_code`                                                      |
