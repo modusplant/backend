@@ -4,8 +4,8 @@ import kr.modusplant.domains.search.domain.vo.SearchKeyword;
 import kr.modusplant.domains.search.domain.vo.SearchResultListSize;
 import kr.modusplant.domains.search.usecase.model.read.SearchPlantNameReadModel;
 import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
-import kr.modusplant.domains.search.usecase.port.transliterator.SearchTransliterator;
 import kr.modusplant.domains.search.usecase.record.SearchPlantNameRecord;
+import kr.modusplant.infrastructure.transliterate.UnicodeTransliterator;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
@@ -22,13 +22,13 @@ import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCod
 @RequiredArgsConstructor
 public class SearchPlantController {
     private final SearchPlantCache searchPlantCache;
-    private final SearchTransliterator searchTransliterator;
+    private final UnicodeTransliterator unicodeTransliterator;
     private final JaroWinklerSimilarity jaroWinklerSimilarity;
 
     public List<SearchPlantNameReadModel> searchPlantNameByKeyword(
             SearchPlantNameRecord record) {
         SearchKeyword keyword = SearchKeyword.create(
-                searchTransliterator.separateKoreanIntoConsonantAndVowel(record.keyword()));
+                unicodeTransliterator.separateKoreanIntoConsonantAndVowel(record.keyword()));
         String keywordValue = keyword.getValue();
         SearchResultListSize searchResultListSize = SearchResultListSize.create(record.size());
         int resultListSize = searchResultListSize.getValue();
@@ -40,14 +40,14 @@ public class SearchPlantController {
                 if (similarityPriorityQueue.size() < resultListSize) {
                     similarityPriorityQueue.offer(
                             new SearchPlantNameReadModel(
-                                    searchTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
+                                    unicodeTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
                 } else if (similarityPriorityQueue.peek() == null) {
                     throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "searchSize");
                 } else if (similarity > similarityPriorityQueue.peek().similarity()) {
                     similarityPriorityQueue.poll();
                     similarityPriorityQueue.offer(
                             new SearchPlantNameReadModel(
-                                    searchTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
+                                    unicodeTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
                 }
             }
         }

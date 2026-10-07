@@ -75,7 +75,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `identity` → `domains/account/identity/`
   - `normal-identity` → `domains/account/normal/`
   - `social-identity` → `domains/account/social/`
-- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security` (all under `infrastructure/<area>/`).
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under `infrastructure/<area>/`).
 
 ### Key Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).

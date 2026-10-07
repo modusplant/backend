@@ -1,8 +1,6 @@
 package kr.modusplant.infrastructure.config.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.ibm.icu.text.Transliterator;
-import kr.modusplant.shared.framework.icu4j.util.Icu4jUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,6 +17,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -56,16 +55,11 @@ public class CacheConfig {
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
                         .maximumWeight(40000)
-                        .weigher((Object key, Object value) -> {
-                            if (value instanceof List<?> list) {
-                                return list.size();
-                            } else if (value instanceof Map<?, ?> map) {
-                                return map.size();
-                            } else if (value instanceof Set<?> set) {
-                                return set.size();
-                            } else {
-                                return 1;
-                            }
+                        .weigher((Object key, Object value) -> switch (value) {
+                            case List<?> list -> list.size();
+                            case Map<?, ?> map -> map.size();
+                            case Set<?> set -> set.size();
+                            default -> 1;
                         })
                         .softValues()
                         .recordStats());
@@ -77,14 +71,13 @@ public class CacheConfig {
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
         log.info("[PostgreSQL] Loading all the plant names from the plant and plant_variety tables");
-        Transliterator transliterator = Icu4jUtils.getAnyNFDTransliterator();
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
                 .where(PLANT.KOREAN_NAME.isNotNull())
                 .union(dslContext.select(PLANT_VARIETY.VARIETY_NAME).from(PLANT_VARIETY))
                 .fetchInto(String.class)
                 .stream()
-                .map(transliterator::transliterate)
+                .map(plantName -> Normalizer.normalize(plantName, Normalizer.Form.NFD))
                 .toList();
     }
 }
