@@ -1,0 +1,33 @@
+table	label
+site_member	사이트 회원
+site_member_auth	사이트 회원 인증
+site_member_term	사이트 회원 약관
+site_member_prof	사이트 회원 프로필
+site_member_withdraw	사이트 회원 탈퇴
+comm_pri_cate	소통 1차 항목
+comm_seco_cate	소통 2차 항목
+comm_post	소통 게시글
+comm_post_archive	소통 게시글 아카이브
+comm_post_like	소통 게시글 좋아요
+comm_post_bookmark	소통 게시글 북마크
+comm_post_abu_rep	소통 게시글 신고
+comm_post_abuse_report_dashboard	게시글 신고 대시보드
+comm_comment_abuse_report_dashboard	댓글 신고 대시보드
+plant	식물
+plant_space	식물 공간 환경 정보
+plant_info	식물 정보
+plant_info_photo	식물 정보 사진
+term	약관
+refresh_token	리프레시 토큰
+fcm_token	FCM 토큰
+comm_comment	소통 댓글
+comm_comment_like	소통 댓글 좋아요
+comm_comment_abu_rep	소통 댓글 신고
+swear	비속어
+prop_bug_rep	건의 및 버그 제보
+prop_bug_rep_archive	건의 및 버그 제보 아카이브
+comm_notification	소통 컨텐츠 알림
+common_code_group	공통 코드 그룹
+common_code	공통 코드
+pending_file	지연 중 파일
+plant_variety	식물 품종

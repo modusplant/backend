@@ -1,6 +1,6 @@
 package kr.modusplant.domains.search.usecase.record;
 
-public record SearchPlantKoreanNameRecord(
+public record SearchPlantNameRecord(
         String keyword,
         Integer size) {
 }

@@ -1,8 +1,6 @@
 package kr.modusplant.infrastructure.config.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
-import com.ibm.icu.text.Transliterator;
-import kr.modusplant.shared.framework.icu4j.util.Icu4jUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,10 +17,14 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static kr.modusplant.jooq.Tables.PLANT;
+import static kr.modusplant.jooq.Tables.PLANT_VARIETY;
 
 @Configuration
 @EnableCaching
@@ -46,14 +48,19 @@ public class CacheConfig {
     }
 
     @Bean
-    @Qualifier("plantKoreanNameCaffeineCacheManager")
+    @Qualifier("plantNameCaffeineCacheManager")
     public CacheManager caffeineCacheManager(DSLContext dslContext) {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.setCacheNames(List.of("transliteratedPlantKoreanNamesCache"));
+        cacheManager.setCacheNames(List.of("transliteratedPlantNamesCache"));
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
-                        .initialCapacity(15000)
-                        .maximumSize(20000)
+                        .maximumWeight(40000)
+                        .weigher((Object key, Object value) -> switch (value) {
+                            case List<?> list -> list.size();
+                            case Map<?, ?> map -> map.size();
+                            case Set<?> set -> set.size();
+                            default -> 1;
+                        })
                         .softValues()
                         .recordStats());
         cacheManager.setCacheLoader(
@@ -63,14 +70,14 @@ public class CacheConfig {
     }
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
-        log.info("[PostgreSQL] Loading all the Korean names from the plant table");
-        Transliterator transliterator = Icu4jUtils.getAnyNFDTransliterator();
+        log.info("[PostgreSQL] Loading all the plant names from the plant and plant_variety tables");
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
                 .where(PLANT.KOREAN_NAME.isNotNull())
+                .union(dslContext.select(PLANT_VARIETY.VARIETY_NAME).from(PLANT_VARIETY))
                 .fetchInto(String.class)
                 .stream()
-                .map(transliterator::transliterate)
+                .map(plantName -> Normalizer.normalize(plantName, Normalizer.Form.NFD))
                 .toList();
     }
 }
