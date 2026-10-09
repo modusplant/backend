@@ -44,6 +44,9 @@
 
       "Bash(docker compose config)",
 
+      "Bash(./gradlew flywayClean*)",
+      "Bash(./gradlew flywayRepair*)",
+
       "Read(/.gradle/**)",
       "Read(/.idea/**)",
       "Read(**/.settings/**)",
