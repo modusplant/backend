@@ -140,6 +140,18 @@ dependencies {
 	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 	implementation "org.mapstruct:mapstruct:$mapstructVersion"
 	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
+
+	dependencies {
+		constraints {
+			//noinspection ForeignDelegate
+            implementation('com.squareup.okhttp3:okhttp') {
+				version {
+					strictly('4.12.0')
+				}
+				because('mailjet-client가 전이적으로 의존하는 OkHttp 5 알파 대신 안정적인 버전 사용')
+			}
+		}
+	}
 }
 
 sourceSets {
