@@ -41,6 +41,7 @@
     "deny": [
       "Bash(rm -rf **/src/**)",
 
+      "Bash(git commit*)",
       "Bash(git push*)",
 
       "Bash(docker compose config)",
