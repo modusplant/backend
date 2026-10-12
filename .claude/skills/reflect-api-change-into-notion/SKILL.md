@@ -162,8 +162,6 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 # Hard Constraints
 
-- Never invoke this skill on your own initiative; only run it when invoked by
-  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.
 - Coverage is enforced per Workflow step 4: every class section in a detected-change file must be
   traceable, by fully-qualified name, to a reflected-change file's Provenance.
 - English-only in this skill's own files; Korean is permitted only where a literal string must

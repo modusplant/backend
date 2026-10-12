@@ -89,8 +89,3 @@ After processing every bucket, report:
   - Per processed area: which classes (marked Primary or Affected) got tests created, modified, or deleted.
   - Skipped areas (missing feature/rule file) and the classes left unprocessed within them.
   - Unmatched classes dropped during Resolving Target Areas.
-
-# Hard Constraints
-
-- Never invoke this skill on your own initiative; only run it when invoked by
-  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.
