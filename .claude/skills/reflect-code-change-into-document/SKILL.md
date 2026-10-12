@@ -34,8 +34,3 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 # Update Strategy
 
 - Necessary-only: update strictly what's needed; leave no bloat in the document (no excessive examples, no content duplicated within the same document or across documents).
-
-# Hard Constraints
-
-- Never invoke this skill on your own initiative; only run it when invoked by
-  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.

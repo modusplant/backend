@@ -291,7 +291,6 @@
 <footer class="page-foot">
   <h2>Guardrails</h2>
   <ul>
-    <li>Runs only when invoked by <code>.claude/skills/postprocess-main-code-change/SKILL.md</code>, never on its own initiative.</li>
     <li>Writes only under its own <code>detected-change/</code> and <code>reflected-change/</code> directories, plus Notion pages. Its <code>SKILL.md</code> and <code>document-format.md</code> are read-only.</li>
     <li>Every fact written to Notion must trace back through <code>## Provenance</code> to the actual source code. No fact is ever invented.</li>
   </ul>
