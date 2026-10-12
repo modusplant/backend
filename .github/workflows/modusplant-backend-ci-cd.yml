@@ -11,6 +11,7 @@ on:
 jobs:
   # 1. TEST: dev용 application.yml + Gradle test
   test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -31,7 +32,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load test env from SSM
+      - name: Load dev environment variables from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -55,7 +56,7 @@ jobs:
             /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
 
-      - name: Debug DB env
+      - name: Print DB connection environment variables
         run: |
           echo "JDBC_CONNECTION_URL=$JDBC_CONNECTION_URL"
           echo "JDBC_USERNAME=$JDBC_USERNAME"
@@ -119,6 +120,7 @@ jobs:
 
   # 2. BUILD: GHCR_PAT + 이미지 빌드/푸시
   build:
+    name: Build and Push Image
     needs: test
     runs-on: ubuntu-latest
 
@@ -136,7 +138,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load CI params from SSM (GHCR_PAT, dev/prod yml)
+      - name: Load GHCR token and dev DB credentials from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -156,7 +158,7 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Build bootJar
+      - name: Migrate dev DB, generate jOOQ code, and build bootJar
         run: |
           ./gradlew flywayMigrate jooqCodegen bootJar \
             -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
@@ -191,7 +193,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # dev/prod 빌드 플랫폼(arm64)
-      - name: Build and push ARM64 image
+      - name: Build and push ARM64 image to GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -203,6 +205,7 @@ jobs:
 
   # 3. DEPLOY: EC2 배포 (EC2에서 SSM → .env.prod → docker run --env-file)
   deploy:
+    name: Deploy to Prod (EC2)
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
@@ -218,7 +221,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load deploy params from SSM
+      - name: Load prod deploy parameters from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -229,14 +232,14 @@ jobs:
             /config/modusplant_prod/docker_logpath  = MODUSPLANT_DOCKER_LOGPATH
           withDecryption: "true"
 
-      - name: Write SSH key from env
+      - name: Write prod EC2 SSH key to temporary file
         env:
           MODUSPLANT_SSH_KEY: ${{ env.MODUSPLANT_SSH_KEY }}
         run: |
           echo "${MODUSPLANT_SSH_KEY}" > _ci_tmp_ssh_key.pem
           chmod 600 _ci_tmp_ssh_key.pem
 
-      - name: Deploy to EC2 via SSH
+      - name: Deploy to prod EC2 via SSH
         env:
           EC2_INSTANCE_IP: ${{ env.MODUSPLANT_EC2_IP }}
           GHCR_PAT: ${{ env.GHCR_PAT }}
@@ -389,12 +392,13 @@ jobs:
           echo "[EC2] Deploy finished."
           EOF
 
-      - name: Cleanup SSH key
+      - name: Remove temporary SSH key file
         if: always()
         run: rm -f _ci_tmp_ssh_key.pem
 
   # 3-2. DEPLOY_DEV: 개발환경 배포 (맥미니 홈서버)
   deploy_dev:
+    name: Deploy to Dev (Mac mini)
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
@@ -410,7 +414,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load deploy params from SSM
+      - name: Load dev deploy parameters from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -421,14 +425,14 @@ jobs:
             /config/modusplant_dev/docker_logpath   = MODUSPLANT_DOCKER_LOGPATH
           withDecryption: "true"
 
-      - name: Write SSH key from env
+      - name: Write dev server SSH key to temporary file
         env:
           DEV_SSH_KEY: ${{ env.DEV_SSH_KEY }}
         run: |
           echo "${DEV_SSH_KEY}" > _ci_tmp_dev_ssh_key.pem
           chmod 600 _ci_tmp_dev_ssh_key.pem
 
-      - name: Deploy to Dev Server via SSH
+      - name: Deploy to dev Mac mini via SSH
         env:
           DEV_SERVER_IP: ${{ env.DEV_SERVER_IP }}
           GHCR_PAT: ${{ env.GHCR_PAT }}
@@ -491,12 +495,13 @@ jobs:
           echo "[Dev Server] Deploy finished."
           EOF
 
-      - name: Cleanup SSH key
+      - name: Remove temporary SSH key file
         if: always()
         run: rm -f _ci_tmp_dev_ssh_key.pem
 
   # 4. GitHub Release 자동 릴리즈 노트
   github_release:
+    name: Create GitHub Release
     needs: deploy
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
@@ -505,7 +510,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
       - name: Create GitHub Release with auto notes
