@@ -2,6 +2,7 @@
 /.claude/CLAUDE.local.md
 /.claude/settings.local.json
 /.claude/logs/
+/.claude/temp/
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/resolve-error-with-stack-trace/result
 /.claude/skills/visualize-docker-container-dependency/result
