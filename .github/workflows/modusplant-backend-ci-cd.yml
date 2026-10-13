@@ -263,7 +263,25 @@ jobs:
           set -euo pipefail
           
           ENV_FILE="/opt/modusplant/.env.prod"
-          
+          NEW_ENV_FILE="${ENV_FILE}.new"
+
+          rollback() {
+            echo "[EC2] Roll back to previous container..."
+            if docker inspect modusplant-be >/dev/null 2>&1; then
+              docker logs --tail 100 modusplant-be || true
+              docker rm -f modusplant-be
+            fi
+            rm -f "${NEW_ENV_FILE}"
+            if docker inspect modusplant-be-previous >/dev/null 2>&1; then
+              docker rename modusplant-be-previous modusplant-be
+              docker start modusplant-be
+              echo "[EC2] Previous container restored."
+            else
+              echo "[EC2] No previous container to roll back to."
+            fi
+            exit 1
+          }
+
           echo "[EC2] IMAGE=${IMAGE}"
           echo "[EC2] ENV_FILE=${ENV_FILE}"
           echo "[EC2] BACKEND_LOGPATH=${BACKEND_LOGPATH:-<empty>}"
@@ -324,9 +342,9 @@ jobs:
           # === FIREBASE_CREDENTIALS_JSON ===
           FIREBASE_CREDENTIALS_JSON=$(aws ssm get-parameter --name "/config/modusplant/FIREBASE_CREDENTIALS_JSON"  --with-decryption --query "Parameter.Value" --output text)
           
-          echo "[EC2] Write env file: ${ENV_FILE}"
+          echo "[EC2] Write new env file: ${NEW_ENV_FILE}"
           mkdir -p /opt/modusplant
-          cat > "${ENV_FILE}" <<EOT
+          cat > "${NEW_ENV_FILE}" <<EOT
           DB_CONNECTION_URL=${DB_CONNECTION_URL}
           DB_USERNAME=${DB_USERNAME}
           DB_PASSWORD=${DB_PASSWORD}
@@ -370,12 +388,17 @@ jobs:
           echo "[EC2] Pull image: ${IMAGE}"
           docker pull "${IMAGE}"
           
-          echo "[EC2] Stop & remove existing container..."
-          docker stop modusplant-be || true
-          docker rm modusplant-be || true
-          
+          echo "[EC2] Remove modusplant-be-previous left by an interrupted deploy, if any..."
+          docker rm -f modusplant-be-previous || true
+
+          if docker inspect modusplant-be >/dev/null 2>&1; then
+            echo "[EC2] Stop & keep existing container as modusplant-be-previous..."
+            docker stop modusplant-be
+            docker rename modusplant-be modusplant-be-previous
+          fi
+
           echo "[EC2] Run new container with env-file..."
-          docker run -d \
+          if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
           --network nginx_proxy \
@@ -385,13 +408,15 @@ jobs:
           --health-retries 3 \
           --health-start-period 60s \
           --health-start-interval 5s \
-          --env-file "${ENV_FILE}" \
+          --env-file "${NEW_ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=prod \
           -e LOG_TO_FILE=true \
           -e LOG_DIR="${DOCKER_LOGPATH}" \
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
-          "${IMAGE}"
-          
+          "${IMAGE}"; then
+            rollback
+          fi
+
           echo "[EC2] Wait for container health..."
           HEALTH_POLL_INTERVAL_SECONDS=5
           while true; do
@@ -401,13 +426,18 @@ jobs:
             fi
             if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
               echo "[EC2] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
-              docker logs --tail 100 modusplant-be
-              exit 1
+              rollback
             fi
             sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
           done
           echo "[EC2] Container is healthy."
-          
+
+          echo "[EC2] Promote env file: ${ENV_FILE}"
+          mv "${NEW_ENV_FILE}" "${ENV_FILE}"
+
+          echo "[EC2] Remove previous container..."
+          docker rm -f modusplant-be-previous || true
+
           echo "[EC2] Deploy finished."
           EOF
 
@@ -478,6 +508,22 @@ jobs:
           
           ENV_FILE="/Users/donghyeok/workspace/modus-plant/modusplant-backend/.env.dev"
 
+          rollback() {
+            echo "[Dev Server] Roll back to previous container..."
+            if docker inspect modusplant-be >/dev/null 2>&1; then
+              docker logs --tail 100 modusplant-be || true
+              docker rm -f modusplant-be
+            fi
+            if docker inspect modusplant-be-previous >/dev/null 2>&1; then
+              docker rename modusplant-be-previous modusplant-be
+              docker start modusplant-be
+              echo "[Dev Server] Previous container restored."
+            else
+              echo "[Dev Server] No previous container to roll back to."
+            fi
+            exit 1
+          }
+
           echo "[Dev Server] IMAGE=${IMAGE}"
           echo "[Dev Server] ENV_FILE=${ENV_FILE}"
           echo "[Dev Server] BACKEND_LOGPATH=${BACKEND_LOGPATH:-<empty>}"
@@ -492,12 +538,17 @@ jobs:
           echo "[Dev Server] Pull image: ${IMAGE}"
           docker pull "${IMAGE}"
 
-          echo "[Dev Server] Stop & remove existing container..."
-          docker stop modusplant-be || true
-          docker rm modusplant-be || true
+          echo "[Dev Server] Remove modusplant-be-previous left by an interrupted deploy, if any..."
+          docker rm -f modusplant-be-previous || true
+
+          if docker inspect modusplant-be >/dev/null 2>&1; then
+            echo "[Dev Server] Stop & keep existing container as modusplant-be-previous..."
+            docker stop modusplant-be
+            docker rename modusplant-be modusplant-be-previous
+          fi
 
           echo "[Dev Server] Run new container with env-file..."
-          docker run -d \
+          if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
           --network nginx_proxy \
@@ -512,7 +563,9 @@ jobs:
           -e LOG_TO_FILE=true \
           -e LOG_DIR="${DOCKER_LOGPATH}" \
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
-          "${IMAGE}"
+          "${IMAGE}"; then
+            rollback
+          fi
 
           echo "[Dev Server] Wait for container health..."
           HEALTH_POLL_INTERVAL_SECONDS=5
@@ -523,12 +576,14 @@ jobs:
             fi
             if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
               echo "[Dev Server] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
-              docker logs --tail 100 modusplant-be
-              exit 1
+              rollback
             fi
             sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
           done
           echo "[Dev Server] Container is healthy."
+
+          echo "[Dev Server] Remove previous container..."
+          docker rm -f modusplant-be-previous || true
 
           echo "[Dev Server] Deploy finished."
           EOF
