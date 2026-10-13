@@ -53,13 +53,13 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 
 ### Deploy to Prod (EC2)
 
-| Step                                     | Description                                                                                                                                                        |
-|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Configure AWS credentials (for SSM)      | Authenticate to AWS for SSM Parameter Store access.                                                                                                                |
-| Load prod deploy parameters from SSM     | Load the GHCR token, EC2 address and SSH key, and log paths.                                                                                                       |
-| Write prod EC2 SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                            |
-| Deploy to prod EC2 via SSH               | On EC2: regenerate `/opt/modusplant/.env.prod` from prod SSM parameters, pull the commit-SHA image, and replace the `modusplant-be` container with `prod` profile. |
-| Remove temporary SSH key file            | Delete the SSH key file, even on failure.                                                                                                                          |
+| Step                                     | Description                                                                                                                                                                                                               |
+|------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Configure AWS credentials (for SSM)      | Authenticate to AWS for SSM Parameter Store access.                                                                                                                                                                       |
+| Load prod deploy parameters from SSM     | Load the GHCR token, EC2 address and SSH key, and log paths.                                                                                                                                                              |
+| Write prod EC2 SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                                                                   |
+| Deploy to prod EC2 via SSH               | On EC2: regenerate `/opt/modusplant/.env.prod` from prod SSM parameters, pull the commit-SHA image, replace the `modusplant-be` container with `prod` profile, and wait for the container health check to report healthy. |
+| Remove temporary SSH key file            | Delete the SSH key file, even on failure.                                                                                                                                                                                 |
 
 ### Create GitHub Release
 
@@ -72,10 +72,10 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 
 ### Deploy to Dev (Mac mini)
 
-| Step                                       | Description                                                                                                                                   |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
-| Configure AWS credentials (for SSM)        | Authenticate to AWS for SSM Parameter Store access.                                                                                           |
-| Load dev deploy parameters from SSM        | Load the GHCR token, dev server address and SSH key, and log paths.                                                                           |
-| Write dev server SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                       |
-| Deploy to dev Mac mini via SSH             | On the home server: pull the `latest` image and replace the `modusplant-be` container with `dev` profile, using the host-resident `.env.dev`. |
-| Remove temporary SSH key file              | Delete the SSH key file, even on failure.                                                                                                     |
+| Step                                       | Description                                                                                                                                                                                          |
+|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Configure AWS credentials (for SSM)        | Authenticate to AWS for SSM Parameter Store access.                                                                                                                                                  |
+| Load dev deploy parameters from SSM        | Load the GHCR token, dev server address and SSH key, and log paths.                                                                                                                                  |
+| Write dev server SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                                              |
+| Deploy to dev Mac mini via SSH             | On the home server: pull the `latest` image, replace the `modusplant-be` container with `dev` profile using the host-resident `.env.dev`, and wait for the container health check to report healthy. |
+| Remove temporary SSH key file              | Delete the SSH key file, even on failure.                                                                                                                                                            |

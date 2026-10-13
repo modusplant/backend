@@ -379,6 +379,12 @@ jobs:
           --name modusplant-be \
           --restart unless-stopped \
           --network nginx_proxy \
+          --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
+          --health-interval 15s \
+          --health-timeout 5s \
+          --health-retries 3 \
+          --health-start-period 60s \
+          --health-start-interval 5s \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=prod \
           -e LOG_TO_FILE=true \
@@ -386,8 +392,21 @@ jobs:
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
           "${IMAGE}"
           
-          echo "[EC2] Check container status..."
-          docker ps | grep modusplant-be || (echo "Container failed to start" && exit 1)
+          echo "[EC2] Wait for container health..."
+          HEALTH_POLL_INTERVAL_SECONDS=5
+          while true; do
+            read -r CONTAINER_HEALTH_STATUS CONTAINER_RESTART_COUNT <<< "$(docker inspect --format '{{.State.Health.Status}} {{.RestartCount}}' modusplant-be)"
+            if [ "${CONTAINER_HEALTH_STATUS}" = "healthy" ]; then
+              break
+            fi
+            if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
+              echo "[EC2] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
+              docker logs --tail 100 modusplant-be
+              exit 1
+            fi
+            sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
+          done
+          echo "[EC2] Container is healthy."
           
           echo "[EC2] Deploy finished."
           EOF
@@ -482,6 +501,12 @@ jobs:
           --name modusplant-be \
           --restart unless-stopped \
           --network nginx_proxy \
+          --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
+          --health-interval 15s \
+          --health-timeout 5s \
+          --health-retries 3 \
+          --health-start-period 60s \
+          --health-start-interval 5s \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=dev \
           -e LOG_TO_FILE=true \
@@ -489,8 +514,21 @@ jobs:
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
           "${IMAGE}"
 
-          echo "[Dev Server] Check container status..."
-          docker ps | grep modusplant-be || (echo "Container failed to start" && exit 1)
+          echo "[Dev Server] Wait for container health..."
+          HEALTH_POLL_INTERVAL_SECONDS=5
+          while true; do
+            read -r CONTAINER_HEALTH_STATUS CONTAINER_RESTART_COUNT <<< "$(docker inspect --format '{{.State.Health.Status}} {{.RestartCount}}' modusplant-be)"
+            if [ "${CONTAINER_HEALTH_STATUS}" = "healthy" ]; then
+              break
+            fi
+            if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
+              echo "[Dev Server] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
+              docker logs --tail 100 modusplant-be
+              exit 1
+            fi
+            sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
+          done
+          echo "[Dev Server] Container is healthy."
 
           echo "[Dev Server] Deploy finished."
           EOF
