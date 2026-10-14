@@ -87,5 +87,5 @@ Both deploy steps swap the `modusplant-be` container as follows:
 1. Remove any `modusplant-be-previous` left by an interrupted deploy.
 2. If `modusplant-be` exists, stop it and rename it to `modusplant-be-previous`.
 3. Start the new `modusplant-be` and wait until its readiness health check reports healthy.
-4. On success, remove `modusplant-be-previous`.
+4. On success, remove `modusplant-be-previous`, then remove the `ghcr.io/modusplant/backend` images that no container uses, along with all dangling images.
 5. On failure (`docker run` error, `unhealthy` status, or a container restart), print the new container's last 100 log lines, remove it, rename `modusplant-be-previous` (if present) back to `modusplant-be`, start it, and fail the job. Prod also deletes `/opt/modusplant/.env.prod.new`.

@@ -438,6 +438,12 @@ jobs:
           echo "[EC2] Remove previous container..."
           docker rm -f modusplant-be-previous || true
 
+          echo "[EC2] Remove unused backend images..."
+          docker images "${IMAGE%:*}" -q | sort -u | xargs docker rmi || true
+
+          echo "[EC2] Remove dangling images..."
+          docker image prune -f || true
+
           echo "[EC2] Deploy finished."
           EOF
 
@@ -584,6 +590,12 @@ jobs:
 
           echo "[Dev Server] Remove previous container..."
           docker rm -f modusplant-be-previous || true
+
+          echo "[Dev Server] Remove unused backend images..."
+          docker images "${IMAGE%:*}" -q | sort -u | xargs docker rmi || true
+
+          echo "[Dev Server] Remove dangling images..."
+          docker image prune -f || true
 
           echo "[Dev Server] Deploy finished."
           EOF
