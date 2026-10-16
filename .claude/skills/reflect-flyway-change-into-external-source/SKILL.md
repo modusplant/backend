@@ -138,8 +138,6 @@ tab-separated fields:
 
 # Hard Constraints
 
-- Never invoke this skill on your own initiative; only run it when invoked by
-  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.
 - Never create, modify, or delete anything in Confluence except what a Target Source implies
   through Change Derivation.
 - Preserve each page's existing format: heading style, table shape, column order, row order,

@@ -8,9 +8,14 @@ on:
       - 'v*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_type }}
+  cancel-in-progress: false
+
 jobs:
   # 1. TEST: dev용 application.yml + Gradle test
   test:
+    name: Test
     runs-on: ubuntu-latest
 
     steps:
@@ -31,7 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load test env from SSM
+      - name: Load dev environment variables from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -54,12 +59,6 @@ jobs:
             /config/modusplant_dev/DEV_PUBLIC_ENDPOINT    = DEV_PUBLIC_ENDPOINT,
             /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
-
-      - name: Debug DB env
-        run: |
-          echo "JDBC_CONNECTION_URL=$JDBC_CONNECTION_URL"
-          echo "JDBC_USERNAME=$JDBC_USERNAME"
-          echo "JDBC_PASSWORD is set? -> ${JDBC_PASSWORD:+YES}"
 
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
@@ -119,6 +118,7 @@ jobs:
 
   # 2. BUILD: GHCR_PAT + 이미지 빌드/푸시
   build:
+    name: Build and Push Image
     needs: test
     runs-on: ubuntu-latest
 
@@ -136,7 +136,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load CI params from SSM (GHCR_PAT, dev/prod yml)
+      - name: Load GHCR token and dev DB credentials from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -156,7 +156,7 @@ jobs:
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
-      - name: Build bootJar
+      - name: Migrate dev DB, generate jOOQ code, and build bootJar
         run: |
           ./gradlew flywayMigrate jooqCodegen bootJar \
             -PjdbcConnectionUrl="$JDBC_CONNECTION_URL" \
@@ -191,7 +191,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       # dev/prod 빌드 플랫폼(arm64)
-      - name: Build and push ARM64 image
+      - name: Build and push ARM64 image to GHCR
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -203,6 +203,7 @@ jobs:
 
   # 3. DEPLOY: EC2 배포 (EC2에서 SSM → .env.prod → docker run --env-file)
   deploy:
+    name: Deploy to Prod (EC2)
     needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
@@ -218,7 +219,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load deploy params from SSM
+      - name: Load prod deploy parameters from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -229,14 +230,14 @@ jobs:
             /config/modusplant_prod/docker_logpath  = MODUSPLANT_DOCKER_LOGPATH
           withDecryption: "true"
 
-      - name: Write SSH key from env
+      - name: Write prod EC2 SSH key to temporary file
         env:
           MODUSPLANT_SSH_KEY: ${{ env.MODUSPLANT_SSH_KEY }}
         run: |
           echo "${MODUSPLANT_SSH_KEY}" > _ci_tmp_ssh_key.pem
           chmod 600 _ci_tmp_ssh_key.pem
 
-      - name: Deploy to EC2 via SSH
+      - name: Deploy to prod EC2 via SSH
         env:
           EC2_INSTANCE_IP: ${{ env.MODUSPLANT_EC2_IP }}
           GHCR_PAT: ${{ env.GHCR_PAT }}
@@ -260,7 +261,26 @@ jobs:
           set -euo pipefail
           
           ENV_FILE="/opt/modusplant/.env.prod"
-          
+          CONTAINER_STOP_TIMEOUT_SECONDS=30
+
+          trap 'rm -f "${ENV_FILE}"' EXIT
+
+          rollback() {
+            echo "[EC2] Roll back to previous container..."
+            if docker inspect modusplant-be >/dev/null 2>&1; then
+              docker logs --tail 100 modusplant-be || true
+              docker rm -f modusplant-be
+            fi
+            if docker inspect modusplant-be-previous >/dev/null 2>&1; then
+              docker rename modusplant-be-previous modusplant-be
+              docker start modusplant-be
+              echo "[EC2] Previous container restored."
+            else
+              echo "[EC2] No previous container to roll back to."
+            fi
+            exit 1
+          }
+
           echo "[EC2] IMAGE=${IMAGE}"
           echo "[EC2] ENV_FILE=${ENV_FILE}"
           echo "[EC2] BACKEND_LOGPATH=${BACKEND_LOGPATH:-<empty>}"
@@ -323,6 +343,8 @@ jobs:
           
           echo "[EC2] Write env file: ${ENV_FILE}"
           mkdir -p /opt/modusplant
+          rm -f "${ENV_FILE}"
+          umask 077
           cat > "${ENV_FILE}" <<EOT
           DB_CONNECTION_URL=${DB_CONNECTION_URL}
           DB_USERNAME=${DB_USERNAME}
@@ -367,34 +389,70 @@ jobs:
           echo "[EC2] Pull image: ${IMAGE}"
           docker pull "${IMAGE}"
           
-          echo "[EC2] Stop & remove existing container..."
-          docker stop modusplant-be || true
-          docker rm modusplant-be || true
-          
+          echo "[EC2] Remove modusplant-be-previous left by an interrupted deploy, if any..."
+          docker rm -f modusplant-be-previous || true
+
+          if docker inspect modusplant-be >/dev/null 2>&1; then
+            echo "[EC2] Stop & keep existing container as modusplant-be-previous..."
+            docker stop -t "${CONTAINER_STOP_TIMEOUT_SECONDS}" modusplant-be
+            docker rename modusplant-be modusplant-be-previous
+          fi
+
           echo "[EC2] Run new container with env-file..."
-          docker run -d \
+          if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
+          --stop-timeout "${CONTAINER_STOP_TIMEOUT_SECONDS}" \
           --network nginx_proxy \
+          --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
+          --health-interval 15s \
+          --health-timeout 5s \
+          --health-retries 3 \
+          --health-start-period 60s \
+          --health-start-interval 5s \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=prod \
           -e LOG_TO_FILE=true \
           -e LOG_DIR="${DOCKER_LOGPATH}" \
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
-          "${IMAGE}"
-          
-          echo "[EC2] Check container status..."
-          docker ps | grep modusplant-be || (echo "Container failed to start" && exit 1)
-          
+          "${IMAGE}"; then
+            rollback
+          fi
+
+          echo "[EC2] Wait for container health..."
+          HEALTH_POLL_INTERVAL_SECONDS=5
+          while true; do
+            read -r CONTAINER_HEALTH_STATUS CONTAINER_RESTART_COUNT <<< "$(docker inspect --format '{{.State.Health.Status}} {{.RestartCount}}' modusplant-be)"
+            if [ "${CONTAINER_HEALTH_STATUS}" = "healthy" ]; then
+              break
+            fi
+            if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
+              echo "[EC2] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
+              rollback
+            fi
+            sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
+          done
+          echo "[EC2] Container is healthy."
+
+          echo "[EC2] Remove previous container..."
+          docker rm -f modusplant-be-previous || true
+
+          echo "[EC2] Remove unused backend images..."
+          docker images "${IMAGE%:*}" -q | sort -u | xargs docker rmi || true
+
+          echo "[EC2] Remove dangling images..."
+          docker image prune -f || true
+
           echo "[EC2] Deploy finished."
           EOF
 
-      - name: Cleanup SSH key
+      - name: Remove temporary SSH key file
         if: always()
         run: rm -f _ci_tmp_ssh_key.pem
 
   # 3-2. DEPLOY_DEV: 개발환경 배포 (맥미니 홈서버)
   deploy_dev:
+    name: Deploy to Dev (Mac mini)
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
@@ -410,7 +468,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Load deploy params from SSM
+      - name: Load dev deploy parameters from SSM
         uses: dkershner6/aws-ssm-getparameters-action@v2
         with:
           parameterPairs: |
@@ -421,14 +479,14 @@ jobs:
             /config/modusplant_dev/docker_logpath   = MODUSPLANT_DOCKER_LOGPATH
           withDecryption: "true"
 
-      - name: Write SSH key from env
+      - name: Write dev server SSH key to temporary file
         env:
           DEV_SSH_KEY: ${{ env.DEV_SSH_KEY }}
         run: |
           echo "${DEV_SSH_KEY}" > _ci_tmp_dev_ssh_key.pem
           chmod 600 _ci_tmp_dev_ssh_key.pem
 
-      - name: Deploy to Dev Server via SSH
+      - name: Deploy to dev Mac mini via SSH
         env:
           DEV_SERVER_IP: ${{ env.DEV_SERVER_IP }}
           GHCR_PAT: ${{ env.GHCR_PAT }}
@@ -437,7 +495,7 @@ jobs:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
-          IMAGE="${IMAGE_NAME}:latest"
+          IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
 
           echo "[CI] IMAGE=${IMAGE}"
           echo "[CI] DEV_SERVER_IP=${DEV_SERVER_IP}"
@@ -454,6 +512,23 @@ jobs:
           export PATH="/usr/local/bin:$PATH"
           
           ENV_FILE="/Users/donghyeok/workspace/modus-plant/modusplant-backend/.env.dev"
+          CONTAINER_STOP_TIMEOUT_SECONDS=30
+
+          rollback() {
+            echo "[Dev Server] Roll back to previous container..."
+            if docker inspect modusplant-be >/dev/null 2>&1; then
+              docker logs --tail 100 modusplant-be || true
+              docker rm -f modusplant-be
+            fi
+            if docker inspect modusplant-be-previous >/dev/null 2>&1; then
+              docker rename modusplant-be-previous modusplant-be
+              docker start modusplant-be
+              echo "[Dev Server] Previous container restored."
+            else
+              echo "[Dev Server] No previous container to roll back to."
+            fi
+            exit 1
+          }
 
           echo "[Dev Server] IMAGE=${IMAGE}"
           echo "[Dev Server] ENV_FILE=${ENV_FILE}"
@@ -469,34 +544,70 @@ jobs:
           echo "[Dev Server] Pull image: ${IMAGE}"
           docker pull "${IMAGE}"
 
-          echo "[Dev Server] Stop & remove existing container..."
-          docker stop modusplant-be || true
-          docker rm modusplant-be || true
+          echo "[Dev Server] Remove modusplant-be-previous left by an interrupted deploy, if any..."
+          docker rm -f modusplant-be-previous || true
+
+          if docker inspect modusplant-be >/dev/null 2>&1; then
+            echo "[Dev Server] Stop & keep existing container as modusplant-be-previous..."
+            docker stop -t "${CONTAINER_STOP_TIMEOUT_SECONDS}" modusplant-be
+            docker rename modusplant-be modusplant-be-previous
+          fi
 
           echo "[Dev Server] Run new container with env-file..."
-          docker run -d \
+          if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
+          --stop-timeout "${CONTAINER_STOP_TIMEOUT_SECONDS}" \
           --network nginx_proxy \
+          --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
+          --health-interval 15s \
+          --health-timeout 5s \
+          --health-retries 3 \
+          --health-start-period 60s \
+          --health-start-interval 5s \
           --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=dev \
           -e LOG_TO_FILE=true \
           -e LOG_DIR="${DOCKER_LOGPATH}" \
           -v "${BACKEND_LOGPATH}:${DOCKER_LOGPATH}" \
-          "${IMAGE}"
+          "${IMAGE}"; then
+            rollback
+          fi
 
-          echo "[Dev Server] Check container status..."
-          docker ps | grep modusplant-be || (echo "Container failed to start" && exit 1)
+          echo "[Dev Server] Wait for container health..."
+          HEALTH_POLL_INTERVAL_SECONDS=5
+          while true; do
+            read -r CONTAINER_HEALTH_STATUS CONTAINER_RESTART_COUNT <<< "$(docker inspect --format '{{.State.Health.Status}} {{.RestartCount}}' modusplant-be)"
+            if [ "${CONTAINER_HEALTH_STATUS}" = "healthy" ]; then
+              break
+            fi
+            if [ "${CONTAINER_HEALTH_STATUS}" = "unhealthy" ] || [ "${CONTAINER_RESTART_COUNT}" -gt 0 ]; then
+              echo "[Dev Server] Container failed (health=${CONTAINER_HEALTH_STATUS}, restart count=${CONTAINER_RESTART_COUNT})"
+              rollback
+            fi
+            sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
+          done
+          echo "[Dev Server] Container is healthy."
+
+          echo "[Dev Server] Remove previous container..."
+          docker rm -f modusplant-be-previous || true
+
+          echo "[Dev Server] Remove unused backend images..."
+          docker images "${IMAGE%:*}" -q | sort -u | xargs docker rmi || true
+
+          echo "[Dev Server] Remove dangling images..."
+          docker image prune -f || true
 
           echo "[Dev Server] Deploy finished."
           EOF
 
-      - name: Cleanup SSH key
+      - name: Remove temporary SSH key file
         if: always()
         run: rm -f _ci_tmp_dev_ssh_key.pem
 
   # 4. GitHub Release 자동 릴리즈 노트
   github_release:
+    name: Create GitHub Release
     needs: deploy
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
@@ -505,7 +616,7 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
+      - name: Checkout Source Code
         uses: actions/checkout@v4
 
       - name: Create GitHub Release with auto notes

@@ -27,14 +27,10 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 - Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that domain.
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md, plus any file under @.claude/documents/ or @.claude/rules/ relevant to that area.
 - Not associated with any domain:
-  - Docker-related (e.g. @docker-compose.yml): @.claude/skills/guide-docker-environment-configuration/SKILL.md only.
+  - Local Docker-related (e.g. @docker-compose.yml): @.claude/skills/guide-local-docker-environment-configuration/SKILL.md only.
+  - CI/CD-related (e.g. @.github/workflows/modusplant-backend-ci-cd.yml): @.claude/skills/guide-prod-dev-ci-cd-pipeline-configuration/SKILL.md only.
   - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/documents/observability-tagging-architecture.md only.
 
 # Update Strategy
 
 - Necessary-only: update strictly what's needed; leave no bloat in the document (no excessive examples, no content duplicated within the same document or across documents).
-
-# Hard Constraints
-
-- Never invoke this skill on your own initiative; only run it when invoked by
-  @.claude/skills/postprocess-main-code-change/SKILL.md's workflow.

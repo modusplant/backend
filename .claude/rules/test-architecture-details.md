@@ -65,7 +65,7 @@ method does.
 
 ## 5. Test Method Display Name Convention
 
-Korean is exceptionally allowed within this section's display-name values, and nowhere else.
+Within this document, Korean is exceptionally allowed only in this section's display-name values.
 
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**

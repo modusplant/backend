@@ -27,6 +27,8 @@
       "Bash(python3 .claude/skills/visualize-docker-container-dependency/scripts/build_graph.py*)",
 
       "Edit(/.claude/logs/**)",
+      "Edit(/.claude/output-styles/**)",
+      "Edit(/.claude/temp/**)",
 
       "Read(/src/main/resources/application-local.yml)",
       "Read(/docker-compose.override.yml)",
@@ -40,6 +42,7 @@
     "deny": [
       "Bash(rm -rf **/src/**)",
 
+      "Bash(git commit*)",
       "Bash(git push*)",
 
       "Bash(docker compose config)",
