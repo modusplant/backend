@@ -29,15 +29,14 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 
 ### Test
 
-| Step                                         | Description                                                                               |
-|----------------------------------------------|-------------------------------------------------------------------------------------------|
-| Checkout Source Code                         | Fetch the repository.                                                                     |
-| Set up JDK 21                                | Install Temurin JDK 21 with Gradle caching.                                               |
-| Configure AWS credentials (for SSM)          | Authenticate to AWS for SSM Parameter Store access.                                       |
-| Load dev environment variables from SSM      | Load dev DB, Redis, Wasabi, admin, and Firebase values into the environment.              |
-| Print DB connection environment variables    | Log the DB URL and username, and whether the password is set.                             |
-| Grant execute permission to gradlew          | Make the Gradle wrapper executable.                                                       |
-| Run Gradle tests                             | Run the test suite against dev resources, with dummy values for OAuth and mail providers. |
+| Step                                    | Description                                                                               |
+|-----------------------------------------|-------------------------------------------------------------------------------------------|
+| Checkout Source Code                    | Fetch the repository.                                                                     |
+| Set up JDK 21                           | Install Temurin JDK 21 with Gradle caching.                                               |
+| Configure AWS credentials (for SSM)     | Authenticate to AWS for SSM Parameter Store access.                                       |
+| Load dev environment variables from SSM | Load dev DB, Redis, Wasabi, admin, and Firebase values into the environment.              |
+| Grant execute permission to gradlew     | Make the Gradle wrapper executable.                                                       |
+| Run Gradle tests                        | Run the test suite against dev resources, with dummy values for OAuth and mail providers. |
 
 ### Build and Push Image
 
@@ -58,13 +57,13 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 
 ### Deploy to Prod (EC2)
 
-| Step                                     | Description                                                                                                                                                                                                                                                       |
-|------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Configure AWS credentials (for SSM)      | Authenticate to AWS for SSM Parameter Store access.                                                                                                                                                                                                               |
-| Load prod deploy parameters from SSM     | Load the GHCR token, EC2 address and SSH key, and log paths.                                                                                                                                                                                                      |
-| Write prod EC2 SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                                                                                                           |
-| Deploy to prod EC2 via SSH               | On EC2: write prod SSM parameters to `/opt/modusplant/.env.prod.new`, pull the commit-SHA image, and swap the `modusplant-be` container with `prod` profile (see Container Swap and Rollback); once healthy, promote the env file to `/opt/modusplant/.env.prod`. |
-| Remove temporary SSH key file            | Delete the SSH key file, even on failure.                                                                                                                                                                                                                         |
+| Step                                     | Description                                                                                                                                                                                                                                                |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Configure AWS credentials (for SSM)      | Authenticate to AWS for SSM Parameter Store access.                                                                                                                                                                                                        |
+| Load prod deploy parameters from SSM     | Load the GHCR token, EC2 address and SSH key, and log paths.                                                                                                                                                                                               |
+| Write prod EC2 SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                                                                                                    |
+| Deploy to prod EC2 via SSH               | On EC2: write prod SSM parameters to the `600`-mode `/opt/modusplant/.env.prod`, pull the commit-SHA image, and swap the `modusplant-be` container with `prod` profile (see Container Swap and Rollback); delete the env file when the step ends whenever. |
+| Remove temporary SSH key file            | Delete the SSH key file, even on failure.                                                                                                                                                                                                                  |
 
 ### Create GitHub Release
 
@@ -93,4 +92,4 @@ Both deploy steps swap the `modusplant-be` container as follows:
 2. If `modusplant-be` exists, stop it and rename it to `modusplant-be-previous`.
 3. Start the new `modusplant-be` and wait until its readiness health check reports healthy.
 4. On success, remove `modusplant-be-previous`, then remove the `ghcr.io/modusplant/backend` images that no container uses, along with all dangling images.
-5. On failure (`docker run` error, `unhealthy` status, or a container restart), print the new container's last 100 log lines, remove it, rename `modusplant-be-previous` (if present) back to `modusplant-be`, start it, and fail the job. Prod also deletes `/opt/modusplant/.env.prod.new`.
+5. On failure (`docker run` error, `unhealthy` status, or a container restart), print the new container's last 100 log lines, remove it, rename `modusplant-be-previous` (if present) back to `modusplant-be`, start it, and fail the job.
