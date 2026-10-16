@@ -264,6 +264,7 @@ jobs:
           
           ENV_FILE="/opt/modusplant/.env.prod"
           NEW_ENV_FILE="${ENV_FILE}.new"
+          CONTAINER_STOP_TIMEOUT_SECONDS=30
 
           rollback() {
             echo "[EC2] Roll back to previous container..."
@@ -393,7 +394,7 @@ jobs:
 
           if docker inspect modusplant-be >/dev/null 2>&1; then
             echo "[EC2] Stop & keep existing container as modusplant-be-previous..."
-            docker stop modusplant-be
+            docker stop -t "${CONTAINER_STOP_TIMEOUT_SECONDS}" modusplant-be
             docker rename modusplant-be modusplant-be-previous
           fi
 
@@ -401,6 +402,7 @@ jobs:
           if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
+          --stop-timeout "${CONTAINER_STOP_TIMEOUT_SECONDS}" \
           --network nginx_proxy \
           --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
           --health-interval 15s \
@@ -513,6 +515,7 @@ jobs:
           export PATH="/usr/local/bin:$PATH"
           
           ENV_FILE="/Users/donghyeok/workspace/modus-plant/modusplant-backend/.env.dev"
+          CONTAINER_STOP_TIMEOUT_SECONDS=30
 
           rollback() {
             echo "[Dev Server] Roll back to previous container..."
@@ -549,7 +552,7 @@ jobs:
 
           if docker inspect modusplant-be >/dev/null 2>&1; then
             echo "[Dev Server] Stop & keep existing container as modusplant-be-previous..."
-            docker stop modusplant-be
+            docker stop -t "${CONTAINER_STOP_TIMEOUT_SECONDS}" modusplant-be
             docker rename modusplant-be modusplant-be-previous
           fi
 
@@ -557,6 +560,7 @@ jobs:
           if ! docker run -d \
           --name modusplant-be \
           --restart unless-stopped \
+          --stop-timeout "${CONTAINER_STOP_TIMEOUT_SECONDS}" \
           --network nginx_proxy \
           --health-cmd "curl -f http://localhost:8080/actuator/health/readiness" \
           --health-interval 15s \

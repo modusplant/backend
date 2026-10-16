@@ -11,7 +11,7 @@ The pipeline is defined in @.github/workflows/modusplant-backend-ci-cd.yml.
 
 - Push to `develop`: common pipeline, then the dev pipeline.
 - Push of a `v*` tag: common pipeline, then the prod pipeline.
-- Manual dispatch: common pipeline only.
+- Manual dispatch: common pipeline, then the dev pipeline when dispatched on `develop` or the prod pipeline when dispatched on a `v*` tag; no deploy on any other ref.
 
 ## Job Dependency Graph
 
@@ -29,7 +29,7 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 | Checkout Source Code                         | Fetch the repository.                                                                     |
 | Set up JDK 21                                | Install Temurin JDK 21 with Gradle caching.                                               |
 | Configure AWS credentials (for SSM)          | Authenticate to AWS for SSM Parameter Store access.                                       |
-| Load dev test environment variables from SSM | Load dev DB, Redis, Wasabi, admin, and Firebase values into the environment.              |
+| Load dev environment variables from SSM      | Load dev DB, Redis, Wasabi, admin, and Firebase values into the environment.              |
 | Print DB connection environment variables    | Log the DB URL and username, and whether the password is set.                             |
 | Grant execute permission to gradlew          | Make the Gradle wrapper executable.                                                       |
 | Run Gradle tests                             | Run the test suite against dev resources, with dummy values for OAuth and mail providers. |
