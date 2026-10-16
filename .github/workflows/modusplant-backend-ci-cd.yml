@@ -8,6 +8,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_type }}
+  cancel-in-progress: false
+
 jobs:
   # 1. TEST: dev용 application.yml + Gradle test
   test:
