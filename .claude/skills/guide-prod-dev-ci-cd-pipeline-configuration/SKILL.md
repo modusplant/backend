@@ -13,6 +13,11 @@ The pipeline is defined in @.github/workflows/modusplant-backend-ci-cd.yml.
 - Push of a `v*` tag: common pipeline, then the prod pipeline.
 - Manual dispatch: common pipeline, then the dev pipeline when dispatched on `develop` or the prod pipeline when dispatched on a `v*` tag; no deploy on any other ref.
 
+## Concurrency
+
+- Runs are serialized in two groups by ref type: branch runs (push to `develop`, manual dispatch on a branch) and tag runs (push of a `v*` tag, manual dispatch on a tag). The two groups run independently.
+- A new run in a group waits until the running one finishes; no in-progress run is cancelled. Only the newest waiting run is kept, and older waiting runs are cancelled.
+
 ## Job Dependency Graph
 
 ```
