@@ -60,12 +60,6 @@ jobs:
             /config/modusplant/FIREBASE_CREDENTIALS_JSON  = FIREBASE_CREDENTIALS_JSON
           withDecryption: "true"
 
-      - name: Print DB connection environment variables
-        run: |
-          echo "JDBC_CONNECTION_URL=$JDBC_CONNECTION_URL"
-          echo "JDBC_USERNAME=$JDBC_USERNAME"
-          echo "JDBC_PASSWORD is set? -> ${JDBC_PASSWORD:+YES}"
-
       - name: Grant execute permission to gradlew
         run: chmod +x ./gradlew
 
@@ -267,8 +261,9 @@ jobs:
           set -euo pipefail
           
           ENV_FILE="/opt/modusplant/.env.prod"
-          NEW_ENV_FILE="${ENV_FILE}.new"
           CONTAINER_STOP_TIMEOUT_SECONDS=30
+
+          trap 'rm -f "${ENV_FILE}"' EXIT
 
           rollback() {
             echo "[EC2] Roll back to previous container..."
@@ -276,7 +271,6 @@ jobs:
               docker logs --tail 100 modusplant-be || true
               docker rm -f modusplant-be
             fi
-            rm -f "${NEW_ENV_FILE}"
             if docker inspect modusplant-be-previous >/dev/null 2>&1; then
               docker rename modusplant-be-previous modusplant-be
               docker start modusplant-be
@@ -347,9 +341,11 @@ jobs:
           # === FIREBASE_CREDENTIALS_JSON ===
           FIREBASE_CREDENTIALS_JSON=$(aws ssm get-parameter --name "/config/modusplant/FIREBASE_CREDENTIALS_JSON"  --with-decryption --query "Parameter.Value" --output text)
           
-          echo "[EC2] Write new env file: ${NEW_ENV_FILE}"
+          echo "[EC2] Write env file: ${ENV_FILE}"
           mkdir -p /opt/modusplant
-          cat > "${NEW_ENV_FILE}" <<EOT
+          rm -f "${ENV_FILE}"
+          umask 077
+          cat > "${ENV_FILE}" <<EOT
           DB_CONNECTION_URL=${DB_CONNECTION_URL}
           DB_USERNAME=${DB_USERNAME}
           DB_PASSWORD=${DB_PASSWORD}
@@ -414,7 +410,7 @@ jobs:
           --health-retries 3 \
           --health-start-period 60s \
           --health-start-interval 5s \
-          --env-file "${NEW_ENV_FILE}" \
+          --env-file "${ENV_FILE}" \
           -e SPRING_PROFILES_ACTIVE=prod \
           -e LOG_TO_FILE=true \
           -e LOG_DIR="${DOCKER_LOGPATH}" \
@@ -437,9 +433,6 @@ jobs:
             sleep "${HEALTH_POLL_INTERVAL_SECONDS}"
           done
           echo "[EC2] Container is healthy."
-
-          echo "[EC2] Promote env file: ${ENV_FILE}"
-          mv "${NEW_ENV_FILE}" "${ENV_FILE}"
 
           echo "[EC2] Remove previous container..."
           docker rm -f modusplant-be-previous || true
