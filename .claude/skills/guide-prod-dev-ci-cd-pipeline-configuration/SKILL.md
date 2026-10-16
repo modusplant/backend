@@ -72,13 +72,13 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 
 ### Deploy to Dev (Mac mini)
 
-| Step                                       | Description                                                                                                                                                                 |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Configure AWS credentials (for SSM)        | Authenticate to AWS for SSM Parameter Store access.                                                                                                                         |
-| Load dev deploy parameters from SSM        | Load the GHCR token, dev server address and SSH key, and log paths.                                                                                                         |
-| Write dev server SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                     |
-| Deploy to dev Mac mini via SSH             | On the home server: pull the `latest` image and swap the `modusplant-be` container with `dev` profile using the host-resident `.env.dev` (see Container Swap and Rollback). |
-| Remove temporary SSH key file              | Delete the SSH key file, even on failure.                                                                                                                                   |
+| Step                                       | Description                                                                                                                                                                   |
+|--------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Configure AWS credentials (for SSM)        | Authenticate to AWS for SSM Parameter Store access.                                                                                                                           |
+| Load dev deploy parameters from SSM        | Load the GHCR token, dev server address and SSH key, and log paths.                                                                                                           |
+| Write dev server SSH key to temporary file | Write the SSH key to a `600`-mode file.                                                                                                                                       |
+| Deploy to dev Mac mini via SSH             | On the home server: pull the commit-SHA image and swap the `modusplant-be` container with `dev` profile using the host-resident `.env.dev` (see Container Swap and Rollback). |
+| Remove temporary SSH key file              | Delete the SSH key file, even on failure.                                                                                                                                     |
 
 ## Container Swap and Rollback
 

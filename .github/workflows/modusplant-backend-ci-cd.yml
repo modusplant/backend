@@ -498,7 +498,7 @@ jobs:
           IMAGE_NAME: ${{ env.IMAGE_NAME }}
           GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
         run: |
-          IMAGE="${IMAGE_NAME}:latest"
+          IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
 
           echo "[CI] IMAGE=${IMAGE}"
           echo "[CI] DEV_SERVER_IP=${DEV_SERVER_IP}"
