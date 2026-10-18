@@ -13,7 +13,7 @@ import java.util.List;
 public interface ContentDataProcessorPort {
     List<PostFileUploadUrlResponse> getMultipleUploadUrls(List<PostFileUploadRequest> files);
 
-    ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename) throws IOException;
+    ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename, List<String> reusableFileKeys) throws IOException;
 
     ArrayNode convertFileSrcToFullFileSrc(JsonNode content) throws IOException;
 
