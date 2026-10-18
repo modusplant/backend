@@ -68,16 +68,16 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         return result;
     }
 
-    public ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename) {
+    public ContentProcessRecord generateContentJson(String contentText, List<FileOrder> contentFiles, String thumbnailFilename, List<String> reusableFileKeys) {
         // contentText : 글자수 초과하는지 확인
         // contentFiles : order 값 검증(1부터인지 순차적인지), 파일타입 검증, 파일명 중복 검증
         // thunmbnailFilename이 실제로 filename에 존재하는지, image 타입인지
-        // fileKey 형식이 우리가 발급한 형식인지, 우리가 발급한 fileKey가 맞는지, 실제로 S3에 업로드됐는지
+        // fileKey 형식이 우리가 발급한 형식인지, 우리가 발급한 fileKey(pending 상태 또는 수정 대상 게시글의 기존 fileKey)가 맞는지, 실제로 S3에 업로드됐는지
         // jsonnode 타입으로 반환
 
         // 게시글 내용 검증(텍스트+파일)
         validateContentText(contentText);
-        validateContentFiles(contentFiles);
+        validateContentFiles(contentFiles, reusableFileKeys);
         validateThumbnail(contentFiles, thumbnailFilename);
 
         // contentFiles을 order순으로 정렬
@@ -258,12 +258,15 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
         }
     }
 
-    private void validateContentFiles(List<FileOrder> contentFiles) {
+    private void validateContentFiles(List<FileOrder> contentFiles, List<String> reusableFileKeys) {
         if (contentFiles == null || contentFiles.isEmpty()) return;
 
-        // 제출된 fileKey는 예외 없이 전부 presign 발급 후 pending 상태여야 한다
+        // 제출된 fileKey는 presign 발급 후 pending 상태이거나, 수정 대상 게시글에 이미 저장된 fileKey여야 한다
         List<String> fileKeysToVerify = contentFiles.stream().map(FileOrder::fileKey).toList();
-        Set<String> trackedFileKeys = new HashSet<>(pendingFileService.findTrackedFileKeys(fileKeysToVerify));
+        Set<String> acceptableFileKeys = new HashSet<>(pendingFileService.findTrackedFileKeys(fileKeysToVerify));
+        if (reusableFileKeys != null) {
+            acceptableFileKeys.addAll(reusableFileKeys);
+        }
 
         Set<String> filenames = new HashSet<>();
         List<Integer> orders = new ArrayList<>();
@@ -281,8 +284,8 @@ public class PostContentDataProcessor implements ContentDataProcessorPort {
             if (!FILE_KEY_PATTERN.matcher(contentFile.fileKey()).matches()) {
                 throw new InvalidFileInputException();
             }
-            // 우리가 발급한 fileKey가 맞는지 검증(presign 발급 후 pending 상태여야 함)
-            if (!trackedFileKeys.contains(contentFile.fileKey())) {
+            // 우리가 발급한 fileKey가 맞는지 검증(pending 상태이거나 수정 대상 게시글의 기존 fileKey여야 함)
+            if (!acceptableFileKeys.contains(contentFile.fileKey())) {
                 throw new InvalidFileInputException();
             }
             // presign은 발급됐으나 실제로 S3에 업로드됐는지 검증
