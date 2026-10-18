@@ -99,18 +99,18 @@ public class PostController {
         if (isPublished) {  // 발행 게시글 생성
             PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postRequest.primaryCategoryId());
             SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postRequest.secondaryCategoryId());
-            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), List.of());
             post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()));
         } else {            // 임시저장 게시글 생성
             PrimaryCategoryId primaryCategoryId = postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null;
             SecondaryCategoryId secondaryCategoryId = postRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postRequest.secondaryCategoryId()) : null;
             ContentProcessRecord result = (postRequest.contentText() == null && postRequest.contentFiles() == null)
                     ? new ContentProcessRecord(null,null)
-                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), List.of());
             post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath()));
         }
         postRepository.save(post);
-        untrackContentFiles(postRequest.contentFiles());
+        pendingFileService.untrackPendingFiles(extractFileKeys(postRequest.contentFiles()));
     }
 
     @Transactional
@@ -122,7 +122,7 @@ public class PostController {
 
         // 게시글 검증 수행
         if (isPublished) {
-            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+            ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), oldFileKeys);
             post.update(
                     AuthorId.fromUuid(currentMemberUuid),
                     PrimaryCategoryId.create(postRequest.primaryCategoryId()),
@@ -133,7 +133,7 @@ public class PostController {
         } else {
             ContentProcessRecord result = (postRequest.contentText() == null && postRequest.contentFiles() == null)
                     ? new ContentProcessRecord(null,null)
-                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename());
+                    : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), oldFileKeys);
             post.updateDraft(
                     AuthorId.fromUuid(currentMemberUuid),
                     postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null,
@@ -142,8 +142,10 @@ public class PostController {
             );
         }
         postRepository.update(post);
-        untrackContentFiles(postRequest.contentFiles());
-        contentDataProcessorPort.deleteFilesWithFileKeys(oldFileKeys);
+        // 새로 업로드된 fileKey만 추적 해제하고, 수정된 내용에서 빠진 기존 fileKey만 삭제
+        List<String> newFileKeys = extractFileKeys(postRequest.contentFiles());
+        pendingFileService.untrackPendingFiles(newFileKeys.stream().filter(fileKey -> !oldFileKeys.contains(fileKey)).toList());
+        contentDataProcessorPort.deleteFilesWithFileKeys(oldFileKeys.stream().filter(fileKey -> !newFileKeys.contains(fileKey)).toList());
     }
 
     @Transactional
@@ -259,10 +261,9 @@ public class PostController {
         return newContent;
     }
 
-    private void untrackContentFiles(List<FileOrder> contentFiles) {
-        List<String> fileKeys = contentFiles != null
+    private List<String> extractFileKeys(List<FileOrder> contentFiles) {
+        return contentFiles != null
                 ? contentFiles.stream().map(FileOrder::fileKey).toList()
                 : List.of();
-        pendingFileService.untrackPendingFiles(fileKeys);
     }
 }
