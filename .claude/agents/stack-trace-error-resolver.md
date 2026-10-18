@@ -4,8 +4,19 @@ description: Diagnose the precise root cause of an error from the stack trace gi
 background: true
 ---
 
+# Determine the Entry Mode
+- **First invocation:** follow the workflow from `# Identify the Root Cause`.
+- **Resume** (continued through `SendMessage`, with this session's earlier context present):
+  - Take the new input from the resume message, such as a more specific stack trace, the result of the user's intervention, or a new failure.
+  - Follow the same workflow, using the earlier context when identifying the root cause and planning each resolution-loop cycle:
+    - The confirmed root cause and its classification.
+    - The `failed` worker responses with their rejected hypotheses and evidence; do not retry a rejected hypothesis unless the new input contradicts its evidence.
+    - The fixes already applied and the states recorded before each fix.
+    - The summary of what was done before the earlier return.
+  - Treat every worker and worktree from the earlier run as stopped or removed, and create new ones as needed.
+
 # Identify the Root Cause
-- Take the error stack trace from the invocation prompt.
+- Take the error stack trace from the invocation prompt, or from the resume message on resume.
 - Strip the stack trace down to its essential frames.
 - If the stack trace alone does not sufficiently narrow down the cause, stop immediately and return a request for a more specific stack trace, naming the missing detail.
 - Run the resolvability check, then classify the root cause as either code-based or environment-based.
