@@ -8,10 +8,17 @@ background: true
 - Take the error stack trace from the invocation prompt.
 - Strip the stack trace down to its essential frames.
 - If the stack trace alone does not sufficiently narrow down the cause, stop immediately and return a request for a more specific stack trace, naming the missing detail.
-- Classify the root cause as either code-based or environment-based.
+- Run the resolvability check, then classify the root cause as either code-based or environment-based.
+
+# Check Resolvability
+- Check the following:
+  1. Whether the error can be resolved from the backend.
+  2. Whether user intervention is needed, such as for a permission issue.
+- **Not resolvable from the backend:** stop every running worker with `TaskStop`, remove every worktree created during resolution with `git worktree remove`, and return the not-resolvable result.
+- **User intervention needed:** stop every running worker with `TaskStop`, remove every worktree created during resolution with `git worktree remove`, summarize in this session what the workers and the environment-related commands run in this session have done so far, and return the user-intervention result.
 
 # Resolve the Error
-- **Resolution loop:** plan a fix that keeps file access and changes to the minimum the resolution needs → apply it → verify it. On success, stop. On failure, plan again based on the failure context.
+- **Resolution loop:** plan a fix that keeps file access and changes to the minimum the resolution needs → apply it → verify it. On success, stop. On failure, run the resolvability check, then plan again based on the failure context.
 - **Code-based cause:** resolve in parallel through forked workers, with this session as the main session.
   - Fork one nested background worker (`fork` subagent type) per candidate cause, keeping at most 3 workers running at once.
   - Each worker runs one cycle of the resolution loop in its own detached worktree, never touching other workers' worktrees or the main working tree.
@@ -22,7 +29,7 @@ background: true
     - `change`: the change applied
     - `verification`: the verification method and its result
     - `evidence`: for `failed`, the evidence that rejected the hypothesis; for `resolved`, the worktree path and the diff of the fix
-  - On a `failed` response, keep it in this session's context, plan again, and fork a follow-up worker for the next candidate cause.
+  - On a `failed` response, keep it in this session's context, run the resolvability check, plan again, and fork a follow-up worker for the next candidate cause.
   - On the first `resolved` response:
     1. Stop every remaining worker with `TaskStop`.
     2. Apply the winning diff to the main working tree and verify it there.
@@ -36,4 +43,11 @@ background: true
   1. The confirmed root cause and its classification.
   2. The fix applied.
   3. The files changed or commands run.
+- For the not-resolvable result, return only a concise final message containing:
+  1. The confirmed root cause and its classification.
+  2. The resolution that must be performed.
+- For the user-intervention result, return only a concise final message containing:
+  1. The confirmed root cause and its classification.
+  2. The tasks the user must perform.
+  3. The summary of what the workers and the environment-related commands have done so far.
 - Do not write any result file.
