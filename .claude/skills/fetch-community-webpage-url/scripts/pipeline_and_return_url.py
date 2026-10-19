@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """커뮤니티 웹페이지 URL을 가져오기 -> 필터 체인 -> 최종 반환 순서로 처리한다.
 
-`fetch`: Wikidata 전역 쿼리, 한국어 위키백과 분류, 웹 검색 URL을 소스별 최대 개수만큼 가져와 candidate-url.json에 저장한다.
+`fetch`: Wikidata 전역 쿼리, 한국어 위키백과 분류, 웹 검색 URL을 소스별 최대 개수만큼 가져와 candidate-url.json에 저장하고, 서비스 종료·로그인 필요 목록에 오른 URL에는 탈락 사유를 기록한다.
+`exclude`: 서비스 종료 또는 로그인 필요로 확인된 URL을 각 목록 파일에 추가하고, 후보 파일이 있으면 해당 후보에 탈락 사유를 기록한다.
 `filter-reachability`: 후보 URL의 도달 가능 여부를 판정해 도달 불가 URL에는 탈락 사유를, 봇 요청을 차단한 URL에는 차단 사유를 기록한다.
 `write-result`: 적합성 탈락 URL을 기록하고, 남은 후보 중 차단되지 않은 URL과 사용자 지정 URL은 result-url.txt로, 차단된 URL은 blocked-url.txt로 저장한다.
 """
@@ -23,6 +24,11 @@ SPARQL_PATH = SKILL_DIR / "query" / "select-url-from-global-wiki.sparql"
 URL_DIR = SKILL_DIR / "url"
 CUSTOM_PATH = URL_DIR / "custom-url.txt"
 KOREAN_WIKI_UNRESOLVED_PATH = SKILL_DIR / "scripts" / "unresolved-korean-wiki-url.txt"
+# 필터 체인 앞단에서 이 순서대로 적용하며, 키는 탈락 사유로 그대로 기록된다
+EXCLUSION_PATHS = {
+    "closed": SKILL_DIR / "scripts" / "closed-webpage-url.txt",
+    "login-required": SKILL_DIR / "scripts" / "login-required-url.txt",
+}
 CANDIDATE_PATH = URL_DIR / "candidate-url.json"
 RESULT_PATH = URL_DIR / "result-url.txt"
 BLOCKED_PATH = URL_DIR / "blocked-url.txt"
@@ -260,6 +266,10 @@ def read_custom_urls(warnings):
     return urls
 
 
+def read_listed_urls():
+    return {name: set(read_url_file(path)) for name, path in EXCLUSION_PATHS.items()}
+
+
 def print_report(summaries, warnings):
     for summary in summaries:
         print(f"SUMMARY: {summary}")
@@ -292,6 +302,18 @@ def run_fetch(count, web_search_urls):
             candidates.setdefault(url, {"url": url, "sources": [], "blockedBy": None, "droppedBy": None})["sources"].append(name)
         summaries.append(f"fetch {name}={len(normalized)}")
 
+    # 사용자 지정 URL은 필터 체인을 거치지 않으며, 경고는 write-result에서만 보고한다
+    custom_urls = read_custom_urls([])
+    filter_summaries = []
+    for name, listed_urls in read_listed_urls().items():
+        dropped = 0
+        for url in listed_urls - custom_urls:
+            candidate = candidates.get(url)
+            if candidate and candidate["droppedBy"] is None:
+                candidate["droppedBy"] = name
+                dropped += 1
+        filter_summaries.append(f"filter {name} dropped={dropped}")
+
     write_candidates([candidates[url] for url in sorted(candidates)])
     if new_unresolved_titles:
         write_atomically(
@@ -303,6 +325,39 @@ def run_fetch(count, web_search_urls):
     summaries.append(f"fetch korean-wiki-unresolved={len(unresolved_titles) + len(new_unresolved_titles)} new={len(new_unresolved_titles)} "
                      f"file={KOREAN_WIKI_UNRESOLVED_PATH.relative_to(PROJECT_ROOT)}")
     summaries.append(f"fetch candidates={len(candidates)}")
+    print_report(summaries + filter_summaries, warnings)
+
+
+def run_exclude(raw_urls_by_list):
+    warnings = []
+    candidates = read_candidates() if CANDIDATE_PATH.exists() else []
+    custom_urls = read_custom_urls(warnings)
+    by_url = {candidate["url"]: candidate for candidate in candidates}
+
+    summaries = []
+    for name, raw_urls in raw_urls_by_list.items():
+        path = EXCLUSION_PATHS[name]
+        listed = read_url_file(path)
+        added = []
+        dropped = 0
+        for raw_url in raw_urls:
+            url = normalize(raw_url)
+            if not url:
+                warnings.append(f"{name}: invalid URL skipped: {raw_url}")
+                continue
+            if url in listed or url in added:
+                warnings.append(f"{name}: URL is already listed: {url}")
+            else:
+                added.append(url)
+            candidate = by_url.get(url)
+            if candidate and candidate["droppedBy"] is None and url not in custom_urls:
+                candidate["droppedBy"] = name
+                dropped += 1
+        if added:
+            write_atomically(path, listed + added)
+        summaries.append(f"exclude {name} added={len(added)} dropped={dropped} file={path.relative_to(PROJECT_ROOT)}")
+    if candidates:
+        write_candidates(candidates)
     print_report(summaries, warnings)
 
 
@@ -339,6 +394,9 @@ def run_write_result(rejected_raw_urls):
     candidates = read_candidates()
     custom_urls = read_custom_urls(warnings)
     by_url = {candidate["url"]: candidate for candidate in candidates}
+    for name, listed_urls in read_listed_urls().items():
+        for url in sorted(custom_urls & listed_urls):
+            warnings.append(f"custom: listed in {EXCLUSION_PATHS[name].relative_to(PROJECT_ROOT)}, kept: {url}")
 
     for raw_url in rejected_raw_urls:
         url = normalize(raw_url)
@@ -390,6 +448,9 @@ def main():
     fetch_parser = subparsers.add_parser("fetch")
     fetch_parser.add_argument("--count", type=positive_integer, default=DEFAULT_FETCH_COUNT)
     fetch_parser.add_argument("--web-search", nargs="*", default=[])
+    exclude_parser = subparsers.add_parser("exclude")
+    for name in EXCLUSION_PATHS:
+        exclude_parser.add_argument(f"--{name}", nargs="*", default=[])
     subparsers.add_parser("filter-reachability")
     result_parser = subparsers.add_parser("write-result")
     result_parser.add_argument("--reject", nargs="*", default=[])
@@ -398,6 +459,8 @@ def main():
     try:
         if arguments.command == "fetch":
             run_fetch(arguments.count, arguments.web_search)
+        elif arguments.command == "exclude":
+            run_exclude({name: getattr(arguments, name.replace("-", "_")) for name in EXCLUSION_PATHS})
         elif arguments.command == "filter-reachability":
             run_filter_reachability()
         else:
