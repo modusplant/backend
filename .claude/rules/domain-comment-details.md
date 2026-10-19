@@ -20,6 +20,7 @@ comment/
  │   ├─ exception/
  │   │   └─ enums/                        # Error code enums (no domain-local exception classes)
  │   └─ vo/                               # Value Objects
+ │       └─ nullobject/                   # Null-object subclasses of optional VOs
  ├─ usecase/
  │   ├─ model/                            # Read models for jOOQ query mapping
  │   ├─ port/
@@ -52,7 +53,7 @@ comment/
 ## 2. domain/ Patterns
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every required constituent VO is non-null; an optional reference VO (e.g. the reply target's path) is accepted as null
+- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every constituent VO is non-null; an optional reference VO (e.g. the reply target's path) is passed as its null-object subclass rather than null
 - May expose an overloaded `create(...)` factory that accepts an explicit optional field alongside the primary factory that derives it internally with a default
 - `equals`/`hashCode` based on the composite identity fields (the referenced post and the comment's own positional identifier), via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
@@ -61,6 +62,7 @@ comment/
 - May expose an additional nullable-tolerant factory (e.g. `createWithNullableUuid(...)`) that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
+- An optional VO's `create(...)` returns its null-object subclass (`vo/nullobject/Empty*`) for blank input instead of throwing; the null object is a singleton whose `getValue()` returns null
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):

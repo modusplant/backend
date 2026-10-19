@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
@@ -10,6 +10,8 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ReplyToCommentPath;
+import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
@@ -277,7 +279,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("1.3"));
-        assertThat(captor.getValue().getReplyToPath()).isEqualTo(CommentPath.create("1.1"));
+        assertThat(captor.getValue().getReplyToPath()).isEqualTo(ReplyToCommentPath.create("1.1"));
         then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
     }
 
@@ -317,7 +319,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         assertThat(captor.getValue().getPostId()).isEqualTo(PostId.create(TEST_POST_ULID));
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("2"));
         assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(content));
-        assertThat(captor.getValue().getReplyToPath()).isNull();
+        assertThat(captor.getValue().getReplyToPath()).isSameAs(EmptyReplyToCommentPath.create());
         then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
         then(validationHelper).should(never()).validateIfCommentExists(any(), any());
     }
@@ -341,6 +343,45 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         then(validationHelper).should(never()).validateIfCommentExists(any(), any());
         then(commandRepository).should(times(1)).save(any(Comment.class));
         then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
+    }
+
+    @Test
+    @DisplayName("빈 문자열 답글 대상 경로로 대댓글 등록 시 답글 대상 경로 없이 저장하는 활동 수행")
+    void testRegister_givenBlankReplyToPath_willProcessAction() {
+        // given
+        String content = "reply";
+        CommentRegisterRequest request = new CommentRegisterRequest("", TEST_POST_ULID, "1.2", content);
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
+                eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
+                .willReturn(Optional.of(CommentPath.create("1.2")));
+        given(swearHolder.filterSwear(content)).willReturn(content);
+
+        // when
+        controller.register(request, MEMBER_BASIC_USER_UUID);
+
+        // then
+        then(validationHelper).should(never()).validateIfCommentExists(any(), any());
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        then(commandRepository).should(times(1)).save(captor.capture());
+        assertThat(captor.getValue().getReplyToPath()).isSameAs(EmptyReplyToCommentPath.create());
+    }
+
+    @Test
+    @DisplayName("최대 깊이를 초과하는 답글 대상 경로로 등록 시 예외 반환")
+    void testRegister_givenReplyToPathDeeperThanMaxDepth_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("1.1.1", TEST_POST_ULID, "1.2", "content");
+
+        // when
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.INVALID_COMMENT_PATH_DEPTH);
+        then(validationHelper).shouldHaveNoInteractions();
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
     }
 
     @Test

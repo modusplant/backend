@@ -1,9 +1,10 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ReplyToCommentPathTestUtils;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
         PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
-        CommentContentTestUtils {
+        CommentContentTestUtils, ReplyToCommentPathTestUtils {
 
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -83,7 +84,7 @@ public class CommentJooqRepositoryTest implements
                             replyToPath, replyToNickname)
                     .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
                             3, true, testDateTime, false, testDateTime,
-                            testCommentReplyToPath.getValue(), "replyToNickname"));
+                            testReplyToCommentPath.getValue(), "replyToNickname"));
             return new MockResult[] { new MockResult(1, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
@@ -103,7 +104,7 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.createdAt()).isEqualTo(testDateTime.withNano(0));
         assertThat(readModel.updatedAt()).isEqualTo(testDateTime.withNano(0));
         assertThat(readModel.isDeleted()).isFalse();
-        assertThat(readModel.replyToPath()).isEqualTo(testCommentReplyToPath.getValue());
+        assertThat(readModel.replyToPath()).isEqualTo(testReplyToCommentPath.getValue());
         assertThat(readModel.replyToNickname()).isEqualTo("replyToNickname");
     }
 

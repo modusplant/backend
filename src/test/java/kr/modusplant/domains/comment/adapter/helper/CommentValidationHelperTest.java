@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.adapter.helper;
 
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;

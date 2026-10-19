@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.framework.outbound.redis;
 
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.shared.exception.ConnectionFailedException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;

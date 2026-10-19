@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.domain.vo;
 
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import org.junit.jupiter.api.DisplayName;

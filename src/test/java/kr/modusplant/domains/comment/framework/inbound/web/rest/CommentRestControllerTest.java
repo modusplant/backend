@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
