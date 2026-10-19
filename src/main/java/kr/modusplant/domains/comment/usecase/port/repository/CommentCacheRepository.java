@@ -19,4 +19,12 @@ public interface CommentCacheRepository {
      */
     Optional<CommentPath> reservePath(PostId postId, CommentPath requestedPath, Author author,
                                       IntSupplier getMaximumSiblingPathOrderFromDB);
+
+    /**
+     * 댓글 경로가 포함된 모든 캐시(멱등성 마커, 형제 순서 카운터)를 만료시킨다.
+     * 기존 댓글 경로가 일괄 변경되어 캐시된 경로 정보가 DB와 어긋날 때 사용한다.
+     *
+     * @return 만료된 캐시 키의 개수
+     */
+    long evictAllPathCaches();
 }
