@@ -8,6 +8,8 @@ import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ReplyToCommentPath;
+import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
@@ -64,11 +66,11 @@ public class CommentController {
     public void register(CommentRegisterRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
-        CommentPath replyToPath = request.replyToPath() == null ? null : CommentPath.create(request.replyToPath());
+        ReplyToCommentPath replyToPath = ReplyToCommentPath.create(request.replyToPath());
         Author author = Author.create(authorId);
         commentValidationHelper.validateIfAuthorCanWriteWithinPost(postId, author);
         validateIfParentCommentExists(postId, path);
-        if (replyToPath != null) {
+        if (!(replyToPath instanceof EmptyReplyToCommentPath)) {
             validateIfReplyToCommentPathIsValid(postId, path, replyToPath);
         }
 
@@ -120,7 +122,7 @@ public class CommentController {
         }
     }
 
-    private void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, CommentPath replyToPath) {
+    private void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, ReplyToCommentPath replyToPath) {
         String[] pathSegments = path.getValue().split("\\.");
         String[] replyToPathSegments = replyToPath.getValue().split("\\.");
         if (replyToPathSegments.length != 2
@@ -128,6 +130,6 @@ public class CommentController {
                 || !replyToPathSegments[0].equals(pathSegments[0])) {
             throw new InvalidValueException(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH, "replyToPath");
         }
-        commentValidationHelper.validateIfCommentExists(postId, replyToPath);
+        commentValidationHelper.validateIfCommentExists(postId, CommentPath.create(replyToPath.getValue()));
     }
 }

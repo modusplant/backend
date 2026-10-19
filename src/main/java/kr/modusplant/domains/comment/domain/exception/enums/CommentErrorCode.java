@@ -14,6 +14,7 @@ public enum CommentErrorCode implements ErrorCode {
     EMPTY_COMMENT_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_comment_status", "댓글의 상태 값이 비어 있습니다"),
     EMPTY_MEMBER_NICKNAME(HttpStatus.BAD_REQUEST.value(), "empty_member_nickname", "작성자의 닉네임 값이 비어 있습니다"),
     EMPTY_POST_ID(HttpStatus.BAD_REQUEST.value(), "empty_post_id", "게시글의 식별자 값이 비었습니다"),
+    EMPTY_REPLY_TO_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_reply_to_comment_path", "답글 대상 댓글의 경로 값이 비었습니다"),
 
     INVALID_AUTHOR_NICKNAME(HttpStatus.BAD_REQUEST.value(), "invalid_author_nickname", "작성자의 닉네임 형식이 올바르지 않습니다"),
     INVALID_COMMENT_CONTENT(HttpStatus.BAD_REQUEST.value(), "invalid_comment_content", "댓글의 길이가 600자를 초과했습니다"),

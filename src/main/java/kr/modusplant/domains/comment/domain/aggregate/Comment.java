@@ -14,22 +14,24 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class Comment {
     private final PostId postId;
     private final CommentPath path;
-    private final CommentPath replyToPath;
+    private final ReplyToCommentPath replyToPath;
     private final Author author;
     private final CommentContent content;
     private final CommentStatus status;
 
-    public static Comment create(PostId postId, CommentPath path, CommentPath replyToPath, Author author, CommentContent content) {
+    public static Comment create(PostId postId, CommentPath path, ReplyToCommentPath replyToPath, Author author, CommentContent content) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
         if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
+        if(replyToPath == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_REPLY_TO_COMMENT_PATH, "replyToPath"); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
         return new Comment(postId, path, replyToPath, author, content, CommentStatus.active());
     }
 
-    public static Comment create(PostId postId, CommentPath path, CommentPath replyToPath, Author author, CommentContent content, CommentStatus status) {
+    public static Comment create(PostId postId, CommentPath path, ReplyToCommentPath replyToPath, Author author, CommentContent content, CommentStatus status) {
         if(postId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
         if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
+        if(replyToPath == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_REPLY_TO_COMMENT_PATH, "replyToPath"); }
         if(author == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
         if(status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status"); }
