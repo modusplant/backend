@@ -108,3 +108,4 @@ variety_name	plant_variety	품종명
 major_category_name	plant_variety	대분류명
 middle_category_code	plant_variety	중분류코드
 middle_category_name	plant_variety	중분류명
+reply_to_path	comm_comment	답글 대상 경로

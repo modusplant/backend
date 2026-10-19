@@ -170,12 +170,11 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     // ---------- register ----------
 
     @Test
-    @DisplayName("부모 댓글이 없는 중첩 경로로 등록 시 예외 반환")
-    void testRegister_givenNestedPathWithoutParentComment_willThrowException() {
+    @DisplayName("부모 댓글이 존재하지 않는 대댓글 경로로 등록 시 예외 반환")
+    void testRegister_givenNonExistentParentComment_willThrowException() {
         // given
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
-                .willReturn(false);
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1.2", "content");
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -188,10 +187,105 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     }
 
     @Test
+    @DisplayName("깊이가 2가 아닌 답글 대상 경로로 등록 시 예외 반환")
+    void testRegister_givenRootReplyToPath_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("1", TEST_POST_ULID, "1.2", "content");
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+
+        // when
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH);
+        then(validationHelper).should(never()).validateIfCommentExists(any(), any());
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("최상위 댓글 경로에 답글 대상 경로를 지정해 등록 시 예외 반환")
+    void testRegister_givenRootPathWithReplyToPath_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1", "content");
+
+        // when
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH);
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("다른 최상위 댓글에 속한 답글 대상 경로로 등록 시 예외 반환")
+    void testRegister_givenReplyToPathUnderDifferentRoot_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("2.1", TEST_POST_ULID, "1.2", "content");
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+
+        // when
+        InvalidValueException ex = assertThrows(InvalidValueException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH);
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 답글 대상 댓글로 등록 시 예외 반환")
+    void testRegister_givenNonExistentReplyToComment_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", "content");
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        doThrow(new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, "comm_comment"))
+                .when(validationHelper).validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+
+        // when
+        NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("유효한 답글 대상 경로로 등록 시 답글 대상 경로와 함께 저장하는 활동 수행")
+    void testRegister_givenValidReplyToPath_willProcessAction() {
+        // given
+        String content = "reply";
+        CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", content);
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
+                eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
+                .willReturn(Optional.of(CommentPath.create("1.3")));
+        given(swearHolder.filterSwear(content)).willReturn(content);
+
+        // when
+        controller.register(request, MEMBER_BASIC_USER_UUID);
+
+        // then
+        then(validationHelper).should(times(1))
+                .validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        then(commandRepository).should(times(1)).save(captor.capture());
+        assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("1.3"));
+        assertThat(captor.getValue().getReplyToPath()).isEqualTo(CommentPath.create("1.1"));
+        then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
+    }
+
+    @Test
     @DisplayName("이미 처리된 등록 요청(경로 예약 없음)은 저장/이벤트 없이 활동 수행")
     void testRegister_givenAlreadyReservedRequest_willProcessAction() {
         // given
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", "content");
         given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(Author.create(MEMBER_BASIC_USER_UUID)), any())).willReturn(Optional.empty());
 
@@ -208,7 +302,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenNewRootComment_willProcessAction() {
         // given
         String content = "hello";
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", content);
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", content);
         given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
@@ -223,18 +317,18 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         assertThat(captor.getValue().getPostId()).isEqualTo(PostId.create(TEST_POST_ULID));
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("2"));
         assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(content));
+        assertThat(captor.getValue().getReplyToPath()).isNull();
         then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
-        then(queryRepository).should(never()).isCommentExists(any(), any());
+        then(validationHelper).should(never()).validateIfCommentExists(any(), any());
     }
 
     @Test
-    @DisplayName("부모 댓글이 있는 중첩 경로 등록 시 저장하는 활동 수행")
-    void testRegister_givenNestedPathWithExistingParentComment_willProcessAction() {
+    @DisplayName("답글 대상 경로가 없는 대댓글 등록 시 저장하는 활동 수행")
+    void testRegister_givenNestedPathWithoutReplyToPath_willProcessAction() {
         // given
         String content = "reply";
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1.2", content);
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1")))
-                .willReturn(true);
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1.2", content);
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
         given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(Author.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
@@ -244,6 +338,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
+        then(validationHelper).should(never()).validateIfCommentExists(any(), any());
         then(commandRepository).should(times(1)).save(any(Comment.class));
         then(publisher).should(times(1)).publishEvent(any(CommentRegisterEvent.class));
     }
@@ -254,7 +349,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         String rawContent = "욕설 포함 내용";
         String filteredContent = "*** 포함 내용";
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", rawContent);
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", rawContent);
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
         given(swearHolder.filterSwear(rawContent)).willReturn(filteredContent);
@@ -273,7 +368,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     @DisplayName("유효한 등록 요청은 작성 가능 여부 검증을 헬퍼에 위임하는 활동 수행")
     void testRegister_givenValidRequest_willProcessAction() {
         // given
-        CommentRegisterRequest request = new CommentRegisterRequest(TEST_POST_ULID, "1", "content");
+        CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", "content");
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
         given(swearHolder.filterSwear("content")).willReturn("content");

@@ -46,6 +46,8 @@ public class CommentMapperImplTest implements
         assertThat(result.createdAt()).isEqualTo(testCommentOfPostReadModel.createdAt());
         assertThat(result.editedAt()).isEqualTo(testCommentOfPostReadModel.updatedAt());
         assertThat(result.isDeleted()).isEqualTo(testCommentOfPostReadModel.isDeleted());
+        assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
+        assertThat(result.replyToNickname()).isEqualTo(testCommentOfPostReadModel.replyToNickname());
     }
 
     @Test
@@ -56,7 +58,8 @@ public class CommentMapperImplTest implements
                 null, testCommentOfPostReadModel.nickname(), testCommentOfPostReadModel.path(),
                 testCommentOfPostReadModel.content(), testCommentOfPostReadModel.likeCount(),
                 testCommentOfPostReadModel.isLiked(), testCommentOfPostReadModel.createdAt(),
-                testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted());
+                testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted(),
+                testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToNickname());
 
         // when
         CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);

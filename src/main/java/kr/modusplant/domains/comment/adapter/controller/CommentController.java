@@ -67,6 +67,7 @@ public class CommentController {
         CommentPath replyToPath = request.replyToPath() == null ? null : CommentPath.create(request.replyToPath());
         Author author = Author.create(authorId);
         commentValidationHelper.validateIfAuthorCanWriteWithinPost(postId, author);
+        validateIfParentCommentExists(postId, path);
         if (replyToPath != null) {
             validateIfReplyToCommentPathIsValid(postId, path, replyToPath);
         }
@@ -108,7 +109,18 @@ public class CommentController {
         commandRepository.deleteComment(PostId.create(postUlid), CommentPath.create(commentPath));
     }
 
-    public void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, CommentPath replyToPath) {
+    private void validateIfParentCommentExists(PostId postId, CommentPath path) {
+        String pathValue = path.getValue();
+        if (!pathValue.contains(".")) {
+            return;
+        }
+        String parentCommentPath = pathValue.substring(0, pathValue.lastIndexOf("."));
+        if (!queryRepository.isCommentExists(postId, CommentPath.create(parentCommentPath))) {
+            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
+        }
+    }
+
+    private void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, CommentPath replyToPath) {
         String[] pathSegments = path.getValue().split("\\.");
         String[] replyToPathSegments = replyToPath.getValue().split("\\.");
         if (replyToPathSegments.length != 2

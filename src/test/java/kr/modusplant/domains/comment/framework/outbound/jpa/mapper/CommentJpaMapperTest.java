@@ -1,7 +1,9 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
+import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
@@ -31,6 +33,24 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
 
         // then
         assertThat(result).isEqualTo(compare);
+        assertThat(result.getReplyToPath()).isEqualTo(testValidComment.getReplyToPath().getValue());
+    }
+
+    @Test
+    @DisplayName("답글 대상 경로가 없는 댓글을 댓글 엔티티로 전환")
+    public void testToCommentEntity_givenCommentWithoutReplyToPath_willReturnCommentEntity() {
+        // given
+        MemberEntity memberEntity = createMemberBasicUserEntity();
+        PostEntity postEntity = createPublishedPostEntityBuilder().build();
+        Comment comment = Comment.create(
+                PostIdTestUtils.testPostId, testCommentPath, null, testAuthor, testCommentContent);
+
+        // when
+        CommentEntity result = mapper.toCommCommentEntity(comment, memberEntity, postEntity);
+
+        // then
+        assertThat(result.getPath()).isEqualTo(testCommentPath.getValue());
+        assertThat(result.getReplyToPath()).isNull();
     }
 
 }

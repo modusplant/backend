@@ -52,7 +52,7 @@ comment/
 ## 2. domain/ Patterns
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every constituent VO is non-null
+- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every required constituent VO is non-null; an optional reference VO (e.g. the reply target's path) is accepted as null
 - May expose an overloaded `create(...)` factory that accepts an explicit optional field alongside the primary factory that derives it internally with a default
 - `equals`/`hashCode` based on the composite identity fields (the referenced post and the comment's own positional identifier), via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
@@ -112,6 +112,7 @@ comment/
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
+- When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
@@ -146,6 +147,7 @@ comment/
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
 - DSLContext directly for joined reads, aggregate counts, and paginated read models
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
+- Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
 - May also implement a cross-domain read-only state check
 - May expose a highest-child-ordinal lookup beneath a given parent path (root-level vs. nested distinguished by different pattern matches)
 
@@ -169,4 +171,4 @@ comment/
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
-**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, checks for a pre-existing row before insert, and delegates soft-delete/update operations to the entity's mutation methods before saving
+**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving

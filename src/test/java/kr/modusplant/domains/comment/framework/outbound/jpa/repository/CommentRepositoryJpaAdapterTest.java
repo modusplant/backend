@@ -60,7 +60,6 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
         given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
-        given(commentRepository.existsById(TEST_COMMENT_ID)).willReturn(false);
 
         // when
         jpaAdapter.save(testValidComment);
@@ -97,27 +96,6 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_POST);
-    }
-
-    @Test
-    @DisplayName("이미 존재하는 댓글 경로로 저장 시 InvalidValueException 발생")
-    public void testSave_givenExistingComment_willThrowInvalidValueException() {
-        // given
-        MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
-        PostEntity postEntity = Mockito.mock(PostEntity.class);
-        CommentEntity commentEntity = createCommentEntityBuilder().build();
-
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
-        given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
-        given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
-        given(commentRepository.existsById(TEST_COMMENT_ID)).willReturn(true);
-
-        // when
-        InvalidValueException ex = assertThrows(InvalidValueException.class,
-                () -> jpaAdapter.save(testValidComment));
-
-        // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.EXIST_COMMENT);
     }
 
     @Test
