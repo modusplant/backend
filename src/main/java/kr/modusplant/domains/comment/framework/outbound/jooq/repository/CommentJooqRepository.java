@@ -32,7 +32,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final CommPost commPost = CommPost.COMM_POST;
     private final CommComment commComment = CommComment.COMM_COMMENT;
     private final CommComment rootComment = CommComment.COMM_COMMENT.as("root_comment");
+    private final CommComment replyToComment = CommComment.COMM_COMMENT.as("reply_to_comment");
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
+    private final SiteMember replyToMember = SiteMember.SITE_MEMBER.as("reply_to_member");
     private final CommCommentLike commentLike = CommCommentLike.COMM_COMMENT_LIKE;
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
 
@@ -54,11 +56,17 @@ public class CommentJooqRepository implements CommentQueryRepository {
                         isLiked,
                         commComment.CREATED_AT,
                         commComment.IS_DELETED,
-                        commComment.EDITED_AT)
+                        commComment.EDITED_AT,
+                        commComment.REPLY_TO_PATH,
+                        replyToMember.NICKNAME)
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
                 .join(memberProf).on(commComment.AUTH_MEMB_UUID.eq(memberProf.UUID))
                 .leftJoin(commentLike).on(likeJoinCondition)
+                .leftJoin(replyToComment).on(
+                        replyToComment.POST_ULID.eq(commComment.POST_ULID)
+                                .and(replyToComment.PATH.eq(commComment.REPLY_TO_PATH)))
+                .leftJoin(replyToMember).on(replyToComment.AUTH_MEMB_UUID.eq(replyToMember.UUID))
                 .leftJoin(rootComment).on(
                         rootComment.POST_ULID.eq(commComment.POST_ULID)
                                 .and(rootComment.PATH.notLike("%.%"))
@@ -80,7 +88,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
                         record.getValue(isLiked),
                         record.getValue(commComment.CREATED_AT).withNano(0),
                         record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
-                        record.getValue(commComment.IS_DELETED)
+                        record.getValue(commComment.IS_DELETED),
+                        record.getValue(commComment.REPLY_TO_PATH),
+                        record.getValue(replyToMember.NICKNAME)
                 ));
     }
 

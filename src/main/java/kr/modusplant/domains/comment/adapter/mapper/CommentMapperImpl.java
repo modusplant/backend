@@ -34,7 +34,8 @@ public class CommentMapperImpl implements CommentMapper {
         return new CommentOfPostResponse(
                 readModel.profileImage() == null ? null : fileService.generateGetPresignedUrl(readModel.profileImage()),
                 readModel.nickname(), readModel.path(), readModel.content(), readModel.likeCount(),
-                readModel.isLiked(), readModel.createdAt(), readModel.updatedAt(), readModel.isDeleted()
+                readModel.isLiked(), readModel.createdAt(), readModel.updatedAt(), readModel.isDeleted(),
+                readModel.replyToPath(), readModel.replyToNickname()
         );
     }
 

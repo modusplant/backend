@@ -64,9 +64,12 @@ public class CommentController {
     public void register(CommentRegisterRequest request, UUID authorId) {
         PostId postId = PostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
+        CommentPath replyToPath = request.replyToPath() == null ? null : CommentPath.create(request.replyToPath());
         Author author = Author.create(authorId);
         commentValidationHelper.validateIfAuthorCanWriteWithinPost(postId, author);
-        validateIfParentCommentExists(postId, path);
+        if (replyToPath != null) {
+            validateIfReplyToCommentPathIsValid(postId, path, replyToPath);
+        }
 
         // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
         // DB 하한값 조회(findMaximumSiblingPathOrder)는 Redis 예약 키가 전혀 없을 때만 실행되도록 지연 전달한다.
@@ -79,7 +82,7 @@ public class CommentController {
         CommentPath reservedPath = optionalReservedPath.get();
 
         Comment comment = Comment.create(
-                postId, reservedPath, author, CommentContent.create(swearHolder.filterSwear(request.content())));
+                postId, reservedPath, replyToPath, author, CommentContent.create(swearHolder.filterSwear(request.content())));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
@@ -105,14 +108,14 @@ public class CommentController {
         commandRepository.deleteComment(PostId.create(postUlid), CommentPath.create(commentPath));
     }
 
-    private void validateIfParentCommentExists(PostId postId, CommentPath path) {
-        String pathValue = path.getValue();
-        if (!pathValue.contains(".")) {
-            return;
+    public void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, CommentPath replyToPath) {
+        String[] pathSegments = path.getValue().split("\\.");
+        String[] replyToPathSegments = replyToPath.getValue().split("\\.");
+        if (replyToPathSegments.length != 2
+                || pathSegments.length != 2
+                || !replyToPathSegments[0].equals(pathSegments[0])) {
+            throw new InvalidValueException(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH, "replyToPath");
         }
-        String parentCommentPath = pathValue.substring(0, pathValue.lastIndexOf("."));
-        if (!queryRepository.isCommentExists(postId, CommentPath.create(parentCommentPath))) {
-            throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
-        }
+        commentValidationHelper.validateIfCommentExists(postId, replyToPath);
     }
 }
