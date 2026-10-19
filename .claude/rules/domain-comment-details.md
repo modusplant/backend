@@ -35,6 +35,7 @@ comment/
      ├─ inbound/web/rest/                 # HTTP entry point
      ├─ inbound/web/cache/                # ETag / Last-Modified conditional-GET support
      │   └─ model/                        # Cache result carrier record
+     ├─ inbound/flyway/                   # Flyway callbacks reacting to applied migrations
      └─ outbound/
          ├─ jooq/
          │   └─ repository/               # DSLContext-based read repository
@@ -89,8 +90,9 @@ comment/
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
 **Cache Port** (`usecase/port/repository/`):
-- Declares a single reservation operation that returns an `Optional` which is empty when the same request was already processed (idempotency)
+- Declares a reservation operation that returns an `Optional` which is empty when the same request was already processed (idempotency)
 - Accepts a lazily-evaluated fallback supplier so the implementation reads the database only when its own state is cold
+- Declares a bulk eviction operation that expires every path-bearing cache entry and returns the evicted count
 
 **Mapper Port** (`usecase/port/mapper/`):
 - Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping, including converting a paginated read model's zero-based page index to a one-based index for API consumers; implemented by a handwritten (non-generated) adapter class
@@ -137,6 +139,10 @@ comment/
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
 
+**Flyway Callback** (`framework/inbound/flyway/`) — `@Component @RequiredArgsConstructor @Slf4j`; implements Flyway's `Callback` and is auto-registered by Spring Boot's Flyway auto-configuration:
+- Records on `AFTER_EACH_MIGRATE` whether a specific migration version was applied in the current run
+- Acts on `AFTER_MIGRATE` / `AFTER_MIGRATE_ERROR` only when that version was applied, delegating the side effect (e.g. cache eviction) to a usecase port
+
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
 - DSLContext directly for joined reads, aggregate counts, and paginated read models
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
@@ -146,6 +152,7 @@ comment/
 **Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
 - Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a bounded, slidingly-refreshed TTL
 - The reservation runs a set-if-absent idempotency guard (a lost race yields an empty `Optional`), then draws the next ordinal from an atomic increment counter that is set from the caller-supplied database lower bound before its first increment, so a cold counter cannot collide with existing rows
+- Bulk eviction walks each key family with cursor-based `SCAN` (never `KEYS`) and deletes the matches in fixed-size batches
 - Null replies and data-access errors are rethrown as a shared connection-failure exception
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:

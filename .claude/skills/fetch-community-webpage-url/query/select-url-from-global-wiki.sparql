@@ -1,0 +1,7 @@
+SELECT ?item (SAMPLE(?site) AS ?website) (MAX(?links) AS ?sitelinks) WHERE {
+  VALUES ?type { wd:Q3220391 wd:Q168210 wd:Q6576792 wd:Q3963243 wd:Q984179 }
+  ?item wdt:P31 ?type ; wdt:P856 ?site ; wikibase:sitelinks ?links .
+  FILTER NOT EXISTS { ?item wdt:P576 [] . }
+}
+GROUP BY ?item
+ORDER BY DESC(?sitelinks)
