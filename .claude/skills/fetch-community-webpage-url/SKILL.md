@@ -46,14 +46,21 @@ Fetch candidates from each source in **Sources** at its `Related Step`.
 ## 3. Filter Chain
 Apply the filters in order. Each filter only looks at candidates that are not yet dropped, and `url/custom-url.txt` URLs skip the chain.
 
-| Order | Filter       | Performed by                         | Drops a candidate when                         |
-|-------|--------------|--------------------------------------|------------------------------------------------|
-| 1     | normalize    | `fetch`                              | it is not a valid URL, or it duplicates one    |
-| 2     | reachability | `filter-reachability`                | it is unreachable or redirects to another host |
-| 3     | suitability  | Claude, then `write-result --reject` | it fails the **Selection Criteria**            |
+| Order | Filter         | Performed by                           | Drops a candidate when                         |
+|-------|----------------|----------------------------------------|------------------------------------------------|
+| 1     | normalize      | `fetch`                                | it is not a valid URL, or it duplicates one    |
+| 2     | closed         | `fetch`, or `exclude --closed`         | it is in `scripts/closed-webpage-url.txt`      |
+| 3     | login-required | `fetch`, or `exclude --login-required` | it is in `scripts/login-required-url.txt`      |
+| 4     | reachability   | `filter-reachability`                  | it is unreachable or redirects to another host |
+| 5     | suitability    | Claude, then `write-result --reject`   | it fails the **Selection Criteria**            |
 
+- **Exclusion lists:** `scripts/closed-webpage-url.txt` and `scripts/login-required-url.txt` keep confirmed sites across runs, and `fetch` drops their URLs right after normalizing. Delete a line to make the next run judge that site again.
 - **Blocked:** A candidate that answers status `400`, `401`, `403`, or `429` is not dropped by the reachability filter. `filter-reachability` records it in `blockedBy` instead, and it stays a suitability target.
 - **Suitability:** After `filter-reachability`, read `url/candidate-url.json` and judge every candidate whose `droppedBy` is `null`, blocked or not, against the **Selection Criteria** by the site as a whole. Collect the failing URLs for step 4.
+- **Closed or login-required:** For a candidate that looks shut down or login-gated during the suitability judgment, `browser_navigate` to it, then `browser_evaluate` with the content of `query/inspect-access-state.js`.
+  - **Closed:** the page shows a shutdown notice, a parked or for-sale domain, or no community content.
+  - **Login-required:** its posts cannot be read without signing in. A bot check (e.g. a Cloudflare challenge) is not evidence of either.
+  - Run `exclude --closed <URL>... --login-required <URL>...` with the confirmed URLs, and do not pass them to `--reject`. Run `browser_close` after the last check.
 
 ### Selection Criteria
 - **Included:** registered users publish posts and reply to or react to each other.
@@ -65,7 +72,7 @@ Apply the filters in order. Each filter only looks at candidates that are not ye
 2. Provide only the following, so that the returned URLs need no further judgment:
    - the content of `url/result-url.txt`;
    - the `added` and `removed` counts of `url/blocked-url.txt` from the `SUMMARY: blocked` line;
-   - every `WARNING: custom:` line from step 1, which names a `url/custom-url.txt` line skipped as an invalid URL.
+   - every `WARNING: custom:` line from step 1, which names a `url/custom-url.txt` line skipped as an invalid URL, or a `url/custom-url.txt` URL kept although it is in an exclusion list.
 
 # File Formats
 
@@ -89,12 +96,12 @@ Apply the filters in order. Each filter only looks at candidates that are not ye
 ```
 
 ## Candidate URL Format
-- `sources` lists every source that produced the URL. `blockedBy` is `null` or `status-<code>`. `droppedBy` is `null` for a surviving candidate, `reachability:<reason>`, or `suitability`.
+- `sources` lists every source that produced the URL. `blockedBy` is `null` or `status-<code>`. `droppedBy` is `null` for a surviving candidate, `closed`, `login-required`, `reachability:<reason>`, or `suitability`.
 
 ```json
 [{"url": "https://<host>/", "sources": ["global-wiki", "web-search"], "blockedBy": null, "droppedBy": null}]
 ```
 
 # Constraint
-- **Single Writer:** Only `scripts/pipeline_and_return_url.py` writes `scripts/unresolved-korean-wiki-url.txt` and the files under `url/`, except `url/custom-url.txt`. The script normalizes every URL to `https://<host>/`.
-- **Output Purity:** `url/result-url.txt`, `url/blocked-url.txt`, `url/custom-url.txt`, and `scripts/unresolved-korean-wiki-url.txt` contain one URL per line and nothing else.
+- **Single Writer:** Only `scripts/pipeline_and_return_url.py` writes `scripts/unresolved-korean-wiki-url.txt`, `scripts/closed-webpage-url.txt`, `scripts/login-required-url.txt`, and the files under `url/`, except `url/custom-url.txt`. The script normalizes every URL to `https://<host>/`.
+- **Output Purity:** `url/result-url.txt`, `url/blocked-url.txt`, `url/custom-url.txt`, `scripts/unresolved-korean-wiki-url.txt`, `scripts/closed-webpage-url.txt`, and `scripts/login-required-url.txt` contain one URL per line and nothing else.
