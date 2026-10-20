@@ -42,6 +42,9 @@ public class CommentEntity {
     @ToString.Exclude
     private MemberEntity authMember;
 
+    @Column(name = "reply_to_path")
+    private String replyToPath;
+
     @Column(name = "like_count", nullable = false)
     private Integer likeCount;
 
@@ -109,12 +112,13 @@ public class CommentEntity {
     }
 
     private CommentEntity(
-            PostEntity post, String path,
+            PostEntity post, String path, String replyToPath,
             MemberEntity authMember, Integer likeCount,
             String content, Boolean isDeleted
     ) {
         this.post = post;
         this.path = path;
+        this.replyToPath = replyToPath;
         this.authMember = authMember;
         this.likeCount = likeCount;
         this.content = content;
@@ -128,6 +132,7 @@ public class CommentEntity {
     public static final class CommentEntityBuilder {
         private PostEntity post;
         private String path;
+        private String replyToPath;
         private MemberEntity authMember;
         private Integer likeCount;
         private String content;
@@ -140,6 +145,11 @@ public class CommentEntity {
 
         public CommentEntityBuilder path(final String path) {
             this.path = path;
+            return this;
+        }
+
+        public CommentEntityBuilder replyToPath(final String replyToPath) {
+            this.replyToPath = replyToPath;
             return this;
         }
 
@@ -166,6 +176,7 @@ public class CommentEntity {
         public CommentEntityBuilder comment(final CommentEntity commentEntity) {
             this.post = commentEntity.getPost();
             this.path = commentEntity.getPath();
+            this.replyToPath = commentEntity.getReplyToPath();
             this.authMember = commentEntity.getAuthMember();
             this.likeCount = commentEntity.getLikeCount();
             this.content = commentEntity.getContent();
@@ -174,7 +185,7 @@ public class CommentEntity {
         }
 
         public CommentEntity build() {
-            return new CommentEntity(this.post, this.path, this.authMember, this.likeCount, this.content, this.isDeleted
+            return new CommentEntity(this.post, this.path, this.replyToPath, this.authMember, this.likeCount, this.content, this.isDeleted
             );
         }
     }

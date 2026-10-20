@@ -59,7 +59,7 @@ public class PostAbuseReportDashboardJooqRepository {
                 .where(ulidCondition)
                 .and(statusCondition)
                 .orderBy(COMM_POST_ABUSE_REPORT_DASHBOARD.POST_ULID.desc())
-                .limit(reportPageSize)
+                .limit(reportPageSize + 1) // 다음 페이지 존재 여부 판단을 위해 1개 더 조회
                 .fetch(getDashboardReadModelMapper());
     }
 

@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.usecase.response;
 
 import java.util.List;
 
-public record CommentPageResponse<T> (
+public record CommentOffsetPageResponse<T> (
         List<T> commentList,
         int page,
         int size,

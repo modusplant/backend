@@ -1,17 +1,19 @@
 package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.response.CommentCursorPageResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
-import kr.modusplant.domains.comment.common.util.usecase.response.CommentPageResponseTestUtils;
+import kr.modusplant.domains.comment.common.util.usecase.response.CommentOffsetPageResponseTestUtils;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
+import kr.modusplant.domains.comment.usecase.response.CommentCursorPageResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
@@ -29,12 +31,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PAGE_SIZE;
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -43,7 +48,7 @@ import static org.mockito.Mockito.times;
 public class CommentRestControllerTest implements PostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
         CommentUpdateRequestTestUtils, MemberIdTestUtils,
-        CommentPageResponseTestUtils {
+        CommentOffsetPageResponseTestUtils, CommentCursorPageResponseTestUtils {
     private final CommentController controller = Mockito.mock(CommentController.class);
     private final CommentCacheService cacheService = Mockito.mock(CommentCacheService.class);
     private final CommentRestController restController = new CommentRestController(controller, cacheService);
@@ -52,16 +57,16 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     private final String testIfModifiedSince = "Sat, 01 Jan 2025 00:00:00 GMT";
 
     @Test
-    @DisplayName("postUlid 기반 조회 시 캐시 가능한 경우 304와 빈 본문 반환")
-    void testGatherByPost_givenCacheableResult_willReturnNotModified() {
+    @DisplayName("postUlid 기반 조회 시 캐시 가능한 경우 ResponseEntity 반환")
+    void testGatherByPost_V1_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
 
         // when
         ResponseEntity<DataResponse<List<CommentOfPostResponse>>> result =
-                restController.gatherByPost(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, null);
+                restController.gatherByPost_V1(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, null);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
@@ -70,19 +75,19 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("postUlid 기반 조회 시 캐시 불가능한 경우 controller에 위임하여 200과 본문 반환")
-    void testGatherByPost_givenNotCacheableResultWithAuthenticatedMember_willDelegateToController() {
+    @DisplayName("postUlid 기반 조회 시 캐시 불가능한 경우 ResponseEntity 반환")
+    void testGatherByPost_V1_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
-        given(controller.gatherByPost(TEST_POST_ULID, MEMBER_BASIC_USER_UUID))
+        given(controller.gatherByPost_V1(TEST_POST_ULID, MEMBER_BASIC_USER_UUID))
                 .willReturn(List.of(testCommentOfPostResponse));
         DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
 
         // when
         ResponseEntity<DataResponse<List<CommentOfPostResponse>>> result =
-                restController.gatherByPost(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, userDetails);
+                restController.gatherByPost_V1(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, userDetails);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -91,30 +96,85 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("postUlid 기반 조회 시 비로그인 사용자는 null uuid로 위임됨")
-    void testGatherByPost_givenAnonymousUser_willDelegateWithNullUuid() {
+    @DisplayName("postUlid 기반 조회 시 비로그인 사용자는 null uuid로 위임하는 활동 수행")
+    void testGatherByPost_V1_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(PostId.class))).willReturn(cacheData);
-        given(controller.gatherByPost(TEST_POST_ULID, null)).willReturn(List.of(testCommentOfPostResponse));
+        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
+        given(controller.gatherByPost_V1(TEST_POST_ULID, null)).willReturn(List.of(testCommentOfPostResponse));
 
         // when
-        restController.gatherByPost(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, null);
+        restController.gatherByPost_V1(TEST_POST_ULID, testIfNoneMatch, testIfModifiedSince, null);
 
         // then
-        then(controller).should(times(1)).gatherByPost(TEST_POST_ULID, null);
+        then(controller).should(times(1)).gatherByPost_V1(TEST_POST_ULID, null);
     }
 
     @Test
-    @DisplayName("memberUuid 기반 조회 시 캐시 가능한 경우 304와 빈 본문 반환")
-    void testGatherByAuthor_givenCacheableResult_willReturnNotModified() {
+    @DisplayName("postUlid 기반 커서 조회 시 캐시 가능한 경우 ResponseEntity 반환")
+    void testGatherByPost_V2_givenCacheableResult_willReturnResponseEntity() {
+        // given
+        CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
+                .willReturn(cacheData);
+
+        // when
+        ResponseEntity<DataResponse<CommentCursorPageResponse>> result = restController.gatherByPost_V2(
+                TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, testIfNoneMatch, testIfModifiedSince, null);
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.NOT_MODIFIED);
+        assertThat(result.getBody()).isNull();
+        then(controller).shouldHaveNoInteractions();
+    }
+
+    @Test
+    @DisplayName("postUlid 기반 커서 조회 시 캐시 불가능한 경우 ResponseEntity 반환")
+    void testGatherByPost_V2_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
+        // given
+        CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
+                .willReturn(cacheData);
+        given(controller.gatherByPost_V2(TEST_POST_ULID, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE, MEMBER_BASIC_USER_UUID))
+                .willReturn(testCommentCursorPageResponse);
+        DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
+
+        // when
+        ResponseEntity<DataResponse<CommentCursorPageResponse>> result = restController.gatherByPost_V2(
+                TEST_POST_ULID, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE, testIfNoneMatch, testIfModifiedSince, userDetails);
+
+        // then
+        assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+        Assertions.assertNotNull(result.getBody());
+        assertThat(result.getBody().getData()).isEqualTo(testCommentCursorPageResponse);
+    }
+
+    @Test
+    @DisplayName("postUlid 기반 커서 조회 시 비로그인 사용자는 null uuid로 위임하는 활동 수행")
+    void testGatherByPost_V2_givenAnonymousUser_willProcessAction() {
+        // given
+        CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
+        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
+        given(controller.gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, null))
+                .willReturn(testCommentCursorPageResponse);
+
+        // when
+        restController.gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, testIfNoneMatch, testIfModifiedSince, null);
+
+        // then
+        then(controller).should(times(1)).gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, null);
+    }
+
+    @Test
+    @DisplayName("memberUuid 기반 조회 시 캐시 가능한 경우 ResponseEntity 반환")
+    void testGatherByAuthor_givenCacheableResult_willReturnResponseEntity() {
         // given
         MemberId memberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId)).willReturn(cacheData);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId, 1, 8)).willReturn(cacheData);
 
         // when
-        ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
+        ResponseEntity<DataResponse<CommentOffsetPageResponse<CommentOfAuthorReadModel>>> result =
                 restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
@@ -124,32 +184,32 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("memberUuid 기반 조회 시 캐시 불가능한 경우 controller에 위임하여 200과 본문 반환")
-    void testGatherByAuthor_givenNotCacheableResult_willDelegateToController() {
+    @DisplayName("memberUuid 기반 조회 시 캐시 불가능한 경우 ResponseEntity 반환")
+    void testGatherByAuthor_givenNotCacheableResult_willReturnResponseEntity() {
         // given
         MemberId memberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId)).willReturn(cacheData);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId, 1, 8)).willReturn(cacheData);
         given(controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(0, 8)))
-                .willReturn(testCommentPageResponseOfAuthorPageModel);
+                .willReturn(testCommentOffsetPageResponseOfAuthorPageModel);
 
         // when
-        ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> result =
+        ResponseEntity<DataResponse<CommentOffsetPageResponse<CommentOfAuthorReadModel>>> result =
                 restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, testIfNoneMatch, testIfModifiedSince, MEMBER_BASIC_USER_UUID);
 
         // then
         assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertNotNull(result.getBody());
-        assertThat(result.getBody().getData()).isEqualTo(testCommentPageResponseOfAuthorPageModel);
+        assertThat(result.getBody().getData()).isEqualTo(testCommentOffsetPageResponseOfAuthorPageModel);
         then(controller).should(times(1)).gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(0, 8));
     }
 
     @Test
-    @DisplayName("1-based page 파라미터가 0-based로 변환되어 controller에 위임됨")
-    void testGatherByAuthor_givenSecondPage_willConvertToZeroBasedPageIndex() {
+    @DisplayName("1-based page 파라미터를 0-based로 변환하여 위임하는 활동 수행")
+    void testGatherByAuthor_givenSecondPage_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(MemberId.class))).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(MemberId.class), anyInt(), anyInt())).willReturn(cacheData);
         given(controller.gatherByAuthor(any(UUID.class), any())).willReturn(null);
 
         // when
@@ -168,7 +228,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("유효한 댓글 등록 요청으로 controller.register 호출 후 200 반환")
+    @DisplayName("유효한 댓글 등록 요청으로 ResponseEntity 반환")
     void testRegister_givenValidRegisterRequest_willReturnResponseEntity() {
         // given
         DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
@@ -183,7 +243,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("유효한 댓글 갱신 요청 객체로 댓글 갱신하기")
+    @DisplayName("유효한 댓글 갱신 요청으로 ResponseEntity 반환")
     public void testUpdateContent_givenValidCommentUpdateRequest_willReturnResponseEntity() {
         // given
         DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
@@ -198,7 +258,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("유효한 삭제 요청으로 controller.delete 호출 후 200 반환")
+    @DisplayName("유효한 삭제 요청으로 ResponseEntity 반환")
     public void testDeleteComment_givenValidPathAndUlid_willReturnResponseEntity() {
         // given
         DefaultUserDetails userDetails = DefaultUserDetails.builder().uuid(MEMBER_BASIC_USER_UUID).build();
