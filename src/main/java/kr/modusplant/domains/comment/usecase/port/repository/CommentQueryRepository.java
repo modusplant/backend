@@ -30,5 +30,7 @@ public interface CommentQueryRepository {
 
     boolean isCommentExists(PostId postId, CommentPath path);
 
+    boolean isCommentDeleted(PostId postId, CommentPath path);
+
     boolean isPostPublished(PostId postId);
 }

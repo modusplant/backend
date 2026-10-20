@@ -59,6 +59,50 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
+    @DisplayName("게시글의 식별자와 댓글 경로로 삭제된 댓글인지 확인 시 True 반환")
+    void testIsCommentDeleted_givenDeletedComment_willReturnTrue() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(
+                    bindings[0].equals(testPostId.getValue())
+                            && bindings[1].equals(testCommentPath.getValue())
+                            && bindings[2].equals(true)));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("게시글의 식별자와 댓글 경로로 삭제되지 않은 댓글인지 확인 시 False 반환")
+    void testIsCommentDeleted_givenNotDeletedComment_willReturnFalse() {
+        // given
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(false));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
     @DisplayName("게시글의 식별자로 댓글 읽기 모델 목록 가져오기")
     void testFindByPost_givenValidPostId_willReturnCommentOfPostReadModelList() {
         // given: column order must match CommentJooqRepository#findByPost's select list

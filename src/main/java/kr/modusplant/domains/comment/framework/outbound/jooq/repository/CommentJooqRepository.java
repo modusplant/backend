@@ -195,6 +195,17 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
+    public boolean isCommentDeleted(PostId postId, CommentPath path) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .and(commComment.PATH.eq(path.getValue()))
+                        .and(commComment.IS_DELETED.eq(true))
+        );
+    }
+
+    @Override
     public boolean isPostPublished(PostId postIdVO) {
         String postId = postIdVO.getValue();
         return postId != null && Boolean.TRUE.equals(

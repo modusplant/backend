@@ -3,6 +3,7 @@ package kr.modusplant.domains.comment.adapter.helper;
 import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -133,6 +134,31 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
         assertThat(ex.getEntityName()).isEqualTo(TableName.COMM_COMMENT);
+    }
+
+    @Test
+    @DisplayName("삭제되지 않은 댓글 검증 시 활동 수행")
+    void testValidateIfCommentIsNotDeleted_givenNotDeletedComment_willProcessAction() {
+        // given
+        given(queryRepository.isCommentDeleted(testPostId, testCommentPath)).willReturn(false);
+
+        // when & then
+        assertDoesNotThrow(() -> helper.validateIfCommentIsNotDeleted(testPostId, testCommentPath));
+        then(queryRepository).should(times(1)).isCommentDeleted(testPostId, testCommentPath);
+    }
+
+    @Test
+    @DisplayName("삭제된 댓글 검증 시 예외 반환")
+    void testValidateIfCommentIsNotDeleted_givenDeletedComment_willThrowException() {
+        // given
+        given(queryRepository.isCommentDeleted(testPostId, testCommentPath)).willReturn(true);
+
+        // when
+        DeletedReplyToCommentException ex = assertThrows(DeletedReplyToCommentException.class,
+                () -> helper.validateIfCommentIsNotDeleted(testPostId, testCommentPath));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.DELETED_REPLY_TO_COMMENT);
     }
 
     @Test

@@ -130,6 +130,8 @@ public class CommentController {
                 || !replyToPathSegments[0].equals(pathSegments[0])) {
             throw new InvalidValueException(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH, "replyToPath");
         }
-        commentValidationHelper.validateIfCommentExists(postId, CommentPath.create(replyToPath.getValue()));
+        CommentPath replyToCommentVO = CommentPath.create(replyToPath.getValue());
+        commentValidationHelper.validateIfCommentExists(postId, replyToCommentVO);
+        commentValidationHelper.validateIfCommentIsNotDeleted(postId, replyToCommentVO);
     }
 }

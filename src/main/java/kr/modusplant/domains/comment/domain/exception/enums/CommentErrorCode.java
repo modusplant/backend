@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CommentErrorCode implements ErrorCode {
+    DELETED_REPLY_TO_COMMENT(HttpStatus.BAD_REQUEST.value(), "deleted_reply_to_comment", "답글 대상 댓글이 삭제되었습니다"),
+
     EMPTY_AUTHOR(HttpStatus.BAD_REQUEST.value(), "empty_author", "작성자의 값이 비어 있습니다"),
     EMPTY_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_comment_path", "댓글의 경로 값이 비었습니다"),
     EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST.value(), "empty_comment_content", "댓글의 내용이 비어 있습니다"),

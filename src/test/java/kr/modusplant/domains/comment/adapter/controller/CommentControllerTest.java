@@ -5,6 +5,7 @@ import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
+import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
@@ -259,6 +260,25 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     }
 
     @Test
+    @DisplayName("삭제된 답글 대상 댓글로 등록 시 예외 반환")
+    void testRegister_givenDeletedReplyToComment_willThrowException() {
+        // given
+        CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", "content");
+        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        doThrow(new DeletedReplyToCommentException())
+                .when(validationHelper).validateIfCommentIsNotDeleted(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+
+        // when
+        DeletedReplyToCommentException ex = assertThrows(DeletedReplyToCommentException.class,
+                () -> controller.register(request, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.DELETED_REPLY_TO_COMMENT);
+        then(cacheRepository).shouldHaveNoInteractions();
+        then(commandRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
     @DisplayName("유효한 답글 대상 경로로 등록 시 답글 대상 경로와 함께 저장하는 활동 수행")
     void testRegister_givenValidReplyToPath_willProcessAction() {
         // given
@@ -276,6 +296,8 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // then
         then(validationHelper).should(times(1))
                 .validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+        then(validationHelper).should(times(1))
+                .validateIfCommentIsNotDeleted(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("1.3"));

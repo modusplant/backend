@@ -17,8 +17,8 @@ comment/
  │   ├─ aggregate/                        # Aggregate root
  │   ├─ enums/                            # Status-style backing enums
  │   ├─ event/                            # Domain events
- │   ├─ exception/
- │   │   └─ enums/                        # Error code enums (no domain-local exception classes)
+ │   ├─ exception/                        # Domain-local exception classes
+ │   │   └─ enums/                        # Error code enums
  │   └─ vo/                               # Value Objects
  │       └─ nullobject/                   # Null-object subclasses of optional VOs
  ├─ usecase/
@@ -70,7 +70,8 @@ comment/
 - May derive a classification field (e.g. an action-type string) internally from the shape of another field rather than accepting it as a parameter
 
 **Domain Exceptions** (`domain/exception/`):
-- This domain defines no domain-local exception subclasses; validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
+- Validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
+- A failure with no matching shared kernel exception (e.g. a soft-deleted reply target) has a domain-local exception extending the shared `BusinessException`, whose no-argument constructor fixes its error code
 
 **Error Codes** (`domain/exception/enums/`):
 - `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`
@@ -114,14 +115,14 @@ comment/
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
-- When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists
+- When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists and is not soft-deleted
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
 **Validation Helper** (`adapter/helper/`) — `@Component @RequiredArgsConstructor`:
 - Exposes single-purpose precondition checks
 - Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
-- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code; the ownership failure maps to HTTP 403
+- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local exception; the ownership failure maps to HTTP 403
 
 **Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
 
