@@ -4,6 +4,7 @@
 /.claude/logs/
 /.claude/output-styles/
 /.claude/temp/
+/.claude/skills/fetch-community-webpage-url/url/candidate-url.json
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/visualize-docker-container-dependency/result
 /.claude/skills/write-portfolio/
