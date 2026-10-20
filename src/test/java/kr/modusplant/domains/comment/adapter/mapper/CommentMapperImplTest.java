@@ -5,7 +5,7 @@ import kr.modusplant.domains.comment.common.util.usecase.model.CommentOfPostRead
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -77,7 +77,7 @@ public class CommentMapperImplTest implements
         PageImpl<CommentOfAuthorReadModel> page = new PageImpl<>(List.of(testCommentOfAuthorReadModel), pageable, 1L);
 
         // when
-        CommentPageResponse<CommentOfAuthorReadModel> result = mapper.toCommentPageResponseWithOnePlusPage(page);
+        CommentOffsetPageResponse<CommentOfAuthorReadModel> result = mapper.toCommentPageResponseWithOnePlusPage(page);
 
         // then
         assertThat(result.commentList()).isEqualTo(List.of(testCommentOfAuthorReadModel));

@@ -8,9 +8,12 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CommentErrorCode implements ErrorCode {
+    COMMENT_PAGE_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "comment_page_size_out_of_range", "댓글 페이지 크기가 올바른 값의 범위를 벗어났습니다"),
+
     DELETED_REPLY_TO_COMMENT(HttpStatus.BAD_REQUEST.value(), "deleted_reply_to_comment", "답글 대상 댓글이 삭제되었습니다"),
 
     EMPTY_AUTHOR(HttpStatus.BAD_REQUEST.value(), "empty_author", "작성자의 값이 비어 있습니다"),
+    EMPTY_COMMENT_PAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "empty_comment_page_size", "댓글 페이지 크기가 비어 있습니다"),
     EMPTY_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "empty_comment_path", "댓글의 경로 값이 비었습니다"),
     EMPTY_COMMENT_CONTENT(HttpStatus.BAD_REQUEST.value(), "empty_comment_content", "댓글의 내용이 비어 있습니다"),
     EMPTY_COMMENT_STATUS(HttpStatus.BAD_REQUEST.value(), "empty_comment_status", "댓글의 상태 값이 비어 있습니다"),

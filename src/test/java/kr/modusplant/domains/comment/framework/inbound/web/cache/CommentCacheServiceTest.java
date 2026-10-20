@@ -50,8 +50,8 @@ class CommentCacheServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 postUlid로 캐시 데이터 조회 시 NotFoundEntityException 발생")
-    void testGetCacheDataByPost_givenNonExistentPost_willThrowNotFoundEntityException() {
+    @DisplayName("존재하지 않는 postUlid로 캐시 데이터 조회 시 예외 반환")
+    void testGetCacheDataByPost_givenNonExistentPost_willThrowException() {
         // given
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.empty());
 
@@ -159,8 +159,8 @@ class CommentCacheServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 memberUuid로 캐시 데이터 조회 시 NotFoundEntityException 발생")
-    void testGetCacheDataByMember_givenNonExistentMember_willThrowNotFoundEntityException() {
+    @DisplayName("존재하지 않는 memberUuid로 캐시 데이터 조회 시 예외 반환")
+    void testGetCacheDataByMember_givenNonExistentMember_willThrowException() {
         // given
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 

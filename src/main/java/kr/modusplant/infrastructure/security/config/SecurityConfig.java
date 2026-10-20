@@ -64,6 +64,7 @@ public class SecurityConfig {
                     "/api/v1/communication/primary-categories/**",
                     "/api/v1/search/plant/korean-name",
                     "/api/v1/communication/comments/post/**",
+                    "/api/v2/communication/comments/post/**",
                     "/api/v1/members/check/nickname/**",
                     "/api/v1/search/posts",
                     "/api/v1/communication/posts/**",

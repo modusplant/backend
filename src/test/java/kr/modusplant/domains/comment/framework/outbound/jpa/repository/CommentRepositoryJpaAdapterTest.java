@@ -69,8 +69,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("존재하지 않는 작성자로 댓글 저장 시 InvalidValueException 발생")
-    public void testSave_givenNonExistentAuthor_willThrowInvalidValueException() {
+    @DisplayName("존재하지 않는 작성자로 댓글 저장 시 예외 반환")
+    public void testSave_givenNonExistentAuthor_willThrowException() {
         // given
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.empty());
 
@@ -83,8 +83,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("존재하지 않는 게시글로 댓글 저장 시 InvalidValueException 발생")
-    public void testSave_givenNonExistentPost_willThrowInvalidValueException() {
+    @DisplayName("존재하지 않는 게시글로 댓글 저장 시 예외 반환")
+    public void testSave_givenNonExistentPost_willThrowException() {
         // given
         MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
@@ -118,8 +118,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신")
-    public void testUpdateContent_givenInvalidCommentIdAndContent_willThrowError() {
+    @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신 시 예외 반환")
+    public void testUpdateContent_givenInvalidCommentIdAndContent_willThrowException() {
         // given
         CommentEntity afterUpdate = createCommentEntityBuilder().build();
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());

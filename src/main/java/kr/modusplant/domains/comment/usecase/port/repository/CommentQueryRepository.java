@@ -1,6 +1,8 @@
 package kr.modusplant.domains.comment.usecase.port.repository;
 
+import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
@@ -15,6 +17,12 @@ import java.util.Optional;
 public interface CommentQueryRepository {
 
     List<CommentOfPostReadModel> findByPost(PostId postId, Author author);
+
+    /**
+     * {@code lastPath} 댓글 이후(첫 페이지면 처음)부터 다음 페이지 존재 여부 판단을 위해
+     * {@code pageSize} 보다 1개 많은 댓글을 조회한다.
+     */
+    List<CommentOfPostReadModel> findByPost(PostId postId, @Nullable CommentPath lastPath, CommentPageSize pageSize, Author author);
 
     PageImpl<CommentOfAuthorReadModel> findByAuthor(Author author, Pageable pageable);
 

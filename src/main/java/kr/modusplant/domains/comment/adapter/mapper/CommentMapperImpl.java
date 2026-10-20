@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,9 +17,9 @@ public class CommentMapperImpl implements CommentMapper {
     private final AmazonS3Service fileService;
 
     @Override
-    public CommentPageResponse<CommentOfAuthorReadModel> toCommentPageResponseWithOnePlusPage(
+    public CommentOffsetPageResponse<CommentOfAuthorReadModel> toCommentPageResponseWithOnePlusPage(
             Page<CommentOfAuthorReadModel> paginatedReadModel) {
-        return new CommentPageResponse<>(
+        return new CommentOffsetPageResponse<>(
                 paginatedReadModel.getContent(),
                 paginatedReadModel.getNumber() + 1,
                 paginatedReadModel.getSize(),

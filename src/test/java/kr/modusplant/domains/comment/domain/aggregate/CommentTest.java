@@ -16,8 +16,8 @@ public class CommentTest implements
         CommentContentTestUtils, CommentStatusTestUtils {
 
     @Test
-    @DisplayName("null인 게시글 id로 댓글 생성")
-    void testCreate_givenNullPostId_willThrowEmptyValueException() {
+    @DisplayName("null인 게시글 id로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullPostId_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(null, testCommentPath, testReplyToCommentPath,
@@ -29,8 +29,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("null인 댓글 경로로 댓글 생성")
-    void testCreate_givenNullCommentPath_willThrowEmptyValueException() {
+    @DisplayName("null인 댓글 경로로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullCommentPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, null, testReplyToCommentPath,
@@ -42,8 +42,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("null인 답글 대상 경로로 댓글 생성")
-    void testCreate_givenNullReplyToPath_willThrowEmptyValueException() {
+    @DisplayName("null인 답글 대상 경로로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullReplyToPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
@@ -55,8 +55,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("상태를 지정하며 null인 답글 대상 경로로 댓글 생성")
-    void testCreateWithStatus_givenNullReplyToPath_willThrowEmptyValueException() {
+    @DisplayName("상태를 지정하며 null인 답글 대상 경로로 댓글 생성 시 예외 반환")
+    void testCreateWithStatus_givenNullReplyToPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
@@ -68,8 +68,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("null인 작성자로 댓글 생성")
-    void testCreate_givenNullAuthor_willThrowEmptyValueException() {
+    @DisplayName("null인 작성자로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullAuthor_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
@@ -81,8 +81,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("null인 댓글 내용으로 댓글 생성")
-    void testCreate_givenNullContent_willThrowEmptyValueException() {
+    @DisplayName("null인 댓글 내용으로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullContent_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
@@ -94,8 +94,8 @@ public class CommentTest implements
     }
 
     @Test
-    @DisplayName("null인 댓글 상태로 댓글 생성")
-    void testCreate_givenNullStatus_willThrowEmptyValueException() {
+    @DisplayName("null인 댓글 상태로 댓글 생성 시 예외 반환")
+    void testCreate_givenNullStatus_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,

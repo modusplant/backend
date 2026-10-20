@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CommentContentTest implements CommentContentTestUtils {
 
     @Test
-    @DisplayName("빈 내용으로 댓글 내용 생성")
-    public void testCreate_givenBlankContent_willThrowEmptyValueException() {
+    @DisplayName("빈 내용으로 댓글 내용 생성 시 예외 반환")
+    public void testCreate_givenBlankContent_willThrowException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () ->
                 CommentContent.create(""));

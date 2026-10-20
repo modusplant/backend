@@ -4,11 +4,7 @@ import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.vo.Author;
-import kr.modusplant.domains.comment.domain.vo.CommentContent;
-import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.domain.vo.ReplyToCommentPath;
+import kr.modusplant.domains.comment.domain.vo.*;
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.port.mapper.CommentMapper;
@@ -17,8 +13,9 @@ import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepos
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentCursorPageResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +44,7 @@ public class CommentController {
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
-    public List<CommentOfPostResponse> gatherByPost(String postUlid, UUID authorId) {
+    public List<CommentOfPostResponse> gatherByPost_V1(String postUlid, UUID authorId) {
         commentValidationHelper.validateIfPostExists(PostId.create(postUlid));
 
         return queryRepository.findByPost(PostId.create(postUlid), Author.createWithNullableUuid(authorId))
@@ -56,7 +53,42 @@ public class CommentController {
     }
 
     @Transactional(readOnly = true)
-    public CommentPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID authorId, Pageable pageable) {
+    public CommentCursorPageResponse gatherByPost_V2(String postUlid, String lastPath, Integer size, UUID authorId) {
+        PostId postId = PostId.create(postUlid);
+        CommentPageSize pageSize = CommentPageSize.create(size);
+        Author author = Author.createWithNullableUuid(authorId);
+        commentValidationHelper.validateIfPostExists(postId);
+
+        List<CommentOfPostResponse> responses;
+        if (lastPath != null) { // 특정 lastPath 이후부터 조회
+            CommentPath commentPath = CommentPath.create(lastPath);
+            commentValidationHelper.validateIfCommentExists(postId, commentPath);
+            responses = queryRepository.findByPost(postId, commentPath, pageSize, author)
+                    .stream().map(mapper::toCommentOfPostResponse)
+                    .toList();
+        } else { // 첫 댓글 데이터부터 조회
+            responses = queryRepository.findByPost(postId, null, pageSize, author)
+                    .stream().map(mapper::toCommentOfPostResponse)
+                    .toList();
+        }
+
+        if (responses.size() > pageSize.getValue()) { // hasNext == true
+            List<CommentOfPostResponse> returnedResponses = responses.subList(0, pageSize.getValue());
+            return CommentCursorPageResponse.of(
+                    returnedResponses, returnedResponses.getLast().path(), true);
+        } else { // hasNext == false
+            if (!responses.isEmpty()) {
+                return CommentCursorPageResponse.of(
+                        responses, responses.getLast().path(), false);
+            } else {
+                return CommentCursorPageResponse.of(
+                        responses, null, false);
+            }
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public CommentOffsetPageResponse<CommentOfAuthorReadModel> gatherByAuthor(UUID authorId, Pageable pageable) {
         commentValidationHelper.validateIfAuthorExists(Author.create(authorId));
 
         Page<CommentOfAuthorReadModel> result = queryRepository.findByAuthor(Author.create(authorId), pageable);

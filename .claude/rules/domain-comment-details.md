@@ -63,6 +63,7 @@ comment/
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
 - An optional VO's `create(...)` returns its null-object subclass (`vo/nullobject/Empty*`) for blank input instead of throwing; the null object is a singleton whose `getValue()` returns null
+- A bounded numeric VO (e.g. a page size) rejects null and values outside a fixed inclusive range
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
@@ -104,7 +105,7 @@ comment/
 - Java records carrying Bean Validation annotations (e.g. `@NotBlank`) and Swagger `@Schema` documentation; deserialized directly from external input
 
 **Response DTOs** (`usecase/response/`):
-- Java records; a generic paginated wrapper carries the page/size/total metadata
+- Java records; a generic offset-paginated wrapper carries the page/size/total metadata, and a cursor-paginated wrapper carries the items, the last item's path as the next cursor, a has-next flag, and the item count
 - Field types: Java primitives, String, boolean, LocalDateTime
 
 ---
@@ -116,6 +117,7 @@ comment/
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
 - When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists and is not soft-deleted
+- For cursor pagination, verifies the cursor record exists, requests one row beyond the page size, and derives the has-next flag and next cursor from that extra row
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
@@ -149,6 +151,7 @@ comment/
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
 - DSLContext directly for joined reads, aggregate counts, and paginated read models
+- Cursor-paginated reads use keyset seek on the shared sort key, first reading the cursor row's sort-key values (an empty list when it is absent)
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
 - Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
 - May also implement a cross-domain read-only state check
