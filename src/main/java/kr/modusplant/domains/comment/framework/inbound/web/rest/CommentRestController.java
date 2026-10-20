@@ -43,7 +43,7 @@ import java.util.UUID;
 @Tag(name = "컨텐츠 댓글 API", description = "컨텐츠 댓글 도메인을 다루는 API입니다.")
 @RestController
 @Primary
-@RequestMapping("/api/v1/communication/comments")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -61,7 +61,7 @@ public class CommentRestController {
             summary = "게시글 식별자로 컨텐츠 댓글 조회 API",
             description = "게시글 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
-    @GetMapping("/post/{ulid}")
+    @GetMapping("/v1/communication/comments/post/{ulid}")
     public ResponseEntity<DataResponse<List<CommentOfPostResponse>>> gatherByPost(
             @Parameter(schema = @Schema(
                     description = "해당 댓글이 달린 게시글의 식별자",
@@ -104,7 +104,7 @@ public class CommentRestController {
             summary = "인가 회원 식별자로 컨텐츠 댓글 조회 API",
             description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
-    @GetMapping("/member/auth/{uuid}")
+    @GetMapping("/v1/communication/comments/member/auth/{uuid}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> gatherByAuthor(
             @Parameter(schema = @Schema(
@@ -158,7 +158,7 @@ public class CommentRestController {
             description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 컨텐츠 댓글을 등록합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping
+    @PostMapping("/v1/communication/comments")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> register(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -175,7 +175,7 @@ public class CommentRestController {
             description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글 내용을 갱신합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/update")
+    @PutMapping("/v1/communication/comments/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> updateContent(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -191,7 +191,7 @@ public class CommentRestController {
             description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/post/{ulid}/path/{path}")
+    @DeleteMapping("/v1/communication/comments/post/{ulid}/path/{path}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> deleteComment(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
