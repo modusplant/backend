@@ -39,6 +39,7 @@ import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
@@ -60,7 +61,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
 
         // when
@@ -78,7 +79,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, MEMBER_BASIC_USER_UUID))
                 .willReturn(List.of(testCommentOfPostResponse));
@@ -99,7 +100,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(PostId.class))).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, null)).willReturn(List.of(testCommentOfPostResponse));
 
         // when
@@ -114,7 +115,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
 
         // when
@@ -132,7 +133,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID)))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE, MEMBER_BASIC_USER_UUID))
                 .willReturn(testCommentCursorPageResponse);
@@ -153,7 +154,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(PostId.class))).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, null))
                 .willReturn(testCommentCursorPageResponse);
 
@@ -170,7 +171,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
         // given
         MemberId memberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId)).willReturn(cacheData);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId, 1, 8)).willReturn(cacheData);
 
         // when
         ResponseEntity<DataResponse<CommentOffsetPageResponse<CommentOfAuthorReadModel>>> result =
@@ -188,7 +189,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
         // given
         MemberId memberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId)).willReturn(cacheData);
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, memberId, 1, 8)).willReturn(cacheData);
         given(controller.gatherByAuthor(MEMBER_BASIC_USER_UUID, PageRequest.of(0, 8)))
                 .willReturn(testCommentOffsetPageResponseOfAuthorPageModel);
 
@@ -208,7 +209,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByAuthor_givenSecondPage_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(MemberId.class))).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(MemberId.class), anyInt(), anyInt())).willReturn(cacheData);
         given(controller.gatherByAuthor(any(UUID.class), any())).willReturn(null);
 
         // when

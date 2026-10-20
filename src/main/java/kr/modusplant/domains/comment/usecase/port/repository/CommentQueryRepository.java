@@ -28,6 +28,8 @@ public interface CommentQueryRepository {
 
     Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId);
 
+    Optional<LocalDateTime> findLatestUpdatedAtByAuthor(Author author);
+
     /**
      * {@code path} 와 같은 부모(마지막 {@code .} 이전, 부모가 없으면 최상위) 아래에 이미 존재하는
      * 형제 댓글들의 마지막 세그먼트 중 가장 큰 값을 반환한다. 형제가 없으면 {@code 0}을 반환한다.

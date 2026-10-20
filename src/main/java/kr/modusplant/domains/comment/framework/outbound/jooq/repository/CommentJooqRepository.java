@@ -202,6 +202,16 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
+    public Optional<LocalDateTime> findLatestUpdatedAtByAuthor(Author author) {
+        return Optional.ofNullable(
+                dsl.select(DSL.max(commComment.UPDATED_AT))
+                        .from(commComment)
+                        .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
+                        .fetchOne(DSL.max(commComment.UPDATED_AT))
+        );
+    }
+
+    @Override
     public int findMaximumSiblingPathOrder(PostId postId, CommentPath path) {
         String pathValue = path.getValue();
         int lastDotIndex = pathValue.lastIndexOf('.');

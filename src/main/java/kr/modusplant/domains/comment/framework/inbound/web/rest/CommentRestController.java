@@ -84,7 +84,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), null, null);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -146,7 +146,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), lastPath, size);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -206,7 +206,7 @@ public class CommentRestController {
             UUID callerUuid
     ) {
         SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid), page, size);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
