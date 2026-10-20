@@ -40,6 +40,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
+
 @Tag(name = "컨텐츠 댓글 API", description = "컨텐츠 댓글 도메인을 다루는 API입니다.")
 @RestController
 @Primary
@@ -118,7 +120,7 @@ public class CommentRestController {
                     example = "3.1")
             )
             @RequestParam(required = false)
-            @Pattern(regexp = "^\\d+(?:\\.\\d+)*$", message = "댓글 경로의 형식이 올바르지 않습니다")
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "댓글 경로의 형식이 올바르지 않습니다")
             String lastPath,
 
             @Parameter(schema = @Schema(
@@ -270,12 +272,12 @@ public class CommentRestController {
             @Parameter(
                     schema = @Schema(
                             description = "댓글이 위치한 경로",
-                            pattern = "^\\d+(?:\\.\\d+)*$",
+                            pattern = REGEX_MATERIALIZED_PATH,
                             example = "4.8.12"
                     )
             )
             @PathVariable
-            @Pattern(regexp = "^\\d+(?:\\.\\d+)*$", message = "댓글 경로의 형식이 올바르지 않습니다")
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "댓글 경로의 형식이 올바르지 않습니다")
             String path) {
         controller.delete(ulid, path, userDetails.getUuid());
         return ResponseEntity.ok().body(DataResponse.ok());

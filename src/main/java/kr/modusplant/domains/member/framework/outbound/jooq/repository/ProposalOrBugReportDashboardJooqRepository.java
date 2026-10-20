@@ -55,7 +55,7 @@ public class ProposalOrBugReportDashboardJooqRepository {
                 .where(ulidCondition)
                 .and(statusCondition)
                 .orderBy(PROP_BUG_REP.ULID.desc())
-                .limit(reportPageSize)
+                .limit(reportPageSize + 1) // 다음 페이지 존재 여부 판단을 위해 1개 더 조회
                 .fetch(getDashboardRecordMapper());
     }
 
