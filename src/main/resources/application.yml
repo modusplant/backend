@@ -80,6 +80,17 @@ firebase:
   credentials:
     json: ${FIREBASE_CREDENTIALS_JSON}
 
+# Google Login API
+google:
+  api-key: ${GOOGLE_API_KEY}
+  secret: ${GOOGLE_SECRET}
+  redirect-uri: ${GOOGLE_REDIRECT_URI}
+
+# Kakao Login API
+kakao:
+  api-key: ${KAKAO_API_KEY}
+  redirect-uri: ${KAKAO_REDIRECT_URI}
+
 # KeyStore
 keystore:
   key-store-password: ${KEYSTORE_PASSWORD}
@@ -93,6 +104,13 @@ jwt:
   aud: https://www.modusplant.kr
   access_duration: 1800000      # 30분
   refresh_duration: 604800000   # 7일
+
+# MailJet API KEY
+mail-api:
+  key: ${MAIL_API_KEY}
+  secret-key: ${MAIL_API_SECRET_KEY}
+  jwt-secret-key: ${MAIL_API_JWT_SECRET_KEY}
+  reset-password-base-url: ${MAIL_API_RESET_PASSWORD_BASE_URL}
 
 # Monitoring
 management:
