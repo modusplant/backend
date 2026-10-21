@@ -11,6 +11,8 @@ public record CommentOfPostResponse(
         boolean isLiked,
         LocalDateTime createdAt,
         LocalDateTime editedAt,
-        boolean isDeleted
+        boolean isDeleted,
+        String replyToPath,
+        String replyToNickname
 ) {
 }

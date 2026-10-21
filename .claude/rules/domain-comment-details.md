@@ -17,9 +17,10 @@ comment/
  │   ├─ aggregate/                        # Aggregate root
  │   ├─ enums/                            # Status-style backing enums
  │   ├─ event/                            # Domain events
- │   ├─ exception/
- │   │   └─ enums/                        # Error code enums (no domain-local exception classes)
+ │   ├─ exception/                        # Domain-local exception classes
+ │   │   └─ enums/                        # Error code enums
  │   └─ vo/                               # Value Objects
+ │       └─ nullobject/                   # Null-object subclasses of optional VOs
  ├─ usecase/
  │   ├─ model/                            # Read models for jOOQ query mapping
  │   ├─ port/
@@ -35,6 +36,7 @@ comment/
      ├─ inbound/web/rest/                 # HTTP entry point
      ├─ inbound/web/cache/                # ETag / Last-Modified conditional-GET support
      │   └─ model/                        # Cache result carrier record
+     ├─ inbound/flyway/                   # Flyway callbacks reacting to applied migrations
      └─ outbound/
          ├─ jooq/
          │   └─ repository/               # DSLContext-based read repository
@@ -51,7 +53,7 @@ comment/
 ## 2. domain/ Patterns
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every constituent VO is non-null
+- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every constituent VO is non-null; an optional reference VO (e.g. the reply target's path) is passed as its null-object subclass rather than null
 - May expose an overloaded `create(...)` factory that accepts an explicit optional field alongside the primary factory that derives it internally with a default
 - `equals`/`hashCode` based on the composite identity fields (the referenced post and the comment's own positional identifier), via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
@@ -60,6 +62,8 @@ comment/
 - May expose an additional nullable-tolerant factory (e.g. `createWithNullableUuid(...)`) that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
+- An optional VO's `create(...)` returns its null-object subclass (`vo/nullobject/Empty*`) for blank input instead of throwing; the null object is a singleton whose `getValue()` returns null
+- A bounded numeric VO (e.g. a page size) rejects null and values outside a fixed inclusive range
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
@@ -67,7 +71,8 @@ comment/
 - May derive a classification field (e.g. an action-type string) internally from the shape of another field rather than accepting it as a parameter
 
 **Domain Exceptions** (`domain/exception/`):
-- This domain defines no domain-local exception subclasses; validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
+- Validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
+- A failure with no matching shared kernel exception (e.g. a soft-deleted reply target) has a domain-local exception extending the shared `BusinessException`, whose no-argument constructor fixes its error code
 
 **Error Codes** (`domain/exception/enums/`):
 - `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`
@@ -89,8 +94,9 @@ comment/
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
 **Cache Port** (`usecase/port/repository/`):
-- Declares a single reservation operation that returns an `Optional` which is empty when the same request was already processed (idempotency)
+- Declares a reservation operation that returns an `Optional` which is empty when the same request was already processed (idempotency)
 - Accepts a lazily-evaluated fallback supplier so the implementation reads the database only when its own state is cold
+- Declares a bulk eviction operation that expires every path-bearing cache entry and returns the evicted count
 
 **Mapper Port** (`usecase/port/mapper/`):
 - Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping, including converting a paginated read model's zero-based page index to a one-based index for API consumers; implemented by a handwritten (non-generated) adapter class
@@ -99,7 +105,7 @@ comment/
 - Java records carrying Bean Validation annotations (e.g. `@NotBlank`) and Swagger `@Schema` documentation; deserialized directly from external input
 
 **Response DTOs** (`usecase/response/`):
-- Java records; a generic paginated wrapper carries the page/size/total metadata
+- Java records; a generic offset-paginated wrapper carries the page/size/total metadata, and a cursor-paginated wrapper carries the items, the last item's path as the next cursor, a has-next flag, and the item count
 - Field types: Java primitives, String, boolean, LocalDateTime
 
 ---
@@ -110,13 +116,15 @@ comment/
 - Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
+- When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists and is not soft-deleted
+- For cursor pagination, verifies the cursor record exists, requests one row beyond the page size, and derives the has-next flag and next cursor from that extra row
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
 **Validation Helper** (`adapter/helper/`) — `@Component @RequiredArgsConstructor`:
 - Exposes single-purpose precondition checks
 - Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
-- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code; the ownership failure maps to HTTP 403
+- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local exception; the ownership failure maps to HTTP 403
 
 **Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
 
@@ -137,15 +145,22 @@ comment/
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
 
+**Flyway Callback** (`framework/inbound/flyway/`) — `@Component @RequiredArgsConstructor @Slf4j`; implements Flyway's `Callback` and is auto-registered by Spring Boot's Flyway auto-configuration:
+- Records on `AFTER_EACH_MIGRATE` whether a specific migration version was applied in the current run
+- Acts on `AFTER_MIGRATE` / `AFTER_MIGRATE_ERROR` only when that version was applied, delegating the side effect (e.g. cache eviction) to a usecase port
+
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
 - DSLContext directly for joined reads, aggregate counts, and paginated read models
+- Cursor-paginated reads use keyset seek on the shared sort key, first reading the cursor row's sort-key values (an empty list when it is absent)
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
+- Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
 - May also implement a cross-domain read-only state check
-- May expose a highest-child-ordinal lookup beneath a given parent path (root-level vs. nested distinguished by different pattern matches)
+- May expose a highest-child-ordinal lookup beneath a given parent path as a `MAX` aggregate over per-depth ordinal columns (root-level: the first-depth column among rows without a second-depth value; nested: the second-depth column among rows sharing the root's first-depth value), returning 0 when no sibling exists
 
 **Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
 - Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a bounded, slidingly-refreshed TTL
 - The reservation runs a set-if-absent idempotency guard (a lost race yields an empty `Optional`), then draws the next ordinal from an atomic increment counter that is set from the caller-supplied database lower bound before its first increment, so a cold counter cannot collide with existing rows
+- Bulk eviction walks each key family with cursor-based `SCAN` (never `KEYS`) and deletes the matches in fixed-size batches
 - Null replies and data-access errors are rethrown as a shared connection-failure exception
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:
@@ -162,4 +177,4 @@ comment/
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
-**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, checks for a pre-existing row before insert, and delegates soft-delete/update operations to the entity's mutation methods before saving
+**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving

@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.adapter.helper;
 
+import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
@@ -45,6 +46,12 @@ public class CommentValidationHelper {
     public void validateIfCommentExists(PostId postId, CommentPath path) {
         if (!queryRepository.isCommentExists(postId, path)) {
             throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
+        }
+    }
+
+    public void validateIfCommentIsNotDeleted(PostId postId, CommentPath path) {
+        if (queryRepository.isCommentDeleted(postId, path)) {
+            throw new DeletedReplyToCommentException();
         }
     }
 

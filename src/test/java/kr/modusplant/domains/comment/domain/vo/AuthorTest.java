@@ -1,8 +1,9 @@
 package kr.modusplant.domains.comment.domain.vo;
 
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +13,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AuthorTest implements AuthorTestUtils {
 
     @Test
-    @DisplayName("null인 사용자의 id로 작성자 생성")
-    public void testCreate_givenInvalidMemberUuid_willThrowEmptyValueException() {
+    @DisplayName("null인 사용자의 id로 작성자 생성 시 예외 반환")
+    public void testCreate_givenInvalidMemberUuid_willThrowException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(null));
 
@@ -22,8 +23,8 @@ public class AuthorTest implements AuthorTestUtils {
     }
 
     @Test
-    @DisplayName("null인 작성자의 닉네임으로 작성자 생성")
-    public void testCreate_givenInvalidNickname_willThrowEmptyValueException() {
+    @DisplayName("null인 작성자의 닉네임으로 작성자 생성 시 예외 반환")
+    public void testCreate_givenInvalidNickname_willThrowException() {
         // given
         EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getUuid(), null));
 

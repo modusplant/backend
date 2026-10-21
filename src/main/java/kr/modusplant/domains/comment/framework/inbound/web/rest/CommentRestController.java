@@ -6,8 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
@@ -15,8 +14,9 @@ import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCa
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.request.CommentRegisterRequest;
 import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
+import kr.modusplant.domains.comment.usecase.response.CommentCursorPageResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
 import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
@@ -40,10 +40,12 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
+
 @Tag(name = "컨텐츠 댓글 API", description = "컨텐츠 댓글 도메인을 다루는 API입니다.")
 @RestController
 @Primary
-@RequestMapping("/api/v1/communication/comments")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Validated
 @Slf4j
@@ -58,11 +60,11 @@ public class CommentRestController {
      * @return 게시글에 등록된 댓글을 화면에 띄우기 위한 CommentResponse 를 반환합니다.
      */
     @Operation(
-            summary = "게시글 식별자로 컨텐츠 댓글 조회 API",
+            summary = "게시글 식별자로 컨텐츠 댓글 조회 API - v1",
             description = "게시글 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
-    @GetMapping("/post/{ulid}")
-    public ResponseEntity<DataResponse<List<CommentOfPostResponse>>> gatherByPost(
+    @GetMapping("/v1/communication/comments/post/{ulid}")
+    public ResponseEntity<DataResponse<List<CommentOfPostResponse>>> gatherByPost_V1(
             @Parameter(schema = @Schema(
                     description = "해당 댓글이 달린 게시글의 식별자",
                     example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
@@ -82,7 +84,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid));
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), null, null);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -90,7 +92,69 @@ public class CommentRestController {
             UUID nullableCurrentMemberUuid = userDetails != null ? userDetails.getUuid() : null;
 
             return buildFixedCacheResponsePart(cacheData)
-                    .body(DataResponse.ok(controller.gatherByPost(postUlid, nullableCurrentMemberUuid)));
+                    .body(DataResponse.ok(controller.gatherByPost_V1(postUlid, nullableCurrentMemberUuid)));
+        }
+    }
+
+    /**
+     * 소통 상세 페이지에 띄워지는 댓글에 대한 API입니다.
+     * @param postUlid 댓글이 등록된 게시글의 식별자입니다.
+     * @return 게시글에 등록된 댓글을 화면에 띄우기 위한 CommentResponse 를 반환합니다.
+     */
+    @Operation(
+            summary = "게시글 식별자로 컨텐츠 댓글 조회 API - v2",
+            description = "게시글 식별자에 맞는 컨텐츠 댓글을 조회합니다."
+    )
+    @GetMapping("/v2/communication/comments/post/{ulid}")
+    public ResponseEntity<DataResponse<CommentCursorPageResponse>> gatherByPost_V2(
+            @Parameter(schema = @Schema(
+                    description = "해당 댓글이 달린 게시글의 식별자",
+                    example = "01JY3PPG5YJ41H7BPD0DSQW2RD")
+            )
+            @PathVariable(required = false, value = "ulid")
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(schema = @Schema(
+                    description = "이전에 조회되었던 마지막 댓글 경로",
+                    example = "3.1")
+            )
+            @RequestParam(required = false)
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "댓글 경로의 형식이 올바르지 않습니다")
+            String lastPath,
+
+            @Parameter(schema = @Schema(
+                    description = "페이지 크기",
+                    example = "10",
+                    minimum = "1",
+                    maximum = "50",
+                    defaultValue = "20")
+            )
+            @RequestParam(required = false, defaultValue = "20")
+            @Min(value = 1, message = "페이지 크기가 허용된 값을 벗어났습니다. ")
+            @Max(value = 50, message = "페이지 크기가 허용된 값을 벗어났습니다. ")
+            Integer size,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_NONE_MATCH, required = false)
+            String ifNoneMatch,
+
+            @Parameter(hidden = true)
+            @RequestHeader(name = HttpHeaders.IF_MODIFIED_SINCE, required = false)
+            String ifModifiedSince,
+
+            @AuthenticationPrincipal
+            DefaultUserDetails userDetails
+            ) {
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), lastPath, size);
+        if (cacheData.isCacheable()) {
+            return buildFixedCacheResponsePart(cacheData)
+                    .build();
+        } else {
+            UUID nullableCurrentMemberUuid = userDetails != null ? userDetails.getUuid() : null;
+
+            return buildFixedCacheResponsePart(cacheData)
+                    .body(DataResponse.ok(controller.gatherByPost_V2(postUlid, lastPath, size, nullableCurrentMemberUuid)));
         }
     }
 
@@ -104,9 +168,9 @@ public class CommentRestController {
             summary = "인가 회원 식별자로 컨텐츠 댓글 조회 API",
             description = "인가 회원 식별자에 맞는 컨텐츠 댓글을 조회합니다."
     )
-    @GetMapping("/member/auth/{uuid}")
+    @GetMapping("/v1/communication/comments/member/auth/{uuid}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<DataResponse<CommentPageResponse<CommentOfAuthorReadModel>>> gatherByAuthor(
+    public ResponseEntity<DataResponse<CommentOffsetPageResponse<CommentOfAuthorReadModel>>> gatherByAuthor(
             @Parameter(schema = @Schema(
                     description = "댓글을 작성한 사용자의 식별자",
                     example = "038ae842-3c93-484f-b526-7c4645a195a7")
@@ -142,7 +206,7 @@ public class CommentRestController {
             UUID callerUuid
     ) {
         SecurityAssertionUtils.requireSelf(callerUuid, memberUuid);
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid));
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, MemberId.fromUuid(memberUuid), page, size);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -158,7 +222,7 @@ public class CommentRestController {
             description = "게시글 식별자와 경로, 회원 식별자, 컨텐츠 정보로 컨텐츠 댓글을 등록합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PostMapping
+    @PostMapping("/v1/communication/comments")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> register(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -175,7 +239,7 @@ public class CommentRestController {
             description = "게시글 식별자, 댓글 경로, 댓글 내용으로 댓글 내용을 갱신합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @PutMapping("/update")
+    @PutMapping("/v1/communication/comments/update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> updateContent(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -191,7 +255,7 @@ public class CommentRestController {
             description = "게시글 식별자와 댓글 경로로 컨텐츠 댓글을 제거합니다.",
             security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
     )
-    @DeleteMapping("/post/{ulid}/path/{path}")
+    @DeleteMapping("/v1/communication/comments/post/{ulid}/path/{path}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<Void>> deleteComment(
             @AuthenticationPrincipal DefaultUserDetails userDetails,
@@ -208,11 +272,12 @@ public class CommentRestController {
             @Parameter(
                     schema = @Schema(
                             description = "댓글이 위치한 경로",
-                            pattern = "^\\d+(?:\\.\\d+)*$",
+                            pattern = REGEX_MATERIALIZED_PATH,
                             example = "4.8.12"
                     )
             )
             @PathVariable
+            @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "댓글 경로의 형식이 올바르지 않습니다")
             String path) {
         controller.delete(ulid, path, userDetails.getUuid());
         return ResponseEntity.ok().body(DataResponse.ok());

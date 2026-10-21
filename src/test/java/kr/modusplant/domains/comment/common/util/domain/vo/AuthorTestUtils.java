@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.common.util.domain;
+package kr.modusplant.domains.comment.common.util.domain.vo;
 
 import kr.modusplant.domains.comment.domain.vo.Author;
 

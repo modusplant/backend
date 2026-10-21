@@ -17,8 +17,9 @@ The Group A / Group B lists below are relative to
 - **Redis repository test policy:** `unit-test (mocked StringRedisTemplate)` — a pure unit
   test that Mockito-mocks `StringRedisTemplate` and the `ValueOperations` returned by
   `opsForValue()`, stubs `setIfAbsent` / `increment` / `expire`, and asserts on the composed
-  key strings, the counter set value, and the TTL. No Spring context. Applies to
-  `framework/outbound/redis`.
+  key strings, the counter set value, and the TTL. Bulk eviction stubs `scan` with an
+  iterator-backed mocked `Cursor` per key pattern and records each `delete` batch as a copy at
+  call time. No Spring context. Applies to `framework/outbound/redis`.
 - **TestUtils shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`, `domains/member/common/constant`, `domains/notification/common/constant`
 - **Group A (fields):** `domain/vo`, `domain/event`, `domain/aggregate`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey` (builder-based but treated as a simple field type)
 - **Group B (methods):** `framework/outbound/jpa/entity`

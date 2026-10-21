@@ -5,7 +5,7 @@ import kr.modusplant.domains.comment.common.util.usecase.model.CommentOfPostRead
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
-import kr.modusplant.domains.comment.usecase.response.CommentPageResponse;
+import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -46,6 +46,8 @@ public class CommentMapperImplTest implements
         assertThat(result.createdAt()).isEqualTo(testCommentOfPostReadModel.createdAt());
         assertThat(result.editedAt()).isEqualTo(testCommentOfPostReadModel.updatedAt());
         assertThat(result.isDeleted()).isEqualTo(testCommentOfPostReadModel.isDeleted());
+        assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
+        assertThat(result.replyToNickname()).isEqualTo(testCommentOfPostReadModel.replyToNickname());
     }
 
     @Test
@@ -56,7 +58,8 @@ public class CommentMapperImplTest implements
                 null, testCommentOfPostReadModel.nickname(), testCommentOfPostReadModel.path(),
                 testCommentOfPostReadModel.content(), testCommentOfPostReadModel.likeCount(),
                 testCommentOfPostReadModel.isLiked(), testCommentOfPostReadModel.createdAt(),
-                testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted());
+                testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted(),
+                testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToNickname());
 
         // when
         CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);
@@ -74,7 +77,7 @@ public class CommentMapperImplTest implements
         PageImpl<CommentOfAuthorReadModel> page = new PageImpl<>(List.of(testCommentOfAuthorReadModel), pageable, 1L);
 
         // when
-        CommentPageResponse<CommentOfAuthorReadModel> result = mapper.toCommentPageResponseWithOnePlusPage(page);
+        CommentOffsetPageResponse<CommentOfAuthorReadModel> result = mapper.toCommentPageResponseWithOnePlusPage(page);
 
         // then
         assertThat(result.commentList()).isEqualTo(List.of(testCommentOfAuthorReadModel));
