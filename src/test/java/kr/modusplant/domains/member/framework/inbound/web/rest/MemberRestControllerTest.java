@@ -5,11 +5,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.domains.member.framework.inbound.web.cache.record.MemberCacheValidationResult;
 import kr.modusplant.domains.member.framework.inbound.web.cache.service.MemberCacheValidationService;
-import kr.modusplant.domains.member.usecase.response.MemberProfilePrepareResponse;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImagePath;
-import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
-import kr.modusplant.domains.member.usecase.response.MemberRoleResponse;
-import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
+import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
@@ -37,10 +33,7 @@ import static kr.modusplant.domains.account.identity.common.constant.MemberAuthC
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_CONTENT_TYPE;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_FILE_NAME;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.*;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
@@ -61,9 +54,7 @@ import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOr
 import static kr.modusplant.domains.member.common.util.usecase.record.ProposalOrBugReportRecord_V2TestUtils.testProposalOrBugReportRecord_v2;
 import static kr.modusplant.domains.member.common.util.usecase.request.MemberWithdrawRequestTestUtils.testBasicMemberWithdrawRequest;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfilePrepareResponseTestUtils.testMemberProfilePrepareResponse;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImagePathV3;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV1;
-import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.testMemberProfileResponseWithImageUrlV4;
+import static kr.modusplant.domains.member.common.util.usecase.response.MemberProfileResponseTestUtils.*;
 import static kr.modusplant.domains.member.common.util.usecase.response.MemberRoleResponseTestUtils.testMemberRoleResponse;
 import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;

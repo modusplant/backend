@@ -16,6 +16,8 @@ class RegexTest {
         assertTrue(PATTERN_EMAIL.matcher("email@naver.kr").matches());
         assertTrue(PATTERN_EMAIL.matcher("1234@5678.com").matches());
         assertTrue(PATTERN_EMAIL.matcher("email999@naver423.item").matches());
+        assertTrue(PATTERN_EMAIL.matcher("first.last_name+tag@gmail.com").matches());
+        assertTrue(PATTERN_EMAIL.matcher("email-99@mail.co.kr").matches());
     }
 
     @Test

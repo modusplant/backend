@@ -2,7 +2,6 @@ package kr.modusplant.domains.post.adapter.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.post.domain.aggregate.Post;
-import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.domains.post.domain.exception.ContentProcessingException;
 import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
@@ -18,6 +17,7 @@ import kr.modusplant.domains.post.usecase.request.PostCategoryRequest;
 import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 import kr.modusplant.domains.post.usecase.request.PostRequest;
 import kr.modusplant.domains.post.usecase.response.*;
+import kr.modusplant.infrastructure.file.service.PendingFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageImpl;

@@ -3,8 +3,10 @@ package kr.modusplant.domains.account.email.usecase.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import org.jspecify.annotations.NonNull;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
 
 public record EmailIdentityRequest(
         @Schema(
@@ -17,4 +19,8 @@ public record EmailIdentityRequest(
                 message = "이메일 서식이 올바르지 않습니다.")
         String email
 ) {
+    @Override
+    public @NonNull String toString() {
+        return "EmailIdentityRequest[email=" + maskEmail(email) + "]";
+    }
 }

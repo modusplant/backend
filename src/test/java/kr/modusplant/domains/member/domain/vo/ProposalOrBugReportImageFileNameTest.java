@@ -6,9 +6,7 @@ import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_1_PNG;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_1_JPG;
-import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_IMAGE_FILE_NAME_2_PNG;
+import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImageFileNameTestUtils.testProposalOrBugReportImageFileName1;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -9,10 +9,7 @@ import java.util.List;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_PROPOSAL_OR_BUG_IMAGE_STORAGE_URL_1;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportImagePathTestUtils.testReportImagePath1;
-import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse1;
-import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse2;
-import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportImagePrepareResponse3;
-import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.testProposalOrBugReportPrepareResponse;
+import static kr.modusplant.domains.member.common.util.usecase.response.ProposalOrBugReportPrepareResponseTestUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ProposalOrBugReportMapperImplTest {

@@ -1,8 +1,8 @@
 package kr.modusplant.infrastructure.file.persistence.jpa.repository;
 
+import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import kr.modusplant.infrastructure.file.common.util.entity.PendingFileEntityTestUtils;
 import kr.modusplant.infrastructure.file.persistence.jpa.entity.PendingFileEntity;
-import kr.modusplant.infrastructure.context.RepositoryOnlyContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.*;
+import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_MEMBER_DOMAIN;
+import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_MEMBER_PROFILE_FILE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 

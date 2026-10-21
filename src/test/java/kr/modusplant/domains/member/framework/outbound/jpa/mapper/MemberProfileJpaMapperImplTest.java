@@ -20,7 +20,8 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.Optional;
 
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.*;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;

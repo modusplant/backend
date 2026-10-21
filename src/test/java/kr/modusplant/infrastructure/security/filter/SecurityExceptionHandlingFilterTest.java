@@ -17,9 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.BDDMockito.*;
 
 class SecurityExceptionHandlingFilterTest {
 

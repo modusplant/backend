@@ -10,7 +10,8 @@ import static kr.modusplant.domains.search.common.util.domain.vo.SearchKeywordTe
 import static kr.modusplant.domains.search.common.util.domain.vo.SearcherIdTestUtils.testSearcherId;
 import static kr.modusplant.domains.search.common.util.domain.vo.nullobject.EmptySearcherIdTestUtils.testEmptySearcherId;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class SearcherIdTest {
     @Test

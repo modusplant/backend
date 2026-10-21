@@ -37,7 +37,6 @@ public class ApiLoggingAspect {
 
         MDC.put("uri", request.getRequestURI());
         MDC.put("method", request.getMethod());
-        MDC.put("clientIp", request.getRemoteAddr());
         MDC.put("methodName", joinPoint.getSignature().getName());
         MDC.put("isLogged", Boolean.FALSE.toString()); // 예외 로깅 중복 방지용
 
@@ -48,8 +47,8 @@ public class ApiLoggingAspect {
             double durationInMs = duration / 1_000_000.0;
             String durationFormatted = String.format("%.2f", durationInMs);
 
-            log.info("[REST API] traceId={} | method={} | uri={} | handler={} | ip={} | duration:{}ms",
-                    getCurrentTraceId(), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), MDC.get("clientIp"), durationFormatted);
+            log.info("[REST API] traceId={} | method={} | uri={} | handler={} | duration:{}ms",
+                    getCurrentTraceId(), MDC.get("method"), MDC.get("uri"), MDC.get("methodName"), durationFormatted);
 
             return result;
         } finally {
@@ -57,7 +56,6 @@ public class ApiLoggingAspect {
             // 이 AOP 가 직접 넣은 키만 제거
             MDC.remove("uri");
             MDC.remove("method");
-            MDC.remove("clientIp");
             MDC.remove("methodName");
             MDC.remove("isLogged");
         }
