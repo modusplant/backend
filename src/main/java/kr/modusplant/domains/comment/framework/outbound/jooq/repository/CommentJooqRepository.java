@@ -31,7 +31,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final DSLContext dsl;
     private final CommPost commPost = CommPost.COMM_POST;
     private final CommComment commComment = CommComment.COMM_COMMENT;
-    private final CommComment rootComment = CommComment.COMM_COMMENT.as("root_comment");
     private final CommComment replyToComment = CommComment.COMM_COMMENT.as("reply_to_comment");
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final SiteMember replyToMember = SiteMember.SITE_MEMBER.as("reply_to_member");
@@ -39,7 +38,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
 
     private final Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
-    private final Field<Boolean> isReply = DSL.field(commComment.PATH.like("%.%"));
 
     public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {
         return dsl.select(getCommentOfPostFields())
@@ -64,10 +62,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
         }
 
         // 특정 lastPath 댓글의 정렬 키 이후부터 조회
-        Record lastCommentSortKey = dsl.select(
-                        rootComment.CREATED_AT, rootComment.PATH, isReply, commComment.CREATED_AT, commComment.PATH)
+        Record lastCommentSortKey = dsl.select(commComment.PATH_1_DEPTH_VALUE, commComment.PATH_2_DEPTH_VALUE)
                 .from(commComment)
-                .join(rootComment).on(getRootCommentJoinCondition())
                 .where(commComment.POST_ULID.eq(postId.getValue()))
                 .and(commComment.PATH.eq(lastPath.getValue()))
                 .fetchOne();
@@ -109,24 +105,13 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 .leftJoin(replyToComment).on(
                         replyToComment.POST_ULID.eq(commComment.POST_ULID)
                                 .and(replyToComment.PATH.eq(commComment.REPLY_TO_PATH)))
-                .leftJoin(replyToMember).on(replyToComment.AUTH_MEMB_UUID.eq(replyToMember.UUID))
-                .leftJoin(rootComment).on(getRootCommentJoinCondition());
-    }
-
-    private Condition getRootCommentJoinCondition() {
-        return rootComment.POST_ULID.eq(commComment.POST_ULID)
-                .and(rootComment.PATH.notLike("%.%"))
-                .and(commComment.PATH.eq(rootComment.PATH)
-                        .or(commComment.PATH.like(rootComment.PATH.concat(".%"))));
+                .leftJoin(replyToMember).on(replyToComment.AUTH_MEMB_UUID.eq(replyToMember.UUID));
     }
 
     private List<SortField<?>> getCommentOfPostOrder() {
         return List.of(
-                rootComment.CREATED_AT.asc(),
-                rootComment.PATH.asc(),
-                isReply.asc(), // 루트 행 → 답글 행
-                commComment.CREATED_AT.asc(),
-                commComment.PATH.asc());
+                commComment.PATH_1_DEPTH_VALUE.asc(),
+                commComment.PATH_2_DEPTH_VALUE.asc().nullsFirst()); // 루트 행 → 답글 행
     }
 
     private CommentOfPostReadModel toCommentOfPostReadModel(Record record) {
@@ -214,25 +199,25 @@ public class CommentJooqRepository implements CommentQueryRepository {
     @Override
     public int findMaximumSiblingPathOrder(PostId postId, CommentPath path) {
         String pathValue = path.getValue();
-        int lastDotIndex = pathValue.lastIndexOf('.');
-        String parentPath = lastDotIndex < 0 ? "" : pathValue.substring(0, lastDotIndex);
+        int dotIndex = pathValue.indexOf('.');
 
-        Condition siblingCondition = parentPath.isEmpty()
-                ? commComment.PATH.notLike("%.%")
-                : commComment.PATH.like(parentPath + ".%").and(commComment.PATH.notLike(parentPath + ".%.%"));
+        // 루트 댓글이면 루트 행들의 1-Depth 값, 대댓글이면 같은 루트 댓글 아래 행들의 2-Depth 값 중 최댓값
+        Field<Integer> maximumSiblingOrder;
+        Condition siblingCondition;
+        if (dotIndex < 0) {
+            maximumSiblingOrder = DSL.max(commComment.PATH_1_DEPTH_VALUE);
+            siblingCondition = commComment.PATH_2_DEPTH_VALUE.isNull();
+        } else {
+            maximumSiblingOrder = DSL.max(commComment.PATH_2_DEPTH_VALUE);
+            siblingCondition = commComment.PATH_1_DEPTH_VALUE.eq(Integer.parseInt(pathValue.substring(0, dotIndex)));
+        }
 
-        List<String> siblingPathOrders = dsl.select(commComment.PATH)
+        Integer maximumOrder = dsl.select(maximumSiblingOrder)
                 .from(commComment)
                 .where(commComment.POST_ULID.eq(postId.getValue()))
                 .and(siblingCondition)
-                .fetch(commComment.PATH);
-
-        int maxIndex = 0;
-        for (String siblingPath : siblingPathOrders) {
-            String lastSegment = siblingPath.substring(siblingPath.lastIndexOf('.') + 1);
-            maxIndex = Math.max(maxIndex, Integer.parseInt(lastSegment));
-        }
-        return maxIndex;
+                .fetchOne(maximumSiblingOrder);
+        return maximumOrder == null ? 0 : maximumOrder;
     }
 
     @Override
