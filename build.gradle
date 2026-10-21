@@ -187,7 +187,11 @@ jooq {
 				name = 'org.jooq.meta.postgres.PostgresDatabase'
 				inputSchema = 'public'
 				includes = '.*'
-				excludes = 'databasechangelog|databasechangeloglock|flyway_schema_history'
+				excludes = 'flyway_schema_history' +
+						'|pg_stat_statements.*' + // pg_stat_statements
+						'|similarity(_dist|_op)?|(strict_)?word_similarity.*|gtrgm_.*|gin_trgm_.*|gin_extract_(query|value)_trgm|set_limit|show_limit|show_trgm' + // pg_trgm
+						'|bigm_similarity.*|bigmtextcmp|gin_bigm_.*|gin_extract_(query|value)_bigm|likequery|show_bigm|pg_gin_pending_stats' + // pg_bigm
+						'|uuid_generate_v.*|uuid_nil|uuid_ns_.*' // uuid-ossp
 			}
 			target {
 				packageName = 'kr.modusplant.jooq'
