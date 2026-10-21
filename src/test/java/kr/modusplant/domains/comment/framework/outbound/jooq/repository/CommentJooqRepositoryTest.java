@@ -6,6 +6,7 @@ import kr.modusplant.domains.comment.common.util.domain.vo.CommentPageSizeTestUt
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.ReplyToCommentPathTestUtils;
+import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import org.jooq.*;
 import org.jooq.Record;
@@ -313,17 +314,15 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
-    @DisplayName("같은 부모 아래 형제 댓글들의 마지막 세그먼트 중 가장 큰 값 반환")
+    @DisplayName("같은 부모 아래 답글들의 두 번째 경로 값 중 가장 큰 값 반환")
     void testFindMaximumSiblingPathOrder_givenSiblingComments_willReturnHighestOrdinal() {
         // given
-        Field<String> path = DSL.field("path", String.class);
+        List<String> capturedSql = new ArrayList<>();
+        List<Object[]> capturedBindings = new ArrayList<>();
         MockDataProvider provider = ctx -> {
-            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record1<String>> result = dsl.newResult(path);
-            result.add(dsl.newRecord(path).values("1.1"));
-            result.add(dsl.newRecord(path).values("1.5"));
-            result.add(dsl.newRecord(path).values("1.2"));
-            return new MockResult[] { new MockResult(result.size(), result) };
+            capturedSql.add(ctx.sql().toLowerCase());
+            capturedBindings.add(ctx.bindings());
+            return new MockResult[] { createMaximumSiblingOrderResult(5) };
         };
         CommentJooqRepository repository = createRepository(provider);
 
@@ -332,18 +331,36 @@ public class CommentJooqRepositoryTest implements
 
         // then
         assertThat(result).isEqualTo(5);
+        assertThat(capturedSql.getFirst()).contains("max(\"public\".\"comm_comment\".\"path_2_depth_value\")");
+        assertThat(capturedSql.getFirst()).contains("\"path_1_depth_value\" = ?");
+        assertThat(capturedBindings.getFirst()).contains(1);
+    }
+
+    @Test
+    @DisplayName("루트 댓글들의 첫 번째 경로 값 중 가장 큰 값 반환")
+    void testFindMaximumSiblingPathOrder_givenRootPath_willReturnHighestOrdinal() {
+        // given
+        List<String> capturedSql = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            return new MockResult[] { createMaximumSiblingOrderResult(12) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+
+        // then
+        assertThat(result).isEqualTo(12);
+        assertThat(capturedSql.getFirst()).contains("max(\"public\".\"comm_comment\".\"path_1_depth_value\")");
+        assertThat(capturedSql.getFirst()).contains("\"path_2_depth_value\" is null");
     }
 
     @Test
     @DisplayName("형제 댓글이 없으면 0 반환")
     void testFindMaximumSiblingPathOrder_givenNoSiblingComments_willReturnZero() {
         // given
-        Field<String> path = DSL.field("path", String.class);
-        MockDataProvider provider = ctx -> {
-            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record1<String>> result = dsl.newResult(path);
-            return new MockResult[] { new MockResult(0, result) };
-        };
+        MockDataProvider provider = ctx -> new MockResult[] { createMaximumSiblingOrderResult(null) };
         CommentJooqRepository repository = createRepository(provider);
 
         // when
@@ -351,6 +368,15 @@ public class CommentJooqRepositoryTest implements
 
         // then
         assertThat(result).isEqualTo(0);
+    }
+
+    // MAX 집계는 형제가 없어도 NULL 값을 가진 한 행을 반환한다
+    private MockResult createMaximumSiblingOrderResult(Integer maximumOrder) {
+        Field<Integer> max = DSL.field("max", Integer.class);
+        DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+        Result<Record1<Integer>> result = dsl.newResult(max);
+        result.add(dsl.newRecord(max).values(maximumOrder));
+        return new MockResult(1, result);
     }
 
     // findByAuthor issues two sequential statements (a selectCount() pre-check, then a grouped,
