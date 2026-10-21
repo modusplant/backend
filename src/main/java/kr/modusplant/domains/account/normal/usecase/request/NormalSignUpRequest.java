@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.shared.constant.Regex;
 
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
+
 public record NormalSignUpRequest(
         @Schema(
                 description = "이메일",
@@ -62,4 +65,14 @@ public record NormalSignUpRequest(
         @NotBlank(message = "동의한 커뮤니티 운영정책 버전이 비어 있습니다.")
         @Pattern(regexp = Regex.REGEX_VERSION, message = "동의한 커뮤니티 운영정책 버전의 서식이 올바르지 않습니다.")
         String agreedCommunityPolicyVersion) {
+    @Override
+    public String toString() {
+        return "NormalSignUpRequest[email=" + maskEmail(email) +
+                ", password=" + maskAnyString(password) +
+                ", nickname=" + nickname +
+                ", agreedTermsOfUseVersion=" + agreedTermsOfUseVersion +
+                ", agreedPrivacyPolicyVersion=" + agreedPrivacyPolicyVersion +
+                ", agreedCommunityPolicyVersion=" + agreedCommunityPolicyVersion +
+                "]";
+    }
 }

@@ -49,6 +49,24 @@
                         </pattern>
                         <stackTrace/>
                     </providers>
+                    <!-- 민감 정보 마스킹: 메시지와 스택 트레이스를 포함한 모든 문자열 값에 적용 -->
+                    <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                        <!-- JWT -->
+                        <valueMask>
+                            <value>eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+</value>
+                            <mask>***</mask>
+                        </valueMask>
+                        <!-- 이메일: 첫 글자와 도메인만 유지 -->
+                        <valueMask>
+                            <value>([A-Za-z0-9._%+-])[A-Za-z0-9._%+-]*(@[A-Za-z0-9.-]+\.[A-Za-z]{2,})</value>
+                            <mask>$1***$2</mask>
+                        </valueMask>
+                        <!-- 비밀번호 키-값 쌍 -->
+                        <valueMask>
+                            <value>(?i)(password|currentPw|newPw)=[^,\s\]]+</value>
+                            <mask>$1=***</mask>
+                        </valueMask>
+                    </jsonGeneratorDecorator>
                 </encoder>
             </appender>
         </then>

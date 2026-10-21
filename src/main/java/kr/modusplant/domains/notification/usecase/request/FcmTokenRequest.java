@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.shared.enums.Platform;
 
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
+
 public record FcmTokenRequest(
         @Schema(description = "Fcm 토큰")
         @NotBlank(message = "Fcm 토큰이 비어 있습니다.")
@@ -14,4 +16,10 @@ public record FcmTokenRequest(
         @NotNull
         Platform platform
 ) {
+    @Override
+    public String toString() {
+        return "FcmTokenRequest[token=" + maskAnyString(token) +
+                ", platform=" + platform +
+                "]";
+    }
 }

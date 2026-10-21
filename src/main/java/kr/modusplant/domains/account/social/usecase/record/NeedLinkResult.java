@@ -2,6 +2,9 @@ package kr.modusplant.domains.account.social.usecase.record;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
+
 public record NeedLinkResult(
         String email,
         String nickname,
@@ -9,4 +12,13 @@ public record NeedLinkResult(
         SocialProvider socialProvider,
         String socialAccessToken
 ) implements SocialPendingResult {
+    @Override
+    public String toString() {
+        return "NeedLinkResult[email=" + maskEmail(email) +
+                ", nickname=" + nickname +
+                ", providerId=" + providerId +
+                ", socialProvider=" + socialProvider +
+                ", socialAccessToken=" + maskAnyString(socialAccessToken) +
+                "]";
+    }
 }

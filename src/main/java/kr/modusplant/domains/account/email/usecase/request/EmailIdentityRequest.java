@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
 
 public record EmailIdentityRequest(
         @Schema(
@@ -17,4 +18,8 @@ public record EmailIdentityRequest(
                 message = "이메일 서식이 올바르지 않습니다.")
         String email
 ) {
+    @Override
+    public String toString() {
+        return "EmailIdentityRequest[email=" + maskEmail(email) + "]";
+    }
 }

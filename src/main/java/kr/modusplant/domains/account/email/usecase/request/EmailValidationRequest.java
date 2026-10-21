@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
 
 public record EmailValidationRequest(
         @Schema(
@@ -26,4 +28,10 @@ public record EmailValidationRequest(
         @Pattern(regexp = "^(\\w){6}$", message = "코드를 잘못 입력하였습니다.")
         String verifyCode
 ) {
+    @Override
+    public String toString() {
+        return "EmailValidationRequest[email=" + maskEmail(email) +
+                ", verifyCode=" + maskAnyString(verifyCode) +
+                "]";
+    }
 }
