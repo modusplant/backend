@@ -31,7 +31,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final DSLContext dsl;
     private final CommPost commPost = CommPost.COMM_POST;
     private final CommComment commComment = CommComment.COMM_COMMENT;
-    private final CommComment rootComment = CommComment.COMM_COMMENT.as("root_comment");
     private final CommComment replyToComment = CommComment.COMM_COMMENT.as("reply_to_comment");
     private final SiteMember siteMember = SiteMember.SITE_MEMBER;
     private final SiteMember replyToMember = SiteMember.SITE_MEMBER.as("reply_to_member");
@@ -39,7 +38,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     private final SiteMemberProf memberProf = SiteMemberProf.SITE_MEMBER_PROF;
 
     private final Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
-    private final Field<Boolean> isReply = DSL.field(commComment.PATH.like("%.%"));
 
     public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {
         return dsl.select(getCommentOfPostFields())
@@ -64,9 +62,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
         }
 
         // 특정 lastPath 댓글의 정렬 키 이후부터 조회
-        Record lastCommentSortKey = dsl.select(rootComment.PATH, isReply, commComment.PATH)
+        Record lastCommentSortKey = dsl.select(commComment.PATH_1_DEPTH_VALUE, commComment.PATH_2_DEPTH_VALUE)
                 .from(commComment)
-                .join(rootComment).on(getRootCommentJoinCondition())
                 .where(commComment.POST_ULID.eq(postId.getValue()))
                 .and(commComment.PATH.eq(lastPath.getValue()))
                 .fetchOne();
@@ -108,22 +105,13 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 .leftJoin(replyToComment).on(
                         replyToComment.POST_ULID.eq(commComment.POST_ULID)
                                 .and(replyToComment.PATH.eq(commComment.REPLY_TO_PATH)))
-                .leftJoin(replyToMember).on(replyToComment.AUTH_MEMB_UUID.eq(replyToMember.UUID))
-                .leftJoin(rootComment).on(getRootCommentJoinCondition());
-    }
-
-    private Condition getRootCommentJoinCondition() {
-        return rootComment.POST_ULID.eq(commComment.POST_ULID)
-                .and(rootComment.PATH.notLike("%.%"))
-                .and(commComment.PATH.eq(rootComment.PATH)
-                        .or(commComment.PATH.like(rootComment.PATH.concat(".%"))));
+                .leftJoin(replyToMember).on(replyToComment.AUTH_MEMB_UUID.eq(replyToMember.UUID));
     }
 
     private List<SortField<?>> getCommentOfPostOrder() {
         return List.of(
-                rootComment.PATH.asc(),
-                isReply.asc(), // 루트 행 → 답글 행
-                commComment.PATH.asc());
+                commComment.PATH_1_DEPTH_VALUE.asc(),
+                commComment.PATH_2_DEPTH_VALUE.asc().nullsFirst()); // 루트 행 → 답글 행
     }
 
     private CommentOfPostReadModel toCommentOfPostReadModel(Record record) {

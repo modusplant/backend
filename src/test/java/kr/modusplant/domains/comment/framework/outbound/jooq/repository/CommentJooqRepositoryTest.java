@@ -188,14 +188,12 @@ public class CommentJooqRepositoryTest implements
 
         // then
         String sql = capturedSql[0];
-        assertThat(sql).contains("root_comment");
-        assertThat(sql).contains("not like");
         int orderByIndex = sql.indexOf("order by");
         assertThat(orderByIndex).isGreaterThanOrEqualTo(0);
         String orderByClause = sql.substring(orderByIndex);
         assertThat(orderByClause).doesNotContain("desc");
-        assertThat(orderByClause).doesNotContain("created_at");
-        assertThat(orderByClause).contains("asc");
+        assertThat(orderByClause).containsSubsequence(
+                "\"path_1_depth_value\" asc", "\"path_2_depth_value\" asc nulls first");
     }
 
     @Test
@@ -256,7 +254,7 @@ public class CommentJooqRepositoryTest implements
             if (capturedSql.size() == 1) {
                 Result<Record> sortKeyResult = createSortKeyResult();
                 Record sortKeyRecord = DSL.using(SQLDialect.POSTGRES).newRecord(sortKeyResult.fields());
-                sortKeyRecord.fromArray(testCommentRootPath.getValue(), false, testCommentRootPath.getValue());
+                sortKeyRecord.fromArray(1, null);
                 sortKeyResult.add(sortKeyRecord);
                 return new MockResult[] { new MockResult(1, sortKeyResult) };
             }
@@ -275,7 +273,8 @@ public class CommentJooqRepositoryTest implements
         assertThat(capturedSql).hasSize(2);
         assertThat(capturedBindings.getFirst()).contains(testPostId.getValue(), testCommentRootPath.getValue());
         assertThat(capturedSql.get(1)).contains("fetch next ? rows only");
-        assertThat(capturedBindings.get(1)).contains(testCommentRootPath.getValue());
+        assertThat(capturedSql.get(1)).contains("\"path_2_depth_value\" is not null");
+        assertThat(capturedBindings.get(1)).contains(1);
         assertThat(capturedBindings.get(1)).contains(testCommentPageSize.getValue() + 1L);
     }
 
@@ -307,9 +306,8 @@ public class CommentJooqRepositoryTest implements
     // column order must match the sort-key select list in CommentJooqRepository#findByPost (paged)
     private Result<Record> createSortKeyResult() {
         Field<?>[] fields = {
-                DSL.field("root_path", String.class),
-                DSL.field("is_reply", Boolean.class),
-                DSL.field("path", String.class)
+                DSL.field("path_1_depth_value", Integer.class),
+                DSL.field("path_2_depth_value", Integer.class)
         };
         return DSL.using(SQLDialect.POSTGRES).newResult(fields);
     }
