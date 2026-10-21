@@ -199,25 +199,25 @@ public class CommentJooqRepository implements CommentQueryRepository {
     @Override
     public int findMaximumSiblingPathOrder(PostId postId, CommentPath path) {
         String pathValue = path.getValue();
-        int lastDotIndex = pathValue.lastIndexOf('.');
-        String parentPath = lastDotIndex < 0 ? "" : pathValue.substring(0, lastDotIndex);
+        int dotIndex = pathValue.indexOf('.');
 
-        Condition siblingCondition = parentPath.isEmpty()
-                ? commComment.PATH.notLike("%.%")
-                : commComment.PATH.like(parentPath + ".%").and(commComment.PATH.notLike(parentPath + ".%.%"));
+        // 루트 댓글이면 루트 행들의 1-Depth 값, 대댓글이면 같은 루트 댓글 아래 행들의 2-Depth 값 중 최댓값
+        Field<Integer> maximumSiblingOrder;
+        Condition siblingCondition;
+        if (dotIndex < 0) {
+            maximumSiblingOrder = DSL.max(commComment.PATH_1_DEPTH_VALUE);
+            siblingCondition = commComment.PATH_2_DEPTH_VALUE.isNull();
+        } else {
+            maximumSiblingOrder = DSL.max(commComment.PATH_2_DEPTH_VALUE);
+            siblingCondition = commComment.PATH_1_DEPTH_VALUE.eq(Integer.parseInt(pathValue.substring(0, dotIndex)));
+        }
 
-        List<String> siblingPathOrders = dsl.select(commComment.PATH)
+        Integer maximumOrder = dsl.select(maximumSiblingOrder)
                 .from(commComment)
                 .where(commComment.POST_ULID.eq(postId.getValue()))
                 .and(siblingCondition)
-                .fetch(commComment.PATH);
-
-        int maxIndex = 0;
-        for (String siblingPath : siblingPathOrders) {
-            String lastSegment = siblingPath.substring(siblingPath.lastIndexOf('.') + 1);
-            maxIndex = Math.max(maxIndex, Integer.parseInt(lastSegment));
-        }
-        return maxIndex;
+                .fetchOne(maximumSiblingOrder);
+        return maximumOrder == null ? 0 : maximumOrder;
     }
 
     @Override
