@@ -314,8 +314,8 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
-    @DisplayName("같은 부모 아래 답글들의 두 번째 경로 값 중 가장 큰 값 반환")
-    void testFindMaximumSiblingPathOrder_givenSiblingComments_willReturnHighestOrdinal() {
+    @DisplayName("답글 경로로 int 반환")
+    void testFindMaximumSiblingPathOrder_givenReplyPath_willReturnInt() {
         // given
         List<String> capturedSql = new ArrayList<>();
         List<Object[]> capturedBindings = new ArrayList<>();
@@ -337,8 +337,8 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
-    @DisplayName("루트 댓글들의 첫 번째 경로 값 중 가장 큰 값 반환")
-    void testFindMaximumSiblingPathOrder_givenRootPath_willReturnHighestOrdinal() {
+    @DisplayName("루트 경로로 int 반환")
+    void testFindMaximumSiblingPathOrder_givenRootPath_willReturnInt() {
         // given
         List<String> capturedSql = new ArrayList<>();
         MockDataProvider provider = ctx -> {
@@ -357,8 +357,8 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
-    @DisplayName("형제 댓글이 없으면 0 반환")
-    void testFindMaximumSiblingPathOrder_givenNoSiblingComments_willReturnZero() {
+    @DisplayName("형제 댓글이 없는 답글 경로로 0 반환")
+    void testFindMaximumSiblingPathOrder_givenReplyPathWithoutSiblings_willReturnZero() {
         // given
         MockDataProvider provider = ctx -> new MockResult[] { createMaximumSiblingOrderResult(null) };
         CommentJooqRepository repository = createRepository(provider);
@@ -368,6 +368,26 @@ public class CommentJooqRepositoryTest implements
 
         // then
         assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("형제 댓글이 없는 루트 경로로 0 반환")
+    void testFindMaximumSiblingPathOrder_givenRootPathWithoutSiblings_willReturnZero() {
+        // given
+        List<String> capturedSql = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            return new MockResult[] { createMaximumSiblingOrderResult(null) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+
+        // then
+        assertThat(result).isEqualTo(0);
+        assertThat(capturedSql.getFirst()).contains("max(\"public\".\"comm_comment\".\"path_1_depth_value\")");
+        assertThat(capturedSql.getFirst()).contains("\"path_2_depth_value\" is null");
     }
 
     // MAX 집계는 형제가 없어도 NULL 값을 가진 한 행을 반환한다
