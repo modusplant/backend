@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.common.util.usecase.response;
 
-import kr.modusplant.domains.comment.common.util.domain.CommentContentTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.usecase.response.CommentResponse;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 

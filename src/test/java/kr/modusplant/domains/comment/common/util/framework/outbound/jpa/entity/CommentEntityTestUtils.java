@@ -10,6 +10,7 @@ public interface CommentEntityTestUtils extends PostEntityTestUtils {
     default CommentEntityBuilder createCommentEntityBuilder() {
         return builder()
                 .path(TEST_COMMENT_PATH)
+                .replyToPath(TEST_COMMENT_REPLY_TO_PATH)
                 .likeCount(TEST_COMMENT_LIKE_COUNT)
                 .content(TEST_COMMENT_CONTENT);
     }

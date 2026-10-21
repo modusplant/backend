@@ -1,9 +1,9 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.CommentTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.compositekey.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
@@ -60,7 +60,6 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
         given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
-        given(commentRepository.existsById(TEST_COMMENT_ID)).willReturn(false);
 
         // when
         jpaAdapter.save(testValidComment);
@@ -70,8 +69,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("존재하지 않는 작성자로 댓글 저장 시 InvalidValueException 발생")
-    public void testSave_givenNonExistentAuthor_willThrowInvalidValueException() {
+    @DisplayName("존재하지 않는 작성자로 댓글 저장 시 예외 반환")
+    public void testSave_givenNonExistentAuthor_willThrowException() {
         // given
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.empty());
 
@@ -84,8 +83,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("존재하지 않는 게시글로 댓글 저장 시 InvalidValueException 발생")
-    public void testSave_givenNonExistentPost_willThrowInvalidValueException() {
+    @DisplayName("존재하지 않는 게시글로 댓글 저장 시 예외 반환")
+    public void testSave_givenNonExistentPost_willThrowException() {
         // given
         MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
         given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
@@ -97,27 +96,6 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_POST);
-    }
-
-    @Test
-    @DisplayName("이미 존재하는 댓글 경로로 저장 시 InvalidValueException 발생")
-    public void testSave_givenExistingComment_willThrowInvalidValueException() {
-        // given
-        MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
-        PostEntity postEntity = Mockito.mock(PostEntity.class);
-        CommentEntity commentEntity = createCommentEntityBuilder().build();
-
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
-        given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
-        given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
-        given(commentRepository.existsById(TEST_COMMENT_ID)).willReturn(true);
-
-        // when
-        InvalidValueException ex = assertThrows(InvalidValueException.class,
-                () -> jpaAdapter.save(testValidComment));
-
-        // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.EXIST_COMMENT);
     }
 
     @Test
@@ -140,8 +118,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     }
 
     @Test
-    @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신")
-    public void testUpdateContent_givenInvalidCommentIdAndContent_willThrowError() {
+    @DisplayName("무효한 댓글 id와 내용으로 댓글 갱신 시 예외 반환")
+    public void testUpdateContent_givenInvalidCommentIdAndContent_willThrowException() {
         // given
         CommentEntity afterUpdate = createCommentEntityBuilder().build();
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());

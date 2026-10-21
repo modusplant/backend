@@ -3,6 +3,8 @@ package kr.modusplant.domains.comment.usecase.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
+
 public record CommentUpdateRequest(
         @Schema(
                 description = "댓글이 등록된 게시글의 식별자",
@@ -13,7 +15,7 @@ public record CommentUpdateRequest(
 
         @Schema(
                 description = "댓글이 위치한 경로",
-                pattern = "^\\d+(?:\\.\\d+)*$",
+                pattern = REGEX_MATERIALIZED_PATH,
                 example = "4.8.12"
         )
         @NotBlank(message = "댓글의 경로가 비어 있습니다.")

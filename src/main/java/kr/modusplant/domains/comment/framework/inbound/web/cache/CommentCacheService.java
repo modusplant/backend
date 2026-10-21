@@ -2,6 +2,7 @@ package kr.modusplant.domains.comment.framework.inbound.web.cache;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -20,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -31,6 +34,8 @@ import static kr.modusplant.shared.http.utils.ParseHttpHeaderUtils.parseIfNoneMa
 @Transactional
 @Slf4j
 public class CommentCacheService {
+
+    private static final String ETAG_SOURCE_DELIMITER = "|";
 
     private final PostJpaRepository postJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
@@ -51,7 +56,9 @@ public class CommentCacheService {
     public CommentCacheData getCacheData(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
-            @Nonnull PostId postUlid
+            @Nonnull PostId postUlid,
+            @Nullable String lastPath,
+            @Nullable Integer size
     ) {
         PostEntity postEntity = postJpaRepository.findByUlid(postUlid.getValue())
                 .orElseThrow( () -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"));
@@ -63,12 +70,14 @@ public class CommentCacheService {
         // post와 댓글 변경 시각 중 더 최신 것을 기준으로 함
         LocalDateTime lastModifiedAt = Stream.of(
                         postEntity.getUpdatedAtAsTruncatedToSeconds(),
-                        latestCommentUpdatedAt)
+                        latestCommentUpdatedAt.truncatedTo(ChronoUnit.SECONDS))
                 .max(Comparator.naturalOrder())
                 .get();
 
-        // ETag 소스도 두 값을 합산
-        String ETagSource = postEntity.getETagSource() + latestCommentUpdatedAt;
+        // ETag 소스도 두 값을 합산하고, 페이지 단위로 구분되도록 페이지네이션 값을 포함
+        String ETagSource = postEntity.getETagSource() + latestCommentUpdatedAt
+                + ETAG_SOURCE_DELIMITER + Objects.requireNonNullElse(lastPath, "null")
+                + ETAG_SOURCE_DELIMITER + Objects.requireNonNullElse(size, "null");
 
         return determineCacheData(ifNoneMatch, ifModifiedSince, ETagSource, lastModifiedAt);
     }
@@ -76,13 +85,29 @@ public class CommentCacheService {
     public CommentCacheData getCacheData(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
-            @Nonnull MemberId memberId
+            @Nonnull MemberId memberId,
+            int page,
+            int size
     ) {
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, "member"));
 
-        String ETagSource = memberEntity.getETagSource();
-        LocalDateTime lastModifiedAt = memberEntity.getLastModifiedAtAsTruncatedToSeconds();
+        // 작성자 댓글의 최신 변경 시각 조회
+        LocalDateTime latestCommentUpdatedAt = commentQueryRepository.findLatestUpdatedAtByAuthor(
+                        Author.create(memberId.getValue()))
+                .orElse(LocalDateTime.MIN);
+
+        // member와 댓글 변경 시각 중 더 최신 것을 기준으로 함
+        LocalDateTime lastModifiedAt = Stream.of(
+                        memberEntity.getLastModifiedAtAsTruncatedToSeconds(),
+                        latestCommentUpdatedAt.truncatedTo(ChronoUnit.SECONDS))
+                .max(Comparator.naturalOrder())
+                .get();
+
+        // ETag 소스도 두 값을 합산하고, 페이지 단위로 구분되도록 페이지네이션 값을 포함
+        String ETagSource = memberEntity.getETagSource() + latestCommentUpdatedAt
+                + ETAG_SOURCE_DELIMITER + page
+                + ETAG_SOURCE_DELIMITER + size;
 
         return determineCacheData(ifNoneMatch, ifModifiedSince, ETagSource, lastModifiedAt);
     }

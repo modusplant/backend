@@ -16,6 +16,7 @@ public interface CommentJpaMapper {
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(source = "comment.path.value", target = "path")
+    @Mapping(source = "comment.replyToPath.value", target = "replyToPath")
     @Mapping(source = "commentPost", target = "post")
     @Mapping(source = "commentAuthor", target = "authMember")
     @Mapping(source = "comment.content.value", target = "content")

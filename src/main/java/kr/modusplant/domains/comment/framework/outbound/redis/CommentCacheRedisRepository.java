@@ -7,10 +7,14 @@ import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheReposit
 import kr.modusplant.shared.exception.ConnectionFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.IntSupplier;
 
@@ -28,6 +32,10 @@ public class CommentCacheRedisRepository implements CommentCacheRepository {
     private static final String SIBLING_ORDER_KEY_FORMAT = "comment:sibling-order:post:%s:parent:%s";
     // parentPath가 빈 문자열(루트)일 때 카운터 키에 넣을 리터럴 식별자 (빈 식별자 방지)
     private static final String ROOT_PARENT_IDENTIFIER = "ROOT";
+    // 댓글 경로가 포함된 모든 캐시 키 서식 목록
+    private static final List<String> ALL_COMMENT_FORMAT_LIST =
+            List.of("comment:idempotency:*", "comment:sibling-order:*");
+    private static final int SCAN_BATCH_SIZE = 1000;
 
     private static final Duration TTL = Duration.ofHours(1);
 
@@ -58,6 +66,38 @@ public class CommentCacheRedisRepository implements CommentCacheRepository {
         } catch (DataAccessException e) {
             throw new ConnectionFailedException(CONNECTION_FAILED, "redis", e);
         }
+    }
+
+    @Override
+    public long evictAllPathCaches() {
+        try {
+            long evictedCount = 0;
+            for (String format : ALL_COMMENT_FORMAT_LIST) {
+                ScanOptions scanOptions = ScanOptions.scanOptions().match(format).count(SCAN_BATCH_SIZE).build();
+                List<String> keys = new ArrayList<>(SCAN_BATCH_SIZE);
+                try (Cursor<String> cursor = stringRedisTemplate.scan(scanOptions)) {
+                    while (cursor.hasNext()) {
+                        keys.add(cursor.next());
+                        if (keys.size() >= SCAN_BATCH_SIZE) {
+                            evictedCount += deleteKeys(keys);
+                        }
+                    }
+                }
+                evictedCount += deleteKeys(keys);
+            }
+            return evictedCount;
+        } catch (DataAccessException e) {
+            throw new ConnectionFailedException(CONNECTION_FAILED, "redis", e);
+        }
+    }
+
+    private long deleteKeys(List<String> keys) {
+        if (keys.isEmpty()) {
+            return 0;
+        }
+        Long deletedCount = stringRedisTemplate.delete(keys);
+        keys.clear();
+        return deletedCount;
     }
 
     /**

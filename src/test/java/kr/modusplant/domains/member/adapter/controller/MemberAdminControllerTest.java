@@ -7,6 +7,7 @@ import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportDismissEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportApproveEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportDismissEvent;
+import kr.modusplant.domains.member.domain.vo.ReportPageSize;
 import kr.modusplant.domains.member.usecase.model.read.CommentAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.PostAbuseReportDashboardReadModel;
 import kr.modusplant.domains.member.usecase.model.read.ProposalOrBugReportDashboardReadModel;
@@ -30,6 +31,7 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
 
+import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_MAXIMUM_SIZE;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
@@ -134,6 +136,22 @@ class MemberAdminControllerTest {
         // then
         verify(reportDashboardRepository, times(1)).getProposalOrBugReports(any(), any(), any());
         assertThat(response).isEqualTo(testProposalOrBugReportDashboardResponseWithTrueHasNext);
+    }
+
+    @Test
+    @DisplayName("최대 페이지 크기일 때 getProposalOrBug로 건의 및 버그 제보 현황 응답 반환")
+    void testGetProposalOrBug_givenMaximumPageSize_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getProposalOrBugReports(any(), any(), any())).willReturn(testProposalOrBugReportDashboardCheckedReadModelList);
+
+        // when
+        ProposalOrBugReportDashboardResponse response =
+                memberAdminController.getProposalOrBug(new ProposalOrBugReportGetRecord(ProposalOrBugReportStatus.CHECKED, null, TEST_REPORT_MAXIMUM_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getProposalOrBugReports(
+                eq(ReportPageSize.create(TEST_REPORT_MAXIMUM_SIZE)), eq(ProposalOrBugReportStatus.CHECKED), isNull());
+        assertThat(response).isEqualTo(testProposalOrBugReportDashboardResponseWithFalseHasNext);
     }
 
     @Test
@@ -269,6 +287,22 @@ class MemberAdminControllerTest {
         // then
         verify(reportDashboardRepository, times(1)).getPostAbuseReports(any(), any(), any());
         assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithTrueHasNext);
+    }
+
+    @Test
+    @DisplayName("최대 페이지 크기일 때 getPostAbuseReport로 게시글 신고 현황 응답 반환")
+    void testGetPostAbuseReport_givenMaximumPageSize_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getPostAbuseReports(any(), any(), any())).willReturn(testPostAbuseReportDashboardReadModelList);
+
+        // when
+        PostAbuseReportDashboardResponse response =
+                memberAdminController.getPostAbuseReport(new PostAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, TEST_REPORT_MAXIMUM_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getPostAbuseReports(
+                eq(ReportPageSize.create(TEST_REPORT_MAXIMUM_SIZE)), eq(AbuseReportStatus.UNCHECKED), isNull());
+        assertThat(response).isEqualTo(testPostAbuseReportDashboardResponseWithFalseHasNext);
     }
 
     @Test
@@ -446,6 +480,22 @@ class MemberAdminControllerTest {
         // then
         verify(reportDashboardRepository, times(1)).getCommentAbuseReports(any(), any(), any());
         assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithTrueHasNext);
+    }
+
+    @Test
+    @DisplayName("최대 페이지 크기일 때 getCommentAbuseReport로 댓글 신고 현황 응답 반환")
+    void testGetCommentAbuseReport_givenMaximumPageSize_willReturnResponse() {
+        // given
+        given(reportDashboardRepository.getCommentAbuseReports(any(), any(), any())).willReturn(testCommentAbuseReportDashboardReadModelList);
+
+        // when
+        CommentAbuseReportDashboardResponse response =
+                memberAdminController.getCommentAbuseReport(new CommentAbuseReportGetRecord(AbuseReportStatus.UNCHECKED, null, null, TEST_REPORT_MAXIMUM_SIZE));
+
+        // then
+        verify(reportDashboardRepository, times(1)).getCommentAbuseReports(
+                eq(ReportPageSize.create(TEST_REPORT_MAXIMUM_SIZE)), eq(AbuseReportStatus.UNCHECKED), isNull());
+        assertThat(response).isEqualTo(testCommentAbuseReportDashboardResponseWithFalseHasNext);
     }
 
     @Test

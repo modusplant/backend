@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommentConstant {
     public static final String TEST_COMMENT_PATH = "1.2";
+    public static final String TEST_COMMENT_REPLY_TO_PATH = "1.1";
     public static final String TEST_COMMENT_CONTENT = "테스트 댓글 내용";
     public static final Integer TEST_COMMENT_LIKE_COUNT = 1;
+    public static final Integer TEST_COMMENT_PAGE_SIZE = 20;
     public static final Boolean TEST_POST_IS_DELETED_TRUE = true;
     public static final Boolean TEST_POST_IS_DELETED_FALSE = false;
     public static final LocalDateTime TEST_COMMENT_CREATED_AT = LocalDateTime.of(2026, 4, 25, 0, 0);
