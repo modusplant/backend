@@ -155,7 +155,7 @@ comment/
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
 - Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
 - May also implement a cross-domain read-only state check
-- May expose a highest-child-ordinal lookup beneath a given parent path (root-level vs. nested distinguished by different pattern matches)
+- May expose a highest-child-ordinal lookup beneath a given parent path as a `MAX` aggregate over per-depth ordinal columns (root-level: the first-depth column among rows without a second-depth value; nested: the second-depth column among rows sharing the root's first-depth value), returning 0 when no sibling exists
 
 **Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
 - Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a bounded, slidingly-refreshed TTL
