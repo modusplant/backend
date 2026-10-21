@@ -16,7 +16,6 @@ import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -157,7 +156,7 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
-    @DisplayName("게시글의 식별자로 루트와 답글 모두 오래된 순으로 조회하는 활동 수행")
+    @DisplayName("게시글의 식별자로 루트와 답글 모두 경로 순으로 조회하는 활동 수행")
     void testFindByPost_givenValidPostId_willProcessAction() {
         // given: MockDataProvider does not execute ORDER BY / JOIN, so assert the ordering
         // contract against the generated SQL text instead of the returned row order
@@ -195,6 +194,7 @@ public class CommentJooqRepositoryTest implements
         assertThat(orderByIndex).isGreaterThanOrEqualTo(0);
         String orderByClause = sql.substring(orderByIndex);
         assertThat(orderByClause).doesNotContain("desc");
+        assertThat(orderByClause).doesNotContain("created_at");
         assertThat(orderByClause).contains("asc");
     }
 
@@ -256,8 +256,7 @@ public class CommentJooqRepositoryTest implements
             if (capturedSql.size() == 1) {
                 Result<Record> sortKeyResult = createSortKeyResult();
                 Record sortKeyRecord = DSL.using(SQLDialect.POSTGRES).newRecord(sortKeyResult.fields());
-                sortKeyRecord.fromArray(testDateTime, testCommentRootPath.getValue(), false,
-                        testDateTime, testCommentRootPath.getValue());
+                sortKeyRecord.fromArray(testCommentRootPath.getValue(), false, testCommentRootPath.getValue());
                 sortKeyResult.add(sortKeyRecord);
                 return new MockResult[] { new MockResult(1, sortKeyResult) };
             }
@@ -276,7 +275,7 @@ public class CommentJooqRepositoryTest implements
         assertThat(capturedSql).hasSize(2);
         assertThat(capturedBindings.getFirst()).contains(testPostId.getValue(), testCommentRootPath.getValue());
         assertThat(capturedSql.get(1)).contains("fetch next ? rows only");
-        assertThat(capturedBindings.get(1)).contains(Timestamp.valueOf(testDateTime), testCommentRootPath.getValue());
+        assertThat(capturedBindings.get(1)).contains(testCommentRootPath.getValue());
         assertThat(capturedBindings.get(1)).contains(testCommentPageSize.getValue() + 1L);
     }
 
@@ -308,10 +307,8 @@ public class CommentJooqRepositoryTest implements
     // column order must match the sort-key select list in CommentJooqRepository#findByPost (paged)
     private Result<Record> createSortKeyResult() {
         Field<?>[] fields = {
-                DSL.field("root_created_at", LocalDateTime.class),
                 DSL.field("root_path", String.class),
                 DSL.field("is_reply", Boolean.class),
-                DSL.field("created_at", LocalDateTime.class),
                 DSL.field("path", String.class)
         };
         return DSL.using(SQLDialect.POSTGRES).newResult(fields);

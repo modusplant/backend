@@ -64,8 +64,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
         }
 
         // 특정 lastPath 댓글의 정렬 키 이후부터 조회
-        Record lastCommentSortKey = dsl.select(
-                        rootComment.CREATED_AT, rootComment.PATH, isReply, commComment.CREATED_AT, commComment.PATH)
+        Record lastCommentSortKey = dsl.select(rootComment.PATH, isReply, commComment.PATH)
                 .from(commComment)
                 .join(rootComment).on(getRootCommentJoinCondition())
                 .where(commComment.POST_ULID.eq(postId.getValue()))
@@ -122,10 +121,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
     private List<SortField<?>> getCommentOfPostOrder() {
         return List.of(
-                rootComment.CREATED_AT.asc(),
                 rootComment.PATH.asc(),
                 isReply.asc(), // 루트 행 → 답글 행
-                commComment.CREATED_AT.asc(),
                 commComment.PATH.asc());
     }
 
