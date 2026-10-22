@@ -110,7 +110,7 @@ public class CommentJooqRepositoryTest implements
     @DisplayName("게시글의 식별자로 댓글 읽기 모델 목록 가져오기")
     void testFindByPost_givenValidPostId_willReturnCommentOfPostReadModelList() {
         // given: column order must match CommentJooqRepository#findByPost's select list
-        // (profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt, replyToPath, replyToNickname)
+        // (profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt, replyToPath, replyToNickname, replyToIsDeleted)
         Field<String> profileImage = DSL.field("profile_image", String.class);
         Field<String> nickname = DSL.field("nickname", String.class);
         Field<String> path = DSL.field("path", String.class);
@@ -122,17 +122,18 @@ public class CommentJooqRepositoryTest implements
         Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
         Field<String> replyToPath = DSL.field("reply_to_path", String.class);
         Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
 
         MockDataProvider provider = ctx -> {
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record11<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String>> result =
+            Result<Record12<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, Boolean>> result =
                     dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname);
+                            replyToPath, replyToNickname, replyToIsDeleted);
             result.add(dsl.newRecord(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname)
+                            replyToPath, replyToNickname, replyToIsDeleted)
                     .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
                             3, true, testDateTime, false, testDateTime,
-                            testReplyToCommentPath.getValue(), "replyToNickname"));
+                            testReplyToCommentPath.getValue(), "replyToNickname", true));
             return new MockResult[] { new MockResult(1, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
@@ -154,6 +155,49 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.isDeleted()).isFalse();
         assertThat(readModel.replyToPath()).isEqualTo(testReplyToCommentPath.getValue());
         assertThat(readModel.replyToNickname()).isEqualTo("replyToNickname");
+        assertThat(readModel.replyToIsDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("답글 대상 삭제 여부가 NULL인 경우 CommentOfPostReadModelList 반환")
+    void testFindByPost_givenNullReplyToIsDeleted_willReturnCommentOfPostReadModelList() {
+        // given: a root comment has no reply target, so the LEFT JOIN yields NULL for reply_to_is_deleted
+        Field<String> profileImage = DSL.field("profile_image", String.class);
+        Field<String> nickname = DSL.field("nickname", String.class);
+        Field<String> path = DSL.field("path", String.class);
+        Field<String> content = DSL.field("content", String.class);
+        Field<Integer> likeCount = DSL.field("like_count", Integer.class);
+        Field<Boolean> isLiked = DSL.field("is_liked", Boolean.class);
+        Field<LocalDateTime> createdAt = DSL.field("created_at", LocalDateTime.class);
+        Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
+        Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
+        Field<String> replyToPath = DSL.field("reply_to_path", String.class);
+        Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
+
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record12<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, Boolean>> result =
+                    dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToNickname, replyToIsDeleted);
+            result.add(dsl.newRecord(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToNickname, replyToIsDeleted)
+                    .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
+                            3, true, testDateTime, false, testDateTime,
+                            null, null, null));
+            return new MockResult[] { new MockResult(1, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testAuthorWithUuid);
+
+        // then
+        assertThat(result).hasSize(1);
+        CommentOfPostReadModel readModel = result.getFirst();
+        assertThat(readModel.replyToPath()).isNull();
+        assertThat(readModel.replyToNickname()).isNull();
+        assertThat(readModel.replyToIsDeleted()).isFalse();
     }
 
     @Test
@@ -172,14 +216,15 @@ public class CommentJooqRepositoryTest implements
         Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
         Field<String> replyToPath = DSL.field("reply_to_path", String.class);
         Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
 
         String[] capturedSql = new String[1];
         MockDataProvider provider = ctx -> {
             capturedSql[0] = ctx.sql().toLowerCase();
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record11<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String>> result =
+            Result<Record12<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, Boolean>> result =
                     dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname);
+                            replyToPath, replyToNickname, replyToIsDeleted);
             return new MockResult[] { new MockResult(0, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
@@ -293,13 +338,14 @@ public class CommentJooqRepositoryTest implements
                 DSL.field("is_deleted", Boolean.class),
                 DSL.field("edited_at", LocalDateTime.class),
                 DSL.field("reply_to_path", String.class),
-                DSL.field("reply_to_nickname", String.class)
+                DSL.field("reply_to_nickname", String.class),
+                DSL.field("reply_to_is_deleted", Boolean.class)
         };
         Result<Record> result = dsl.newResult(fields);
         Record record = dsl.newRecord(fields);
         record.fromArray("profile.png", "nickname", commentPath,
                 testCommentContent.getValue(), 3, true, testDateTime, false, testDateTime,
-                testReplyToCommentPath.getValue(), "replyToNickname");
+                testReplyToCommentPath.getValue(), "replyToNickname", false);
         result.add(record);
         return result;
     }

@@ -88,7 +88,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 commComment.IS_DELETED,
                 commComment.EDITED_AT,
                 commComment.REPLY_TO_PATH,
-                replyToMember.NICKNAME);
+                replyToMember.NICKNAME,
+                replyToComment.IS_DELETED);
     }
 
     private Table<?> getCommentOfPostTable(Author nullableAuthor) {
@@ -126,7 +127,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
                 record.getValue(commComment.IS_DELETED),
                 record.getValue(commComment.REPLY_TO_PATH),
-                record.getValue(replyToMember.NICKNAME)
+                record.getValue(replyToMember.NICKNAME),
+                Boolean.TRUE.equals(record.getValue(replyToComment.IS_DELETED)) // 답글 대상이 없으면 NULL → false
         );
     }
 
