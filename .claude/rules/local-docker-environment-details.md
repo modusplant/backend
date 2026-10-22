@@ -1,11 +1,19 @@
 ---
-name: guide-local-docker-environment-configuration
-description: Guides how the local Docker environment builds and runs the Spring Boot backend.
+paths:
+  - "Dockerfile"
+  - ".dockerignore"
+  - "build.gradle"
+  - "docker-compose.yml"
+  - "docker-compose.override.yml"
 ---
 
-# Local Docker Environment Configuration
+# Local Docker Environment Details
 
-## Files
+Applies to @Dockerfile, @.dockerignore, the `assembleDocker` task in @build.gradle, @docker-compose.yml, and @docker-compose.override.yml.
+
+---
+
+## 1. Files
 
 - @Dockerfile: Runtime-only image; copies a prebuilt jar and runs it. No source compilation happens inside Docker.
 - @.dockerignore: Limits the build context to the prebuilt jar at `build/docker/modusplant-backend.jar`.
@@ -13,12 +21,12 @@ description: Guides how the local Docker environment builds and runs the Spring 
 - @docker-compose.yml: Base `backend` service.
 - @docker-compose.override.yml: Local layer auto-merged on top of `docker-compose.yml`.
 
-## Prerequisites
+## 2. Prerequisites
 
 - The external `nginx_proxy` network exists (`docker network create nginx_proxy`, once).
 - Every Compose file listed under `include` in `docker-compose.override.yml` exists on the host.
 
-## Workflow
+## 3. Workflow
 
 1. `./gradlew assembleDocker` — produce the jar in the build context.
 2. `docker compose build` — build the image from the jar.
