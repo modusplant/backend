@@ -13,7 +13,8 @@ public final class Regex {
     public static final String REGEX_PASSWORD = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&()_\\-+=\\[\\]{}|\\\\;:'\",.<>/?]).{8,64}$";
     public static final String REGEX_ULID = "^[0-9A-HJKMNP-TV-Z]{26}$";
     public static final String REGEX_UUID = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
-    public static final String REGEX_VERSION = "^v\\d+.\\d+.\\d+$";
+    public static final String REGEX_VERIFY_CODE = "^(\\w){6}$";
+    public static final String REGEX_VERSION ="^v\\d+.\\d+.\\d+$";
 
     public static final Pattern PATTERN_EMAIL = Pattern.compile(REGEX_EMAIL);
     public static final Pattern PATTERN_MATERIALIZED_PATH = Pattern.compile(REGEX_MATERIALIZED_PATH);
@@ -21,5 +22,6 @@ public final class Regex {
     public static final Pattern PATTERN_PASSWORD = Pattern.compile(REGEX_PASSWORD);
     public static final Pattern PATTERN_ULID = Pattern.compile(REGEX_ULID);
     public static final Pattern PATTERN_UUID = Pattern.compile(REGEX_UUID);
+    public static final Pattern PATTERN_VERIFY_CODE = Pattern.compile(REGEX_VERIFY_CODE);
     public static final Pattern PATTERN_VERSION = Pattern.compile(REGEX_VERSION);
 }

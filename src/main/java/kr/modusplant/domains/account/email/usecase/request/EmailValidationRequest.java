@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Pattern;
 import org.jspecify.annotations.NonNull;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
+import static kr.modusplant.shared.constant.Regex.REGEX_VERIFY_CODE;
 import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
 import static kr.modusplant.shared.util.MaskUtils.maskEmail;
 
@@ -22,11 +23,11 @@ public record EmailValidationRequest(
 
         @Schema(
         description = "검증 코드",
-        pattern = "^(\\w){6}$",
+        pattern = REGEX_VERIFY_CODE,
         example = "12cA56"
         )
         @NotBlank(message = "코드가 비어 있습니다.")
-        @Pattern(regexp = "^(\\w){6}$", message = "코드를 잘못 입력하였습니다.")
+        @Pattern(regexp = REGEX_VERIFY_CODE,message = "코드를 잘못 입력하였습니다.")
         String verifyCode
 ) {
     @Override
