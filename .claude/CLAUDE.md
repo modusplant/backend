@@ -77,14 +77,18 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `social-identity` → `domains/account/social/`
 - Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under `infrastructure/<area>/`).
 
-### Key Design Decisions
+### Technical Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
 - **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually — run `./gradlew jooqCodegen` to regenerate after schema changes.
 - **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or `@Mapping(target=..., ignore=true)` must be set.
-- **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.
 - **Redis**: Used for response caching and JWT refresh-token blacklisting.
-- **Async**: Virtual threads (Java 21) power asynchronous push notifications via Firebase FCM.
+
+### Project Conventions
+- **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.
 - **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via Spring `ApplicationEvent`s defined in `shared/event/`.
+- **Sensitive-data masking**: Classes holding sensitive values (email, password, tokens, auth codes) override `toString()` to mask them via `shared/util/MaskUtils`. Log statements that print such values directly use the same helpers.
+- **Regex constants**: Regular expressions live in `shared/constant/Regex` — `REGEX_*` for annotations and the precompiled `PATTERN_*` for method bodies. Add new expressions there instead of writing them inline.
+  Flyway Java migrations under `db/migration` are the exception and keep their own inline patterns.
 
 ### Spring Profiles
 - `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled
