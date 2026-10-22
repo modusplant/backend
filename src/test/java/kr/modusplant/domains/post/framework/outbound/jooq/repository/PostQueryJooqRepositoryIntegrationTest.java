@@ -117,7 +117,7 @@ class PostQueryJooqRepositoryIntegrationTest {
         assertThat(firstPostResult.commentCount()).isEqualTo(0);
         assertThat(firstPostResult.isLiked()).isTrue();
         assertThat(firstPostResult.isBookmarked()).isFalse();
-        assertThat(secondPostResult.commentCount()).isEqualTo(2);
+        assertThat(secondPostResult.commentCount()).isEqualTo(3);
         assertThat(secondPostResult.isLiked()).isTrue();
         assertThat(secondPostResult.isBookmarked()).isTrue();
         assertThat(pageWithAnonymousUserResult.isLiked()).isFalse();

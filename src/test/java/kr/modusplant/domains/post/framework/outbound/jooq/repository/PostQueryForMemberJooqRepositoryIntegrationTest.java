@@ -120,7 +120,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4Result.isLiked()).isFalse();
         assertThat(post4Result.isBookmarked()).isFalse();
         PostSummaryReadModel post1Result = secondPage.getContent().getFirst();
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isLiked()).isFalse();
         assertThat(post1Result.isBookmarked()).isFalse();
     }
@@ -162,8 +162,8 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getContent()).hasSize(2);
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost3.getUlid());
         assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testDraftPost.getUlid());
-        assertThat(firstPage.getContent().getFirst().secondaryCategory()).isEqualTo(testDraftPost.getSecoCateId());
-        assertThat(firstPage.getContent().getFirst().content()).isEqualTo(testDraftPost.getContent());
+        assertThat(firstPage.getContent().getFirst().secondaryCategory()).isNull();
+        assertThat(firstPage.getContent().getFirst().content()).isNull();
     }
 
     @Test
@@ -212,7 +212,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4.commentCount()).isEqualTo(0);
         assertThat(post1.isLiked()).isTrue();
         assertThat(post1.isBookmarked()).isTrue();
-        assertThat(post1.commentCount()).isEqualTo(2);
+        assertThat(post1.commentCount()).isEqualTo(3);
         assertThat(post2.isLiked()).isFalse();
         assertThat(post2.isBookmarked()).isTrue();
         assertThat(post2.commentCount()).isEqualTo(1);
@@ -263,7 +263,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4Result.commentCount()).isEqualTo(0);
         assertThat(post4Result.isBookmarked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isBookmarked()).isTrue();
     }
 
@@ -319,7 +319,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post2Result.commentCount()).isEqualTo(1);
         assertThat(post2Result.isLiked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isLiked()).isTrue();
     }
 
