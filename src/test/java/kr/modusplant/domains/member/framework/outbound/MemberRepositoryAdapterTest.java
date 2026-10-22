@@ -219,6 +219,7 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         willDoNothing().given(eventPublisher).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(TEST_POST_ULID_ARRAY);
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of(TEST_POST_CONTENT_JSON_NODE));
+        given(activitySubjectCommentJooqRepository.getCommentIdsByMemberId(any())).willReturn(List.of(testActivitySubjectCommentIdRecord));
         given(activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(any())).willReturn(List.of(TEST_POST_ULID));
         given(activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(any())).willReturn(List.of(testActivitySubjectCommentIdRecord));
         given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.of(createMemberProfileBasicUserEntityBuilder().member(createMemberBasicUserEntity()).build()));
@@ -235,12 +236,13 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveTask.class));
         verify(activitySubjectPostJooqRepository, times(1)).archiveAllByPostUlids(any());
         verify(activitySubjectPostJooqRepository, times(1)).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
+        verify(activitySubjectCommentJooqRepository, times(1)).archiveAllByCommentIds(any());
+        verify(activitySubjectCommentJooqRepository, times(1)).deleteAllAndRelatedRecordsByMemberIdAndCommentIds(any(), any());
         verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());
         verify(activitySubjectCommentJooqRepository, times(1)).decreaseLikeCountByCommentIds(any());
         verify(postLikeJpaRepository, times(1)).deleteByMemberId(any());
         verify(commentLikeJpaRepository, times(1)).deleteByMemberId(any());
         verify(memberWithdrawJpaRepository, times(1)).save(any());
-        verify(activitySubjectCommentJooqRepository, times(1)).markAsWithdrawnByMemberId(any());
         verify(memberJooqRepository, times(1)).updateMemberIdToNullByMemberId(any());
         verify(memberJooqRepository, times(1)).deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(any());
     }
@@ -251,6 +253,7 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         // given
         given(postJooqRepository.getPublishedPostUlidsByMemberId(any())).willReturn(new String[]{});
         given(postJooqRepository.getPostContentsFromPublishedPostUlids(any())).willReturn(List.of());
+        given(activitySubjectCommentJooqRepository.getCommentIdsByMemberId(any())).willReturn(List.of());
         given(activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(any())).willReturn(List.of());
         given(activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(any())).willReturn(List.of());
         willDoNothing().given(postLikeJpaRepository).deleteByMemberId(any());
@@ -269,12 +272,13 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         verify(eventPublisher, never()).publishEvent(any(ImageRemoveTask.class));
         verify(activitySubjectPostJooqRepository, never()).archiveAllByPostUlids(any());
         verify(activitySubjectPostJooqRepository, never()).deleteAllAndRelatedRecordsByMemberIdAndPostUlids(any(), any());
+        verify(activitySubjectCommentJooqRepository, never()).archiveAllByCommentIds(any());
+        verify(activitySubjectCommentJooqRepository, never()).deleteAllAndRelatedRecordsByMemberIdAndCommentIds(any(), any());
         verify(activitySubjectPostJooqRepository, times(1)).decreaseLikeCountByPostUlids(any());
         verify(activitySubjectCommentJooqRepository, times(1)).decreaseLikeCountByCommentIds(any());
         verify(postLikeJpaRepository, times(1)).deleteByMemberId(any());
         verify(commentLikeJpaRepository, times(1)).deleteByMemberId(any());
         verify(memberWithdrawJpaRepository, times(1)).save(any());
-        verify(activitySubjectCommentJooqRepository, times(1)).markAsWithdrawnByMemberId(any());
         verify(memberJooqRepository, times(1)).updateMemberIdToNullByMemberId(any());
         verify(memberJooqRepository, times(1)).deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(any());
     }

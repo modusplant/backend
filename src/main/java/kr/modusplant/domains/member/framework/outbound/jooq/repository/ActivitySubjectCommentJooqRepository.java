@@ -10,9 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static kr.modusplant.jooq.Tables.COMM_COMMENT;
-import static kr.modusplant.jooq.Tables.COMM_COMMENT_LIKE;
-import static org.jooq.impl.DSL.row;
+import static kr.modusplant.jooq.Tables.*;
+import static org.jooq.impl.DSL.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -26,10 +25,57 @@ public class ActivitySubjectCommentJooqRepository {
                 .fetchInto(ActivitySubjectCommentIdRecord.class);
     }
 
+    public List<ActivitySubjectCommentIdRecord> getCommentIdsByMemberId(UUID memberId) {
+        return dsl.select(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
+                .from(COMM_COMMENT)
+                .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId))
+                .fetchInto(ActivitySubjectCommentIdRecord.class);
+    }
+
+    public void archiveAllByCommentIds(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
+        dsl.insertInto(COMM_COMMENT_ARCHIVE,
+                        COMM_COMMENT_ARCHIVE.PATH,
+                        COMM_COMMENT_ARCHIVE.POST_ULID,
+                        COMM_COMMENT_ARCHIVE.AUTH_MEMB_UUID,
+                        COMM_COMMENT_ARCHIVE.CONTENT,
+                        COMM_COMMENT_ARCHIVE.IS_DELETED,
+                        COMM_COMMENT_ARCHIVE.CREATED_AT,
+                        COMM_COMMENT_ARCHIVE.UPDATED_AT,
+                        COMM_COMMENT_ARCHIVE.EDITED_AT,
+                        COMM_COMMENT_ARCHIVE.ARCHIVED_AT
+                )
+                .select(
+                        select(
+                                COMM_COMMENT.PATH,
+                                COMM_COMMENT.POST_ULID,
+                                COMM_COMMENT.AUTH_MEMB_UUID,
+                                COMM_COMMENT.CONTENT,
+                                COMM_COMMENT.IS_DELETED,
+                                COMM_COMMENT.CREATED_AT,
+                                COMM_COMMENT.UPDATED_AT,
+                                COMM_COMMENT.EDITED_AT,
+                                val(LocalDateTime.now())
+                        )
+                                .from(COMM_COMMENT)
+                                .where(row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
+                                        .in(convertToCommentIdRow2List(activitySubjectCommentIds)))
+                ).execute();
+    }
+
+    public void deleteAllAndRelatedRecordsByMemberIdAndCommentIds(
+            UUID memberId, List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
+        dsl.batch(
+                dsl.deleteFrom(COMM_COMMENT_LIKE)
+                        .where(row(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
+                                .in(convertToCommentIdRow2List(activitySubjectCommentIds))),
+
+                dsl.deleteFrom(COMM_COMMENT)
+                        .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId))
+        ).execute();
+    }
+
     public void decreaseLikeCountByCommentIds(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
-        List<Row2<String, String>> activitySubjectCommentIdRows = activitySubjectCommentIds.stream()
-                .map(dto -> row(dto.postUlid(), dto.path()))
-                .toList();
+        List<Row2<String, String>> activitySubjectCommentIdRows = convertToCommentIdRow2List(activitySubjectCommentIds);
         dsl.update(COMM_COMMENT)
                 .set(COMM_COMMENT.LIKE_COUNT, COMM_COMMENT.LIKE_COUNT.minus(1))
                 .set(COMM_COMMENT.UPDATED_AT, LocalDateTime.now())
@@ -40,11 +86,9 @@ public class ActivitySubjectCommentJooqRepository {
                 .execute();
     }
 
-    public void markAsWithdrawnByMemberId(UUID memberId) {
-        dsl.update(COMM_COMMENT)
-                .setNull(COMM_COMMENT.AUTH_MEMB_UUID)
-                .set(COMM_COMMENT.IS_DELETED, true)
-                .set(COMM_COMMENT.UPDATED_AT, LocalDateTime.now())
-                .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId)).execute();
+    private List<Row2<String, String>> convertToCommentIdRow2List(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
+        return activitySubjectCommentIds.stream()
+                .map(dto -> row(dto.postUlid(), dto.path()))
+                .toList();
     }
 }

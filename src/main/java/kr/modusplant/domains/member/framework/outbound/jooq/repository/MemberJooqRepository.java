@@ -21,6 +21,11 @@ public class MemberJooqRepository {
                         .set(COMM_POST_ARCHIVE.UPDATED_AT, LocalDateTime.now())
                         .where(COMM_POST_ARCHIVE.AUTH_MEMB_UUID.eq(memberId)),
 
+                dsl.update(COMM_COMMENT_ARCHIVE)
+                        .setNull(COMM_COMMENT_ARCHIVE.AUTH_MEMB_UUID)
+                        .set(COMM_COMMENT_ARCHIVE.UPDATED_AT, LocalDateTime.now())
+                        .where(COMM_COMMENT_ARCHIVE.AUTH_MEMB_UUID.eq(memberId)),
+
                 dsl.update(PROP_BUG_REP)
                         .setNull(PROP_BUG_REP.MEMB_UUID)
                         .where(PROP_BUG_REP.MEMB_UUID.eq(memberId)),
