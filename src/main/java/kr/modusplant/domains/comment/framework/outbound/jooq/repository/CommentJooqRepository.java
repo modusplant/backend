@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.jooq.impl.DSL.count;
-
 @Repository
 @RequiredArgsConstructor
 public class CommentJooqRepository implements CommentQueryRepository {
@@ -137,7 +135,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
+                .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid())
+                        .and(commComment.IS_DELETED.isFalse()))
                 .fetchOptional();
 
         if(totalComments.isPresent()) {
@@ -145,10 +144,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
             Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-            Field<Integer> totalCommentsOfPost = dsl.select(count())
+            Field<Integer> totalCommentsOfPost = dsl.selectCount()
                     .from(commComment)
-                    .where(commComment.POST_ULID.eq(commPost.ULID)
-                            .and(commComment.IS_DELETED.eq(false)))
+                    .where(commComment.POST_ULID.eq(commPost.ULID))
                     .asField();
 
             List<CommentOfAuthorReadModel> commentList = dsl.select(commComment.CONTENT,
@@ -160,7 +158,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
                     .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
-                    .and(commComment.IS_DELETED.eq(false))
+                    .and(commComment.IS_DELETED.isFalse())
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)
                     .orderBy(commComment.CREATED_AT.desc())
@@ -249,7 +247,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                         .from(commComment)
                         .where(commComment.POST_ULID.eq(postId.getValue()))
                         .and(commComment.PATH.eq(path.getValue()))
-                        .and(commComment.IS_DELETED.eq(true))
+                        .and(commComment.IS_DELETED.isTrue())
         );
     }
 
