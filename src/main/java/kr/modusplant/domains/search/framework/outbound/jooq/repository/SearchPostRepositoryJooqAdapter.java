@@ -152,7 +152,6 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
 
         Table<?> commentCountTable = select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                 .from(COMM_COMMENT)
-                .where(COMM_COMMENT.IS_DELETED.isFalse())
                 .groupBy(COMM_COMMENT.POST_ULID)
                 .asTable("comm_cnt");
 
@@ -401,7 +400,6 @@ public class SearchPostRepositoryJooqAdapter implements SearchPostRepository {
 
         Table<?> commentCountTable = select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                 .from(COMM_COMMENT)
-                .where(COMM_COMMENT.IS_DELETED.isFalse())
                 .groupBy(COMM_COMMENT.POST_ULID)
                 .asTable("comm_cnt");
 

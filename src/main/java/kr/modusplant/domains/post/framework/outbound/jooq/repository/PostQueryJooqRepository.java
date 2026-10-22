@@ -63,7 +63,6 @@ public class PostQueryJooqRepository implements PostQueryRepository {
                 .leftJoin(
                         select(COMM_COMMENT.POST_ULID, count().as("comment_count"))
                                 .from(COMM_COMMENT)
-                                .where(COMM_COMMENT.IS_DELETED.isFalse())
                                 .groupBy(COMM_COMMENT.POST_ULID)
                                 .asTable("cc")
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid",String.class)))
