@@ -13,6 +13,7 @@ public record CommentOfPostResponse(
         LocalDateTime editedAt,
         boolean isDeleted,
         String replyToPath,
-        String replyToNickname
+        String replyToNickname,
+        boolean replyToIsDeleted
 ) {
 }
