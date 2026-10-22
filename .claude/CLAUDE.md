@@ -86,14 +86,8 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 ### Project Conventions
 - **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.
 - **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via Spring `ApplicationEvent`s defined in `shared/event/`.
-- **Sensitive-data masking**: Classes holding sensitive values (email, password, tokens, auth codes) override `toString()` to mask them via `shared/util/MaskUtils`. Log statements that print such values directly use the same helpers.
 - **Regex constants**: Regular expressions live in `shared/constant/Regex` — `REGEX_*` for annotations and the precompiled `PATTERN_*` for method bodies. Add new expressions there instead of writing them inline.
   Flyway Java migrations under `db/migration` are the exception and keep their own inline patterns.
-- **Endpoint–`SecurityConfig` sync**: `infrastructure/security/config/SecurityConfig` matches endpoints by hard-coded URL patterns. Update it in the same change as the endpoint:
-  - New endpoint: register a permit-all endpoint under its `HttpMethod` in `SecurityConfig.PUBLIC_ENDPOINTS` (`LOCAL_PUBLIC_ENDPOINTS` for a `local`-only one); give every other endpoint a method-security annotation (`@PreAuthorize`/`@PostAuthorize`/`@Secured`).
-  - Changed URL or HTTP method: update every pattern that matches the endpoint.
-  - Removed endpoint: remove its public-endpoint entry unless another endpoint still matches the pattern.
-  - `EndpointAuthorizationCoverageTest` fails only for an endpoint with neither an annotation nor a matching public-endpoint entry.
 
 ### Spring Profiles
 - `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled
