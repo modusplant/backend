@@ -6,6 +6,9 @@ mirrored 1:1 under `src/test/java/kr/modusplant/infrastructure/security/common/u
 - **ErrorCode class:** `SecurityErrorCode`
 - **Excluded-classes additions:** `config/SecurityConfig` (pure bean-assembly `@Configuration`
   class; no `infrastructure/config/*Config` class in this codebase carries a dedicated test)
+- **Endpoint authorization coverage:** `EndpointAuthorizationCoverageTest` (at the area test
+  root) is a pure reflection/classpath-scan test with no Spring context, so `@Profile` is not
+  evaluated and a `LOCAL_PUBLIC_ENDPOINTS` entry counts as public regardless of the active profile
 - **Pure-Unit-Test path exceptions:** `component/**` uses `@SpringBootTest` +
   `@AutoConfigureMockMvc` + `@MockitoBean` — there is no pure-POJO way to exercise the assembled
   `SecurityFilterChain` (JWT filter, exception translation, login/logout, authorization) end to
