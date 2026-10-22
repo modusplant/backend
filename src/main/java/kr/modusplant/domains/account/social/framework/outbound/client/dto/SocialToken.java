@@ -1,6 +1,9 @@
 package kr.modusplant.domains.account.social.framework.outbound.client.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.jspecify.annotations.NonNull;
+
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
 
 public record SocialToken(
         @JsonProperty("access_token")
@@ -9,4 +12,10 @@ public record SocialToken(
         @JsonProperty("id_token")
         String idToken
 ) {
+    @Override
+    public @NonNull String toString() {
+        return "SocialToken[accessToken=" + maskAnyString(accessToken) +
+                ", idToken=" + maskAnyString(idToken) +
+                "]";
+    }
 }

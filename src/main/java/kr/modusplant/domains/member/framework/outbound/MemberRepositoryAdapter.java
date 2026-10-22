@@ -6,7 +6,6 @@ import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
 import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
-import kr.modusplant.shared.enums.Role;
 import kr.modusplant.domains.member.framework.outbound.jooq.record.ActivitySubjectCommentIdRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
@@ -17,6 +16,7 @@ import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberJ
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
+import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;

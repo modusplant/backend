@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import kr.modusplant.shared.enums.Platform;
+import org.jspecify.annotations.NonNull;
+
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
 
 public record FcmTokenRequest(
         @Schema(description = "Fcm 토큰")
@@ -14,4 +17,10 @@ public record FcmTokenRequest(
         @NotNull
         Platform platform
 ) {
+    @Override
+    public @NonNull String toString() {
+        return "FcmTokenRequest[token=" + maskAnyString(token) +
+                ", platform=" + platform +
+                "]";
+    }
 }

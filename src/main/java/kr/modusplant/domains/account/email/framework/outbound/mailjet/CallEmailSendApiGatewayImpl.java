@@ -19,6 +19,8 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
+
 @Slf4j
 @Service
 public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
@@ -132,7 +134,7 @@ public class CallEmailSendApiGatewayImpl implements CallEmailSendApiGateway {
         } catch (MailjetException e) {
             throw new NotSendableEmailException();
         }
-        log.info("Mail Send Address : {}, Send Status : {} ", email, response.getStatus());
+        log.info("Mail Send Address : {}, Send Status : {} ", maskEmail(email), response.getStatus());
         return response;
     }
 }

@@ -5,9 +5,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithIm
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_URL;
-import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_INTRODUCTION;
+import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.*;
 
 public interface MemberProfileResponseTestUtils {
     MemberProfileResponseWithImageUrl testMemberProfileResponseWithImageUrlV1 = new MemberProfileResponseWithImageUrl(MEMBER_BASIC_USER_UUID, MEMBER_PROFILE_BASIC_USER_IMAGE_URL, MEMBER_PROFILE_BASIC_USER_INTRODUCTION, MEMBER_BASIC_USER_NICKNAME);

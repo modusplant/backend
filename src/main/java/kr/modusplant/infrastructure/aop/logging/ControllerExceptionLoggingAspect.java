@@ -41,9 +41,8 @@ public class ControllerExceptionLoggingAspect {
         String traceId = MDC.get("traceId") != null ? MDC.get("traceId") : "N/A";
         String uri = MDC.get("uri") != null ? MDC.get("uri") : "N/A";
         String method = MDC.get("method") != null ? MDC.get("method") : "N/A";
-        String clientIp = MDC.get("clientIp") != null ? MDC.get("clientIp") : "UNKNOWN";
 
-        log.error("[REST ERROR] traceId={}, method={} | uri={} | handler={} | ip={} | exception={} | message={} | location={} ",
-                traceId, method, uri, methodName, clientIp, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation);
+        log.error("[REST ERROR] traceId={}, method={} | uri={} | handler={} | exception={} | message={} | location={} ",
+                traceId, method, uri, methodName, ex.getClass().getSimpleName(), ex.getMessage(), errorLocation);
     }
 }

@@ -2,8 +2,10 @@ package kr.modusplant.domains.account.normal.usecase.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import org.jspecify.annotations.NonNull;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_EMAIL;
+import static kr.modusplant.shared.util.MaskUtils.maskEmail;
 
 public record EmailModificationRequest(
         @Schema(
@@ -22,4 +24,10 @@ public record EmailModificationRequest(
         @NotBlank(message = "변경된 이메일이 비어 있습니다.")
         String newEmail
 ) {
+    @Override
+    public @NonNull String toString() {
+        return "EmailModificationRequest[currentEmail=" + maskEmail(currentEmail) +
+                ", newEmail=" + maskEmail(newEmail) +
+                "]";
+    }
 }

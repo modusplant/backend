@@ -13,9 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_MEMBER_PROFILE_FILE_KEY;
-import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_POST_CONTENT_FILE_KEY;
-import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.TEST_POST_DOMAIN;
+import static kr.modusplant.infrastructure.file.common.constant.PendingFileConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
