@@ -1,31 +1,33 @@
 ---
-name: guide-prod-dev-ci-cd-pipeline-configuration
-description: Guides the GitHub Actions CI/CD pipeline that tests, builds, and deploys the Spring Boot backend to the prod and dev environments.
+paths:
+  - ".github/workflows/modusplant-backend-ci-cd.yml"
 ---
 
-# Prod / Dev CI/CD Pipeline Configuration
+# Prod / Dev CI/CD Pipeline Details
 
-The pipeline is defined in @.github/workflows/modusplant-backend-ci-cd.yml.
+Applies to the GitHub Actions pipeline in @.github/workflows/modusplant-backend-ci-cd.yml, which tests, builds, and deploys the Spring Boot backend to the prod and dev environments.
 
-## Triggers
+---
+
+## 1. Triggers
 
 - Push to `develop`: common pipeline, then the dev pipeline.
 - Push of a `v*` tag: common pipeline, then the prod pipeline.
 - Manual dispatch: common pipeline, then the dev pipeline when dispatched on `develop` or the prod pipeline when dispatched on a `v*` tag; no deploy on any other ref.
 
-## Concurrency
+## 2. Concurrency
 
 - Runs are serialized in two groups by ref type: branch runs (push to `develop`, manual dispatch on a branch) and tag runs (push of a `v*` tag, manual dispatch on a tag). The two groups run independently.
 - A new run in a group waits until the running one finishes; no in-progress run is cancelled. Only the newest waiting run is kept, and older waiting runs are cancelled.
 
-## Job Dependency Graph
+## 3. Job Dependency Graph
 
 ```
 Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub Release
                              └→ Deploy to Dev (Mac mini)
 ```
 
-## Common Pipeline
+## 4. Common Pipeline
 
 ### Test
 
@@ -53,7 +55,7 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 | Resolve Docker image tags                             | Tag with `latest` and the commit SHA, plus the git tag on tag pushes.                                                                       |
 | Build and push ARM64 image to GHCR                    | Build a `linux/arm64` image to `ghcr.io/modusplant/backend` and push all tags.                                                              |
 
-## Prod Pipeline
+## 5. Prod Pipeline
 
 ### Deploy to Prod (EC2)
 
@@ -72,7 +74,7 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 | Checkout Source Code                  | Fetch the repository.                                                         |
 | Create GitHub Release with auto notes | Create a release for the tag with generated notes; skip if it already exists. |
 
-## Dev Pipeline
+## 6. Dev Pipeline
 
 ### Deploy to Dev (Mac mini)
 
@@ -84,7 +86,7 @@ Test → Build and Push Image ─┬→ Deploy to Prod (EC2) → Create GitHub R
 | Deploy to dev Mac mini via SSH             | On the home server: pull the commit-SHA image and swap the `modusplant-be` container with `dev` profile using the host-resident `.env.dev` (see Container Swap and Rollback). |
 | Remove temporary SSH key file              | Delete the SSH key file, even on failure.                                                                                                                                     |
 
-## Container Swap and Rollback
+## 7. Container Swap and Rollback
 
 Both deploy steps swap the `modusplant-be` container as follows:
 
