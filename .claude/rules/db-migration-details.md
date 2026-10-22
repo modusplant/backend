@@ -2,13 +2,12 @@
 paths:
   - "src/main/resources/db/migration/**"
   - "src/main/java/db/migration/**"
-  - "build.gradle"
   - "src/main/resources/application*.yml"
 ---
 
 # DB Migration Conventions
 
-Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, and the Flyway/jOOQ configuration in `build.gradle` and `application*.yml`.
+Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, and the Flyway/jOOQ configuration in `application*.yml`.
 
 ---
 

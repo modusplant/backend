@@ -2,14 +2,13 @@
 paths:
   - "Dockerfile"
   - ".dockerignore"
-  - "build.gradle"
   - "docker-compose.yml"
   - "docker-compose.override.yml"
 ---
 
 # Local Docker Environment Details
 
-Applies to @Dockerfile, @.dockerignore, the `assembleDocker` task in @build.gradle, @docker-compose.yml, and @docker-compose.override.yml.
+Applies to @Dockerfile, @.dockerignore, @docker-compose.yml, and @docker-compose.override.yml.
 
 ---
 
