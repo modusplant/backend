@@ -131,6 +131,12 @@ public class MemberRepositoryAdapter implements MemberRepository {
             activitySubjectPostJooqRepository.archiveAllByPostUlids(publishedPostUlids);
             activitySubjectPostJooqRepository.deleteAllAndRelatedRecordsByMemberIdAndPostUlids(memberId, publishedPostUlids);
         }
+        List<ActivitySubjectCommentIdRecord> commentIds =
+                activitySubjectCommentJooqRepository.getCommentIdsByMemberId(memberId);
+        if (!commentIds.isEmpty()) {    // 댓글 아카이빙 및 삭제
+            activitySubjectCommentJooqRepository.archiveAllByCommentIds(commentIds);
+            activitySubjectCommentJooqRepository.deleteAllAndRelatedRecordsByMemberIdAndCommentIds(memberId, commentIds);
+        }
         List<String> likedPostIds =
                 activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(memberId);
         activitySubjectPostJooqRepository.decreaseLikeCountByPostUlids(likedPostIds);     // 게시글 좋아요 감소
@@ -150,7 +156,6 @@ public class MemberRepositoryAdapter implements MemberRepository {
                         .reason(reason)
                         .opinion(opinion)
                         .build());
-        activitySubjectCommentJooqRepository.markAsWithdrawnByMemberId(memberId);
         memberJooqRepository.updateMemberIdToNullByMemberId(memberId);        // 회원 식별자 정리
         memberJooqRepository.deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(memberId); // 남은 회원 데이터 제거
     }
