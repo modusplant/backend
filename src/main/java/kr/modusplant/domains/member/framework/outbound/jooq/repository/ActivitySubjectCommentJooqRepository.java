@@ -1,13 +1,13 @@
 package kr.modusplant.domains.member.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.member.framework.outbound.jooq.record.ActivitySubjectCommentIdRecord;
 import lombok.RequiredArgsConstructor;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Row2;
+import org.jooq.Record2;
+import org.jooq.Select;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
@@ -18,21 +18,8 @@ import static org.jooq.impl.DSL.*;
 public class ActivitySubjectCommentJooqRepository {
     private final DSLContext dsl;
 
-    public List<ActivitySubjectCommentIdRecord> getCommentIdsLikedByMemberId(UUID memberId) {
-        return dsl.select(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
-                .from(COMM_COMMENT_LIKE)
-                .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId))
-                .fetchInto(ActivitySubjectCommentIdRecord.class);
-    }
-
-    public List<ActivitySubjectCommentIdRecord> getCommentIdsByMemberId(UUID memberId) {
-        return dsl.select(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
-                .from(COMM_COMMENT)
-                .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId))
-                .fetchInto(ActivitySubjectCommentIdRecord.class);
-    }
-
-    public void archiveAllByCommentIds(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
+    // 대상 댓글: 회원의 모든 댓글 + 발행된 게시글에 포함된 댓글
+    public void archiveAllByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
         dsl.insertInto(COMM_COMMENT_ARCHIVE,
                         COMM_COMMENT_ARCHIVE.PATH,
                         COMM_COMMENT_ARCHIVE.POST_ULID,
@@ -57,38 +44,57 @@ public class ActivitySubjectCommentJooqRepository {
                                 val(LocalDateTime.now())
                         )
                                 .from(COMM_COMMENT)
-                                .where(row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
-                                        .in(convertToCommentIdRow2List(activitySubjectCommentIds)))
+                                .where(isTargetComment(memberId, publishedPostUlids))
                 ).execute();
     }
 
-    public void deleteAllAndRelatedRecordsByMemberIdAndCommentIds(
-            UUID memberId, List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
+    public void deleteRelatedRecordsByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
         dsl.batch(
                 dsl.deleteFrom(COMM_COMMENT_LIKE)
-                        .where(row(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
-                                .in(convertToCommentIdRow2List(activitySubjectCommentIds))),
+                        .where(COMM_COMMENT_LIKE.POST_ULID.eq(any(publishedPostUlids))
+                                .or(row(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
+                                        .in(selectCommentIdsByMemberId(memberId)))),
 
-                dsl.deleteFrom(COMM_COMMENT)
-                        .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId))
+                dsl.deleteFrom(COMM_COMMENT_ABU_REP)
+                        .where(COMM_COMMENT_ABU_REP.POST_ULID.eq(any(publishedPostUlids))
+                                .or(row(COMM_COMMENT_ABU_REP.POST_ULID, COMM_COMMENT_ABU_REP.PATH)
+                                        .in(selectCommentIdsByMemberId(memberId)))),
+
+                dsl.deleteFrom(COMM_COMMENT_ABUSE_REPORT_DASHBOARD)
+                        .where(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.POST_ULID.eq(any(publishedPostUlids))
+                                .or(row(COMM_COMMENT_ABUSE_REPORT_DASHBOARD.POST_ULID, COMM_COMMENT_ABUSE_REPORT_DASHBOARD.PATH)
+                                        .in(selectCommentIdsByMemberId(memberId))))
         ).execute();
     }
 
-    public void decreaseLikeCountByCommentIds(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
-        List<Row2<String, String>> activitySubjectCommentIdRows = convertToCommentIdRow2List(activitySubjectCommentIds);
+    public void deleteAllByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
+        dsl.deleteFrom(COMM_COMMENT)
+                .where(isTargetComment(memberId, publishedPostUlids))
+                .execute();
+    }
+
+    public void decreaseLikeCountOfCommentsLikedByMemberId(UUID memberId) {
         dsl.update(COMM_COMMENT)
                 .set(COMM_COMMENT.LIKE_COUNT, COMM_COMMENT.LIKE_COUNT.minus(1))
                 .set(COMM_COMMENT.UPDATED_AT, LocalDateTime.now())
                 .where(
-                        row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH).in(activitySubjectCommentIdRows)
+                        row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH).in(
+                                        select(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
+                                                .from(COMM_COMMENT_LIKE)
+                                                .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId)))
                                 .and(COMM_COMMENT.LIKE_COUNT.gt(0))   // 좋아요 수가 1 이상일 때만 좋아요 수 감소
                 )
                 .execute();
     }
 
-    private List<Row2<String, String>> convertToCommentIdRow2List(List<ActivitySubjectCommentIdRecord> activitySubjectCommentIds) {
-        return activitySubjectCommentIds.stream()
-                .map(dto -> row(dto.postUlid(), dto.path()))
-                .toList();
+    private Condition isTargetComment(UUID memberId, String[] publishedPostUlids) {
+        return COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId)
+                .or(COMM_COMMENT.POST_ULID.eq(any(publishedPostUlids)));
+    }
+
+    private Select<Record2<String, String>> selectCommentIdsByMemberId(UUID memberId) {
+        return select(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
+                .from(COMM_COMMENT)
+                .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId));
     }
 }

@@ -5,7 +5,6 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
@@ -15,13 +14,6 @@ import static org.jooq.impl.DSL.*;
 @RequiredArgsConstructor
 public class ActivitySubjectPostJooqRepository {
     private final DSLContext dsl;
-
-    public List<String> getPostUlidsLikedByMemberId(UUID memberId) {
-        return dsl.select(COMM_POST_LIKE.POST_ULID)
-                .from(COMM_POST_LIKE)
-                .where(COMM_POST_LIKE.MEMB_UUID.eq(memberId))
-                .fetchInto(String.class);
-    }
 
     public void archiveAllByPostUlids(String[] publishedPostUlids) {
         dsl.insertInto(COMM_POST_ARCHIVE,
@@ -52,33 +44,42 @@ public class ActivitySubjectPostJooqRepository {
                                 COMM_POST.EDITED_AT
                         )
                                 .from(COMM_POST)
-                                .where(COMM_POST.ULID.in(publishedPostUlids))
+                                .where(COMM_POST.ULID.eq(any(publishedPostUlids)))
                 ).execute();
     }
 
-    public void deleteAllAndRelatedRecordsByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
+    public void deleteRelatedRecordsByPostUlids(String[] publishedPostUlids) {
         dsl.batch(
                 dsl.deleteFrom(COMM_POST_LIKE)
-                        .where(COMM_POST_LIKE.POST_ULID.in(publishedPostUlids)),
+                        .where(COMM_POST_LIKE.POST_ULID.eq(any(publishedPostUlids))),
 
                 dsl.deleteFrom(COMM_POST_BOOKMARK)
-                        .where(COMM_POST_BOOKMARK.POST_ULID.in(publishedPostUlids)),
+                        .where(COMM_POST_BOOKMARK.POST_ULID.eq(any(publishedPostUlids))),
 
-                dsl.deleteFrom(COMM_COMMENT_LIKE)
-                        .where(COMM_COMMENT_LIKE.POST_ULID.in(publishedPostUlids)),
+                dsl.deleteFrom(COMM_POST_ABU_REP)
+                        .where(COMM_POST_ABU_REP.POST_ULID.eq(any(publishedPostUlids))),
 
-                dsl.deleteFrom(COMM_POST)
-                        .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
+                dsl.deleteFrom(COMM_POST_ABUSE_REPORT_DASHBOARD)
+                        .where(COMM_POST_ABUSE_REPORT_DASHBOARD.POST_ULID.eq(any(publishedPostUlids)))
         ).execute();
     }
 
-    public void decreaseLikeCountByPostUlids(List<String> activitySubjectPostUlids) {
+    public void deleteAllByMemberId(UUID memberId) {
+        dsl.deleteFrom(COMM_POST)
+                .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
+                .execute();
+    }
+
+    public void decreaseLikeCountOfPostsLikedByMemberId(UUID memberId) {
         dsl.update(COMM_POST)
                 .set(COMM_POST.LIKE_COUNT, COMM_POST.LIKE_COUNT.minus(1))
                 .set(COMM_POST.UPDATED_AT, LocalDateTime.now())
                 .set(COMM_POST.VER, coalesce(COMM_POST.VER, 0).plus(1))
                 .where(
-                        COMM_POST.ULID.in(activitySubjectPostUlids)
+                        COMM_POST.ULID.in(
+                                        select(COMM_POST_LIKE.POST_ULID)
+                                                .from(COMM_POST_LIKE)
+                                                .where(COMM_POST_LIKE.MEMB_UUID.eq(memberId)))
                                 .and(COMM_POST.LIKE_COUNT.gt(0)))   // 좋아요 수가 1 이상일 때만 좋아요 수 감소
                 .execute();
     }
