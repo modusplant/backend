@@ -67,8 +67,7 @@ public class SecurityConfig {
                     "/api/v2/communication/comments/post/**",
                     "/api/v1/members/check/nickname/**",
                     "/api/v1/search/posts",
-                    "/api/v1/communication/posts/**",
-                    "/actuator/prometheus"
+                    "/api/v1/communication/posts/**"
             ),
             HttpMethod.POST, List.of(
                     "/api/members/register",

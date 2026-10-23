@@ -59,10 +59,8 @@ public class PostRecentlyViewRedisRepository implements PostRecentlyViewReposito
 
     public void removePostFromAllMembers(PostId postId) {
         Set<String> keys = stringRedisTemplate.keys("recentlyView:member:*:posts");
-        if (keys != null) {
-            for (String key : keys) {
-                stringRedisTemplate.opsForZSet().remove(key, postId.getValue());
-            }
+        for (String key : keys) {
+            stringRedisTemplate.opsForZSet().remove(key, postId.getValue());
         }
     }
 
