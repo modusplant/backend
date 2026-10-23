@@ -100,18 +100,21 @@ public class MemberRepositoryAdapter implements MemberRepository {
     /**
      * 회원 탈퇴 워크플로우
      * <ol>
-     *     <li>Redis: 탈퇴 유저의 최근에 본 게시글 데이터 삭제</li>
-     *     <li>Amazon S3: 발행된 게시글의 이미지 삭제</li>
-     *     <li>Redis: 다른 유저의 최근에 본 게시글 데이터에서 해당 게시글을 제거</li>
-     *     <li>발행된 게시글 아카이빙 후, 해당 게시글에 대한 좋아요·북마크 삭제</li>
-     *     <li>해당 게시글에 포함된 댓글에 대한 좋아요와 회원의 모든 게시글 삭제</li>
-     *     <li>회원의 모든 댓글 아카이빙 후, 해당 댓글에 대한 좋아요와 회원의 모든 댓글 삭제</li>
+     *     <li>Redis: 회원의 최근에 본 게시글 데이터와 검색 기록 삭제</li>
+     *     <li>Redis: 다른 유저의 최근에 본 게시글 데이터에서 해당 게시글을 제거하고, 해당 게시글의 조회수 데이터 삭제</li>
+     *     <li>Amazon S3: 회원의 모든 게시글(발행·임시저장)의 이미지 삭제</li>
+     *     <li>Amazon S3: 회원 프로필 이미지와 식물 정보 사진 이미지 삭제</li>
+     *     <li>발행된 게시글에 대한 좋아요·북마크·신고·신고 대시보드 삭제</li>
+     *     <li>발행된 게시글에 포함된 댓글과 회원의 모든 댓글에 대한 좋아요·신고·신고 대시보드 삭제</li>
+     *     <li>회원이 발신자 또는 수신자이거나, 발행된 게시글·해당 게시글에 포함된 댓글·회원의 모든 댓글을 대상으로 하는 알림 삭제</li>
+     *     <li>발행된 게시글 및 해당 게시글에 포함된 댓글, 회원의 모든 댓글 아카이빙</li>
+     *     <li>발행된 게시글 및 해당 게시글에 포함된 댓글, 회원의 모든 댓글 삭제</li>
      *     <li>회원이 좋아요한 게시글·댓글의 좋아요 수 감소 후, 회원의 게시글·댓글 좋아요 삭제</li>
-     *     <li>프로필 이미지 삭제</li>
      *     <li>탈퇴 사유·의견 저장</li>
      *     <li>게시글·댓글·건의 및 버그 제보 아카이브와 건의 및 버그 제보에서 회원 식별자를 null로 변경</li>
      *     <li>refresh_token, comm_post_bookmark, comm_post_abu_rep, comm_comment_abu_rep, site_member_prof,
-     *         site_member_term, site_member_auth, site_member, fcm_token에서 회원 데이터 삭제</li>
+     *         site_member_term, site_member_auth, site_member, fcm_token, plant_space, plant_info
+     *         에서 회원 데이터 삭제(plant_info_photo는 FK의 ON DELETE CASCADE로 삭제)</li>
      * </ol>
      */
     @Override
