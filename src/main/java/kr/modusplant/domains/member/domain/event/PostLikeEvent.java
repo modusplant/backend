@@ -1,8 +1,7 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +16,10 @@ public class PostLikeEvent {
 
     public static PostLikeEvent create(UUID memberId, String postUlid) {
         if (memberId == null) {
-            throw new InvalidValueException(MemberErrorCode.NOT_FOUND_MEMBER, "memberId");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "memberId");
         }
         if (postUlid == null || postUlid.isBlank()) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "postUlid");
         }
         return new PostLikeEvent(memberId, postUlid);
     }

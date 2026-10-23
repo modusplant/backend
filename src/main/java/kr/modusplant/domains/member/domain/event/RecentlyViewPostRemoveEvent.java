@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class RecentlyViewPostRemoveEvent {
 
     public static RecentlyViewPostRemoveEvent create(String[] postIds) {
         if (ArrayUtils.isEmpty(postIds)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postIds");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "postIds");
         } else {
             return new RecentlyViewPostRemoveEvent(postIds);
         }

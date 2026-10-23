@@ -1,6 +1,6 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.event.CommentAbuseReportApproveEventTestUtils.testCommentAbuseReportApproveEvent;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
-import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_COMMENT;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,22 +29,22 @@ class CommentAbuseReportApproveEventTest {
         @DisplayName("postUlid가 비어 있을 때 예외 반환")
         void testCreate_givenBlankPostUlid_willThrowException() {
             // given & when
-            InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+            EmptyValueException exception = assertThrows(EmptyValueException.class, () ->
                     CommentAbuseReportApproveEvent.create("", TEST_COMMENT_PATH));
 
             // then
-            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
+            assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
         }
 
         @Test
         @DisplayName("path가 비어 있을 때 예외 반환")
         void testCreate_givenBlankPath_willThrowException() {
             // given & when
-            InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+            EmptyValueException exception = assertThrows(EmptyValueException.class, () ->
                     CommentAbuseReportApproveEvent.create(TEST_POST_ULID, " "));
 
             // then
-            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
+            assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
         }
     }
 }

@@ -1,12 +1,12 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.member.common.util.domain.event.PostAbuseReportApproveEventTestUtils.testPostAbuseReportApproveEvent;
-import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,11 +27,11 @@ class PostAbuseReportApproveEventTest {
         @DisplayName("postUlid가 비어 있을 때 예외 반환")
         void testCreate_givenBlankPostUlid_willThrowException() {
             // given & when
-            InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+            EmptyValueException exception = assertThrows(EmptyValueException.class, () ->
                     PostAbuseReportApproveEvent.create(""));
 
             // then
-            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_POST);
+            assertThat(exception.getErrorCode()).isEqualTo(EMPTY_VALUE);
         }
     }
 }
