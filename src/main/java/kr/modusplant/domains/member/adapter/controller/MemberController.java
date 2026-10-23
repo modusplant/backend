@@ -8,10 +8,12 @@ import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
+import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
+import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
@@ -19,7 +21,6 @@ import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
@@ -51,7 +52,6 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 @Slf4j
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final TokenService tokenService;
     private final SwearHolder swearHolder;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
@@ -301,14 +301,18 @@ public class MemberController {
         MemberId memberId = MemberId.fromUuid(jwtTokenProvider.getMemberUuidFromToken(accessToken));
         validateBeforeWithdraw(memberId, authCode, authProvider);
 
+        String socialAccessToken = null;
         if (!StringUtils.isBlank(authCode) && !StringUtils.isBlank(authProvider)) {
-            memberSocialTranslator.deleteSocialAccountWithSocialAccessToken(
-                    memberSocialTranslator.getSocialAccessToken(authCode, authProvider),
-                    authProvider,
-                    memberId.getValue());
+            memberSocialTranslator.validateIfSocialAccountDeletable(authProvider, memberId.getValue());
+            socialAccessToken = memberSocialTranslator.getSocialAccessToken(authCode, authProvider);
         }
-        tokenService.blacklistAccessToken(accessToken);
         memberRepository.withdraw(memberId, record.reason(), MemberWithdrawOpinion.create(record.opinion()));
+
+        if (socialAccessToken != null) {
+            applicationEventPublisher.publishEvent(
+                    SocialAccessRevokeEvent.create(memberId.getValue(), authProvider, socialAccessToken));
+        }
+        applicationEventPublisher.publishEvent(AccessTokenBlacklistEvent.create(accessToken));
     }
 
     private void validateBeforeOverrideProfile(MemberId memberId, Nickname nickname, MemberProfileImage memberProfileImage) {
