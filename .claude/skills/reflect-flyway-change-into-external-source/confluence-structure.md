@@ -33,9 +33,9 @@ Tables in page order, as they currently appear on each page.
 | `post`                  | `comm_pri_cate`, `comm_seco_cate`, `comm_post`, `comm_post_archive`, `comm_post_like`, `comm_post_bookmark`, `comm_post_abu_rep` |
 | `admin-activity`        | `comm_post_abuse_report_dashboard`, `comm_comment_abuse_report_dashboard`                                                        |
 | `environment-and-plant` | `plant`, `plant_variety`, `plant_space`, `plant_info`, `plant_info_photo`                                                        |
-| `user-activity`         | `comm_comment`, `comm_comment_archive`, `comm_comment_like`, `comm_comment_abu_rep`, `prop_bug_rep`                              |
+| `user-activity`         | `comm_comment`, `comm_comment_archive`, `comm_comment_like`, `comm_comment_abu_rep`, `prop_bug_rep`, `prop_bug_rep_archive`      |
 | `server-function`       | `refresh_token`, `fcm_token`, `comm_notification`, `pending_file`                                                                |
-| `policy-implementation` | `term`, `swear`, `prop_bug_rep_archive`, `common_code_group`, `common_code`                                                      |
+| `policy-implementation` | `term`, `swear`, `common_code_group`, `common_code`                                                                              |
 
 ## Prefix Map
 
@@ -45,15 +45,22 @@ matches, ask the user.
 Pages fall into two kinds, which the rows and any page proposed to the user follow:
 
 - Domain pages (`member`, `post`, `environment-and-plant`): a domain's tables belong here, including
-  auxiliary tables such as archives (e.g. `comm_post_archive`), unless the table serves a role page.
+  auxiliary tables such as archives (e.g. `comm_post_archive`).
   Judge domain membership qualitatively, chiefly by table naming, not by which code references the
   table: other domains may reference these domains' entities and repositories.
 - Role pages (`admin-activity`, `user-activity`, `server-function`, `policy-implementation`): a
   table belongs to the page matching its own role, so tables of one domain may sit on different
-  pages (e.g. `prop_bug_rep` on `user-activity`, `prop_bug_rep_archive` on `policy-implementation`).
-  A role page takes precedence over a domain page. `admin-activity` holds tables used only by
-  admin-only features (e.g. `comm_post_abuse_report_dashboard`); identify them in the code by
-  endpoint URLs containing `admin` and by entity and repository usage confined to that feature.
+  pages (e.g. `comm_comment` on `user-activity`, `comm_comment_abuse_report_dashboard` on
+  `admin-activity`).
+  - `admin-activity`: tables used only by admin-only features (e.g.
+    `comm_post_abuse_report_dashboard`); identify them in the code by endpoint URLs containing
+    `admin` and by entity and repository usage confined to that feature.
+  - `user-activity`: every table related to user activity that no other page takes, including
+    auxiliary tables such as archives (e.g. `prop_bug_rep_archive`).
+  - `server-function`: tables backing server-side functions such as tokens, notifications, and file
+    handling (e.g. `refresh_token`, `pending_file`).
+  - `policy-implementation`: tables for pure policy independent of users; they contain no user
+    identifier column (e.g. `term`, `swear`).
 
 | Table name pattern                                                    | page-slug               |
 |-----------------------------------------------------------------------|-------------------------|
@@ -61,7 +68,7 @@ Pages fall into two kinds, which the rows and any page proposed to the user foll
 | `site_member*`                                                        | `member`                |
 | `plant*`                                                              | `environment-and-plant` |
 | `comm_post*`, `comm_pri_cate*`, `comm_seco_cate*`                     | `post`                  |
-| `prop_bug_rep_archive*`, `term*`, `swear*`, `common_code*`            | `policy-implementation` |
+| `term*`, `swear*`, `common_code*`                                     | `policy-implementation` |
 | `comm_comment*`, `prop_bug_rep*`                                      | `user-activity`         |
 | `comm_notification*`, `refresh_token*`, `fcm_token*`, `pending_file*` | `server-function`       |
 
