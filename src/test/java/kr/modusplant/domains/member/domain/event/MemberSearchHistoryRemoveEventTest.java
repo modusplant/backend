@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
-import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,11 +17,11 @@ class MemberSearchHistoryRemoveEventTest {
         @DisplayName("memberId가 null일 때 예외 반환")
         void testCreate_givenNullMemberId_willThrowException() {
             // given & when
-            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+            EmptyValueException emptyValueException = assertThrows(EmptyValueException.class, () ->
                     MemberSearchHistoryRemoveEvent.create(null));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
+            assertThat(emptyValueException.getErrorCode()).isEqualTo(GeneralErrorCode.EMPTY_VALUE);
         }
     }
 }
