@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import static kr.modusplant.shared.framework.redis.RedisKeys.MEMBER_SEARCH_HISTORY_PREFIX;
 import static kr.modusplant.shared.framework.redis.RedisKeys.generateRedisKeyWithEqualCase;
 
 @Repository
@@ -19,6 +18,7 @@ import static kr.modusplant.shared.framework.redis.RedisKeys.generateRedisKeyWit
 public class SearchPostHistoryRedisRepository implements SearchPostHistoryRepository {
     private static final int MAX_HISTORY = 20;
     private static final long TTL_DAYS = 30;
+    private static final String MEMBER_SEARCH_HISTORY_PREFIX = "searchHistory:member:";    // 회원 검색 기록 key prefix
 
     private final StringRedisTemplate stringRedisTemplate;
 

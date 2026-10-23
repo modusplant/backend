@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
 
-import static kr.modusplant.shared.framework.redis.RedisKeys.BLACKLIST_ACCESS_TOKEN_PREFIX;
 import static kr.modusplant.shared.framework.redis.RedisKeys.generateRedisKeyWithEqualCase;
 import static kr.modusplant.shared.util.EncryptUtils.encryptWithSha256;
 
@@ -14,6 +13,8 @@ import static kr.modusplant.shared.util.EncryptUtils.encryptWithSha256;
 @RequiredArgsConstructor
 public class AccessTokenRedisRepository {
     private final RedisHelper redisHelper;
+
+    private static final String BLACKLIST_ACCESS_TOKEN_PREFIX = "blacklist:access_token:"; // 접근 토큰 블랙리스팅 key prefix
 
     public void addToBlacklist(String token, Long ttlSeconds) {
         redisHelper.setString(generateKey(token), token, Duration.ofSeconds(ttlSeconds));
