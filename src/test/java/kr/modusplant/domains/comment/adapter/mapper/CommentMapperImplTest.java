@@ -47,6 +47,7 @@ public class CommentMapperImplTest implements
         assertThat(result.editedAt()).isEqualTo(testCommentOfPostReadModel.updatedAt());
         assertThat(result.isDeleted()).isEqualTo(testCommentOfPostReadModel.isDeleted());
         assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
+        assertThat(result.replyToIsExisted()).isTrue();
         assertThat(result.replyToNickname()).isEqualTo(testCommentOfPostReadModel.replyToNickname());
         assertThat(result.replyToIsDeleted()).isEqualTo(testCommentOfPostReadModel.replyToIsDeleted());
     }
@@ -60,8 +61,8 @@ public class CommentMapperImplTest implements
                 testCommentOfPostReadModel.content(), testCommentOfPostReadModel.likeCount(),
                 testCommentOfPostReadModel.isLiked(), testCommentOfPostReadModel.createdAt(),
                 testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted(),
-                testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToNickname(),
-                testCommentOfPostReadModel.replyToIsDeleted());
+                testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToIsExisted(),
+                testCommentOfPostReadModel.replyToNickname(), testCommentOfPostReadModel.replyToIsDeleted());
 
         // when
         CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);
@@ -69,6 +70,56 @@ public class CommentMapperImplTest implements
         // then
         assertThat(result.profileImagePath()).isNull();
         then(fileService).should(times(0)).generateGetPresignedUrl(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    @DisplayName("삭제된 답글 대상을 가진 읽기 모델을 답글 대상 닉네임 없이 응답으로 변환")
+    public void testToCommentOfPostResponse_givenDeletedReplyToComment_willReturnResponseWithNullReplyToNickname() {
+        // given
+        CommentOfPostReadModel readModel = createReadModelWithReplyTo(
+                testCommentOfPostReadModel.replyToPath(), true, testCommentOfPostReadModel.replyToNickname(), true);
+
+        // when
+        CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);
+
+        // then
+        assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
+        assertThat(result.replyToIsExisted()).isTrue();
+        assertThat(result.replyToNickname()).isNull();
+        assertThat(result.replyToIsDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 답글 대상을 가진 읽기 모델을 삭제된 답글 대상으로 응답 변환")
+    public void testToCommentOfPostResponse_givenMissingReplyToComment_willReturnResponseWithDeletedReplyTo() {
+        // given
+        CommentOfPostReadModel readModel = createReadModelWithReplyTo(
+                testCommentOfPostReadModel.replyToPath(), false, null, false);
+
+        // when
+        CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);
+
+        // then
+        assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
+        assertThat(result.replyToIsExisted()).isFalse();
+        assertThat(result.replyToNickname()).isNull();
+        assertThat(result.replyToIsDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("답글 대상이 없는 읽기 모델을 응답으로 변환")
+    public void testToCommentOfPostResponse_givenNoReplyToPath_willReturnResponseWithoutReplyTo() {
+        // given
+        CommentOfPostReadModel readModel = createReadModelWithReplyTo(null, false, null, false);
+
+        // when
+        CommentOfPostResponse result = mapper.toCommentOfPostResponse(readModel);
+
+        // then
+        assertThat(result.replyToPath()).isNull();
+        assertThat(result.replyToIsExisted()).isFalse();
+        assertThat(result.replyToNickname()).isNull();
+        assertThat(result.replyToIsDeleted()).isFalse();
     }
 
     @Test
@@ -89,5 +140,16 @@ public class CommentMapperImplTest implements
         assertThat(result.totalPages()).isEqualTo(page.getTotalPages());
         assertThat(result.hasNext()).isEqualTo(page.hasNext());
         assertThat(result.hasPrevious()).isEqualTo(page.hasPrevious());
+    }
+
+    private CommentOfPostReadModel createReadModelWithReplyTo(
+            String replyToPath, boolean replyToIsExisted, String replyToNickname, boolean replyToIsDeleted) {
+        return new CommentOfPostReadModel(
+                testCommentOfPostReadModel.profileImage(), testCommentOfPostReadModel.nickname(),
+                testCommentOfPostReadModel.path(), testCommentOfPostReadModel.content(),
+                testCommentOfPostReadModel.likeCount(), testCommentOfPostReadModel.isLiked(),
+                testCommentOfPostReadModel.createdAt(), testCommentOfPostReadModel.updatedAt(),
+                testCommentOfPostReadModel.isDeleted(),
+                replyToPath, replyToIsExisted, replyToNickname, replyToIsDeleted);
     }
 }

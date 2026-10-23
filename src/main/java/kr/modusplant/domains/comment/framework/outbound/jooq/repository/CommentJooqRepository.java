@@ -86,6 +86,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 commComment.IS_DELETED,
                 commComment.EDITED_AT,
                 commComment.REPLY_TO_PATH,
+                replyToComment.PATH,
                 replyToMember.NICKNAME,
                 replyToComment.IS_DELETED);
     }
@@ -125,6 +126,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
                 record.getValue(commComment.IS_DELETED),
                 record.getValue(commComment.REPLY_TO_PATH),
+                record.getValue(replyToComment.PATH) != null, // 답글 대상 행이 없으면 NULL → false
                 record.getValue(replyToMember.NICKNAME),
                 Boolean.TRUE.equals(record.getValue(replyToComment.IS_DELETED)) // 답글 대상이 없으면 NULL → false
         );

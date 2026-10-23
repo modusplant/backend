@@ -35,22 +35,22 @@ public class SecurityExceptionHandlingFilter extends OncePerRequestFilter {
         } catch (AuthenticationException ex) {
             entryPoint.commence(request, response, ex);
         } catch (BusinessException ex) {
-            if (!isResponseCommitted(response, ex)) {
+            if (isResponseNotCommitted(response, ex)) {
                 writeBusinessErrorResponse(response, ex);
             }
         } catch (Exception ex) {
-            if (!isResponseCommitted(response, ex)) {
+            if (isResponseNotCommitted(response, ex)) {
                 writeGeneralErrorResponse(response, ex);
             }
         }
     }
 
-    private boolean isResponseCommitted(HttpServletResponse response, Exception exception) {
+    private boolean isResponseNotCommitted(HttpServletResponse response, Exception exception) {
         if (response.isCommitted()) {
             log.warn("Response already committed, cannot write error for: {}", exception.getMessage());
-            return true;
+            return false;
         }
-        return false;
+        return true;
     }
 
     private void writeBusinessErrorResponse(HttpServletResponse response, BusinessException businessEx) throws IOException {
