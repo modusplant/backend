@@ -223,16 +223,6 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public int countPostComment(PostId postId) {
-        return dsl.selectCount()
-                .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getValue()))
-                .fetchOptional()
-                .map(Record1::value1)
-                .orElse(0);
-    }
-
-    @Override
     public boolean isCommentExists(PostId postId, CommentPath path) {
         return dsl.fetchExists(
                 dsl.selectOne()

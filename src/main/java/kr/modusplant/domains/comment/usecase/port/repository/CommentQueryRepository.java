@@ -36,8 +36,6 @@ public interface CommentQueryRepository {
      */
     int findMaximumSiblingPathOrder(PostId postId, CommentPath path);
 
-    int countPostComment(PostId postId);
-
     boolean isCommentExists(PostId postId, CommentPath path);
 
     boolean isCommentDeleted(PostId postId, CommentPath path);
