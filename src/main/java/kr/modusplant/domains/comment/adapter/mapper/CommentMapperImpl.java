@@ -31,12 +31,17 @@ public class CommentMapperImpl implements CommentMapper {
 
     @Override
     public CommentOfPostResponse toCommentOfPostResponse(CommentOfPostReadModel readModel) {
+        boolean replyToIsExisted = readModel.replyToIsExisted();
+        // 레코드에 답글 대상 경로 값이 존재함에도, 회원 탈퇴 등으로 해당 경로에 대한 댓글 레코드가 존재하지 않으면 삭제된 것으로 간주
+        boolean replyToIsDeleted = replyToIsExisted
+                ? readModel.replyToIsDeleted()
+                : readModel.replyToPath() != null;
+        String replyToNickname = replyToIsExisted && !replyToIsDeleted ? readModel.replyToNickname() : null;
         return new CommentOfPostResponse(
                 readModel.profileImage() == null ? null : fileService.generateGetPresignedUrl(readModel.profileImage()),
                 readModel.nickname(), readModel.path(), readModel.content(), readModel.likeCount(),
                 readModel.isLiked(), readModel.createdAt(), readModel.updatedAt(), readModel.isDeleted(),
-                readModel.replyToPath(), readModel.replyToNickname(), readModel.replyToIsDeleted()
+                readModel.replyToPath(), replyToIsExisted, replyToNickname, replyToIsDeleted
         );
     }
-
 }
