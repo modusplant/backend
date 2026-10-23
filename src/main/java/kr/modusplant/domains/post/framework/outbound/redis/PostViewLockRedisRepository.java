@@ -21,12 +21,12 @@ public class PostViewLockRedisRepository implements PostViewLockRepository {
 
     public boolean lock(PostId postId, UUID memberUuid, long ttlMinutes) {
         String key = generateKey(postId.getValue(),memberUuid);
-        return stringRedisTemplate.opsForValue().setIfAbsent(key,"",Duration.ofMinutes(ttlMinutes));
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, "", Duration.ofMinutes(ttlMinutes)));
     }
 
     public boolean lockAnonymous(PostId postId, UUID guestId, long ttlMinutes) {
         String key = generateAnonymousUserKey(postId.getValue(),guestId);
-        return stringRedisTemplate.opsForValue().setIfAbsent(key,"",Duration.ofMinutes(ttlMinutes));
+        return Boolean.TRUE.equals(stringRedisTemplate.opsForValue().setIfAbsent(key, "", Duration.ofMinutes(ttlMinutes)));
     }
 
     private String generateKey(String ulid, UUID memberUuid) {
