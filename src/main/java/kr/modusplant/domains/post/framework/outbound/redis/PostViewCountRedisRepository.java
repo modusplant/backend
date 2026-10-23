@@ -20,7 +20,7 @@ public class PostViewCountRedisRepository implements PostViewCountRepository {
 
     private final StringRedisTemplate stringRedisTemplate;
 
-    @SuppressWarnings({"ConstantValue", "UnreachableCode"})
+    @SuppressWarnings({"UnreachableCode"})
     public Long read(PostId postId) {
         String result = stringRedisTemplate.opsForValue().get(generatedKey(postId.getValue()));
         return result == null ? null : Long.parseLong(result);
