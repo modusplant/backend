@@ -1,10 +1,9 @@
 package kr.modusplant.domains.post.framework.outbound.jooq.repository;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import kr.modusplant.domains.post.framework.outbound.jooq.record.PostIsPublishedAndContentRecord;
 import kr.modusplant.shared.framework.jooq.converter.JsonbJsonNodeConverter;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
-import org.jooq.JSONB;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,21 +17,13 @@ public class PostJooqRepository {
     private final DSLContext dsl;
     private final JsonbJsonNodeConverter jsonbJsonNodeConverter = new JsonbJsonNodeConverter();
 
-    public String[] getPublishedPostUlidsByMemberId(UUID memberId) {
-        return dsl.select(COMM_POST.ULID)
+    public List<PostIsPublishedAndContentRecord> getPostIsPublishedAndContentsByMemberId(UUID memberId) {
+        return dsl.select(COMM_POST.ULID, COMM_POST.IS_PUBLISHED, COMM_POST.CONTENT)
                 .from(COMM_POST)
                 .where(COMM_POST.AUTH_MEMB_UUID.eq(memberId))
-                .and(COMM_POST.IS_PUBLISHED.isTrue())
-                .fetchInto(String.class).toArray(new String[0]);
-    }
-
-    public List<JsonNode> getPostContentsFromPublishedPostUlids(String[] publishedPostUlids) {
-        return dsl.select(COMM_POST.CONTENT)
-                .from(COMM_POST)
-                .where(COMM_POST.ULID.in(publishedPostUlids))
-                .fetchInto(JSONB.class)
-                .stream()
-                .map(jsonbJsonNodeConverter::from)
-                .toList();
+                .fetch(postRecord -> new PostIsPublishedAndContentRecord(
+                        postRecord.get(COMM_POST.ULID),
+                        postRecord.get(COMM_POST.IS_PUBLISHED),
+                        jsonbJsonNodeConverter.from(postRecord.get(COMM_POST.CONTENT))));
     }
 }
