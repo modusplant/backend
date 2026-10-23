@@ -28,7 +28,6 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.account.email.domain.exception.enums.EmailIdentityErrorCode.*;
 import static kr.modusplant.infrastructure.jwt.enums.TokenScope.RESET_PASSWORD_INPUT;
-import static kr.modusplant.shared.framework.redis.RedisKeys.RESET_PASSWORD_PREFIX;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,6 +38,8 @@ public class EmailIdentityController {
     private final RedisHelper redisHelper;
     private final CallEmailSendApiGateway apiGateway;
     private final EmailIdentityRepository repository;
+
+    private static final String RESET_PASSWORD_PREFIX = "auth:reset-password:email:";      // 비밀번호 재설정 key prefix
 
     public String sendAuthCodeEmail(EmailIdentityRequest request) {
         String email = request.email();
