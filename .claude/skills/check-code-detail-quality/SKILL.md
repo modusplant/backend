@@ -34,6 +34,15 @@ Each item names what it applies to and the conditions the changes must meet to p
   - **Removed endpoint:** its public-endpoint entry is removed, unless another endpoint still matches the pattern.
 - **Scope:** `EndpointAuthorizationCoverageTest` fails only for an endpoint with neither an annotation nor a matching public-endpoint entry; every other condition above is checked only here.
 
+## Data-deletion consistency
+
+- **Applies to:** a changed class that hard-deletes, soft-deletes, or archives persisted data, or deletes the S3 objects or Redis keys tied to it, with `.claude/documents/data-deletion-architecture.md`, which records the project's deletion policy.
+- **Passes when** the change matches the document, read in full:
+  - **Delete type:** the data is soft-deleted or hard-deleted as the document specifies.
+  - **Archiving:** data the document lists as archived is copied to its archive table before being hard-deleted, and member identifiers are nulled in archives on member withdrawal.
+  - **Related data:** every related row, S3 object, Redis key, and count the document assigns to the flow is removed or adjusted in it, in the documented order.
+  - **Cascade:** related rows relied on to disappear are covered by the documented database cascade or deleted explicitly.
+
 # Workflow
 
 1. Resolve the Target Classes.

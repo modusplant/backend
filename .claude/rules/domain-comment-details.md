@@ -127,6 +127,7 @@ comment/
 - Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local exception; the ownership failure maps to HTTP 403
 
 **Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
+- Exposes a reply target as deleted with a null nickname when it is soft-deleted, or when its row is absent while the reply-target path is set; the reply-target path itself is returned as stored
 
 ---
 
