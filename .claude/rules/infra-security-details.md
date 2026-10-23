@@ -120,7 +120,7 @@ After the chain, the request reaches `DispatcherServlet` and the controller.
 **Logout** (`/api/auth/logout`)
 - `SecurityExceptionHandlingFilter` → `LogoutFilter` → `JwtClearingLogoutHandler` → `WriteResponseLogoutSuccessHandler`
 - `LogoutFilter` runs before `JwtAuthenticationFilter`, so the access token is not validated on this path; `JwtClearingLogoutHandler` reads the `refreshToken` cookie and the `Authorization` header directly, removes the refresh token, and blacklists the access token. `WriteResponseLogoutSuccessHandler` writes a success body. The chain ends here.
-- A missing cookie or header raises `BadCredentialException(BAD_CREDENTIALS)` → `SecurityExceptionHandlingFilter` → `DefaultAuthenticationEntryPoint`.
+- A missing cookie or header raises `BadCredentialException(BAD_CREDENTIALS)`, and a header without the `Bearer ` prefix raises `BadCredentialException(INVALID_TOKEN_FORMAT)` before the refresh token is removed; both go → `SecurityExceptionHandlingFilter` → `DefaultAuthenticationEntryPoint`.
 
 **Request with an `Authorization` header** (any other endpoint)
 - Valid token: `JwtAuthenticationFilter` → … → `AuthorizationFilter` → controller. `JwtAuthenticationFilter` builds `DefaultUserDetails` from the token claims (subject UUID, nickname, role) and stores an authenticated `DefaultAuthToken` in the security context.

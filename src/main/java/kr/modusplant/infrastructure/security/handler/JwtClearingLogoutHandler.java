@@ -23,6 +23,7 @@ public class JwtClearingLogoutHandler implements LogoutHandler {
 
         if (refreshToken == null) { throw new BadCredentialException(SecurityErrorCode.BAD_CREDENTIALS); }
         if (accessToken == null) { throw new BadCredentialException(SecurityErrorCode.BAD_CREDENTIALS); }
+        if (!accessToken.startsWith("Bearer ")) { throw new BadCredentialException(SecurityErrorCode.INVALID_TOKEN_FORMAT); }
 
         tokenService.removeToken(refreshToken.getValue());
         tokenService.blacklistAccessToken(accessToken.substring(7));
