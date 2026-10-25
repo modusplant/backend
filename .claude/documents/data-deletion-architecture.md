@@ -49,12 +49,12 @@ Every other hard-deleted row is removed without a copy, including:
 ### 2.3 Related-Data Handling per Flow
 
 **Post deletion**:
-- Published post: archived, then its likes, bookmarks, and Redis recently-viewed entries are deleted.
+- Published post: archived, then its likes, bookmarks, abuse reports, abuse-report dashboard, and Redis recently-viewed entries are deleted.
 - Draft and published post: its content's S3 files are deleted synchronously, then the post row is deleted.
 
-**Post abuse-report approval**: after verifying that the approving member (`memberId` on the event) has the `ADMIN` role, the
-reported post goes through the same steps as post deletion, without the author check, synchronously within the approval
-transaction.
+**Post abuse-report approval**: the dashboard is marked `BLINDED` and its read model is captured for the response before
+the event is published. Then, after verifying that the approving member (`memberId` on the event) has the `ADMIN` role, the
+reported post goes through the same steps as post deletion, without the author check, synchronously within the approval transaction.
 
 **Comment abuse-report approval**: after verifying that the approving member (`memberId` on the event) has the `ADMIN` role,
 the reported comment is soft-deleted (section 3), without the author check, synchronously within the approval transaction.

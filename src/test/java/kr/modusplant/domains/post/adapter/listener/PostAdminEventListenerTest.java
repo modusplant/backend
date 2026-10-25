@@ -53,6 +53,8 @@ class PostAdminEventListenerTest implements PostTestUtils {
         verify(postArchiveRepository).save(testPostId);
         verify(postRepository).deletePostLikeByPostId(testPostId);
         verify(postRepository).deletePostBookmarkByPostId(testPostId);
+        verify(postRepository).deletePostAbuseReportByPostId(testPostId);
+        verify(postRepository).deletePostAbuseReportDashboardByPostId(testPostId);
         verify(postRepository).deletePostRecentlyViewRecordByPostId(testPostId);
         verify(contentDataProcessorPort).deleteFiles(post.getPostContent().getContent());
         verify(postRepository).delete(post);
@@ -72,6 +74,8 @@ class PostAdminEventListenerTest implements PostTestUtils {
 
         // then
         verify(postArchiveRepository, never()).save(any());
+        verify(postRepository, never()).deletePostAbuseReportByPostId(any());
+        verify(postRepository, never()).deletePostAbuseReportDashboardByPostId(any());
         verify(contentDataProcessorPort).deleteFiles(post.getPostContent().getContent());
         verify(postRepository).delete(post);
     }

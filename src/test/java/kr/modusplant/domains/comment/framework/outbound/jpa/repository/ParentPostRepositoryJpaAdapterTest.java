@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -12,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
-class ParentPostRepositoryJpaAdapterTest implements ImmediateParentPostIdTestUtils, PostEntityTestUtils {
+class ParentPostRepositoryJpaAdapterTest implements ParentPostIdTestUtils, PostEntityTestUtils {
     private final PostJpaRepository postRepository = Mockito.mock(PostJpaRepository.class);
     private final ParentPostRepositoryJpaAdapter parentPostRepositoryJpaAdapter =
             new ParentPostRepositoryJpaAdapter(postRepository);

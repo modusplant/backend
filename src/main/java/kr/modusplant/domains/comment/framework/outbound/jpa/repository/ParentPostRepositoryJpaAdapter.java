@@ -1,6 +1,7 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.comment.domain.vo.ParentPostId;
+import kr.modusplant.domains.comment.usecase.port.repository.ParentPostRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class ParentPostRepositoryJpaAdapter implements ImmediateParentPostRepository {
+public class ParentPostRepositoryJpaAdapter implements ParentPostRepository {
     private final PostJpaRepository postRepository;
 
     @Override

@@ -17,7 +17,6 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberWithdrawJpaRepository;
 import kr.modusplant.domains.post.framework.outbound.jooq.record.PostIsPublishedAndContentRecord;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
-import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
@@ -221,7 +220,6 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
 
         // then
         verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveTask.class));
-        verify(eventPublisher, times(1)).publishEvent(any(ImageRemoveTask.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(PostViewCountRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewMemberRemoveEvent.class));
@@ -254,7 +252,6 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
 
         // then
         verify(eventPublisher, never()).publishEvent(any(ImagesRemoveTask.class));
-        verify(eventPublisher, never()).publishEvent(any(ImageRemoveTask.class));
         verify(eventPublisher, never()).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(PostViewCountRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewMemberRemoveEvent.class));

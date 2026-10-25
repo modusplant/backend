@@ -3,6 +3,8 @@ package kr.modusplant.domains.post.framework.outbound.jpa.repository;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
@@ -42,9 +44,11 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
     private final PostViewCountRedisRepository postViewCountRedisRepository = Mockito.mock(PostViewCountRedisRepository.class);
     private final PostLikeJpaRepository postLikeJpaRepository = Mockito.mock(PostLikeJpaRepository.class);
     private final PostBookmarkJpaRepository postBookmarkJpaRepository = Mockito.mock(PostBookmarkJpaRepository.class);
+    private final PostAbuseReportJpaRepository postAbuseReportJpaRepository = Mockito.mock(PostAbuseReportJpaRepository.class);
+    private final PostAbuseReportDashboardJpaRepository postAbuseReportDashboardJpaRepository = Mockito.mock(PostAbuseReportDashboardJpaRepository.class);
     private final PostRecentlyViewRedisRepository postRecentlyViewRedisRepository = Mockito.mock(PostRecentlyViewRedisRepository.class);
     private final PostRepositoryJpaAdapter postRepositoryJpaAdapter = new PostRepositoryJpaAdapter(
-            postJpaMapper, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository,postLikeJpaRepository,postBookmarkJpaRepository,postRecentlyViewRedisRepository
+            postJpaMapper, postJpaRepository, authorJpaRepository, primaryCategoryJpaRepository, secondaryCategoryJpaRepository, postViewCountRedisRepository,postLikeJpaRepository,postBookmarkJpaRepository,postAbuseReportJpaRepository,postAbuseReportDashboardJpaRepository,postRecentlyViewRedisRepository
     );
 
     @Test
@@ -299,6 +303,32 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
 
         // then
         verify(postBookmarkJpaRepository).deleteByPostId(testPostId.getValue());
+    }
+
+    @Test
+    @DisplayName("게시글 id로 게시글 신고 삭제 시 활동 수행")
+    void testDeletePostAbuseReportByPostId_givenPostId_willDeletePostAbuseReport() {
+        // given
+        Post post = createPublishedPost();
+
+        // when
+        postRepositoryJpaAdapter.deletePostAbuseReportByPostId(post.getPostId());
+
+        // then
+        verify(postAbuseReportJpaRepository).deleteByPostId(testPostId.getValue());
+    }
+
+    @Test
+    @DisplayName("게시글 id로 게시글 신고 대시보드 삭제 시 활동 수행")
+    void testDeletePostAbuseReportDashboardByPostId_givenPostId_willDeletePostAbuseReportDashboard() {
+        // given
+        Post post = createPublishedPost();
+
+        // when
+        postRepositoryJpaAdapter.deletePostAbuseReportDashboardByPostId(post.getPostId());
+
+        // then
+        verify(postAbuseReportDashboardJpaRepository).deleteByPostUlid(testPostId.getValue());
     }
 
     @Test

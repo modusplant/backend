@@ -36,6 +36,8 @@ public class PostAdminEventListener {
             postArchiveRepository.save(postId);
             postRepository.deletePostLikeByPostId(post.getPostId());
             postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportDashboardByPostId(post.getPostId());
             postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         contentDataProcessorPort.deleteFiles(post.getPostContent().getContent());

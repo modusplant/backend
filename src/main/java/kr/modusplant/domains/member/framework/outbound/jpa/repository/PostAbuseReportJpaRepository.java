@@ -16,4 +16,5 @@ public interface PostAbuseReportJpaRepository extends
         CreatedAtRepository<PostAbuseReportEntity>,
         JpaRepository<PostAbuseReportEntity, UUID> {
     Optional<PostAbuseReportEntity> findByMemberIdAndPost(UUID memberId, PostEntity post);
+    void deleteByPostId(String postId);
 }

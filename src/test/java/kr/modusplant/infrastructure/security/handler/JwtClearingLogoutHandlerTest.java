@@ -69,4 +69,21 @@ class JwtClearingLogoutHandlerTest {
                 .isInstanceOf(BadCredentialException.class)
                 .extracting("errorCode").isEqualTo(SecurityErrorCode.BAD_CREDENTIALS);
     }
+
+    @Test
+    @DisplayName("Bearer 형식이 아닌 Authorization 헤더로 예외 반환")
+    void testLogout_givenNonBearerAuthorizationHeader_willThrowException() {
+        // given
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        Authentication authentication = Mockito.mock(Authentication.class);
+        given(request.getCookies()).willReturn(new Cookie[]{new Cookie("refreshToken", "refresh-value")});
+        given(request.getHeader("Authorization")).willReturn("access-value");
+
+        // when & then
+        assertThatThrownBy(() -> handler.logout(request, response, authentication))
+                .isInstanceOf(BadCredentialException.class)
+                .extracting("errorCode").isEqualTo(SecurityErrorCode.INVALID_TOKEN_FORMAT);
+        then(tokenService).shouldHaveNoInteractions();
+    }
 }
