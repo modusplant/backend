@@ -10,6 +10,8 @@ import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.supers.Commen
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils,
         MemberEntityTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
     private final CommentJpaMapper mapper = new CommentJpaMapperImpl();
 
     @Test
@@ -45,7 +49,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         MemberEntity memberEntity = createMemberBasicUserEntity();
         PostEntity postEntity = createPublishedPostEntityBuilder().build();
         Comment comment = Comment.create(
-                ImmediateParentPostIdTestUtils.testImmediateParentPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthor, testCommentContent);
+                ImmediateParentPostIdTestUtils.testImmediateParentPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthorId, testCommentContent);
 
         // when
         CommentEntity result = mapper.toCommCommentEntity(comment, memberEntity, postEntity);

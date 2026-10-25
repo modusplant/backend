@@ -19,13 +19,8 @@ public class CommentRegisterEvent {
     private final String action;
 
     public static CommentRegisterEvent create(UUID authorId, String postUlid, String commentPath, String contentPreview) {
-        validate(authorId, postUlid, commentPath);
-        return new CommentRegisterEvent(authorId, postUlid, commentPath, contentPreview, getActionType(commentPath));
-    }
-
-    private static void validate(UUID actorId, String postUlid, String commentPath) {
-        if (actorId == null) {
-            throw new InvalidValueException(CommentErrorCode.EMPTY_AUTHOR, "authorId");
+        if (authorId == null) {
+            throw new InvalidValueException(CommentErrorCode.EMPTY_COMMENT_AUTHOR, "authorId");
         }
         if (postUlid == null || postUlid.isBlank()) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "postUlid");
@@ -33,6 +28,7 @@ public class CommentRegisterEvent {
         if (commentPath == null || commentPath.isBlank()) {
             throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "commentPath");
         }
+        return new CommentRegisterEvent(authorId, postUlid, commentPath, contentPreview, getActionType(commentPath));
     }
 
     private static String getActionType(String commentPath) {

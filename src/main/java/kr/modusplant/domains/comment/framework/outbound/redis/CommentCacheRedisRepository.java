@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.redis;
 
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
@@ -40,14 +40,16 @@ public class CommentCacheRedisRepository implements CommentCacheRepository {
     private static final Duration TTL = Duration.ofHours(1);
 
     @Override
-    public Optional<CommentPath> reservePath(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentAuthor commentAuthor,
+    public Optional<CommentPath> reservePath(ImmediateParentPostId immediateParentPostId,
+                                             CommentPath path,
+                                             CommentAuthorId commentAuthorId,
                                              IntSupplier getMaximumSiblingPathOrderFromDB) {
         String postIdValue = immediateParentPostId.getValue();
         String pathValue = path.getValue();
 
         try {
             String idempotencyKey =
-                    IDEMPOTENCY_KEY_FORMAT.formatted(postIdValue, pathValue, commentAuthor.getUuid());
+                    IDEMPOTENCY_KEY_FORMAT.formatted(postIdValue, pathValue, commentAuthorId.getValue());
             Boolean reserveSucceeded = stringRedisTemplate.opsForValue().setIfAbsent(idempotencyKey, "", TTL);
             if (reserveSucceeded == null) {
                 throw new ConnectionFailedException(CONNECTION_FAILED, "redis");

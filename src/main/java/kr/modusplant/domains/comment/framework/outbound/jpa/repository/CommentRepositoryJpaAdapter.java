@@ -32,10 +32,10 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
 
     @Override
     public void save(Comment comment) {
-        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getCommentAuthor().getUuid())
-                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
+        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getCommentAuthorId().getValue())
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_FOUND_COMMENT_AUTHOR, "commentAuthor"));
         PostEntity commentPostEntity = postRepository.findByUlid(comment.getImmediateParentPostId().getValue())
-                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
+                .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_FOUND_IMMEDIATE_PARENT_POST, "immediateParentPost"));
         CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
         commentRepository.save(commentEntity);
     }

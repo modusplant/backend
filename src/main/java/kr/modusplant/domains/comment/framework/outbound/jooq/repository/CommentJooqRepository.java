@@ -1,10 +1,11 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyCommentAuthorId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -37,9 +38,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
     private final Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-    public List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, CommentAuthor nullableCommentAuthor) {
+    public List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, CommentAuthorId commentAuthorId) {
         return dsl.select(getCommentOfPostFields())
-                .from(getCommentOfPostTable(nullableCommentAuthor))
+                .from(getCommentOfPostTable(commentAuthorId))
                 .where(commComment.POST_ULID.eq(immediateParentPostId.getValue()))
                 .orderBy(getCommentOfPostOrder())
                 .fetch(this::toCommentOfPostReadModel);
@@ -47,9 +48,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
     @Override
     public List<CommentOfPostReadModel> findByPost(
-            ImmediateParentPostId immediateParentPostId, @Nullable CommentPath lastPath, CommentPageSize pageSize, CommentAuthor nullableCommentAuthor) {
+            ImmediateParentPostId immediateParentPostId, @Nullable CommentPath lastPath, CommentPageSize pageSize, CommentAuthorId commentAuthorId) {
         SelectSeekStepN<Record> orderedComments = dsl.select(getCommentOfPostFields())
-                .from(getCommentOfPostTable(nullableCommentAuthor))
+                .from(getCommentOfPostTable(commentAuthorId))
                 .where(commComment.POST_ULID.eq(immediateParentPostId.getValue()))
                 .orderBy(getCommentOfPostOrder());
 
@@ -91,12 +92,12 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 replyToComment.IS_DELETED);
     }
 
-    private Table<?> getCommentOfPostTable(CommentAuthor nullableCommentAuthor) {
-        Condition likeJoinCondition = nullableCommentAuthor != null
-                ? commComment.POST_ULID.eq(commentLike.POST_ULID)
+    private Table<?> getCommentOfPostTable(CommentAuthorId commentAuthorId) {
+        Condition likeJoinCondition = commentAuthorId instanceof EmptyCommentAuthorId
+                ? DSL.falseCondition()
+                : commComment.POST_ULID.eq(commentLike.POST_ULID)
                 .and(commComment.PATH.eq(commentLike.PATH))
-                .and(commentLike.MEMB_UUID.eq(nullableCommentAuthor.getUuid()))
-                : DSL.falseCondition();
+                .and(commentLike.MEMB_UUID.eq(commentAuthorId.getValue()));
 
         return commComment
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -132,12 +133,12 @@ public class CommentJooqRepository implements CommentQueryRepository {
         );
     }
 
-    public PageImpl<CommentOfAuthorReadModel> findByAuthor(CommentAuthor commentAuthor, Pageable pageable) {
+    public PageImpl<CommentOfAuthorReadModel> findByAuthor(CommentAuthorId commentAuthorId, Pageable pageable) {
 
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .where(commComment.AUTH_MEMB_UUID.eq(commentAuthor.getUuid())
+                .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue())
                         .and(commComment.IS_DELETED.isFalse()))
                 .fetchOptional();
 
@@ -159,7 +160,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                     .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
-                    .where(commComment.AUTH_MEMB_UUID.eq(commentAuthor.getUuid()))
+                    .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
                     .and(commComment.IS_DELETED.isFalse())
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)
@@ -189,11 +190,11 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public Optional<LocalDateTime> findLatestUpdatedAtByAuthor(CommentAuthor commentAuthor) {
+    public Optional<LocalDateTime> findLatestUpdatedAtByAuthor(CommentAuthorId commentAuthorId) {
         return Optional.ofNullable(
                 dsl.select(DSL.max(commComment.UPDATED_AT))
                         .from(commComment)
-                        .where(commComment.AUTH_MEMB_UUID.eq(commentAuthor.getUuid()))
+                        .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
                         .fetchOne(DSL.max(commComment.UPDATED_AT))
         );
     }
@@ -244,13 +245,13 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public boolean isImmediateParentPostPublished(ImmediateParentPostId immediateParentPostIdVO) {
-        String postId = immediateParentPostIdVO.getValue();
-        return postId != null && Boolean.TRUE.equals(
-                dsl.select(commPost.IS_PUBLISHED)
-                        .from(commPost)
-                        .where(commPost.ULID.eq(postId))
-                        .fetchOne(commPost.IS_PUBLISHED)
+    public boolean isCommentWrittenByAuthor(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(immediateParentPostId.getValue()))
+                        .and(commComment.PATH.eq(path.getValue()))
+                        .and(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
         );
     }
-}
+}

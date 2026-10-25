@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
+import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyCommentAuthorId;
 import kr.modusplant.shared.exception.EmptyValueException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -16,27 +16,27 @@ public class Comment {
     private final ImmediateParentPostId immediateParentPostId;
     private final CommentPath path;
     private final ReplyToCommentPath replyToPath;
-    private final CommentAuthor commentAuthor;
+    private final CommentAuthorId commentAuthorId;
     private final CommentContent content;
     private final CommentStatus status;
 
-    public static Comment create(ImmediateParentPostId immediateParentPostId, CommentPath path, ReplyToCommentPath replyToPath, CommentAuthor commentAuthor, CommentContent content) {
+    public static Comment create(ImmediateParentPostId immediateParentPostId, CommentPath path, ReplyToCommentPath replyToPath, CommentAuthorId commentAuthorId, CommentContent content) {
         if(immediateParentPostId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
         if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
         if(replyToPath == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_REPLY_TO_COMMENT_PATH, "replyToPath"); }
-        if(commentAuthor == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
+        if(commentAuthorId == null || commentAuthorId instanceof EmptyCommentAuthorId) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_AUTHOR, "commentAuthorId"); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
-        return new Comment(immediateParentPostId, path, replyToPath, commentAuthor, content, CommentStatus.active());
+        return new Comment(immediateParentPostId, path, replyToPath, commentAuthorId, content, CommentStatus.active());
     }
 
-    public static Comment create(ImmediateParentPostId immediateParentPostId, CommentPath path, ReplyToCommentPath replyToPath, CommentAuthor commentAuthor, CommentContent content, CommentStatus status) {
+    public static Comment create(ImmediateParentPostId immediateParentPostId, CommentPath path, ReplyToCommentPath replyToPath, CommentAuthorId commentAuthorId, CommentContent content, CommentStatus status) {
         if(immediateParentPostId == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId"); }
         if(path == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_PATH, "path"); }
         if(replyToPath == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_REPLY_TO_COMMENT_PATH, "replyToPath"); }
-        if(commentAuthor == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_AUTHOR, "author"); }
+        if(commentAuthorId == null || commentAuthorId instanceof EmptyCommentAuthorId) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_AUTHOR, "commentAuthorId"); }
         if(content == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_CONTENT, "content"); }
         if(status == null) { throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status"); }
-        return new Comment(immediateParentPostId, path, replyToPath, commentAuthor, content, status);
+        return new Comment(immediateParentPostId, path, replyToPath, commentAuthorId, content, status);
     }
 
     @Override

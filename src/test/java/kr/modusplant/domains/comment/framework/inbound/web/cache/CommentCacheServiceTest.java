@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.inbound.web.cache;
 
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -40,7 +40,7 @@ class CommentCacheServiceTest {
 
     private final ImmediateParentPostId testImmediateParentPostId = ImmediateParentPostId.create(TEST_POST_ULID);
     private final MemberId testMemberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
-    private final CommentAuthor testCommentAuthor = CommentAuthor.create(MEMBER_BASIC_USER_UUID);
+    private final CommentAuthorId testCommentAuthorId = CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID);
 
     private final PostEntity postEntity = Mockito.mock(PostEntity.class);
     private final LocalDateTime postUpdatedAt = LocalDateTime.of(2025, 6, 1, 12, 0, 0);
@@ -227,7 +227,7 @@ class CommentCacheServiceTest {
         LocalDateTime memberLastModifiedAt = LocalDateTime.of(2025, 7, 1, 0, 0, 0);
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(memberEntity.getETagSource()).willReturn(memberEtagSource);
-        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthor)).willReturn(Optional.empty());
+        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthorId)).willReturn(Optional.empty());
         given(memberEntity.getLastModifiedAtAsTruncatedToSeconds()).willReturn(memberLastModifiedAt);
         given(passwordEncoder.encode(memberEtagSource + LocalDateTime.MIN + "|1|8")).willReturn("encoded-tag");
 
@@ -251,7 +251,7 @@ class CommentCacheServiceTest {
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(memberEntity.getETagSource()).willReturn(memberEtagSource);
         given(memberEntity.getLastModifiedAtAsTruncatedToSeconds()).willReturn(memberLastModifiedAt);
-        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthor)).willReturn(Optional.of(latestCommentUpdatedAt));
+        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthorId)).willReturn(Optional.of(latestCommentUpdatedAt));
         given(passwordEncoder.encode(memberEtagSource + latestCommentUpdatedAt + "|1|8")).willReturn("encoded-tag");
 
         // when
@@ -274,7 +274,7 @@ class CommentCacheServiceTest {
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(memberEntity.getETagSource()).willReturn(memberEtagSource);
         given(memberEntity.getLastModifiedAtAsTruncatedToSeconds()).willReturn(memberLastModifiedAt);
-        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthor)).willReturn(Optional.of(latestCommentUpdatedAt));
+        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthorId)).willReturn(Optional.of(latestCommentUpdatedAt));
         given(passwordEncoder.matches(ETagSource, "abc123")).willReturn(true);
         given(passwordEncoder.encode(ETagSource)).willReturn("encoded-tag");
 
@@ -294,7 +294,7 @@ class CommentCacheServiceTest {
         String memberEtagSource = "member-etag-source";
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.of(memberEntity));
         given(memberEntity.getETagSource()).willReturn(memberEtagSource);
-        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthor)).willReturn(Optional.empty());
+        given(commentQueryRepository.findLatestUpdatedAtByAuthor(testCommentAuthorId)).willReturn(Optional.empty());
         given(memberEntity.getLastModifiedAtAsTruncatedToSeconds()).willReturn(LocalDateTime.of(2025, 7, 1, 0, 0, 0));
         given(passwordEncoder.matches(memberEtagSource + LocalDateTime.MIN + "|1|8", "abc123")).willReturn(true);
         given(passwordEncoder.matches(memberEtagSource + LocalDateTime.MIN + "|2|8", "abc123")).willReturn(false);
