@@ -175,7 +175,7 @@
   <p class="kicker">Skill workflow</p>
   <h1>reflect-code-change-into-test</h1>
   <p class="role">Creates, modifies, and deletes tests for every domain and infrastructure area touched by unpushed changes, batched per area.</p>
-  <p class="source">Skill file: <code>.claude/skills/reflect-code-change-into-test/SKILL.md</code>. That file is the source of truth; this page is a human-oriented view of it.</p>
+  <p class="source">Skill file: <code>.claude/skills/reflect-code-change-into-test/SKILL.md</code>, which runs as the <code>test-code-synchronizer</code> agent defined in <code>.claude/agents/test-code-synchronizer.md</code>. Those files are the source of truth; this page is a human-oriented view of them.</p>
 </header>
 
 <div class="legend" aria-label="Legend">
@@ -186,6 +186,8 @@
   <span><i class="l-branch"></i>Branch or fallback</span>
   <span><i class="l-loop"></i>Repeated per item</span>
 </div>
+
+<div class="note" style="margin: 0 0 22px;">The skill runs in a forked <code>test-code-synchronizer</code> agent in the foreground (<code>context: fork</code>, <code>background: false</code>): the invoking turn waits for it, and the agent's final report is the skill's result. Steps 1–7 run inside the agent.</div>
 
 <ol class="flow">
   <li class="step">
@@ -249,7 +251,7 @@
           <h3>Apply the Test Architecture &amp; Strategy</h3>
           <p>Start from the Pure Unit Test baseline, then apply the area-specific adjustments from the feature: ErrorCode assertions, path exceptions that may use a real Spring context or DB, and the servlet mock pattern.</p>
           <div class="docs">
-            <div class="doc read"><span class="tag">Read</span><span class="path">.claude/rules/test-architecture-details.md</span><span class="what">Project-wide test baseline, inlined into the skill at load time.</span></div>
+            <div class="doc read"><span class="tag">Read</span><span class="path">.claude/rules/test-architecture-details.md</span><span class="what">Project-wide test baseline, read by the agent.</span></div>
           </div>
           <div class="branch"><strong>jOOQ repository test policy</strong> (for <code>framework/outbound/jooq/repository</code>, if the feature names one)
             <ul>
@@ -277,8 +279,8 @@
   <li class="step">
     <span class="badge">7</span>
     <div class="card">
-      <h3>Report the Summary</h3>
-      <p>For each processed area: the classes whose tests were created, modified, or deleted. It also lists skipped areas with their unprocessed classes, and the unmatched classes dropped in step 2.</p>
+      <h3>Return the Summary to the Main Session</h3>
+      <p>A concise final message, with no test diffs or file contents: for each processed area, the classes whose tests were created, modified, or deleted. It also lists skipped areas with their unprocessed classes, and the unmatched classes dropped in step 2.</p>
     </div>
   </li>
 </ol>
@@ -286,7 +288,7 @@
 <footer class="page-foot">
   <h2>Guardrails</h2>
   <ul>
-    <li>Edits under <code>src/main/**</code> are disallowed.</li>
+    <li>The agent's body forbids creating, modifying, or deleting files under <code>src/main/**</code>.</li>
   </ul>
 </footer>
 
