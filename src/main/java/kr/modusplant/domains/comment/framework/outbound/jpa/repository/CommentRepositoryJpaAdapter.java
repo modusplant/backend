@@ -7,7 +7,7 @@ import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.supers.CommentJpaMapper;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
