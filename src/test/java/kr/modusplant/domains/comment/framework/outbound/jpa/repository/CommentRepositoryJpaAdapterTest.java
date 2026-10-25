@@ -55,7 +55,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         PostEntity postEntity = Mockito.mock(PostEntity.class);
         CommentEntity commentEntity = createCommentEntityBuilder().build();
 
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
         given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
 
@@ -70,7 +70,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     @DisplayName("존재하지 않는 작성자로 댓글 저장 시 예외 반환")
     public void testSave_givenNonExistentAuthor_willThrowException() {
         // given
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.empty());
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.empty());
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -85,7 +85,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     public void testSave_givenNonExistentPost_willThrowException() {
         // given
         MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.empty());
 
         // when

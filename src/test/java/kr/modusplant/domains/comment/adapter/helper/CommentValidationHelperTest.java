@@ -37,22 +37,22 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("존재하는 작성자 검증 시 활동 수행")
     void testValidateIfAuthorExists_givenExistingAuthor_willProcessAction() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(true);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfAuthorExists(testAuthorWithUuid));
-        then(memberJpaRepository).should(times(1)).existsById(testAuthorWithUuid.getUuid());
+        assertDoesNotThrow(() -> helper.validateIfAuthorExists(testCommentAuthorWithUuid));
+        then(memberJpaRepository).should(times(1)).existsById(testCommentAuthorWithUuid.getUuid());
     }
 
     @Test
     @DisplayName("존재하지 않는 작성자 검증 시 예외 반환")
     void testValidateIfAuthorExists_givenNonExistentAuthor_willThrowException() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(false);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(false);
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
-                () -> helper.validateIfAuthorExists(testAuthorWithUuid));
+                () -> helper.validateIfAuthorExists(testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_AUTHOR);
@@ -166,12 +166,12 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfCommentWrittenByAuthor_givenCommentWrittenByAuthor_willProcessAction() {
         // given
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid())).willReturn(true);
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testAuthorWithUuid));
+        assertDoesNotThrow(() -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testCommentAuthorWithUuid));
         then(commentJpaRepository).should(times(1)).existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid());
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
     }
 
     @Test
@@ -179,11 +179,11 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfCommentWrittenByAuthor_givenCommentNotWrittenByAuthor_willThrowException() {
         // given
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid())).willReturn(false);
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
 
         // when
         NotAccessibleException ex = assertThrows(NotAccessibleException.class,
-                () -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testAuthorWithUuid));
+                () -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR);
@@ -193,13 +193,13 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("작성자가 게시글에 댓글을 쓸 수 있는 모든 조건 충족 시 활동 수행")
     void testValidateIfAuthorCanWriteWithinPost_givenAllConditionsMet_willProcessAction() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(true);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
         given(queryRepository.isPostPublished(testPostId)).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testAuthorWithUuid));
-        then(memberJpaRepository).should(times(1)).existsById(testAuthorWithUuid.getUuid());
+        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testCommentAuthorWithUuid));
+        then(memberJpaRepository).should(times(1)).existsById(testCommentAuthorWithUuid.getUuid());
         then(postJpaRepository).should(times(1)).existsByUlid(testPostId.getValue());
         then(queryRepository).should(times(1)).isPostPublished(testPostId);
     }
@@ -208,13 +208,13 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("작성자가 게시글에 댓글을 쓸 때 게시글이 게시되지 않았으면 예외 반환")
     void testValidateIfAuthorCanWriteWithinPost_givenUnpublishedPost_willThrowException() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(true);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
         given(queryRepository.isPostPublished(testPostId)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
-                () -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testAuthorWithUuid));
+                () -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_PUBLISHED_POST);
@@ -224,34 +224,34 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("작성자가 기존 댓글을 수정/삭제할 수 있는 모든 조건 충족 시 활동 수행")
     void testValidateIfAuthorCanWriteCommentWithinPost_givenAllConditionsMet_willProcessAction() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(true);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
         given(queryRepository.isPostPublished(testPostId)).willReturn(true);
         given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid())).willReturn(true);
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testAuthorWithUuid));
+        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testCommentAuthorWithUuid));
         then(queryRepository).should(times(1)).isCommentExists(testPostId, testCommentPath);
         then(commentJpaRepository).should(times(1)).existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid());
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
     }
 
     @Test
     @DisplayName("작성자가 기존 댓글을 수정/삭제할 때 본인이 작성한 댓글이 아니면 예외 반환")
     void testValidateIfAuthorCanWriteCommentWithinPost_givenCommentNotWrittenByAuthor_willThrowException() {
         // given
-        given(memberJpaRepository.existsById(testAuthorWithUuid.getUuid())).willReturn(true);
+        given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
         given(queryRepository.isPostPublished(testPostId)).willReturn(true);
         given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testAuthorWithUuid.getUuid())).willReturn(false);
+                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
 
         // when
         NotAccessibleException ex = assertThrows(NotAccessibleException.class,
-                () -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testAuthorWithUuid));
+                () -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR);

@@ -11,7 +11,7 @@ import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_
 public interface PostEntityTestUtils extends PostTestUtils, MemberEntityTestUtils, PrimaryCategoryEntityTestUtils, SecondaryCategoryEntityTestUtils {
     default PostEntityBuilder createPublishedPostEntityBuilder() {
         return PostEntity.builder()
-                .likeCount(testLikeCount.getValue())
+                .likeCount(testPostLikeCount.getValue())
                 .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())
@@ -23,7 +23,7 @@ public interface PostEntityTestUtils extends PostTestUtils, MemberEntityTestUtil
     default PostEntityBuilder createPublishedPostEntityBuilderWithUuid() {
         return PostEntity.builder()
                 .ulid(testPostId.getValue())
-                .likeCount(testLikeCount.getValue())
+                .likeCount(testPostLikeCount.getValue())
                 .viewCount(TEST_POST_VIEW_COUNT)
                 .title(testPostContent.getTitle())
                 .content(testPostContent.getContent())

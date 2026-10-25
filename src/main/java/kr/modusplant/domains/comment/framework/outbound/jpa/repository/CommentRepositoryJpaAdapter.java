@@ -32,7 +32,7 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
 
     @Override
     public void save(Comment comment) {
-        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getAuthor().getUuid())
+        MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getCommentAuthor().getUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
         PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getValue())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));

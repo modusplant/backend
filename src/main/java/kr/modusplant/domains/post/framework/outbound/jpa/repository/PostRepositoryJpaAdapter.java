@@ -41,7 +41,7 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     @Override
     public void save(Post post) {
         // post : category id, title, content는 null일수도 있음
-        MemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
+        MemberEntity authorEntity = authorJpaRepository.findByUuid(post.getPostAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
         PrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
                 ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
                 : null;

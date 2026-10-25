@@ -3,7 +3,7 @@ package kr.modusplant.domains.post.domain.aggregate;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;
-import kr.modusplant.domains.post.domain.vo.LikeCount;
+import kr.modusplant.domains.post.domain.vo.PostLikeCount;
 import kr.modusplant.domains.post.domain.vo.PostContent;
 import kr.modusplant.domains.post.domain.vo.PostStatus;
 import org.junit.jupiter.api.DisplayName;
@@ -25,11 +25,11 @@ class PostTest implements PostTestUtils {
             // then
             assertNotNull(createPublishedPost());
             assertEquals(testPostId, createPublishedPost().getPostId());
-            assertEquals(testAuthorId, createPublishedPost().getAuthorId());
+            assertEquals(testPostAuthorId, createPublishedPost().getPostAuthorId());
             assertEquals(testPrimaryCategoryId, createPublishedPost().getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, createPublishedPost().getSecondaryCategoryId());
             assertEquals(testPostContent, createPublishedPost().getPostContent());
-            assertEquals(testLikeCount, createPublishedPost().getLikeCount());
+            assertEquals(testPostLikeCount, createPublishedPost().getPostLikeCount());
             assertEquals(PostStatus.published(), createPublishedPost().getStatus());
         }
 
@@ -37,28 +37,28 @@ class PostTest implements PostTestUtils {
         @DisplayName("파라미터가 null일 때 예외 반환")
         void testCreate_givenNullParameter_willThrowException() {
             assertThrows(EmptyValueException.class, () ->
-                    Post.create(null, testAuthorId, testPrimaryCategoryId,
-                            testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
+                    Post.create(null, testPostAuthorId, testPrimaryCategoryId,
+                            testSecondaryCategoryId, testPostContent, testPostLikeCount, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
                     Post.create(testPostId, null, testPrimaryCategoryId,
-                            testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
+                            testSecondaryCategoryId, testPostContent, testPostLikeCount, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.create(testPostId, testAuthorId, null,
-                            testSecondaryCategoryId, testPostContent, testLikeCount, PostStatus.published()));
+                    Post.create(testPostId, testPostAuthorId, null,
+                            testSecondaryCategoryId, testPostContent, testPostLikeCount, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
-                            testSecondaryCategoryId, null, testLikeCount, PostStatus.published()));
+                    Post.create(testPostId, testPostAuthorId, testPrimaryCategoryId,
+                            testSecondaryCategoryId, null, testPostLikeCount, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
+                    Post.create(testPostId, testPostAuthorId, testPrimaryCategoryId,
                             testSecondaryCategoryId, testPostContent, null, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.create(testPostId, testAuthorId, testPrimaryCategoryId,
-                            testSecondaryCategoryId, testPostContent, testLikeCount, null));
+                    Post.create(testPostId, testPostAuthorId, testPrimaryCategoryId,
+                            testSecondaryCategoryId, testPostContent, testPostLikeCount, null));
 
         }
     }
@@ -70,15 +70,15 @@ class PostTest implements PostTestUtils {
         @DisplayName("유효한 파라미터로 Draft Post 반환")
         void testCreateDraft_givenValidParameter_willReturnPost() {
             // when
-            Post post = Post.createDraft(testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
+            Post post = Post.createDraft(testPostAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
 
             // then
             assertNotNull(post);
-            assertEquals(testAuthorId, post.getAuthorId());
+            assertEquals(testPostAuthorId, post.getPostAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
-            assertEquals(LikeCount.zero(), post.getLikeCount());
+            assertEquals(PostLikeCount.zero(), post.getPostLikeCount());
             assertEquals(PostStatus.draft(), post.getStatus());
         }
 
@@ -88,9 +88,9 @@ class PostTest implements PostTestUtils {
             assertThrows(EmptyValueException.class, () ->
                     Post.createDraft( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
             assertThrows(EmptyValueException.class, () ->
-                    Post.createDraft(testAuthorId, null, testSecondaryCategoryId, testPostContent));
+                    Post.createDraft(testPostAuthorId, null, testSecondaryCategoryId, testPostContent));
             assertThrows(EmptyValueException.class, () ->
-                    Post.createDraft( testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
+                    Post.createDraft(testPostAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
         }
     }
 
@@ -101,15 +101,15 @@ class PostTest implements PostTestUtils {
         @DisplayName("유효한 파라미터로 Published Post 반환")
         void testCreatePublished_givenValidParameter_willReturnPost() {
             // when
-            Post post = Post.createPublished(testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
+            Post post = Post.createPublished(testPostAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent);
 
             // then
             assertNotNull(post);
-            assertEquals(testAuthorId, post.getAuthorId());
+            assertEquals(testPostAuthorId, post.getPostAuthorId());
             assertEquals(testPrimaryCategoryId, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId, post.getSecondaryCategoryId());
             assertEquals(testPostContent, post.getPostContent());
-            assertEquals(LikeCount.zero(), post.getLikeCount());
+            assertEquals(PostLikeCount.zero(), post.getPostLikeCount());
             assertEquals(PostStatus.published(), post.getStatus());
         }
 
@@ -120,13 +120,13 @@ class PostTest implements PostTestUtils {
                     Post.createPublished( null, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.createPublished( testAuthorId, null, testSecondaryCategoryId, testPostContent));
+                    Post.createPublished(testPostAuthorId, null, testSecondaryCategoryId, testPostContent));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.createPublished( testAuthorId, testPrimaryCategoryId, null, testPostContent));
+                    Post.createPublished(testPostAuthorId, testPrimaryCategoryId, null, testPostContent));
 
             assertThrows(EmptyValueException.class, () ->
-                    Post.createPublished( testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
+                    Post.createPublished(testPostAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, null));
         }
     }
 
@@ -141,10 +141,10 @@ class PostTest implements PostTestUtils {
             PostContent postContent = PostContent.create("title",TEST_POST_CONTENT,TEST_POST_CONTENT_THUMBNAIL_KEY);
 
             // when
-            post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.published());
+            post.update(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.published());
 
             // then
-            assertEquals(testAuthorId2, post.getAuthorId());
+            assertEquals(testPostAuthorId2, post.getPostAuthorId());
             assertEquals(testPrimaryCategoryId2, post.getPrimaryCategoryId());
             assertEquals(testSecondaryCategoryId2, post.getSecondaryCategoryId());
             assertEquals(postContent, post.getPostContent());
@@ -163,16 +163,16 @@ class PostTest implements PostTestUtils {
                     post.update(null, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.update(testAuthorId2, null, testSecondaryCategoryId2, postContent, PostStatus.published()));
+                    post.update(testPostAuthorId2, null, testSecondaryCategoryId2, postContent, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.update(testAuthorId2, testPrimaryCategoryId2, null, postContent, PostStatus.published()));
+                    post.update(testPostAuthorId2, testPrimaryCategoryId2, null, postContent, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null, PostStatus.published()));
+                    post.update(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null, PostStatus.published()));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.update(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, null));
+                    post.update(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent, null));
         }
 
         @Test
@@ -184,7 +184,7 @@ class PostTest implements PostTestUtils {
 
             // when & then
             assertThrows(InvalidValueException.class, () ->
-                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
+                    post.updateDraft(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
         }
     }
 
@@ -199,10 +199,10 @@ class PostTest implements PostTestUtils {
             PostContent postContent = testPostContent;
 
             // when
-            post.updateDraft(testAuthorId2, testPrimaryCategoryId2, null, postContent);
+            post.updateDraft(testPostAuthorId2, testPrimaryCategoryId2, null, postContent);
 
             // then
-            assertEquals(testAuthorId2, post.getAuthorId());
+            assertEquals(testPostAuthorId2, post.getPostAuthorId());
             assertEquals(testPrimaryCategoryId2, post.getPrimaryCategoryId());
             assertNull(post.getSecondaryCategoryId());
             assertEquals(postContent, post.getPostContent());
@@ -221,10 +221,10 @@ class PostTest implements PostTestUtils {
                     post.updateDraft(null, testPrimaryCategoryId2, testSecondaryCategoryId2, postContent));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.updateDraft(testAuthorId2, null, testSecondaryCategoryId2, postContent));
+                    post.updateDraft(testPostAuthorId2, null, testSecondaryCategoryId2, postContent));
 
             assertThrows(EmptyValueException.class, () ->
-                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null));
+                    post.updateDraft(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, null));
         }
 
         @Test
@@ -235,14 +235,14 @@ class PostTest implements PostTestUtils {
 
             // when & then
             assertThrows(InvalidValueException.class, () ->
-                    post.updateDraft(testAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, testPostContent));
+                    post.updateDraft(testPostAuthorId2, testPrimaryCategoryId2, testSecondaryCategoryId2, testPostContent));
         }
     }
 
 
     @Nested
     @DisplayName("AuthorId 업데이트 테스트")
-    class UpdateAuthorIdTests {
+    class UpdateCommentPostAuthorIdTests {
 
         @Test
         @DisplayName("유효한 AuthorId로 수정 활동 수행")
@@ -251,10 +251,10 @@ class PostTest implements PostTestUtils {
             Post post = createPublishedPost();
 
             // when
-            post.updateAuthorId(testAuthorId2);
+            post.updateAuthorId(testPostAuthorId2);
 
             // then
-            assertEquals(testAuthorId2, post.getAuthorId());
+            assertEquals(testPostAuthorId2, post.getPostAuthorId());
         }
 
         @Test
@@ -335,13 +335,13 @@ class PostTest implements PostTestUtils {
         void testLike_givenPublishedPost_willProcessAction() {
             // given
             Post post = createPublishedPost();
-            LikeCount originalLikeCount = post.getLikeCount();
+            PostLikeCount originalPostLikeCount = post.getPostLikeCount();
 
             // when
             post.like();
 
             // then
-            assertEquals(originalLikeCount.increment(), post.getLikeCount());
+            assertEquals(originalPostLikeCount.increment(), post.getPostLikeCount());
         }
 
         @Test
@@ -365,13 +365,13 @@ class PostTest implements PostTestUtils {
             // given
             Post post = createPublishedPost();
             post.like(); // 먼저 like를 추가
-            LikeCount likedCount = post.getLikeCount();
+            PostLikeCount likedCount = post.getPostLikeCount();
 
             // when
             post.unlike();
 
             // then
-            assertEquals(likedCount.decrement(), post.getLikeCount());
+            assertEquals(likedCount.decrement(), post.getPostLikeCount());
         }
 
         @Test
@@ -408,7 +408,7 @@ class PostTest implements PostTestUtils {
         void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             assertNotEquals(
                     createPublishedPost(),
-                    Post.create(testPostId2,testAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent,testLikeCount, PostStatus.published())
+                    Post.create(testPostId2, testPostAuthorId, testPrimaryCategoryId, testSecondaryCategoryId, testPostContent, testPostLikeCount, PostStatus.published())
             );
         }
 

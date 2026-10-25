@@ -16,33 +16,33 @@ import static kr.modusplant.shared.constant.Regex.PATTERN_UUID;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class AuthorId {
+public class PostAuthorId {
     private final UUID value;
 
-    public static AuthorId fromUuid(UUID uuid) {
+    public static PostAuthorId fromUuid(UUID uuid) {
         if (uuid == null) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
-        return new AuthorId(uuid);
+        return new PostAuthorId(uuid);
     }
 
-    public static AuthorId fromString(String value) {
+    public static PostAuthorId fromString(String value) {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(PostErrorCode.EMPTY_AUTHOR_ID);
         }
         if (!PATTERN_UUID.matcher(value).matches()) {
             throw new InvalidValueException(PostErrorCode.INVALID_AUTHOR_ID);
         }
-        return new AuthorId(UUID.fromString(value));
+        return new PostAuthorId(UUID.fromString(value));
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof AuthorId authorId)) return false;
+        if (!(o instanceof PostAuthorId postAuthorId)) return false;
 
-        return new EqualsBuilder().append(getValue(), authorId.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), postAuthorId.getValue()).isEquals();
     }
 
     @Override

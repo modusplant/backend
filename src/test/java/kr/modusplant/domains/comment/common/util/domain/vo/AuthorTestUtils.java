@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.common.util.domain.vo;
 
-import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
@@ -8,7 +8,7 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 
 public interface AuthorTestUtils {
 
-    Author testAuthor = Author.create(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_NICKNAME);
-    Author testAuthorWithUuid = Author.create(MEMBER_BASIC_USER_UUID);
+    CommentAuthor testCommentAuthor = CommentAuthor.create(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_USER_NICKNAME);
+    CommentAuthor testCommentAuthorWithUuid = CommentAuthor.create(MEMBER_BASIC_USER_UUID);
 
 }
