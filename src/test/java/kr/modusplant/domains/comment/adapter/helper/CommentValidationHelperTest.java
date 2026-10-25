@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.helper;
 
 import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
@@ -25,7 +25,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
-public class CommentValidationHelperTest implements PostIdTestUtils, CommentPathTestUtils, AuthorTestUtils {
+public class CommentValidationHelperTest implements ImmediateParentPostIdTestUtils, CommentPathTestUtils, AuthorTestUtils {
     private final CommentQueryRepository queryRepository = Mockito.mock(CommentQueryRepository.class);
     private final CommentJpaRepository commentJpaRepository = Mockito.mock(CommentJpaRepository.class);
     private final PostJpaRepository postJpaRepository = Mockito.mock(PostJpaRepository.class);
@@ -63,22 +63,22 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("존재하는 게시글 검증 시 활동 수행")
     void testValidateIfPostExists_givenExistingPost_willProcessAction() {
         // given
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfPostExists(testPostId));
-        then(postJpaRepository).should(times(1)).existsByUlid(testPostId.getValue());
+        assertDoesNotThrow(() -> helper.validateIfPostExists(testImmediateParentPostId));
+        then(postJpaRepository).should(times(1)).existsByUlid(testImmediateParentPostId.getValue());
     }
 
     @Test
     @DisplayName("존재하지 않는 게시글 검증 시 예외 반환")
     void testValidateIfPostExists_givenNonExistentPost_willThrowException() {
         // given
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(false);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(false);
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
-                () -> helper.validateIfPostExists(testPostId));
+                () -> helper.validateIfPostExists(testImmediateParentPostId));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST);
@@ -89,22 +89,22 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("게시된 게시글 검증 시 활동 수행")
     void testValidateIfPostIsPublished_givenPublishedPost_willProcessAction() {
         // given
-        given(queryRepository.isPostPublished(testPostId)).willReturn(true);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfPostIsPublished(testPostId));
-        then(queryRepository).should(times(1)).isPostPublished(testPostId);
+        assertDoesNotThrow(() -> helper.validateIfPostIsPublished(testImmediateParentPostId));
+        then(queryRepository).should(times(1)).isPostPublished(testImmediateParentPostId);
     }
 
     @Test
     @DisplayName("게시되지 않은 게시글 검증 시 예외 반환")
     void testValidateIfPostIsPublished_givenUnpublishedPost_willThrowException() {
         // given
-        given(queryRepository.isPostPublished(testPostId)).willReturn(false);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
-                () -> helper.validateIfPostIsPublished(testPostId));
+                () -> helper.validateIfPostIsPublished(testImmediateParentPostId));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_PUBLISHED_POST);
@@ -114,22 +114,22 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("존재하는 댓글 검증 시 활동 수행")
     void testValidateIfCommentExists_givenExistingComment_willProcessAction() {
         // given
-        given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(true);
+        given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfCommentExists(testPostId, testCommentPath));
-        then(queryRepository).should(times(1)).isCommentExists(testPostId, testCommentPath);
+        assertDoesNotThrow(() -> helper.validateIfCommentExists(testImmediateParentPostId, testCommentPath));
+        then(queryRepository).should(times(1)).isCommentExists(testImmediateParentPostId, testCommentPath);
     }
 
     @Test
     @DisplayName("존재하지 않는 댓글 검증 시 예외 반환")
     void testValidateIfCommentExists_givenNonExistentComment_willThrowException() {
         // given
-        given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(false);
+        given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(false);
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
-                () -> helper.validateIfCommentExists(testPostId, testCommentPath));
+                () -> helper.validateIfCommentExists(testImmediateParentPostId, testCommentPath));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
@@ -140,22 +140,22 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     @DisplayName("삭제되지 않은 댓글 검증 시 활동 수행")
     void testValidateIfCommentIsNotDeleted_givenNotDeletedComment_willProcessAction() {
         // given
-        given(queryRepository.isCommentDeleted(testPostId, testCommentPath)).willReturn(false);
+        given(queryRepository.isCommentDeleted(testImmediateParentPostId, testCommentPath)).willReturn(false);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfCommentIsNotDeleted(testPostId, testCommentPath));
-        then(queryRepository).should(times(1)).isCommentDeleted(testPostId, testCommentPath);
+        assertDoesNotThrow(() -> helper.validateIfCommentIsNotDeleted(testImmediateParentPostId, testCommentPath));
+        then(queryRepository).should(times(1)).isCommentDeleted(testImmediateParentPostId, testCommentPath);
     }
 
     @Test
     @DisplayName("삭제된 댓글 검증 시 예외 반환")
     void testValidateIfCommentIsNotDeleted_givenDeletedComment_willThrowException() {
         // given
-        given(queryRepository.isCommentDeleted(testPostId, testCommentPath)).willReturn(true);
+        given(queryRepository.isCommentDeleted(testImmediateParentPostId, testCommentPath)).willReturn(true);
 
         // when
         DeletedReplyToCommentException ex = assertThrows(DeletedReplyToCommentException.class,
-                () -> helper.validateIfCommentIsNotDeleted(testPostId, testCommentPath));
+                () -> helper.validateIfCommentIsNotDeleted(testImmediateParentPostId, testCommentPath));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.DELETED_REPLY_TO_COMMENT);
@@ -166,12 +166,12 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfCommentWrittenByAuthor_givenCommentWrittenByAuthor_willProcessAction() {
         // given
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testCommentAuthorWithUuid));
+        assertDoesNotThrow(() -> helper.validateIfCommentWrittenByAuthor(testImmediateParentPostId, testCommentPath, testCommentAuthorWithUuid));
         then(commentJpaRepository).should(times(1)).existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
     }
 
     @Test
@@ -179,11 +179,11 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfCommentWrittenByAuthor_givenCommentNotWrittenByAuthor_willThrowException() {
         // given
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
 
         // when
         NotAccessibleException ex = assertThrows(NotAccessibleException.class,
-                () -> helper.validateIfCommentWrittenByAuthor(testPostId, testCommentPath, testCommentAuthorWithUuid));
+                () -> helper.validateIfCommentWrittenByAuthor(testImmediateParentPostId, testCommentPath, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR);
@@ -194,14 +194,14 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfAuthorCanWriteWithinPost_givenAllConditionsMet_willProcessAction() {
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testPostId)).willReturn(true);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testCommentAuthorWithUuid));
+        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteWithinPost(testImmediateParentPostId, testCommentAuthorWithUuid));
         then(memberJpaRepository).should(times(1)).existsById(testCommentAuthorWithUuid.getUuid());
-        then(postJpaRepository).should(times(1)).existsByUlid(testPostId.getValue());
-        then(queryRepository).should(times(1)).isPostPublished(testPostId);
+        then(postJpaRepository).should(times(1)).existsByUlid(testImmediateParentPostId.getValue());
+        then(queryRepository).should(times(1)).isPostPublished(testImmediateParentPostId);
     }
 
     @Test
@@ -209,12 +209,12 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfAuthorCanWriteWithinPost_givenUnpublishedPost_willThrowException() {
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testPostId)).willReturn(false);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
-                () -> helper.validateIfAuthorCanWriteWithinPost(testPostId, testCommentAuthorWithUuid));
+                () -> helper.validateIfAuthorCanWriteWithinPost(testImmediateParentPostId, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_PUBLISHED_POST);
@@ -225,17 +225,17 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfAuthorCanWriteCommentWithinPost_givenAllConditionsMet_willProcessAction() {
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testPostId)).willReturn(true);
-        given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(true);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
 
         // when & then
-        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testCommentAuthorWithUuid));
-        then(queryRepository).should(times(1)).isCommentExists(testPostId, testCommentPath);
+        assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteCommentWithinPost(testImmediateParentPostId, testCommentPath, testCommentAuthorWithUuid));
+        then(queryRepository).should(times(1)).isCommentExists(testImmediateParentPostId, testCommentPath);
         then(commentJpaRepository).should(times(1)).existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid());
     }
 
     @Test
@@ -243,15 +243,15 @@ public class CommentValidationHelperTest implements PostIdTestUtils, CommentPath
     void testValidateIfAuthorCanWriteCommentWithinPost_givenCommentNotWrittenByAuthor_willThrowException() {
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
-        given(postJpaRepository.existsByUlid(testPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testPostId)).willReturn(true);
-        given(queryRepository.isCommentExists(testPostId, testCommentPath)).willReturn(true);
+        given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
+        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
-                testPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
+                testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);
 
         // when
         NotAccessibleException ex = assertThrows(NotAccessibleException.class,
-                () -> helper.validateIfAuthorCanWriteCommentWithinPost(testPostId, testCommentPath, testCommentAuthorWithUuid));
+                () -> helper.validateIfAuthorCanWriteCommentWithinPost(testImmediateParentPostId, testCommentPath, testCommentAuthorWithUuid));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR);

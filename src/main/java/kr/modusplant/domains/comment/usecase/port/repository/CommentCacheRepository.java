@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.usecase.port.repository;
 
 import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 
 import java.util.Optional;
 import java.util.function.IntSupplier;
@@ -17,7 +17,7 @@ public interface CommentCacheRepository {
      * @return 신규 요청이면 예약된 CommentPath, 이미 처리된 (게시글, 댓글 경로, 작성자) 요청이면
      *         {@link Optional#empty()} (멱등 보장을 위한 무시 처리)
      */
-    Optional<CommentPath> reservePath(PostId postId, CommentPath requestedPath, CommentAuthor commentAuthor,
+    Optional<CommentPath> reservePath(ImmediateParentPostId immediateParentPostId, CommentPath requestedPath, CommentAuthor commentAuthor,
                                       IntSupplier getMaximumSiblingPathOrderFromDB);
 
     /**

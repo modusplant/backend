@@ -121,7 +121,7 @@ class PostJpaMapperImplTest implements PostEntityTestUtils, MemberEntityTestUtil
         // given
         MemberEntity memberEntity = MemberEntity.builder().uuid(testPostAuthorId.getValue()).build();
         PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
-        SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();;
+        SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         PostEntity postEntity = createDraftPostEntityBuilderWithUuid()
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)

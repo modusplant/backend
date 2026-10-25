@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.framework.outbound.jpa.compositekey.CommentCompositeKey;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
@@ -34,16 +34,16 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     public void save(Comment comment) {
         MemberEntity commentAuthorEntity = memberRepository.findByUuid(comment.getCommentAuthor().getUuid())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_AUTHOR, "author"));
-        PostEntity commentPostEntity = postRepository.findByUlid(comment.getPostId().getValue())
+        PostEntity commentPostEntity = postRepository.findByUlid(comment.getImmediateParentPostId().getValue())
                 .orElseThrow(() -> new InvalidValueException(CommentErrorCode.NOT_EXIST_POST, "post"));
         CommentEntity commentEntity = mapper.toCommCommentEntity(comment, commentAuthorEntity, commentPostEntity);
         commentRepository.save(commentEntity);
     }
 
     @Override
-    public void updateContent(PostId postId, CommentPath path, CommentContent content) {
+    public void updateContent(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentContent content) {
         CommentCompositeKey id = CommentCompositeKey.builder()
-                .post(postId.getValue())
+                .post(immediateParentPostId.getValue())
                 .path(path.getValue())
                 .build();
         CommentEntity comment = commentRepository.findById(id)
@@ -54,9 +54,9 @@ public class CommentRepositoryJpaAdapter implements CommentCommandRepository {
     }
 
     @Override
-    public void deleteComment(PostId postId, CommentPath path) {
+    public void deleteComment(ImmediateParentPostId immediateParentPostId, CommentPath path) {
         CommentCompositeKey id = CommentCompositeKey.builder()
-                .post(postId.getValue())
+                .post(immediateParentPostId.getValue())
                 .path(path.getValue())
                 .build();
         Optional<CommentEntity> comment = commentRepository.findById(id);
