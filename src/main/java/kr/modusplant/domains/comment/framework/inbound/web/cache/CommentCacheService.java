@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.framework.inbound.web.cache;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
@@ -56,7 +56,7 @@ public class CommentCacheService {
     public CommentCacheData getCacheData(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
-            @Nonnull ImmediateParentPostId postUlid,
+            @Nonnull ParentPostId postUlid,
             @Nullable String lastPath,
             @Nullable Integer size
     ) {

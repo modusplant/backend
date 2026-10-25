@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.listener;
 
 import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
@@ -25,7 +25,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-class CommentAdminEventListenerTest implements ImmediateParentPostIdTestUtils, CommentPathTestUtils {
+class CommentAdminEventListenerTest implements ParentPostIdTestUtils, CommentPathTestUtils {
     private final CommentCommandRepository commandRepository = Mockito.mock(CommentCommandRepository.class);
     private final CommentAuthorRepository authorRepository = Mockito.mock(CommentAuthorRepository.class);
     private final CommentValidationHelper commentValidationHelper = Mockito.mock(CommentValidationHelper.class);
@@ -44,10 +44,10 @@ class CommentAdminEventListenerTest implements ImmediateParentPostIdTestUtils, C
         commentAdminEventListener.deleteComment(event);
 
         // then
-        verify(commentValidationHelper).validateIfImmediateParentPostExists(testImmediateParentPostId);
-        verify(commentValidationHelper).validateIfImmediateParentPostIsPublished(testImmediateParentPostId);
-        verify(commentValidationHelper).validateIfCommentExists(testImmediateParentPostId, testCommentPath);
-        verify(commandRepository).deleteComment(testImmediateParentPostId, testCommentPath);
+        verify(commentValidationHelper).validateIfParentPostExists(testParentPostId);
+        verify(commentValidationHelper).validateIfParentPostIsPublished(testParentPostId);
+        verify(commentValidationHelper).validateIfCommentExists(testParentPostId, testCommentPath);
+        verify(commandRepository).deleteComment(testParentPostId, testCommentPath);
     }
 
     @Test

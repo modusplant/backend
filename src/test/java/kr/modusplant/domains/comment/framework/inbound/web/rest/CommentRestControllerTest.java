@@ -1,13 +1,13 @@
 package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentCursorPageResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOffsetPageResponseTestUtils;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
@@ -45,7 +45,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
-public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils,
+public class CommentRestControllerTest implements ParentPostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
         CommentUpdateRequestTestUtils, MemberIdTestUtils,
         CommentOffsetPageResponseTestUtils, CommentCursorPageResponseTestUtils {
@@ -61,7 +61,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V1_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ImmediateParentPostId.create(TEST_POST_ULID), null, null))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
 
         // when
@@ -79,7 +79,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V1_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ImmediateParentPostId.create(TEST_POST_ULID), null, null))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, MEMBER_BASIC_USER_UUID))
                 .willReturn(List.of(testCommentOfPostResponse));
@@ -100,7 +100,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V1_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(ImmediateParentPostId.class), any(), any())).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(ParentPostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, null)).willReturn(List.of(testCommentOfPostResponse));
 
         // when
@@ -115,7 +115,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V2_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ImmediateParentPostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
 
         // when
@@ -133,7 +133,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V2_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ImmediateParentPostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE, MEMBER_BASIC_USER_UUID))
                 .willReturn(testCommentCursorPageResponse);
@@ -154,7 +154,7 @@ public class CommentRestControllerTest implements ImmediateParentPostIdTestUtils
     void testGatherByPost_V2_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(ImmediateParentPostId.class), any(), any())).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(ParentPostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, null))
                 .willReturn(testCommentCursorPageResponse);
 
