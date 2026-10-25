@@ -45,29 +45,29 @@ public class CommentController {
 
     @Transactional(readOnly = true)
     public List<CommentOfPostResponse> gatherByPost_V1(String postUlid, UUID authorId) {
-        commentValidationHelper.validateIfPostExists(PostId.create(postUlid));
+        commentValidationHelper.validateIfPostExists(ImmediateParentPostId.create(postUlid));
 
-        return queryRepository.findByPost(PostId.create(postUlid), CommentAuthor.createWithNullableUuid(authorId))
+        return queryRepository.findByPost(ImmediateParentPostId.create(postUlid), CommentAuthor.createWithNullableUuid(authorId))
                 .stream().map(mapper::toCommentOfPostResponse)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public CommentCursorPageResponse gatherByPost_V2(String postUlid, String lastPath, Integer size, UUID authorId) {
-        PostId postId = PostId.create(postUlid);
+        ImmediateParentPostId immediateParentPostId = ImmediateParentPostId.create(postUlid);
         CommentPageSize pageSize = CommentPageSize.create(size);
         CommentAuthor commentAuthor = CommentAuthor.createWithNullableUuid(authorId);
-        commentValidationHelper.validateIfPostExists(postId);
+        commentValidationHelper.validateIfPostExists(immediateParentPostId);
 
         List<CommentOfPostResponse> responses;
         if (lastPath != null) { // 특정 lastPath 이후부터 조회
             CommentPath commentPath = CommentPath.create(lastPath);
-            commentValidationHelper.validateIfCommentExists(postId, commentPath);
-            responses = queryRepository.findByPost(postId, commentPath, pageSize, commentAuthor)
+            commentValidationHelper.validateIfCommentExists(immediateParentPostId, commentPath);
+            responses = queryRepository.findByPost(immediateParentPostId, commentPath, pageSize, commentAuthor)
                     .stream().map(mapper::toCommentOfPostResponse)
                     .toList();
         } else { // 첫 댓글 데이터부터 조회
-            responses = queryRepository.findByPost(postId, null, pageSize, commentAuthor)
+            responses = queryRepository.findByPost(immediateParentPostId, null, pageSize, commentAuthor)
                     .stream().map(mapper::toCommentOfPostResponse)
                     .toList();
         }
@@ -96,28 +96,28 @@ public class CommentController {
     }
 
     public void register(CommentRegisterRequest request, UUID authorId) {
-        PostId postId = PostId.create(request.postId());
+        ImmediateParentPostId immediateParentPostId = ImmediateParentPostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
         ReplyToCommentPath replyToPath = ReplyToCommentPath.create(request.replyToPath());
         CommentAuthor commentAuthor = CommentAuthor.create(authorId);
-        commentValidationHelper.validateIfAuthorCanWriteWithinPost(postId, commentAuthor);
-        validateIfParentCommentExists(postId, path);
+        commentValidationHelper.validateIfAuthorCanWriteWithinPost(immediateParentPostId, commentAuthor);
+        validateIfParentCommentExists(immediateParentPostId, path);
         if (!(replyToPath instanceof EmptyReplyToCommentPath)) {
-            validateIfReplyToCommentPathIsValid(postId, path, replyToPath);
+            validateIfReplyToCommentPathIsValid(immediateParentPostId, path, replyToPath);
         }
 
         // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
         // DB 하한값 조회(findMaximumSiblingPathOrder)는 Redis 예약 키가 전혀 없을 때만 실행되도록 지연 전달한다.
         Optional<CommentPath> optionalReservedPath =
-                cacheRepository.reservePath(postId, path, commentAuthor,
-                        () -> queryRepository.findMaximumSiblingPathOrder(postId, path));
+                cacheRepository.reservePath(immediateParentPostId, path, commentAuthor,
+                        () -> queryRepository.findMaximumSiblingPathOrder(immediateParentPostId, path));
         if (optionalReservedPath.isEmpty()) {
             return;
         }
         CommentPath reservedPath = optionalReservedPath.get();
 
         Comment comment = Comment.create(
-                postId, reservedPath, replyToPath, commentAuthor, CommentContent.create(swearHolder.filterSwear(request.content())));
+                immediateParentPostId, reservedPath, replyToPath, commentAuthor, CommentContent.create(swearHolder.filterSwear(request.content())));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
@@ -126,35 +126,35 @@ public class CommentController {
     }
 
     public void updateContent(CommentUpdateRequest request, UUID authorId) {
-        PostId postId = PostId.create(request.postId());
+        ImmediateParentPostId immediateParentPostId = ImmediateParentPostId.create(request.postId());
         CommentPath path = CommentPath.create(request.path());
         CommentAuthor commentAuthor = CommentAuthor.create(authorId);
-        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postId, path, commentAuthor);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(immediateParentPostId, path, commentAuthor);
 
-        commandRepository.updateContent(postId, path, CommentContent.create(request.content()));
+        commandRepository.updateContent(immediateParentPostId, path, CommentContent.create(request.content()));
     }
 
     public void delete(String postUlid, String commentPath, UUID authorId) {
-        PostId postIdVo = PostId.create(postUlid);
+        ImmediateParentPostId immediateParentPostIdVo = ImmediateParentPostId.create(postUlid);
         CommentPath commentPathVO = CommentPath.create(commentPath);
         CommentAuthor commentAuthor = CommentAuthor.create(authorId);
-        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(postIdVo, commentPathVO, commentAuthor);
+        commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(immediateParentPostIdVo, commentPathVO, commentAuthor);
 
-        commandRepository.deleteComment(PostId.create(postUlid), CommentPath.create(commentPath));
+        commandRepository.deleteComment(ImmediateParentPostId.create(postUlid), CommentPath.create(commentPath));
     }
 
-    private void validateIfParentCommentExists(PostId postId, CommentPath path) {
+    private void validateIfParentCommentExists(ImmediateParentPostId immediateParentPostId, CommentPath path) {
         String pathValue = path.getValue();
         if (!pathValue.contains(".")) {
             return;
         }
         String parentCommentPath = pathValue.substring(0, pathValue.lastIndexOf("."));
-        if (!queryRepository.isCommentExists(postId, CommentPath.create(parentCommentPath))) {
+        if (!queryRepository.isCommentExists(immediateParentPostId, CommentPath.create(parentCommentPath))) {
             throw new InvalidValueException(CommentErrorCode.NOT_EXIST_PARENT_COMMENT, "commentPath");
         }
     }
 
-    private void validateIfReplyToCommentPathIsValid(PostId postId, CommentPath path, ReplyToCommentPath replyToPath) {
+    private void validateIfReplyToCommentPathIsValid(ImmediateParentPostId immediateParentPostId, CommentPath path, ReplyToCommentPath replyToPath) {
         String[] pathSegments = path.getValue().split("\\.");
         String[] replyToPathSegments = replyToPath.getValue().split("\\.");
         if (replyToPathSegments.length != 2
@@ -163,7 +163,7 @@ public class CommentController {
             throw new InvalidValueException(CommentErrorCode.INVALID_REPLY_TO_COMMENT_PATH, "replyToPath");
         }
         CommentPath replyToCommentVO = CommentPath.create(replyToPath.getValue());
-        commentValidationHelper.validateIfCommentExists(postId, replyToCommentVO);
-        commentValidationHelper.validateIfCommentIsNotDeleted(postId, replyToCommentVO);
+        commentValidationHelper.validateIfCommentExists(immediateParentPostId, replyToCommentVO);
+        commentValidationHelper.validateIfCommentIsNotDeleted(immediateParentPostId, replyToCommentVO);
     }
 }

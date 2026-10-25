@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
@@ -51,7 +51,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.*;
 
-public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
+public class CommentControllerTest implements ImmediateParentPostIdTestUtils, AuthorTestUtils {
     private final CommentMapper mapper = Mockito.mock(CommentMapper.class);
     private final CommentQueryRepository queryRepository = Mockito.mock(CommentQueryRepository.class);
     private final CommentCommandRepository commandRepository = Mockito.mock(CommentCommandRepository.class);
@@ -69,7 +69,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testGatherByPost_V1_givenNonExistentPost_willThrowException() {
         // given
         doThrow(new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"))
-                .when(validationHelper).validateIfPostExists(PostId.create(TEST_POST_ULID));
+                .when(validationHelper).validateIfPostExists(ImmediateParentPostId.create(TEST_POST_ULID));
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
@@ -85,7 +85,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testGatherByPost_V1_givenAuthenticatedViewer_willReturnResponse() {
         // given
         CommentOfPostResponse response = Mockito.mock(CommentOfPostResponse.class);
-        given(queryRepository.findByPost(PostId.create(TEST_POST_ULID),
+        given(queryRepository.findByPost(ImmediateParentPostId.create(TEST_POST_ULID),
                 CommentAuthor.createWithNullableUuid(MEMBER_BASIC_USER_UUID)))
                 .willReturn(List.of(testCommentOfPostReadModel));
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(response);
@@ -95,7 +95,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         assertThat(result).containsExactly(response);
-        then(validationHelper).should(times(1)).validateIfPostExists(PostId.create(TEST_POST_ULID));
+        then(validationHelper).should(times(1)).validateIfPostExists(ImmediateParentPostId.create(TEST_POST_ULID));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testGatherByPost_V1_givenAnonymousViewer_willReturnResponse() {
         // given
         CommentOfPostResponse response = Mockito.mock(CommentOfPostResponse.class);
-        given(queryRepository.findByPost(PostId.create(TEST_POST_ULID), CommentAuthor.createWithNullableUuid(null)))
+        given(queryRepository.findByPost(ImmediateParentPostId.create(TEST_POST_ULID), CommentAuthor.createWithNullableUuid(null)))
                 .willReturn(List.of(testCommentOfPostReadModel));
         given(mapper.toCommentOfPostResponse(testCommentOfPostReadModel)).willReturn(response);
 
@@ -118,7 +118,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     @DisplayName("댓글이 없는 게시글 조회 시 빈 응답 반환")
     void testGatherByPost_V1_givenPostWithNoComments_willReturnResponse() {
         // given
-        given(queryRepository.findByPost(any(PostId.class), any(CommentAuthor.class)))
+        given(queryRepository.findByPost(any(ImmediateParentPostId.class), any(CommentAuthor.class)))
                 .willReturn(Collections.emptyList());
 
         // when
@@ -147,7 +147,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testGatherByPost_V2_givenNonExistentPost_willThrowException() {
         // given
         doThrow(new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post"))
-                .when(validationHelper).validateIfPostExists(PostId.create(TEST_POST_ULID));
+                .when(validationHelper).validateIfPostExists(ImmediateParentPostId.create(TEST_POST_ULID));
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
@@ -163,7 +163,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testGatherByPost_V2_givenNonExistentLastPath_willThrowException() {
         // given
         doThrow(new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, "comm_comment"))
-                .when(validationHelper).validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("3"));
+                .when(validationHelper).validateIfCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("3"));
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
@@ -184,7 +184,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         CommentOfPostResponse firstResponse = Mockito.mock(CommentOfPostResponse.class);
         CommentOfPostResponse secondResponse = Mockito.mock(CommentOfPostResponse.class);
         CommentOfPostResponse thirdResponse = Mockito.mock(CommentOfPostResponse.class);
-        given(queryRepository.findByPost(PostId.create(TEST_POST_ULID), null, CommentPageSize.create(2),
+        given(queryRepository.findByPost(ImmediateParentPostId.create(TEST_POST_ULID), null, CommentPageSize.create(2),
                 CommentAuthor.createWithNullableUuid(MEMBER_BASIC_USER_UUID)))
                 .willReturn(List.of(firstReadModel, secondReadModel, thirdReadModel));
         given(mapper.toCommentOfPostResponse(firstReadModel)).willReturn(firstResponse);
@@ -201,7 +201,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         assertThat(result.lastPath()).isEqualTo("1.1");
         assertThat(result.hasNext()).isTrue();
         assertThat(result.size()).isEqualTo(2);
-        then(validationHelper).should(times(1)).validateIfPostExists(PostId.create(TEST_POST_ULID));
+        then(validationHelper).should(times(1)).validateIfPostExists(ImmediateParentPostId.create(TEST_POST_ULID));
         then(validationHelper).should(never()).validateIfCommentExists(any(), any());
     }
 
@@ -211,7 +211,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         CommentOfPostReadModel readModel = Mockito.mock(CommentOfPostReadModel.class);
         CommentOfPostResponse response = Mockito.mock(CommentOfPostResponse.class);
-        given(queryRepository.findByPost(PostId.create(TEST_POST_ULID), CommentPath.create("3"),
+        given(queryRepository.findByPost(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("3"),
                 CommentPageSize.create(2), CommentAuthor.createWithNullableUuid(null)))
                 .willReturn(List.of(readModel));
         given(mapper.toCommentOfPostResponse(readModel)).willReturn(response);
@@ -226,14 +226,14 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         assertThat(result.hasNext()).isFalse();
         assertThat(result.size()).isEqualTo(1);
         then(validationHelper).should(times(1))
-                .validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("3"));
+                .validateIfCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("3"));
     }
 
     @Test
     @DisplayName("댓글이 없는 게시글 커서 조회 시 CommentCursorPageResponse 반환")
     void testGatherByPost_V2_givenPostWithNoComments_willReturnCommentCursorPageResponse() {
         // given
-        given(queryRepository.findByPost(any(PostId.class), any(), any(CommentPageSize.class), any(CommentAuthor.class)))
+        given(queryRepository.findByPost(any(ImmediateParentPostId.class), any(), any(CommentPageSize.class), any(CommentAuthor.class)))
                 .willReturn(Collections.emptyList());
 
         // when
@@ -295,7 +295,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenNonExistentParentComment_willThrowException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(false);
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -312,7 +312,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenRootReplyToPath_willThrowException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest("1", TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -346,7 +346,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenReplyToPathUnderDifferentRoot_willThrowException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest("2.1", TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -363,9 +363,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenNonExistentReplyToComment_willThrowException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
         doThrow(new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, "comm_comment"))
-                .when(validationHelper).validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+                .when(validationHelper).validateIfCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
@@ -382,9 +382,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenDeletedReplyToComment_willThrowException() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", "content");
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
         doThrow(new DeletedReplyToCommentException())
-                .when(validationHelper).validateIfCommentIsNotDeleted(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+                .when(validationHelper).validateIfCommentIsNotDeleted(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
 
         // when
         DeletedReplyToCommentException ex = assertThrows(DeletedReplyToCommentException.class,
@@ -402,8 +402,8 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         String content = "reply";
         CommentRegisterRequest request = new CommentRegisterRequest("1.1", TEST_POST_ULID, "1.2", content);
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
-        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(cacheRepository.reservePath(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthor.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.3")));
         given(swearHolder.filterSwear(content)).willReturn(content);
@@ -413,9 +413,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         then(validationHelper).should(times(1))
-                .validateIfCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+                .validateIfCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
         then(validationHelper).should(times(1))
-                .validateIfCommentIsNotDeleted(PostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
+                .validateIfCommentIsNotDeleted(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.1"));
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("1.3"));
@@ -428,7 +428,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
     void testRegister_givenAlreadyReservedRequest_willProcessAction() {
         // given
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", "content");
-        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
+        given(cacheRepository.reservePath(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(CommentAuthor.create(MEMBER_BASIC_USER_UUID)), any())).willReturn(Optional.empty());
 
         // when
@@ -445,7 +445,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         String content = "hello";
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", content);
-        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
+        given(cacheRepository.reservePath(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(CommentAuthor.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
         given(swearHolder.filterSwear(content)).willReturn(content);
@@ -456,7 +456,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // then
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
-        assertThat(captor.getValue().getPostId()).isEqualTo(PostId.create(TEST_POST_ULID));
+        assertThat(captor.getValue().getImmediateParentPostId()).isEqualTo(ImmediateParentPostId.create(TEST_POST_ULID));
         assertThat(captor.getValue().getPath()).isEqualTo(CommentPath.create("2"));
         assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(content));
         assertThat(captor.getValue().getReplyToPath()).isSameAs(EmptyReplyToCommentPath.create());
@@ -470,8 +470,8 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         String content = "reply";
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1.2", content);
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
-        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(cacheRepository.reservePath(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthor.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
         given(swearHolder.filterSwear(content)).willReturn(content);
@@ -491,8 +491,8 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
         // given
         String content = "reply";
         CommentRegisterRequest request = new CommentRegisterRequest("", TEST_POST_ULID, "1.2", content);
-        given(queryRepository.isCommentExists(PostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
-        given(cacheRepository.reservePath(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
+        given(queryRepository.isCommentExists(ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1"))).willReturn(true);
+        given(cacheRepository.reservePath(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthor.create(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
         given(swearHolder.filterSwear(content)).willReturn(content);
@@ -559,7 +559,7 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         then(validationHelper).should(times(1)).validateIfAuthorCanWriteWithinPost(
-                PostId.create(TEST_POST_ULID), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
+                ImmediateParentPostId.create(TEST_POST_ULID), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
     }
 
     // ---------- updateContent ----------
@@ -576,9 +576,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         then(validationHelper).should(times(1)).validateIfAuthorCanWriteCommentWithinPost(
-                PostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
+                ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
         then(commandRepository).should(times(1)).updateContent(
-                PostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentContent.create(updatedContent));
+                ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentContent.create(updatedContent));
     }
 
     @Test
@@ -611,9 +611,9 @@ public class CommentControllerTest implements PostIdTestUtils, AuthorTestUtils {
 
         // then
         then(validationHelper).should(times(1)).validateIfAuthorCanWriteCommentWithinPost(
-                PostId.create(TEST_POST_ULID), CommentPath.create(commentPath), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
+                ImmediateParentPostId.create(TEST_POST_ULID), CommentPath.create(commentPath), CommentAuthor.create(MEMBER_BASIC_USER_UUID));
         then(commandRepository).should(times(1))
-                .deleteComment(eq(PostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
+                .deleteComment(eq(ImmediateParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create(commentPath)));
     }
 
     @Test

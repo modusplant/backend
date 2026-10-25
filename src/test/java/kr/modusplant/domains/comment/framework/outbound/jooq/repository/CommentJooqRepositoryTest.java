@@ -4,7 +4,7 @@ import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPageSizeTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.ReplyToCommentPathTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
@@ -28,7 +28,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
-        PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
+        ImmediateParentPostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
         CommentContentTestUtils, ReplyToCommentPathTestUtils, CommentPageSizeTestUtils {
 
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -46,7 +46,7 @@ public class CommentJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testPostId.getValue()) && bindings[1].equals(testCommentPath.getValue())) {
+            if (bindings[0].equals(testImmediateParentPostId.getValue()) && bindings[1].equals(testCommentPath.getValue())) {
                 DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
                 Field<Boolean> existsField = DSL.field("exists", Boolean.class);
                 Result<Record1<Boolean>> result = dsl.newResult(existsField);
@@ -59,7 +59,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentExists(testPostId, testCommentPath);
+        boolean result = repository.isCommentExists(testImmediateParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(true);
@@ -76,7 +76,7 @@ public class CommentJooqRepositoryTest implements
             Field<Boolean> existsField = DSL.field("exists", Boolean.class);
             Result<Record1<Boolean>> result = dsl.newResult(existsField);
             result.add(dsl.newRecord(existsField).values(
-                    bindings[0].equals(testPostId.getValue())
+                    bindings[0].equals(testImmediateParentPostId.getValue())
                             && bindings[1].equals(testCommentPath.getValue())
                             && ctx.sql().toLowerCase().contains("\"is_deleted\" = true")));
             return new MockResult[] { new MockResult(0, result) };
@@ -84,7 +84,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+        boolean result = repository.isCommentDeleted(testImmediateParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(true);
@@ -104,7 +104,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+        boolean result = repository.isCommentDeleted(testImmediateParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(false);
@@ -144,7 +144,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -197,7 +197,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -241,7 +241,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -283,7 +283,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        repository.findByPost(testPostId, testCommentAuthorWithUuid);
+        repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
 
         // then
         String sql = capturedSql[0];
@@ -311,7 +311,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, null, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, null, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -334,7 +334,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).isEmpty();
@@ -364,13 +364,13 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getValue());
         assertThat(capturedSql).hasSize(2);
-        assertThat(capturedBindings.getFirst()).contains(testPostId.getValue(), testCommentRootPath.getValue());
+        assertThat(capturedBindings.getFirst()).contains(testImmediateParentPostId.getValue(), testCommentRootPath.getValue());
         assertThat(capturedSql.get(1)).contains("fetch next ? rows only");
         assertThat(capturedSql.get(1)).contains("\"path_2_depth_value\" is not null");
         assertThat(capturedBindings.get(1)).contains(1);
@@ -427,7 +427,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+        int result = repository.findMaximumSiblingPathOrder(testImmediateParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(5);
@@ -448,7 +448,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+        int result = repository.findMaximumSiblingPathOrder(testImmediateParentPostId, CommentPath.create("3"));
 
         // then
         assertThat(result).isEqualTo(12);
@@ -464,7 +464,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+        int result = repository.findMaximumSiblingPathOrder(testImmediateParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(0);
@@ -482,7 +482,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+        int result = repository.findMaximumSiblingPathOrder(testImmediateParentPostId, CommentPath.create("3"));
 
         // then
         assertThat(result).isEqualTo(0);
@@ -531,7 +531,7 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.content()).isEqualTo(testCommentContent.getValue());
         assertThat(readModel.createdAt()).isEqualTo(testDateTime.withNano(0));
         assertThat(readModel.postTitle()).isEqualTo("postTitle");
-        assertThat(readModel.postId()).isEqualTo(testPostId.getValue());
+        assertThat(readModel.postId()).isEqualTo(testImmediateParentPostId.getValue());
         assertThat(readModel.isLiked()).isTrue();
         assertThat(readModel.totalCommentsOfPost()).isEqualTo(4);
 
@@ -579,7 +579,7 @@ public class CommentJooqRepositoryTest implements
         };
         Result<Record> result = dsl.newResult(fields);
         Record record = dsl.newRecord(fields);
-        record.fromArray(testCommentContent.getValue(), testDateTime, "postTitle", testPostId.getValue(), true, 4);
+        record.fromArray(testCommentContent.getValue(), testDateTime, "postTitle", testImmediateParentPostId.getValue(), true, 4);
         result.add(record);
         return result;
     }
