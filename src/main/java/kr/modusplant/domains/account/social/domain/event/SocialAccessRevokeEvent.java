@@ -5,10 +5,12 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 
 import java.util.UUID;
 
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
+import static kr.modusplant.shared.util.MaskUtils.maskAnyString;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -28,5 +30,12 @@ public class SocialAccessRevokeEvent {
             throw new EmptyValueException(EMPTY_VALUE, "socialAccessToken");
         }
         return new SocialAccessRevokeEvent(memberId, authProvider, socialAccessToken);
+    }
+    @Override
+    public @NonNull String toString() {
+        return "SocialAccessRevokeEvent[memberId=" + memberId +
+                ", authProvider=" + authProvider +
+                ", socialAccessToken=" + maskAnyString(socialAccessToken) +
+                "]";
     }
 }
