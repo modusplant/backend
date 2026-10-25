@@ -10,7 +10,7 @@ import kr.modusplant.domains.comment.common.util.usecase.response.CommentRespons
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.supers.CommentJpaMapper;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;

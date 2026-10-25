@@ -72,7 +72,7 @@ the reported comment is soft-deleted (section 3), without the author check, sync
 
 **Proposal/bug report removal**: image S3 objects are removed by an event handled after the transaction commits; the report is archived, then deleted.
 
-**Like cancellation** (post or comment): the like row is deleted and the target's `like_count` is decreased, floored at zero for comments.
+**Like cancellation** (post or comment): the like row is deleted and the target's `like_count` is decreased, floored at zero.
 
 ---
 

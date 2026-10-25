@@ -44,7 +44,8 @@ comment/
          └─ jpa/
              ├─ entity/                    # @Entity classes
              ├─ compositekey/              # Composite PK class for @IdClass entities
-             ├─ mapper/                    # Domain ↔ JPA Entity mapping (MapStruct)
+             ├─ mapper/                    # Domain ↔ JPA Entity mapping implementation
+             │   └─ supers/                # Domain ↔ JPA Entity mapping interface
              └─ repository/                # Spring Data JPA interface + write-port adapter
 ```
 
@@ -174,7 +175,7 @@ comment/
 
 **Composite Key** (`framework/outbound/jpa/compositekey/`) — plain class implementing `Serializable`, paired 1:1 with an `@IdClass` entity; `equals`/`hashCode` over all key fields; manual static nested builder including a copy-from-existing-instance factory
 
-**JPA Mapper** (`framework/outbound/jpa/mapper/`) — MapStruct `@Mapper(componentModel = "spring")` interface: domain Aggregate (+ related entities resolved by the caller) → JPA Entity, `@BeanMapping(ignoreByDefault = true)` with explicit per-field `@Mapping`s; a `default` method may translate a domain status VO into a persisted boolean flag via a qualified mapping
+**JPA Mapper** (`framework/outbound/jpa/mapper/`) — `@Component` `*Impl` class implementing an interface in `mapper/supers/`: domain Aggregate (+ related entities resolved by the caller) → JPA Entity via the entity's builder, setting only the fields derived from its inputs; a `private` method translates a domain status VO into a persisted boolean flag
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
