@@ -89,18 +89,18 @@ public class CommentValidationHelperTest implements ImmediateParentPostIdTestUti
     @DisplayName("게시된 게시글 검증 시 활동 수행")
     void testValidateIfPostIsPublished_givenPublishedPost_willProcessAction() {
         // given
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(true);
 
         // when & then
         assertDoesNotThrow(() -> helper.validateIfPostIsPublished(testImmediateParentPostId));
-        then(queryRepository).should(times(1)).isPostPublished(testImmediateParentPostId);
+        then(queryRepository).should(times(1)).isImmediateParentPostPublished(testImmediateParentPostId);
     }
 
     @Test
     @DisplayName("게시되지 않은 게시글 검증 시 예외 반환")
     void testValidateIfPostIsPublished_givenUnpublishedPost_willThrowException() {
         // given
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(false);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -195,13 +195,13 @@ public class CommentValidationHelperTest implements ImmediateParentPostIdTestUti
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(true);
 
         // when & then
         assertDoesNotThrow(() -> helper.validateIfAuthorCanWriteWithinPost(testImmediateParentPostId, testCommentAuthorWithUuid));
         then(memberJpaRepository).should(times(1)).existsById(testCommentAuthorWithUuid.getUuid());
         then(postJpaRepository).should(times(1)).existsByUlid(testImmediateParentPostId.getValue());
-        then(queryRepository).should(times(1)).isPostPublished(testImmediateParentPostId);
+        then(queryRepository).should(times(1)).isImmediateParentPostPublished(testImmediateParentPostId);
     }
 
     @Test
@@ -210,7 +210,7 @@ public class CommentValidationHelperTest implements ImmediateParentPostIdTestUti
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(false);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(false);
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
@@ -226,7 +226,7 @@ public class CommentValidationHelperTest implements ImmediateParentPostIdTestUti
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(true);
         given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
                 testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(true);
@@ -244,7 +244,7 @@ public class CommentValidationHelperTest implements ImmediateParentPostIdTestUti
         // given
         given(memberJpaRepository.existsById(testCommentAuthorWithUuid.getUuid())).willReturn(true);
         given(postJpaRepository.existsByUlid(testImmediateParentPostId.getValue())).willReturn(true);
-        given(queryRepository.isPostPublished(testImmediateParentPostId)).willReturn(true);
+        given(queryRepository.isImmediateParentPostPublished(testImmediateParentPostId)).willReturn(true);
         given(queryRepository.isCommentExists(testImmediateParentPostId, testCommentPath)).willReturn(true);
         given(commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(
                 testImmediateParentPostId.getValue(), testCommentPath.getValue(), testCommentAuthorWithUuid.getUuid())).willReturn(false);

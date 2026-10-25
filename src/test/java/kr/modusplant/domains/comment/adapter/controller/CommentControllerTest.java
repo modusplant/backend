@@ -8,7 +8,7 @@ import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;

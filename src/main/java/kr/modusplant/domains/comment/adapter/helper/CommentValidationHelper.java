@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.helper;
 
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
@@ -38,7 +38,7 @@ public class CommentValidationHelper {
     }
 
     public void validateIfPostIsPublished(ImmediateParentPostId immediateParentPostId) {
-        if (!queryRepository.isPostPublished(immediateParentPostId)) {
+        if (!queryRepository.isImmediateParentPostPublished(immediateParentPostId)) {
             throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "post");
         }
     }

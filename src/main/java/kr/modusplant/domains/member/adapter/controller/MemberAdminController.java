@@ -130,7 +130,7 @@ public class MemberAdminController {
         if (reportDashboardRepository.isApprovedInPostAbuseReportDashboard(postId)) {
             throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_BLINDED, "status");
         }
-        applicationEventPublisher.publishEvent(PostAbuseReportApproveEvent.create(postId.getValue()));
+        applicationEventPublisher.publishEvent(PostAbuseReportApproveEvent.create(postId.getValue(), record.memberId()));
         return reportDashboardRepository.approvePostAbuseReport(postId);
     }
 
@@ -191,7 +191,7 @@ public class MemberAdminController {
             throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_BLINDED, "status");
         }
         applicationEventPublisher.publishEvent(
-                CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue()));
+                CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue(), record.memberId()));
         return reportDashboardRepository.approveCommentAbuseReport(commentId);
     }
 }

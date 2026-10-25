@@ -13,7 +13,7 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_AUTHOR_ID_STRING;
 import static org.junit.jupiter.api.Assertions.*;
 
-class CommentPostAuthorIdTest implements PostTestUtils {
+class PostAuthorIdTest implements PostTestUtils {
 
     @Nested
     @DisplayName("AuthorId UUID 생성 테스트")

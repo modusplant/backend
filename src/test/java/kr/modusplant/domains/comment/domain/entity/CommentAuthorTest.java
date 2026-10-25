@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.domain.vo;
+package kr.modusplant.domains.comment.domain.entity;
 
 import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
 import kr.modusplant.shared.exception.EmptyValueException;
