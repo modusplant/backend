@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class AuthorTest implements AuthorTestUtils {
+public class CommentAuthorTest implements AuthorTestUtils {
 
     @Test
     @DisplayName("null인 사용자의 id로 작성자 생성 시 예외 반환")
     public void testCreate_givenInvalidMemberUuid_willThrowException() {
         // given
-        EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(null));
+        EmptyValueException result = assertThrows(EmptyValueException.class, () -> CommentAuthor.create(null));
 
         // when & then
         assertEquals(CommentErrorCode.EMPTY_AUTHOR, result.getErrorCode());
@@ -25,7 +25,7 @@ public class AuthorTest implements AuthorTestUtils {
     @DisplayName("null인 작성자의 닉네임으로 작성자 생성 시 예외 반환")
     public void testCreate_givenInvalidNickname_willThrowException() {
         // given
-        EmptyValueException result = assertThrows(EmptyValueException.class, () -> Author.create(testAuthor.getUuid(), null));
+        EmptyValueException result = assertThrows(EmptyValueException.class, () -> CommentAuthor.create(testCommentAuthor.getUuid(), null));
 
         // when & then
         assertEquals(CommentErrorCode.EMPTY_MEMBER_NICKNAME, result.getErrorCode());

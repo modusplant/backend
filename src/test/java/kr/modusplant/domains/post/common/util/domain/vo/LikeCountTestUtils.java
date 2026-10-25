@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.common.util.domain.vo;
 
-import kr.modusplant.domains.post.domain.vo.LikeCount;
+import kr.modusplant.domains.post.domain.vo.PostLikeCount;
 
 public interface LikeCountTestUtils {
-    LikeCount testLikeCount = LikeCount.create(15);
+    PostLikeCount testPostLikeCount = PostLikeCount.create(15);
 }

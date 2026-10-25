@@ -26,7 +26,7 @@ class CommentInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
 
     @Nested
     @DisplayName("getAuthorIdByPostIdAndCommentPath 테스트")
-    class GetAuthorIdTests {
+    class GetCommentPostAuthorIdTests {
         @Test
         @DisplayName("댓글이 존재할 때 UUID 반환")
         void testGetAuthorIdByPostIdAndCommentPath_givenExistingComment_willReturnUuid() {

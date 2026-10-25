@@ -44,7 +44,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         MemberEntity memberEntity = createMemberBasicUserEntity();
         PostEntity postEntity = createPublishedPostEntityBuilder().build();
         Comment comment = Comment.create(
-                PostIdTestUtils.testPostId, testCommentPath, EmptyReplyToCommentPath.create(), testAuthor, testCommentContent);
+                PostIdTestUtils.testPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthor, testCommentContent);
 
         // when
         CommentEntity result = mapper.toCommCommentEntity(comment, memberEntity, postEntity);

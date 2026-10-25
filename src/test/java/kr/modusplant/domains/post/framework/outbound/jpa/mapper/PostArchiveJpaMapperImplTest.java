@@ -27,7 +27,7 @@ class PostArchiveJpaMapperImplTest implements PostEntityTestUtils, PostArchiveEn
     @DisplayName("toPostArchiveEntity로 엔티티 반환하기")
     void testToPostArchiveEntity_givenPostEntity_willReturnPostArchiveEntity() {
         // given
-        MemberEntity memberEntity = MemberEntity.builder().uuid(testAuthorId.getValue()).build();
+        MemberEntity memberEntity = MemberEntity.builder().uuid(testPostAuthorId.getValue()).build();
         PrimaryCategoryEntity primaryCategoryEntity = PrimaryCategoryEntity.builder().id(testPrimaryCategoryId.getValue()).build();
         SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder().id(testSecondaryCategoryId.getValue()).build();
         PostEntity postEntity = createPublishedPostEntityBuilderWithUuid()

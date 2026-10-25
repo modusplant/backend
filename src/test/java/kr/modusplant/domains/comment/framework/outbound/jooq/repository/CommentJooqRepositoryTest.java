@@ -144,7 +144,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -197,7 +197,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -241,7 +241,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -283,7 +283,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        repository.findByPost(testPostId, testAuthorWithUuid);
+        repository.findByPost(testPostId, testCommentAuthorWithUuid);
 
         // then
         String sql = capturedSql[0];
@@ -311,7 +311,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, null, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testPostId, null, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -334,7 +334,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).isEmpty();
@@ -364,7 +364,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
 
         // then
         assertThat(result).hasSize(1);
@@ -522,7 +522,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         PageImpl<CommentOfAuthorReadModel> result =
-                repository.findByAuthor(testAuthorWithUuid, PageRequest.of(1, 1));
+                repository.findByAuthor(testCommentAuthorWithUuid, PageRequest.of(1, 1));
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(3);
@@ -536,9 +536,9 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.totalCommentsOfPost()).isEqualTo(4);
 
         assertThat(capturedSql).hasSize(2);
-        assertThat(capturedBindings.getFirst()).contains(testAuthorWithUuid.getUuid());
+        assertThat(capturedBindings.getFirst()).contains(testCommentAuthorWithUuid.getUuid());
         assertThat(capturedSql.getFirst()).contains("\"is_deleted\" = false");
-        assertThat(capturedBindings.get(1)).contains(testAuthorWithUuid.getUuid());
+        assertThat(capturedBindings.get(1)).contains(testCommentAuthorWithUuid.getUuid());
         // 작성자 댓글 목록만 삭제된 댓글을 제외하고, 게시글 댓글 수 서브쿼리는 삭제된 댓글을 포함한다
         assertThat(capturedSql.get(1).split("\"is_deleted\" = false", -1)).hasSize(2);
         assertThat(capturedSql.get(1)).contains("offset ? rows fetch next ? rows only");
@@ -558,7 +558,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         PageImpl<CommentOfAuthorReadModel> result =
-                repository.findByAuthor(testAuthorWithUuid, PageRequest.of(0, 5));
+                repository.findByAuthor(testCommentAuthorWithUuid, PageRequest.of(0, 5));
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(0);

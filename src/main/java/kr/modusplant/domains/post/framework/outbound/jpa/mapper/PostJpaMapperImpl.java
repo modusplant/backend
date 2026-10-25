@@ -29,7 +29,7 @@ public class PostJpaMapperImpl implements PostJpaMapper {
                 .primaryCategory(primaryCategoryEntity)
                 .secondaryCategory(secondaryCategoryEntity)
                 .authMember(authorEntity)
-                .likeCount(post.getLikeCount().getValue())
+                .likeCount(post.getPostLikeCount().getValue())
                 .viewCount(viewCount)
                 .title(post.getPostContent().getTitle())
                 .content(post.getPostContent().getContent())
@@ -56,11 +56,11 @@ public class PostJpaMapperImpl implements PostJpaMapper {
         }
         return Post.create(
                 PostId.create(postEntity.getUlid()),
-                AuthorId.fromUuid(postEntity.getAuthMember().getUuid()),
+                PostAuthorId.fromUuid(postEntity.getAuthMember().getUuid()),
                 postEntity.getPrimaryCategory() != null ? PrimaryCategoryId.create(postEntity.getPrimaryCategory().getId()) : null,
                 postEntity.getSecondaryCategory() != null ? SecondaryCategoryId.create(postEntity.getSecondaryCategory().getId()) : null,
                 content,
-                LikeCount.create(postEntity.getLikeCount()),
+                PostLikeCount.create(postEntity.getLikeCount()),
                 postStatus
         );
     }

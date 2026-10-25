@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.adapter.helper;
 
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.PostId;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
@@ -25,8 +25,8 @@ public class CommentValidationHelper {
     private final PostJpaRepository postJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
 
-    public void validateIfAuthorExists(Author author) {
-        if (!memberJpaRepository.existsById(author.getUuid())) {
+    public void validateIfAuthorExists(CommentAuthor commentAuthor) {
+        if (!memberJpaRepository.existsById(commentAuthor.getUuid())) {
             throw new NotFoundEntityException(CommentErrorCode.NOT_EXIST_AUTHOR, "author");
         }
     }
@@ -55,23 +55,23 @@ public class CommentValidationHelper {
         }
     }
 
-    public void validateIfCommentWrittenByAuthor(PostId postId, CommentPath path, Author author) {
-        if (!commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(postId.getValue(), path.getValue(), author.getUuid())) {
+    public void validateIfCommentWrittenByAuthor(PostId postId, CommentPath path, CommentAuthor commentAuthor) {
+        if (!commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(postId.getValue(), path.getValue(), commentAuthor.getUuid())) {
             throw new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "comment", path.getValue());
         }
     }
 
-    public void validateIfAuthorCanWriteWithinPost(PostId postId, Author author) {
-        validateIfAuthorExists(author);
+    public void validateIfAuthorCanWriteWithinPost(PostId postId, CommentAuthor commentAuthor) {
+        validateIfAuthorExists(commentAuthor);
         validateIfPostExists(postId);
         validateIfPostIsPublished(postId);
     }
 
-    public void validateIfAuthorCanWriteCommentWithinPost(PostId postId, CommentPath path, Author author) {
-        validateIfAuthorExists(author);
+    public void validateIfAuthorCanWriteCommentWithinPost(PostId postId, CommentPath path, CommentAuthor commentAuthor) {
+        validateIfAuthorExists(commentAuthor);
         validateIfPostExists(postId);
         validateIfPostIsPublished(postId);
         validateIfCommentExists(postId, path);
-        validateIfCommentWrittenByAuthor(postId, path, author);
+        validateIfCommentWrittenByAuthor(postId, path, commentAuthor);
     }
 }

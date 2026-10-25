@@ -21,7 +21,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(null, testCommentPath, testReplyToCommentPath,
-                        testAuthor, testCommentContent)
+                        testCommentAuthor, testCommentContent)
         );
 
         // when & then
@@ -34,7 +34,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, null, testReplyToCommentPath,
-                        testAuthor, testCommentContent)
+                        testCommentAuthor, testCommentContent)
         );
 
         // when & then
@@ -47,7 +47,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
-                        testAuthor, testCommentContent)
+                        testCommentAuthor, testCommentContent)
         );
 
         // when & then
@@ -60,7 +60,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
-                        testAuthor, testCommentContent, testCommentStatusValid)
+                        testCommentAuthor, testCommentContent, testCommentStatusValid)
         );
 
         // when & then
@@ -86,7 +86,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
-                        testAuthor, null)
+                        testCommentAuthor, null)
         );
 
         // when & then
@@ -99,7 +99,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
-                        testAuthor, testCommentContent, null)
+                        testCommentAuthor, testCommentContent, null)
         );
 
         // when & then
@@ -110,7 +110,7 @@ public class CommentTest implements
     @DisplayName("비어 있는 답글 대상 경로로 댓글 생성 시 Comment 반환")
     void testCreate_givenEmptyReplyToPath_willReturnComment() {
         // when
-        Comment result = Comment.create(testPostId, testCommentPath, EmptyReplyToCommentPath.create(), testAuthor, testCommentContent);
+        Comment result = Comment.create(testPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthor, testCommentContent);
 
         // then
         assertThat(result.getReplyToPath()).isSameAs(EmptyReplyToCommentPath.create());
@@ -138,7 +138,7 @@ public class CommentTest implements
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Comment compare = Comment.create(testPostId, CommentPath.create("1"), EmptyReplyToCommentPath.create(), testAuthor, testCommentContent);
+        Comment compare = Comment.create(testPostId, CommentPath.create("1"), EmptyReplyToCommentPath.create(), testCommentAuthor, testCommentContent);
 
         assertNotEquals(testValidComment, compare);
     }

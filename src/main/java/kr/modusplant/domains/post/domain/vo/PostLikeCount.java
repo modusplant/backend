@@ -10,35 +10,35 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class LikeCount {
+public class PostLikeCount {
     private final int value;
 
-    public static LikeCount zero() {
-        return new LikeCount(0);
+    public static PostLikeCount zero() {
+        return new PostLikeCount(0);
     }
 
-    public static LikeCount create(int value) {
+    public static PostLikeCount create(int value) {
         if (value < 0) {
             throw new InvalidValueException(PostErrorCode.INVALID_LIKE_COUNT);
         }
-        return new LikeCount(value);
+        return new PostLikeCount(value);
     }
 
-    public LikeCount increment() {
-        return new LikeCount(this.value + 1);
+    public PostLikeCount increment() {
+        return new PostLikeCount(this.value + 1);
     }
 
-    public LikeCount decrement() {
-        return new LikeCount(Math.max(value - 1, 0));
+    public PostLikeCount decrement() {
+        return new PostLikeCount(Math.max(value - 1, 0));
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof LikeCount likeCount)) return false;
+        if (!(o instanceof PostLikeCount postLikeCount)) return false;
 
-        return new EqualsBuilder().append(getValue(), likeCount.getValue()).isEquals();
+        return new EqualsBuilder().append(getValue(), postLikeCount.getValue()).isEquals();
     }
 
     @Override

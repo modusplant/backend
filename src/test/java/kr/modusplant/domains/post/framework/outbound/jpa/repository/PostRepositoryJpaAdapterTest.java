@@ -53,7 +53,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // given
         Post post = createPublishedPost();
         PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
-        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getPostAuthorId().getValue()).build();
         PrimaryCategoryEntity primaryCategoryEntity = createPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
         SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder()
                 .id(post.getSecondaryCategoryId().getValue())
@@ -61,7 +61,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
                 .build();
         long viewCount = 0L;
 
-        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(authorJpaRepository.findByUuid(post.getPostAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
         given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
@@ -84,7 +84,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // given
         Post post = createDraftPost();
         PostEntity postEntity = createPublishedPostEntityBuilderWithUuid().build();
-        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getPostAuthorId().getValue()).build();
         PrimaryCategoryEntity primaryCategoryEntity = createPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
         SecondaryCategoryEntity secondaryCategoryEntity = createSecondaryCategoryEntityBuilder()
                 .id(post.getSecondaryCategoryId().getValue())
@@ -92,7 +92,7 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
                 .build();
         long viewCount = 0L;
 
-        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(authorJpaRepository.findByUuid(post.getPostAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(secondaryCategoryJpaRepository.findById(post.getSecondaryCategoryId().getValue())).willReturn(Optional.of(secondaryCategoryEntity));
         given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, secondaryCategoryEntity, viewCount)).willReturn(postEntity);
@@ -115,11 +115,11 @@ class PostRepositoryJpaAdapterTest implements PostTestUtils, PostEntityTestUtils
         // given
         Post post = createDraftPostWithEmptyValue();
         PostEntity postEntity = createDraftPostEntityBuilderWithoutContentWithUuid().build();
-        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getAuthorId().getValue()).build();
+        MemberEntity memberEntity = createMemberBasicUserEntity().builder().uuid(post.getPostAuthorId().getValue()).build();
         PrimaryCategoryEntity primaryCategoryEntity = createPrimaryCategoryEntity().builder().id(post.getPrimaryCategoryId().getValue()).build();
         long viewCount = 0L;
 
-        given(authorJpaRepository.findByUuid(post.getAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(authorJpaRepository.findByUuid(post.getPostAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue())).willReturn(Optional.of(primaryCategoryEntity));
         given(postJpaMapper.toPostEntity(post, memberEntity, primaryCategoryEntity, null, viewCount)).willReturn(postEntity);
         given(postJpaRepository.save(postEntity)).willReturn(postEntity);

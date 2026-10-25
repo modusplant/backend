@@ -12,7 +12,7 @@ import kr.modusplant.domains.post.common.util.usecase.response.PostResponseTestU
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
-import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostAuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
 import kr.modusplant.domains.post.usecase.port.processor.ContentDataProcessorPort;
@@ -252,7 +252,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(contentDataProcessorPort).generateContentJson(anyString(),anyList(),any(String.class),eq(List.of()));
         verify(postRepository).save(argThat(post ->
-                post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
+                post.getPostAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         post.getStatus().isPublished()
         ));
         verify(pendingFileService).untrackPendingFiles(anyList());
@@ -271,7 +271,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(contentDataProcessorPort).generateContentJson(anyString(),anyList(),any(String.class),eq(List.of()));
         verify(postRepository).save(argThat(post ->
-                post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
+                post.getPostAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         !post.getStatus().isPublished()
         ));
         verify(pendingFileService).untrackPendingFiles(anyList());
@@ -286,7 +286,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // then
         verify(contentDataProcessorPort,never()).generateContentJson(anyString(),anyList(),any(String.class),anyList());
         verify(postRepository).save(argThat(post ->
-                post.getAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
+                post.getPostAuthorId().getValue().equals(MEMBER_BASIC_USER_UUID) &&
                         !post.getStatus().isPublished()
         ));
         verify(pendingFileService).untrackPendingFiles(anyList());
@@ -651,7 +651,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         long totalElements = 1;
         Page<PostSummaryReadModel> readModelPage = new PageImpl<>(List.of(TEST_POST_SUMMARY_READ_MODEL), PageRequest.of(0,size),totalElements);
 
-        given(postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(any(AuthorId.class), eq(0), eq(size))).willReturn(readModelPage);
+        given(postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(any(PostAuthorId.class), eq(0), eq(size))).willReturn(readModelPage);
         given(contentDataProcessorPort.convertToPreview(any(JsonNode.class),any(String.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
 
         // when
@@ -666,7 +666,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.totalPages()).isEqualTo(1);
         assertThat(result.hasNext()).isFalse();
         assertThat(result.hasPrevious()).isFalse();
-        verify(postQueryForMemberRepository).findPublishedByAuthMemberWithOffset(any(AuthorId.class),eq(0),eq(size));
+        verify(postQueryForMemberRepository).findPublishedByAuthMemberWithOffset(any(PostAuthorId.class),eq(0),eq(size));
         verify(contentDataProcessorPort).convertToPreview(any(JsonNode.class),any(String.class));
     }
 
@@ -679,7 +679,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         long totalElements = 1;
         Page<DraftPostReadModel> readModelPage = new PageImpl<>(List.of(TEST_DRAFT_POST_READ_MODEL), PageRequest.of(0,size),totalElements);
 
-        given(postQueryForMemberRepository.findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(0),eq(size))).willReturn(readModelPage);
+        given(postQueryForMemberRepository.findDraftByAuthMemberWithOffset(any(PostAuthorId.class), eq(0),eq(size))).willReturn(readModelPage);
         given(contentDataProcessorPort.convertToPreview(any(JsonNode.class),any(String.class))).willReturn((ArrayNode) TEST_POST_CONTENT_TEXT_AND_IMAGE);
 
         // when
@@ -695,7 +695,7 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         assertThat(result.hasNext()).isFalse();
         assertThat(result.hasPrevious()).isFalse();
 
-        verify(postQueryForMemberRepository).findDraftByAuthMemberWithOffset(any(AuthorId.class), eq(0),eq(size));
+        verify(postQueryForMemberRepository).findDraftByAuthMemberWithOffset(any(PostAuthorId.class), eq(0),eq(size));
         verify(contentDataProcessorPort).convertToPreview(any(JsonNode.class),any(String.class));
     }
 

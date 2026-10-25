@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostAuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.framework.outbound.jooq.mapper.supers.PostJooqMapper;
 import kr.modusplant.domains.post.usecase.port.repository.PostQueryForMemberRepository;
@@ -26,13 +26,13 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
     private final PostJooqMapper postJooqMapper;
     private final JsonbJsonNodeConverter jsonConverter = new JsonbJsonNodeConverter();
 
-    public Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(AuthorId authorId, int page, int size) {
+    public Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(PostAuthorId postAuthorId, int page, int size) {
         long offset = (long) page * size;
 
         long totalElements = dsl.selectCount()
                 .from(COMM_POST)
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
-                .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
+                .and(COMM_POST.AUTH_MEMB_UUID.eq(postAuthorId.getValue()))
                 .fetchOne(0, Long.class);
 
         // 데이터 조회
@@ -50,12 +50,12 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 exists(
                         selectOne().from(COMM_POST_LIKE)
                                 .where(COMM_POST_LIKE.POST_ULID.eq(COMM_POST.ULID))
-                                .and(COMM_POST_LIKE.MEMB_UUID.eq(authorId.getValue()))
+                                .and(COMM_POST_LIKE.MEMB_UUID.eq(postAuthorId.getValue()))
                 ).as("isLiked"),
                 exists(
                         selectOne().from(COMM_POST_BOOKMARK)
                                 .where(COMM_POST_BOOKMARK.POST_ULID.eq(COMM_POST.ULID))
-                                .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(authorId.getValue()))
+                                .and(COMM_POST_BOOKMARK.MEMB_UUID.eq(postAuthorId.getValue()))
                 ).as("isBookmarked")
         ).from(COMM_POST)
                 .join(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
@@ -68,7 +68,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                                 .asTable("cc")
                 ).on(COMM_POST.ULID.eq(field("cc.post_ulid",String.class)))
                 .where(COMM_POST.IS_PUBLISHED.isTrue())
-                .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
+                .and(COMM_POST.AUTH_MEMB_UUID.eq(postAuthorId.getValue()))
                 .orderBy(COMM_POST.PUBLISHED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size)
                 .offset(offset)
@@ -78,13 +78,13 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
         return new PageImpl<>(posts, PageRequest.of(page, size), totalElements);
     }
 
-    public Page<DraftPostReadModel> findDraftByAuthMemberWithOffset(AuthorId authorId, int page, int size) {
+    public Page<DraftPostReadModel> findDraftByAuthMemberWithOffset(PostAuthorId postAuthorId, int page, int size) {
         long offset = (long) page * size;
 
         long totalElements = dsl.selectCount()
                 .from(COMM_POST)
                 .where(COMM_POST.IS_PUBLISHED.isFalse())
-                .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
+                .and(COMM_POST.AUTH_MEMB_UUID.eq(postAuthorId.getValue()))
                 .fetchOne(0, Long.class);
 
         // 데이터 조회
@@ -100,7 +100,7 @@ public class PostQueryForMemberJooqRepository implements PostQueryForMemberRepos
                 .leftOuterJoin(COMM_PRI_CATE).on(COMM_POST.PRI_CATE_ID.eq(COMM_PRI_CATE.ID))
                 .leftOuterJoin(COMM_SECO_CATE).on(COMM_POST.SECO_CATE_ID.eq(COMM_SECO_CATE.ID))
                 .where(COMM_POST.IS_PUBLISHED.isFalse())
-                .and(COMM_POST.AUTH_MEMB_UUID.eq(authorId.getValue()))
+                .and(COMM_POST.AUTH_MEMB_UUID.eq(postAuthorId.getValue()))
                 .orderBy(COMM_POST.EDITED_AT.desc(), COMM_POST.ULID.desc())
                 .limit(size)
                 .offset(offset)

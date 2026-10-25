@@ -13,7 +13,7 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_AUTHOR_ID_STRING;
 import static org.junit.jupiter.api.Assertions.*;
 
-class AuthorIdTest implements PostTestUtils {
+class CommentPostAuthorIdTest implements PostTestUtils {
 
     @Nested
     @DisplayName("AuthorId UUID 생성 테스트")
@@ -22,15 +22,15 @@ class AuthorIdTest implements PostTestUtils {
         @Test
         @DisplayName("유효한 UUID로 AuthorId 반환")
         void testFromUuid_givenUuid_willReturnAuthorId() {
-            assertNotNull(testAuthorId);
-            assertEquals(MEMBER_BASIC_USER_UUID, testAuthorId.getValue());
+            assertNotNull(testPostAuthorId);
+            assertEquals(MEMBER_BASIC_USER_UUID, testPostAuthorId.getValue());
         }
 
         @Test
         @DisplayName("null UUID일 때 예외 반환")
         void testFromUuid_givenNullParameter_willThrowException() {
             // when & then
-            assertThrows(EmptyValueException.class, () -> AuthorId.fromUuid(null));
+            assertThrows(EmptyValueException.class, () -> PostAuthorId.fromUuid(null));
         }
     }
 
@@ -42,20 +42,20 @@ class AuthorIdTest implements PostTestUtils {
         @DisplayName("유효한 UUID 문자열로 AuthorId 반환")
         void testFromString_givenValidString_willReturnAuthorId() {
             // when
-            AuthorId authorId = AuthorId.fromString(TEST_AUTHOR_ID_STRING);
+            PostAuthorId postAuthorId = PostAuthorId.fromString(TEST_AUTHOR_ID_STRING);
 
             // then
-            assertNotNull(authorId);
-            assertEquals(UUID.fromString(TEST_AUTHOR_ID_STRING), authorId.getValue());
+            assertNotNull(postAuthorId);
+            assertEquals(UUID.fromString(TEST_AUTHOR_ID_STRING), postAuthorId.getValue());
         }
 
         @Test
         @DisplayName("null이나 빈 문자열일 때 예외 반환")
         void testFromString_givenNullOrEmptyParameter_willThrowException() {
             // when & then
-            assertThrows(EmptyValueException.class, () -> AuthorId.fromString(null));
-            assertThrows(EmptyValueException.class, () -> AuthorId.fromString(""));
-            assertThrows(EmptyValueException.class, () -> AuthorId.fromString("   "));
+            assertThrows(EmptyValueException.class, () -> PostAuthorId.fromString(null));
+            assertThrows(EmptyValueException.class, () -> PostAuthorId.fromString(""));
+            assertThrows(EmptyValueException.class, () -> PostAuthorId.fromString("   "));
         }
 
         @Test
@@ -74,7 +74,7 @@ class AuthorIdTest implements PostTestUtils {
 
             // when & then
             for (String invalidUuid : invalidUuids) {
-                assertThrows(InvalidValueException.class, () -> AuthorId.fromString(invalidUuid));
+                assertThrows(InvalidValueException.class, () -> PostAuthorId.fromString(invalidUuid));
             }
         }
     }
@@ -88,22 +88,22 @@ class AuthorIdTest implements PostTestUtils {
         void testEquals_givenSameObject_willReturnTrue() {
             // when & then
             //noinspection EqualsWithItself
-            assertEquals(testAuthorId, testAuthorId);
-            assertEquals(testAuthorId.hashCode(), testAuthorId.hashCode());
+            assertEquals(testPostAuthorId, testPostAuthorId);
+            assertEquals(testPostAuthorId.hashCode(), testPostAuthorId.hashCode());
         }
 
         @Test
         @DisplayName("다른 클래스 인스턴스로 거짓 반환")
         void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
-            assertNotEquals(testAuthorId,testPostId);
+            assertNotEquals(testPostAuthorId,testPostId);
         }
 
         @Test
         @DisplayName("다른 프로퍼티 인스턴스로 거짓 반환")
         void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
             // when & then
-            assertNotEquals(testAuthorId, testAuthorId2);
+            assertNotEquals(testPostAuthorId, testPostAuthorId2);
         }
 
     }
