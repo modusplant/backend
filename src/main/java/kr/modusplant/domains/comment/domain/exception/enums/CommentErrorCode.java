@@ -30,7 +30,7 @@ public enum CommentErrorCode implements ErrorCode {
     INVALID_REPLY_TO_COMMENT_PATH(HttpStatus.BAD_REQUEST.value(), "invalid_reply_to_comment_path", "답글 대상 댓글의 경로가 올바르지 않습니다"),
 
     NOT_FOUND_COMMENT_AUTHOR(HttpStatus.NOT_FOUND.value(), "not_found_comment_author", "댓글 작성자를 찾을 수 없습니다"),
-    NOT_FOUND_IMMEDIATE_PARENT_POST(HttpStatus.NOT_FOUND.value(), "not_found_immediate_parent_post", "댓글이 작성된 게시글을 찾을 수 없습니다"),
+    NOT_FOUND_PARENT_POST(HttpStatus.NOT_FOUND.value(), "not_found_parent_post", "댓글이 작성된 게시글을 찾을 수 없습니다"),
     NOT_FOUND_PARENT_COMMENT(HttpStatus.NOT_FOUND.value(), "not_exist_parent_comment", "댓글의 부모 댓글을 찾을 수 없습니다"),
 
     NOT_PUBLISHED_POST(HttpStatus.CONFLICT.value(), "not_published_post", "게시글이 출간된 상태가 아닙니다"),

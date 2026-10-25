@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.mapper;
 
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
@@ -49,7 +49,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         MemberEntity memberEntity = createMemberBasicUserEntity();
         PostEntity postEntity = createPublishedPostEntityBuilder().build();
         Comment comment = Comment.create(
-                ImmediateParentPostIdTestUtils.testImmediateParentPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthorId, testCommentContent);
+                ParentPostIdTestUtils.testParentPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthorId, testCommentContent);
 
         // when
         CommentEntity result = mapper.toCommCommentEntity(comment, memberEntity, postEntity);

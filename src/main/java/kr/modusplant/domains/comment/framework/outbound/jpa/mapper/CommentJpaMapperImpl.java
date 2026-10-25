@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentJpaMapperImpl implements CommentJpaMapper {
     @Override
-    public CommentEntity toCommCommentEntity(Comment comment, MemberEntity commentAuthor, PostEntity immediateParentPost) {
+    public CommentEntity toCommCommentEntity(Comment comment, MemberEntity commentAuthor, PostEntity parentPost) {
         return CommentEntity.builder()
-                .post(immediateParentPost)
+                .post(parentPost)
                 .path(comment.getPath().getValue())
                 .replyToPath(comment.getReplyToPath().getValue())
                 .authMember(commentAuthor)

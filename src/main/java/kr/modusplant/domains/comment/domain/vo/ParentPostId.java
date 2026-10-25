@@ -14,10 +14,10 @@ import static kr.modusplant.shared.constant.Regex.PATTERN_ULID;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ImmediateParentPostId {
+public class ParentPostId {
     private final String value;
 
-    public static ImmediateParentPostId create(String value) {
+    public static ParentPostId create(String value) {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_POST_ID, "postId");
         }
@@ -27,17 +27,17 @@ public class ImmediateParentPostId {
         if (!PATTERN_ULID.matcher(value).matches()) {
             throw new InvalidValueException(CommentErrorCode.INVALID_POST_ID, "postId");
         }
-        return new ImmediateParentPostId(value);
+        return new ParentPostId(value);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
-        if (!(o instanceof ImmediateParentPostId immediateParentPostId)) return false;
+        if (!(o instanceof ParentPostId parentPostId)) return false;
 
         return new EqualsBuilder()
-                .append(getValue(), immediateParentPostId.getValue())
+                .append(getValue(), parentPostId.getValue())
                 .isEquals();
     }
 

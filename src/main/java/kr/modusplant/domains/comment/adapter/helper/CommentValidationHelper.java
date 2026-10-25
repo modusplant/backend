@@ -4,10 +4,10 @@ import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
-import kr.modusplant.domains.comment.usecase.port.repository.ImmediateParentPostRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.ParentPostRepository;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.exception.NotFoundValueException;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 public class CommentValidationHelper {
     private final CommentQueryRepository queryRepository;
     private final CommentAuthorRepository authorRepository;
-    private final ImmediateParentPostRepository immediateParentPostRepository;
+    private final ParentPostRepository parentPostRepository;
 
     public void validateIfAuthorExists(CommentAuthorId commentAuthorId) {
         if (!authorRepository.isExists(commentAuthorId)) {
@@ -29,47 +29,47 @@ public class CommentValidationHelper {
         }
     }
 
-    public void validateIfImmediateParentPostExists(ImmediateParentPostId postUlid) {
-        if (!immediateParentPostRepository.isImmediateParentPostExists(postUlid)) {
-            throw new NotFoundValueException(CommentErrorCode.NOT_FOUND_IMMEDIATE_PARENT_POST, "immediateParentPost");
+    public void validateIfParentPostExists(ParentPostId postUlid) {
+        if (!parentPostRepository.isParentPostExists(postUlid)) {
+            throw new NotFoundValueException(CommentErrorCode.NOT_FOUND_PARENT_POST, "parentPost");
         }
     }
 
-    public void validateIfImmediateParentPostIsPublished(ImmediateParentPostId immediateParentPostId) {
-        if (!immediateParentPostRepository.isImmediateParentPostPublished(immediateParentPostId)) {
-            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "immediateParentPost");
+    public void validateIfParentPostIsPublished(ParentPostId parentPostId) {
+        if (!parentPostRepository.isParentPostPublished(parentPostId)) {
+            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "parentPost");
         }
     }
 
-    public void validateIfCommentExists(ImmediateParentPostId immediateParentPostId, CommentPath path) {
-        if (!queryRepository.isCommentExists(immediateParentPostId, path)) {
+    public void validateIfCommentExists(ParentPostId parentPostId, CommentPath path) {
+        if (!queryRepository.isCommentExists(parentPostId, path)) {
             throw new NotFoundValueException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
     }
 
-    public void validateIfCommentIsNotDeleted(ImmediateParentPostId immediateParentPostId, CommentPath path) {
-        if (queryRepository.isCommentDeleted(immediateParentPostId, path)) {
+    public void validateIfCommentIsNotDeleted(ParentPostId parentPostId, CommentPath path) {
+        if (queryRepository.isCommentDeleted(parentPostId, path)) {
             throw new DeletedReplyToCommentException();
         }
     }
 
-    public void validateIfCommentWrittenByAuthor(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
-        if (!queryRepository.isCommentWrittenByAuthor(immediateParentPostId, path, commentAuthorId)) {
+    public void validateIfCommentWrittenByAuthor(ParentPostId parentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+        if (!queryRepository.isCommentWrittenByAuthor(parentPostId, path, commentAuthorId)) {
             throw new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "commentAuthorId", path.getValue());
         }
     }
 
-    public void validateIfAuthorCanWriteWithinPost(ImmediateParentPostId immediateParentPostId, CommentAuthorId commentAuthorId) {
+    public void validateIfAuthorCanWriteWithinPost(ParentPostId parentPostId, CommentAuthorId commentAuthorId) {
         validateIfAuthorExists(commentAuthorId);
-        validateIfImmediateParentPostExists(immediateParentPostId);
-        validateIfImmediateParentPostIsPublished(immediateParentPostId);
+        validateIfParentPostExists(parentPostId);
+        validateIfParentPostIsPublished(parentPostId);
     }
 
-    public void validateIfAuthorCanWriteCommentWithinPost(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+    public void validateIfAuthorCanWriteCommentWithinPost(ParentPostId parentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
         validateIfAuthorExists(commentAuthorId);
-        validateIfImmediateParentPostExists(immediateParentPostId);
-        validateIfImmediateParentPostIsPublished(immediateParentPostId);
-        validateIfCommentExists(immediateParentPostId, path);
-        validateIfCommentWrittenByAuthor(immediateParentPostId, path, commentAuthorId);
+        validateIfParentPostExists(parentPostId);
+        validateIfParentPostIsPublished(parentPostId);
+        validateIfCommentExists(parentPostId, path);
+        validateIfCommentWrittenByAuthor(parentPostId, path, commentAuthorId);
     }
 }

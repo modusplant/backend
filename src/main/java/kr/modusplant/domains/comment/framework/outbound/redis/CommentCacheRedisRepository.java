@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.framework.outbound.redis;
 
 import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;
 import kr.modusplant.shared.exception.ConnectionFailedException;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +40,11 @@ public class CommentCacheRedisRepository implements CommentCacheRepository {
     private static final Duration TTL = Duration.ofHours(1);
 
     @Override
-    public Optional<CommentPath> reservePath(ImmediateParentPostId immediateParentPostId,
+    public Optional<CommentPath> reservePath(ParentPostId parentPostId,
                                              CommentPath path,
                                              CommentAuthorId commentAuthorId,
                                              IntSupplier getMaximumSiblingPathOrderFromDB) {
-        String postIdValue = immediateParentPostId.getValue();
+        String postIdValue = parentPostId.getValue();
         String pathValue = path.getValue();
 
         try {

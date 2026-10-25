@@ -3,7 +3,7 @@ package kr.modusplant.domains.comment.adapter.listener;
 import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCommandRepository;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportApproveEvent;
@@ -27,12 +27,12 @@ public class CommentAdminEventListener {
             throw new NotAccessibleException(
                     GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS, "memberId", String.valueOf(event.getMemberId()));
         }
-        ImmediateParentPostId immediateParentPostId = ImmediateParentPostId.create(event.getPostUlid());
+        ParentPostId parentPostId = ParentPostId.create(event.getPostUlid());
         CommentPath commentPath = CommentPath.create(event.getPath());
-        commentValidationHelper.validateIfImmediateParentPostExists(immediateParentPostId);
-        commentValidationHelper.validateIfImmediateParentPostIsPublished(immediateParentPostId);
-        commentValidationHelper.validateIfCommentExists(immediateParentPostId, commentPath);
+        commentValidationHelper.validateIfParentPostExists(parentPostId);
+        commentValidationHelper.validateIfParentPostIsPublished(parentPostId);
+        commentValidationHelper.validateIfCommentExists(parentPostId, commentPath);
 
-        commandRepository.deleteComment(immediateParentPostId, commentPath);
+        commandRepository.deleteComment(parentPostId, commentPath);
     }
 }

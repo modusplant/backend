@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.framework.inbound.web.cache;
 
 import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
-import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
@@ -38,7 +38,7 @@ class CommentCacheServiceTest {
     private final CommentCacheService service = new CommentCacheService(
             postJpaRepository, memberJpaRepository, commentQueryRepository, passwordEncoder);
 
-    private final ImmediateParentPostId testImmediateParentPostId = ImmediateParentPostId.create(TEST_POST_ULID);
+    private final ParentPostId testParentPostId = ParentPostId.create(TEST_POST_ULID);
     private final MemberId testMemberId = MemberId.fromUuid(MEMBER_BASIC_USER_UUID);
     private final CommentAuthorId testCommentAuthorId = CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID);
 
@@ -51,7 +51,7 @@ class CommentCacheServiceTest {
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(postEntity));
         given(postEntity.getUpdatedAtAsTruncatedToSeconds()).willReturn(postUpdatedAt);
         given(postEntity.getETagSource()).willReturn(postEtagSource);
-        given(commentQueryRepository.findLatestUpdatedAtByPost(testImmediateParentPostId)).willReturn(Optional.empty());
+        given(commentQueryRepository.findLatestUpdatedAtByPost(testParentPostId)).willReturn(Optional.empty());
     }
 
     @Test
@@ -62,7 +62,7 @@ class CommentCacheServiceTest {
 
         // when
         NotFoundEntityException ex = assertThrows(NotFoundEntityException.class,
-                () -> service.getCacheData(null, null, testImmediateParentPostId, null, null));
+                () -> service.getCacheData(null, null, testParentPostId, null, null));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_POST);
@@ -77,7 +77,7 @@ class CommentCacheServiceTest {
         given(passwordEncoder.encode(expectedETagSource)).willReturn("encoded-tag");
 
         // when
-        CommentCacheData result = service.getCacheData(null, null, testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData(null, null, testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isFalse();
@@ -94,7 +94,7 @@ class CommentCacheServiceTest {
         given(passwordEncoder.encode(expectedETagSource)).willReturn("encoded-tag");
 
         // when
-        CommentCacheData result = service.getCacheData("\"abc123\"", null, testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData("\"abc123\"", null, testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isFalse();
@@ -109,7 +109,7 @@ class CommentCacheServiceTest {
         given(passwordEncoder.encode(expectedETagSource)).willReturn("encoded-tag");
 
         // when
-        CommentCacheData result = service.getCacheData("\"abc123\"", null, testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData("\"abc123\"", null, testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isTrue();
@@ -124,7 +124,7 @@ class CommentCacheServiceTest {
         given(passwordEncoder.encode(expectedETagSource)).willReturn("encoded-tag");
 
         // when: GMT 00:00 -> Asia/Seoul 09:00, before postUpdatedAt(12:00)
-        CommentCacheData result = service.getCacheData("\"abc123\"", "Sun, 01 Jun 2025 00:00:00 GMT", testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData("\"abc123\"", "Sun, 01 Jun 2025 00:00:00 GMT", testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isFalse();
@@ -139,7 +139,7 @@ class CommentCacheServiceTest {
         given(passwordEncoder.encode(expectedETagSource)).willReturn("encoded-tag");
 
         // when: GMT 04:00 -> Asia/Seoul 13:00, after postUpdatedAt(12:00)
-        CommentCacheData result = service.getCacheData("\"abc123\"", "Sun, 01 Jun 2025 04:00:00 GMT", testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData("\"abc123\"", "Sun, 01 Jun 2025 04:00:00 GMT", testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isTrue();
@@ -153,11 +153,11 @@ class CommentCacheServiceTest {
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(postEntity));
         given(postEntity.getUpdatedAtAsTruncatedToSeconds()).willReturn(postUpdatedAt);
         given(postEntity.getETagSource()).willReturn(postEtagSource);
-        given(commentQueryRepository.findLatestUpdatedAtByPost(testImmediateParentPostId)).willReturn(Optional.of(latestCommentUpdatedAt));
+        given(commentQueryRepository.findLatestUpdatedAtByPost(testParentPostId)).willReturn(Optional.of(latestCommentUpdatedAt));
         given(passwordEncoder.encode(postEtagSource + latestCommentUpdatedAt + "|null|null")).willReturn("encoded-tag");
 
         // when
-        CommentCacheData result = service.getCacheData(null, null, testImmediateParentPostId, null, null);
+        CommentCacheData result = service.getCacheData(null, null, testParentPostId, null, null);
 
         // then
         assertThat(result.lastModifiedAt()).isEqualTo(latestCommentUpdatedAt.truncatedTo(ChronoUnit.SECONDS));
@@ -172,13 +172,13 @@ class CommentCacheServiceTest {
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.of(postEntity));
         given(postEntity.getUpdatedAtAsTruncatedToSeconds()).willReturn(postUpdatedAt);
         given(postEntity.getETagSource()).willReturn(postEtagSource);
-        given(commentQueryRepository.findLatestUpdatedAtByPost(testImmediateParentPostId)).willReturn(Optional.of(latestCommentUpdatedAt));
+        given(commentQueryRepository.findLatestUpdatedAtByPost(testParentPostId)).willReturn(Optional.of(latestCommentUpdatedAt));
         given(passwordEncoder.matches(ETagSource, "abc123")).willReturn(true);
         given(passwordEncoder.encode(ETagSource)).willReturn("encoded-tag");
 
         // when: GMT 03:00 -> Asia/Seoul 12:00, same second as latestCommentUpdatedAt(2025-06-02 12:00:00.123456789)
         CommentCacheData result = service.getCacheData(
-                "\"abc123\"", "Mon, 02 Jun 2025 03:00:00 GMT", testImmediateParentPostId, null, null);
+                "\"abc123\"", "Mon, 02 Jun 2025 03:00:00 GMT", testParentPostId, null, null);
 
         // then
         assertThat(result.isCacheable()).isTrue();
@@ -196,7 +196,7 @@ class CommentCacheServiceTest {
 
         // when
         CommentCacheData result = service.getCacheData(
-                "\"abc123\"", null, testImmediateParentPostId, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE);
+                "\"abc123\"", null, testParentPostId, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE);
 
         // then
         assertThat(result.isCacheable()).isFalse();
