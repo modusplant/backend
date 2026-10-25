@@ -17,6 +17,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.*;
 
 class SecurityExceptionHandlingFilterTest {
@@ -94,5 +95,41 @@ class SecurityExceptionHandlingFilterTest {
 
         // then
         Mockito.verify(response).setStatus(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus());
+    }
+
+    @Test
+    @DisplayName("응답이 커밋된 상태에서 비즈니스 예외 발생 시 응답 작성 생략 활동 수행")
+    void testDoFilterInternal_givenCommittedResponseAndBusinessException_willSkipWritingErrorResponse() throws Exception {
+        // given
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        FilterChain filterChain = Mockito.mock(FilterChain.class);
+        given(response.isCommitted()).willReturn(true);
+        willThrow(new BusinessException(GeneralErrorCode.EMPTY_VALUE)).given(filterChain).doFilter(request, response);
+
+        // when
+        filter.doFilterInternal(request, response, filterChain);
+
+        // then
+        then(response).should(never()).setStatus(anyInt());
+        then(response).should(never()).getWriter();
+    }
+
+    @Test
+    @DisplayName("응답이 커밋된 상태에서 알 수 없는 예외 발생 시 응답 작성 생략 활동 수행")
+    void testDoFilterInternal_givenCommittedResponseAndUnknownException_willSkipWritingErrorResponse() throws Exception {
+        // given
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        FilterChain filterChain = Mockito.mock(FilterChain.class);
+        given(response.isCommitted()).willReturn(true);
+        willThrow(new RuntimeException("boom")).given(filterChain).doFilter(request, response);
+
+        // when
+        filter.doFilterInternal(request, response, filterChain);
+
+        // then
+        then(response).should(never()).setStatus(anyInt());
+        then(response).should(never()).getWriter();
     }
 }

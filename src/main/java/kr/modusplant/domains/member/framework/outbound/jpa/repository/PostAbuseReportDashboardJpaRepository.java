@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PostAbuseReportDashboardJpaRepository extends JpaRepository<PostAbuseReportDashboardEntity, String> {
+    void deleteByPostUlid(String postUlid);
 }

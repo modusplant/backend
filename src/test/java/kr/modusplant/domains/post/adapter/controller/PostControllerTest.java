@@ -443,6 +443,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         willDoNothing().given(postArchiveRepository).save(any(PostId.class));
         willDoNothing().given(postRepository).deletePostLikeByPostId(any(PostId.class));
         willDoNothing().given(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostAbuseReportByPostId(any(PostId.class));
+        willDoNothing().given(postRepository).deletePostAbuseReportDashboardByPostId(any(PostId.class));
         willDoNothing().given(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         willDoNothing().given(contentDataProcessorPort).deleteFiles(any(JsonNode.class));
         willDoNothing().given(postRepository).delete(any(Post.class));
@@ -455,6 +457,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postArchiveRepository).save(any(PostId.class));
         verify(postRepository).deletePostLikeByPostId(any(PostId.class));
         verify(postRepository).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository).deletePostAbuseReportByPostId(any(PostId.class));
+        verify(postRepository).deletePostAbuseReportDashboardByPostId(any(PostId.class));
         verify(postRepository).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(contentDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
@@ -478,6 +482,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postArchiveRepository, never()).save(any(PostId.class));
         verify(postRepository, never()).deletePostLikeByPostId(any(PostId.class));
         verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostAbuseReportByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostAbuseReportDashboardByPostId(any(PostId.class));
         verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(contentDataProcessorPort).deleteFiles(any(JsonNode.class));
         verify(postRepository).delete(any(Post.class));
@@ -501,6 +507,8 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         verify(postArchiveRepository, never()).save(any(PostId.class));
         verify(postRepository, never()).deletePostLikeByPostId(any(PostId.class));
         verify(postRepository, never()).deletePostBookmarkByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostAbuseReportByPostId(any(PostId.class));
+        verify(postRepository, never()).deletePostAbuseReportDashboardByPostId(any(PostId.class));
         verify(postRepository, never()).deletePostRecentlyViewRecordByPostId(any(PostId.class));
         verify(contentDataProcessorPort).deleteFiles(null);
         verify(postRepository).delete(any(Post.class));

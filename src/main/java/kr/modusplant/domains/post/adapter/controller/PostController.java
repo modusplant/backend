@@ -158,6 +158,8 @@ public class PostController {
             postArchiveRepository.save(PostId.create(ulid));
             postRepository.deletePostLikeByPostId(post.getPostId());
             postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportDashboardByPostId(post.getPostId());
             postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         contentDataProcessorPort.deleteFiles(post.getPostContent().getContent());

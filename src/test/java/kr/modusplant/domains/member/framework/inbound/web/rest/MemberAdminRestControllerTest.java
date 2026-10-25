@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Objects;
 
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
+import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_SIZE;
 import static kr.modusplant.domains.member.common.constant.ReportConstant.TEST_REPORT_ULID;
 import static kr.modusplant.domains.member.common.util.usecase.model.read.CommentAbuseReportDashboardReadModelTestUtils.testCommentAbuseReportDashboardReadModel;
@@ -130,7 +131,7 @@ class MemberAdminRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<PostAbuseReportDashboardReadModel>> responseEntity =
-                memberAdminRestController.approvePostAbuseReport(TEST_POST_ULID);
+                memberAdminRestController.approvePostAbuseReport(TEST_POST_ULID, MEMBER_BASIC_ADMIN_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -181,7 +182,7 @@ class MemberAdminRestControllerTest {
 
         // when
         ResponseEntity<DataResponse<CommentAbuseReportDashboardReadModel>> responseEntity =
-                memberAdminRestController.approveCommentAbuseReport(TEST_POST_ULID, TEST_COMMENT_PATH);
+                memberAdminRestController.approveCommentAbuseReport(TEST_POST_ULID, TEST_COMMENT_PATH, MEMBER_BASIC_ADMIN_UUID);
 
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);

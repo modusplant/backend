@@ -23,6 +23,10 @@ public interface PostRepository {
 
     void deletePostBookmarkByPostId(PostId postId);
 
+    void deletePostAbuseReportByPostId(PostId postId);
+
+    void deletePostAbuseReportDashboardByPostId(PostId postId);
+
     void deletePostRecentlyViewRecordByPostId(PostId postId);
 
 }
