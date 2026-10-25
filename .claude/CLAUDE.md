@@ -57,7 +57,8 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 ```
 [domain]
- ├─ adapter    # Orchestration controllers (inbound use-case calls, NO framework deps)
+ ├─ adapter    # Orchestration controllers (inbound use-case calls, NO framework deps;
+               #   `shared.framework` belongs to `shared` first, so depending on it is allowed)
  ├─ domain     # Pure business logic: aggregates, entities, VOs, validation
  ├─ usecase    # Ports (interfaces), request/response DTOs, read/write models
  └─ framework  # Technical implementations:

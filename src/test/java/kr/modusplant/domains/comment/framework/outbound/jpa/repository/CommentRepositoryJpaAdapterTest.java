@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.ImmediateParentPostIdTestUtils;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 
 public class CommentRepositoryJpaAdapterTest implements ImmediateParentPostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,
-        AuthorTestUtils, CommentTestUtils, CommentPathTestUtils,
+        CommentAuthorIdTestUtils, CommentTestUtils, CommentPathTestUtils,
         CommentEntityTestUtils, CommentCompositeKeyTestUtils {
     @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
@@ -55,7 +55,7 @@ public class CommentRepositoryJpaAdapterTest implements ImmediateParentPostIdTes
         PostEntity postEntity = Mockito.mock(PostEntity.class);
         CommentEntity commentEntity = createCommentEntityBuilder().build();
 
-        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getImmediateParentPostId().getValue())).willReturn(Optional.of(postEntity));
         given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
 
@@ -70,14 +70,14 @@ public class CommentRepositoryJpaAdapterTest implements ImmediateParentPostIdTes
     @DisplayName("존재하지 않는 작성자로 댓글 저장 시 예외 반환")
     public void testSave_givenNonExistentAuthor_willThrowException() {
         // given
-        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.empty());
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.empty());
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
                 () -> jpaAdapter.save(testValidComment));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_AUTHOR);
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_FOUND_COMMENT_AUTHOR);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class CommentRepositoryJpaAdapterTest implements ImmediateParentPostIdTes
     public void testSave_givenNonExistentPost_willThrowException() {
         // given
         MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
-        given(memberRepository.findByUuid(testValidComment.getCommentAuthor().getUuid())).willReturn(Optional.of(memberEntity));
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.of(memberEntity));
         given(postRepository.findByUlid(testValidComment.getImmediateParentPostId().getValue())).willReturn(Optional.empty());
 
         // when
@@ -93,7 +93,7 @@ public class CommentRepositoryJpaAdapterTest implements ImmediateParentPostIdTes
                 () -> jpaAdapter.save(testValidComment));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_POST);
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_FOUND_IMMEDIATE_PARENT_POST);
     }
 
     @Test

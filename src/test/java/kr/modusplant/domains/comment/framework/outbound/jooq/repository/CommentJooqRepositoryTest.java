@@ -1,6 +1,7 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.nullobject.EmptyCommentAuthorIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPageSizeTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
@@ -28,8 +29,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
-        ImmediateParentPostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
-        CommentContentTestUtils, ReplyToCommentPathTestUtils, CommentPageSizeTestUtils {
+        ImmediateParentPostIdTestUtils, CommentPathTestUtils,
+        CommentContentTestUtils, ReplyToCommentPathTestUtils, CommentPageSizeTestUtils,
+        CommentAuthorIdTestUtils, EmptyCommentAuthorIdTestUtils {
 
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -111,6 +113,50 @@ public class CommentJooqRepositoryTest implements
     }
 
     @Test
+    @DisplayName("게시글의 식별자, 댓글 경로, 작성자 식별자로 작성자 본인의 댓글인지 확인 시 True 반환")
+    void testIsCommentWrittenByAuthor_givenCommentWrittenByAuthor_willReturnTrue() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(
+                    bindings[0].equals(testImmediateParentPostId.getValue())
+                            && bindings[1].equals(testCommentPath.getValue())
+                            && bindings[2].equals(testCommentAuthorId.getValue())));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentWrittenByAuthor(testImmediateParentPostId, testCommentPath, testCommentAuthorId);
+
+        // then
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("게시글의 식별자, 댓글 경로, 작성자 식별자로 작성자 본인의 댓글이 아닌지 확인 시 False 반환")
+    void testIsCommentWrittenByAuthor_givenCommentNotWrittenByAuthor_willReturnFalse() {
+        // given
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(false));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentWrittenByAuthor(testImmediateParentPostId, testCommentPath, testCommentAuthorId);
+
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
     @DisplayName("게시글의 식별자로 댓글 읽기 모델 목록 가져오기")
     void testFindByPost_givenValidPostId_willReturnCommentOfPostReadModelList() {
         // given: column order must match CommentJooqRepository#findByPost's select list
@@ -144,7 +190,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -197,7 +243,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -241,7 +287,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -283,7 +329,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        repository.findByPost(testImmediateParentPostId, testCommentAuthorWithUuid);
+        repository.findByPost(testImmediateParentPostId, testCommentAuthorId);
 
         // then
         String sql = capturedSql[0];
@@ -293,6 +339,29 @@ public class CommentJooqRepositoryTest implements
         assertThat(orderByClause).doesNotContain("desc");
         assertThat(orderByClause).containsSubsequence(
                 "\"path_1_depth_value\" asc", "\"path_2_depth_value\" asc nulls first");
+    }
+
+    @Test
+    @DisplayName("빈 작성자 식별자로 게시글의 댓글 조회 시 활동 수행")
+    void testFindByPost_givenEmptyCommentAuthorId_willProcessAction() {
+        // given
+        List<String> capturedSql = new ArrayList<>();
+        List<Object[]> capturedBindings = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            capturedBindings.add(ctx.bindings());
+            Result<Record> result = createCommentOfPostResult(testCommentPath.getValue());
+            return new MockResult[] { new MockResult(result.size(), result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        List<CommentOfPostReadModel> result = repository.findByPost(testImmediateParentPostId, testEmptyCommentAuthorId);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(capturedSql.getFirst()).doesNotContain("\"memb_uuid\" = ?");
+        assertThat(capturedBindings.getFirst()).doesNotContainNull();
     }
 
     @Test
@@ -311,7 +380,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testImmediateParentPostId, null, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, null, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -334,7 +403,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).isEmpty();
@@ -364,7 +433,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorWithUuid);
+                repository.findByPost(testImmediateParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -522,7 +591,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         PageImpl<CommentOfAuthorReadModel> result =
-                repository.findByAuthor(testCommentAuthorWithUuid, PageRequest.of(1, 1));
+                repository.findByAuthor(testCommentAuthorId, PageRequest.of(1, 1));
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(3);
@@ -536,9 +605,9 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.totalCommentsOfPost()).isEqualTo(4);
 
         assertThat(capturedSql).hasSize(2);
-        assertThat(capturedBindings.getFirst()).contains(testCommentAuthorWithUuid.getUuid());
+        assertThat(capturedBindings.getFirst()).contains(testCommentAuthorId.getValue());
         assertThat(capturedSql.getFirst()).contains("\"is_deleted\" = false");
-        assertThat(capturedBindings.get(1)).contains(testCommentAuthorWithUuid.getUuid());
+        assertThat(capturedBindings.get(1)).contains(testCommentAuthorId.getValue());
         // 작성자 댓글 목록만 삭제된 댓글을 제외하고, 게시글 댓글 수 서브쿼리는 삭제된 댓글을 포함한다
         assertThat(capturedSql.get(1).split("\"is_deleted\" = false", -1)).hasSize(2);
         assertThat(capturedSql.get(1)).contains("offset ? rows fetch next ? rows only");
@@ -558,7 +627,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         PageImpl<CommentOfAuthorReadModel> result =
-                repository.findByAuthor(testCommentAuthorWithUuid, PageRequest.of(0, 5));
+                repository.findByAuthor(testCommentAuthorId, PageRequest.of(0, 5));
 
         // then
         assertThat(result.getTotalElements()).isEqualTo(0);

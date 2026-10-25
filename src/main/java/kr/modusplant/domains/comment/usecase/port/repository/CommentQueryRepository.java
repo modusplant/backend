@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.usecase.port.repository;
 
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
@@ -16,19 +16,19 @@ import java.util.Optional;
 
 public interface CommentQueryRepository {
 
-    List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, CommentAuthor commentAuthor);
+    List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, CommentAuthorId commentAuthorId);
 
     /**
      * {@code lastPath} 댓글 이후(첫 페이지면 처음)부터 다음 페이지 존재 여부 판단을 위해
      * {@code pageSize} 보다 1개 많은 댓글을 조회한다.
      */
-    List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, @Nullable CommentPath lastPath, CommentPageSize pageSize, CommentAuthor commentAuthor);
+    List<CommentOfPostReadModel> findByPost(ImmediateParentPostId immediateParentPostId, @Nullable CommentPath lastPath, CommentPageSize pageSize, CommentAuthorId commentAuthorId);
 
-    PageImpl<CommentOfAuthorReadModel> findByAuthor(CommentAuthor commentAuthor, Pageable pageable);
+    PageImpl<CommentOfAuthorReadModel> findByAuthor(CommentAuthorId commentAuthorId, Pageable pageable);
 
     Optional<LocalDateTime> findLatestUpdatedAtByPost(ImmediateParentPostId immediateParentPostId);
 
-    Optional<LocalDateTime> findLatestUpdatedAtByAuthor(CommentAuthor commentAuthor);
+    Optional<LocalDateTime> findLatestUpdatedAtByAuthor(CommentAuthorId commentAuthorId);
 
     /**
      * {@code path} 와 같은 부모(마지막 {@code .} 이전, 부모가 없으면 최상위) 아래에 이미 존재하는
@@ -40,5 +40,5 @@ public interface CommentQueryRepository {
 
     boolean isCommentDeleted(ImmediateParentPostId immediateParentPostId, CommentPath path);
 
-    boolean isImmediateParentPostPublished(ImmediateParentPostId immediateParentPostId);
+    boolean isCommentWrittenByAuthor(ImmediateParentPostId immediateParentPostId, CommentPath path, CommentAuthorId commentAuthorId);
 }

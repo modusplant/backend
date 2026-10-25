@@ -2,7 +2,7 @@ package kr.modusplant.domains.comment.framework.inbound.web.cache;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -94,7 +94,7 @@ public class CommentCacheService {
 
         // 작성자 댓글의 최신 변경 시각 조회
         LocalDateTime latestCommentUpdatedAt = commentQueryRepository.findLatestUpdatedAtByAuthor(
-                        CommentAuthor.create(memberId.getValue()))
+                        CommentAuthorId.fromUuid(memberId.getValue()))
                 .orElse(LocalDateTime.MIN);
 
         // member와 댓글 변경 시각 중 더 최신 것을 기준으로 함

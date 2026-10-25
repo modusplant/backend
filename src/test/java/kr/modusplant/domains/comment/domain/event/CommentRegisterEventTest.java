@@ -56,7 +56,7 @@ class CommentRegisterEventTest {
                     CommentRegisterEvent.create(null, TEST_NOTIFICATION_POST_ULID, TEST_NOTIFICATION_COMMENT_PATH_DEPTH3, TEST_NOTIFICATION_COMMENT_PREVIEW));
 
             // then
-            assertThat(exception.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_AUTHOR);
+            assertThat(exception.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_COMMENT_AUTHOR);
         }
 
         @Test

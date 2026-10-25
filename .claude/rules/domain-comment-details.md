@@ -25,7 +25,7 @@ comment/
  │   ├─ model/                            # Read models for jOOQ query mapping
  │   ├─ port/
  │   │   ├─ mapper/                       # Domain → DTO mapper interface
- │   │   └─ repository/                   # Query/Command/Cache repository port interfaces
+ │   │   └─ repository/                   # Query/Command/Cache/lookup repository port interfaces
  │   ├─ request/                          # Inbound REST DTOs (Bean Validation)
  │   └─ response/                         # Outbound REST DTOs
  ├─ adapter/
@@ -60,7 +60,7 @@ comment/
 
 **Value Object** (`domain/vo/`):
 - `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, blank, regex, or length)
-- May expose an additional nullable-tolerant factory (e.g. `createWithNullableUuid(...)`) that skips validation for contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
+- An identity VO wrapping a UUID exposes `fromUuid(...)` / `fromString(...)` factories instead of `create()`, plus a nullable-tolerant `fromNullableUuid(...)` that returns its null-object subclass for null input in contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
 - An optional VO's `create(...)` returns its null-object subclass (`vo/nullobject/Empty*`) for blank input instead of throwing; the null object is a singleton whose `getValue()` returns null
@@ -89,9 +89,9 @@ comment/
 - Java records optimized for specific views, direct targets of jOOQ query mapping; placed directly under `model/`; named with a `*ReadModel` suffix
 
 **Repository Ports** (`usecase/port/repository/`):
-- Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology
+- Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology; separate read-only lookup ports, each named after the referenced object (the author, the immediate parent post), cover cross-aggregate references
 - Parameters and return types use domain VOs/Aggregates on every port;
-- The query port may also declare a cross-domain read-only precondition check (e.g. whether a referenced parent resource is in a publishable state);
+- The query port may also declare an ownership check (whether a comment was written by a given author);
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
 **Cache Port** (`usecase/port/repository/`):
@@ -156,7 +156,7 @@ comment/
 - Cursor-paginated reads use keyset seek on the shared sort key, first reading the cursor row's sort-key values (an empty list when it is absent)
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
 - Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
-- May also implement a cross-domain read-only state check
+- May implement the ownership check as an existence query matching the comment's identity and its author
 - May expose a highest-child-ordinal lookup beneath a given parent path as a `MAX` aggregate over per-depth ordinal columns (root-level: the first-depth column among rows without a second-depth value; nested: the second-depth column among rows sharing the root's first-depth value), returning 0 when no sibling exists
 
 **Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
@@ -180,3 +180,5 @@ comment/
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
 **Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving
+
+**Lookup Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements a read-only lookup port over the referenced domain's Spring Data repository; a lookup that must return a value throws a not-found exception parameterized with a `domain/exception/enums` error code when the referenced row is absent, and a state check returns false for an absent row
