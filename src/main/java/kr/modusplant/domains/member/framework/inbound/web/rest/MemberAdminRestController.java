@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import kr.modusplant.domains.member.adapter.controller.MemberAdminController;
 import kr.modusplant.domains.member.domain.enums.AbuseReportStatus;
@@ -25,8 +26,11 @@ import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 import static kr.modusplant.shared.constant.Regex.REGEX_MATERIALIZED_PATH;
 import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
@@ -181,9 +185,14 @@ public class MemberAdminRestController {
             @PathVariable
             @NotBlank(message = "게시글 식별자가 비어 있습니다.")
             @Pattern(regexp = REGEX_ULID, message = "유효하지 않은 ULID 형식입니다. ")
-            String postUlid) {
+            String postUlid,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         PostAbuseReportDashboardReadModel readModel =
-                memberAdminController.approvePostAbuse(new PostAbuseReportApproveRecord(postUlid));
+                memberAdminController.approvePostAbuse(new PostAbuseReportApproveRecord(postUlid, memberId));
         return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
 
@@ -281,9 +290,14 @@ public class MemberAdminRestController {
             @PathVariable
             @NotBlank(message = "댓글 경로가 비어 있습니다.")
             @Pattern(regexp = REGEX_MATERIALIZED_PATH, message = "유효하지 않은 댓글 경로 형식입니다. ")
-            String path) {
+            String path,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
         CommentAbuseReportDashboardReadModel readModel =
-                memberAdminController.approveCommentAbuse(new CommentAbuseReportApproveRecord(postUlid, path));
+                memberAdminController.approveCommentAbuse(new CommentAbuseReportApproveRecord(postUlid, path, memberId));
         return ResponseEntity.ok().body(DataResponse.ok(readModel));
     }
 }

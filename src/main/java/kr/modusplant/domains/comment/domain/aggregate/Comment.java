@@ -1,5 +1,6 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;
 import kr.modusplant.shared.exception.EmptyValueException;

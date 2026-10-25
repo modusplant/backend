@@ -2,6 +2,7 @@ package kr.modusplant.domains.comment.adapter.controller;
 
 import kr.modusplant.domains.comment.adapter.helper.CommentValidationHelper;
 import kr.modusplant.domains.comment.domain.aggregate.Comment;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.event.CommentRegisterEvent;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.*;

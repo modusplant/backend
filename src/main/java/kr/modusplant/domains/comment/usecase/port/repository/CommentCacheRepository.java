@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.usecase.port.repository;
 
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 

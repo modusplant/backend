@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.domain.vo;
+package kr.modusplant.domains.comment.domain.entity;
 
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.shared.constant.Regex;

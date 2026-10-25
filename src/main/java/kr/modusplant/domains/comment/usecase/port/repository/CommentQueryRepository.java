@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.usecase.port.repository;
 
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
@@ -40,5 +40,5 @@ public interface CommentQueryRepository {
 
     boolean isCommentDeleted(ImmediateParentPostId immediateParentPostId, CommentPath path);
 
-    boolean isPostPublished(ImmediateParentPostId immediateParentPostId);
+    boolean isImmediateParentPostPublished(ImmediateParentPostId immediateParentPostId);
 }

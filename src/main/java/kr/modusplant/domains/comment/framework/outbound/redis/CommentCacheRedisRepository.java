@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.redis;
 
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentCacheRepository;

@@ -1,7 +1,7 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.vo.CommentAuthor;
+import kr.modusplant.domains.comment.domain.entity.CommentAuthor;
 import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ImmediateParentPostId;
@@ -244,7 +244,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public boolean isPostPublished(ImmediateParentPostId immediateParentPostIdVO) {
+    public boolean isImmediateParentPostPublished(ImmediateParentPostId immediateParentPostIdVO) {
         String postId = immediateParentPostIdVO.getValue();
         return postId != null && Boolean.TRUE.equals(
                 dsl.select(commPost.IS_PUBLISHED)

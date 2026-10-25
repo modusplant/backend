@@ -21,8 +21,6 @@ public interface CommentJpaRepository extends JpaRepository<CommentEntity, Comme
 
     List<CommentEntity> findByContent(String content);
 
-    void deleteByPostUlidAndPath(String postUlid, String path);
-
     boolean existsByPostUlidAndPath(String postUlid, String path);
 
     boolean existsByPostUlidAndPathAndAuthMemberUuid(String postUlid, String path, UUID authMemberUuid);
