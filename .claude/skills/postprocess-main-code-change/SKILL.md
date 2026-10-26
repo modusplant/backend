@@ -25,6 +25,11 @@ Wait for each invoked skill to finish before starting the next one.
 - Quality gate: if `check-code-detail-quality` returns `QUALITY CHECK PASSED`, continue with the
   next step. If it returns `QUALITY CHECK REJECTED`, report that response as-is and stop the
   workflow there.
+- Test gate: if `reflect-code-change-into-test` returns `TEST SYNC PASSED`, continue with the
+  next step. If it returns `TEST SYNC FAILED`, report that response as-is and stop the workflow
+  there.
+- Precedence: when a step returns a gate verdict, that verdict alone decides whether the workflow
+  continues. Skip and Stop below apply only to a step that ends without a gate verdict.
 - Skip: if a step terminates because its target set is empty — including a set left empty by
   that skill's own scope filter — treat the step as skipped and continue with the next step.
 - Stop: if a step terminates early for any other reason, stop the workflow there — do not force
