@@ -9,8 +9,6 @@ import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,8 +17,7 @@ public class NormalIdentityMapperImplTest implements NormalCredentialsTestUtils,
     @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
-    private final PasswordEncoder encoder = new BCryptPasswordEncoder();
-    private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl(encoder);
+    private final NormalIdentityMapper mapper = new NormalIdentityMapperImpl();
 
     @Test
     @DisplayName("유효한 요청을 일반 회원가입 데이터 VO로 변환")
@@ -31,8 +28,8 @@ public class NormalIdentityMapperImplTest implements NormalCredentialsTestUtils,
         // then
         assertThat(result.getNormalCredentials().getEmail())
                 .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNormalCredentials().getEmail());
-        assertThat(encoder.matches(testNormalCredentials.getPassword().getValue(),
-                result.getNormalCredentials().getPassword().getValue())).isTrue();
+        assertThat(result.getNormalCredentials().getPassword())
+                .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNormalCredentials().getPassword());
         assertThat(result.getNickname().getValue())
                 .isEqualTo(TEST_NORMAL_SIGN_UP_DATA.getNickname().getValue());
         assertThat(result.getAgreedTermsOfUseVersion().getValue())

@@ -7,7 +7,6 @@ import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
-import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -19,11 +18,12 @@ import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityJooqRepositoryTest implements
-        EmailTestUtils, PasswordTestUtils, NicknameTestUtils {
+        EmailTestUtils, NicknameTestUtils {
     @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
@@ -45,7 +45,7 @@ public class NormalIdentityJooqRepositoryTest implements
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
             Result<Record1<String>> result = dsl.newResult(memberAuth.PW);
             result.add(
-                    dsl.newRecord(memberAuth.PW).value1(testNormalUserPassword.getValue())
+                    dsl.newRecord(memberAuth.PW).value1(MEMBER_AUTH_BASIC_USER_PW)
             );
 
             if (bindings[0].equals(testNormalMemberId.getValue()) && bindings[1].equals(AuthProvider.BASIC.name())) {
@@ -62,7 +62,7 @@ public class NormalIdentityJooqRepositoryTest implements
         String result = repository.getMemberPassword(testNormalMemberId);
 
         // then
-        assertThat(result).isEqualTo(testNormalUserPassword.getValue());
+        assertThat(result).isEqualTo(MEMBER_AUTH_BASIC_USER_PW);
     }
 
     @Test

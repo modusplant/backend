@@ -62,7 +62,7 @@ normal/
 
 **Request DTOs** (`usecase/request/`):
 - Java records carrying Bean Validation annotations (`@NotBlank`, `@Pattern`) and Swagger `@Schema`; patterns reference `Regex.REGEX_*` constants
-- Override `toString()` to mask personal data (`MaskUtils.maskEmail`, `MaskUtils.maskAnyString`) so it never reaches logs in plain text
+- Override `toString()` to mask personal data (`MaskUtils.maskEmail`, `MaskUtils.maskAnyString`)
 
 ---
 
@@ -72,9 +72,9 @@ normal/
 - Receives request DTOs and a raw `UUID`, converts them to domain VOs, calls the repository ports
 - Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then rejects a duplicate nickname, before saving the mapped sign-up data
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before calling the update port
-- Throws shared exceptions (`ExistsEntityException`, `NotFoundEntityException`, `InvalidValueException`) or domain-local ones, parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `MemberErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
+- Throws shared exceptions (`ExistsEntityException`, `NotFoundEntityException`, `InvalidValueException`) or domain-local ones, parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
 
-**Mapper** (`adapter/mapper/`) — `@Component`, explicit constructor injecting `@Qualifier("bcryptPasswordEncoder") PasswordEncoder`; implements the mapper port, encoding the raw password before building the domain VO
+**Mapper** (`adapter/mapper/`) — `@Component`; implements the mapper port, building the domain VO from the raw request values
 
 ---
 
@@ -83,7 +83,7 @@ normal/
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @Slf4j @RequiredArgsConstructor @Validated`:
 - Each mapping carries its full path (no class-level `@RequestMapping`); request bodies use `@RequestBody @Valid`; responses wrap in `DataResponse`
 - Member-scoped endpoints carry `@PreAuthorize("isAuthenticated()")`, take the caller via `@AuthenticationPrincipal(expression = "uuid")` with `@Parameter(hidden = true)`, and call `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)` before delegating to the adapter Controller
-- Endpoints handled by a Spring Security filter (e.g. email-password login) are declared as empty dummy methods documented with Javadoc, only so that Swagger UI lists them
+- Endpoints handled by a Spring Security filter (e.g. email-password login) are declared as empty dummy methods documented with Javadoc
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
 **jOOQ Repository** (`framework/outbound/persistence/jooq/`) — `@Repository`, explicit constructor; implements the read port with `DSLContext`:
@@ -95,5 +95,5 @@ normal/
 - Takes the already-saved member entity as a source parameter for entities that reference it; fixed values use `expression = "java( ... )"` (e.g. `AuthProvider.BASIC`)
 
 **Repository Adapter** (`framework/outbound/persistence/jpa/repository/`) — `@Repository`, explicit constructor injecting `@Qualifier("bcryptPasswordEncoder") PasswordEncoder`; implements the create and update ports:
-- Sign-up saves the member entity first, then the member-auth, member-term, and member-profile entities built from it through the JPA mappers
+- Sign-up saves the member entity first, then the member-auth, member-term, and member-profile entities built from it through the JPA mappers; the raw password is encoded here and passed to the member-auth mapper
 - Updates load the member and its member-auth entity (throwing `NotFoundEntityException` when absent), apply the entity's intent-named `update*` methods (encoding a new password first), then save

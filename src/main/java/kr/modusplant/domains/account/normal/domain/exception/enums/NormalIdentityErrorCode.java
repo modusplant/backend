@@ -8,17 +8,16 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum NormalIdentityErrorCode implements ErrorCode {
-
     // domain
     INVALID_CODE(HttpStatus.BAD_REQUEST.value(), "invalid_code", "올바른 코드가 아닙니다"),
     INVALID_ROLE(HttpStatus.BAD_REQUEST.value(), "invalid_role", "올바른 사용자의 역할이 아닙니다"),
     INVALID_AGREED_TERM_VERSION(HttpStatus.BAD_REQUEST.value(), "invalid_agreed_term_version", "동의한 약관의 버전 값이 올바른 형식이 아닙니다"),
     EMPTY_AGREED_TERM_VERSION(HttpStatus.BAD_REQUEST.value(), "empty_agreed_term_version", "동의한 약관의 버전 값이 비어 있습니다"),
-
     EXISTS_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_account", "회원 계정이 이미 있습니다"),
     EXISTS_BASIC_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_basic_account", "일반 회원 계정이 이미 있습니다"),
     EXISTS_GOOGLE_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_google_account", "Google 계정이 이미 있습니다"),
-    EXISTS_KAKAO_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_kakao_account", "Kakao 계정이 이미 있습니다")
+    EXISTS_KAKAO_ACCOUNT(HttpStatus.CONFLICT.value(), "exists_kakao_account", "Kakao 계정이 이미 있습니다"),
+    NOT_FOUND_ACCOUNT(HttpStatus.NOT_FOUND.value(), "not_found_account", "계정을 찾을 수 없습니다"),
     ;
 
     private final int httpStatus;

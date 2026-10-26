@@ -5,6 +5,7 @@ import kr.modusplant.domains.account.normal.common.util.domain.vo.SignUpDataTest
 import kr.modusplant.domains.account.normal.common.util.usecase.request.EmailModificationRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSignUpRequestTestUtils;
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
+import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityReadRepository;
@@ -12,7 +13,6 @@ import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdenti
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
@@ -25,11 +25,14 @@ import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
+import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -52,8 +55,8 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
             identityMapper, createRepository, updateRepository, readRepository, encoder);
 
     @Test
-    @DisplayName("이미 존재하는 닉네임으로 요청 시 DataAlreadyExistsException 발생")
-    public void testRegisterNormalMember_givenExistingNickname_willThrowDataAlreadyExistsException() {
+    @DisplayName("이미 존재하는 닉네임으로 요청 시 ExistsValueException 발생")
+    public void testRegisterNormalMember_givenExistingNickname_willThrowException() {
         // given
         NormalSignUpRequest request = testNormalSignUpRequest;
 
@@ -61,7 +64,8 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
 
         // when & then
         assertThatThrownBy(() -> controller.registerNormalMember(request))
-                .isInstanceOf(ExistsValueException.class);
+                .isInstanceOf(ExistsValueException.class)
+                .extracting("errorCode").isEqualTo(KernelErrorCode.EXISTS_NICKNAME);
 
         verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(Email.create(request.email()));
@@ -171,8 +175,24 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
                 () -> controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest));
 
-        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
+        assertThat(exception.getErrorCode()).isEqualTo(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT);
+        assertThat(exception.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
         verify(updateRepository, never()).updateEmail(any(), any());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원의 비밀번호 변경 시 예외 반환")
+    public void testModifyPassword_givenNotFoundMember_willThrowException() {
+        // given
+        given(readRepository.existsByMemberId(testNormalMemberId)).willReturn(false);
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                () -> controller.modifyPassword(testNormalMemberId.getValue(), testPasswordModificationRequest));
+
+        assertThat(exception.getErrorCode()).isEqualTo(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT);
+        assertThat(exception.getErrorCode().getHttpStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
+        verify(updateRepository, never()).updatePassword(any(), any());
     }
 
     @Test
@@ -212,8 +232,8 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         PasswordModificationRequest request = testPasswordModificationRequest;
 
         given(readRepository.existsByMemberId(testNormalMemberId)).willReturn(true);
-        given(readRepository.getMemberPassword(testNormalMemberId)).willReturn(request.currentPw());
-        given(encoder.matches(request.currentPw(), request.currentPw())).willReturn(true);
+        given(readRepository.getMemberPassword(testNormalMemberId)).willReturn(MEMBER_AUTH_BASIC_USER_PW);
+        given(encoder.matches(request.currentPw(), MEMBER_AUTH_BASIC_USER_PW)).willReturn(true);
         doNothing().when(updateRepository).updatePassword(testNormalMemberId, Password.create(request.newPw()));
 
         // when
@@ -222,7 +242,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         // then
         verify(readRepository, times(1)).existsByMemberId(testNormalMemberId);
         verify(readRepository, times(1)).getMemberPassword(testNormalMemberId);
-        verify(encoder, times(1)).matches(request.currentPw(), request.currentPw());
+        verify(encoder, times(1)).matches(request.currentPw(), MEMBER_AUTH_BASIC_USER_PW);
         verify(updateRepository, times(1)).updatePassword(testNormalMemberId, Password.create(request.newPw()));
     }
 }

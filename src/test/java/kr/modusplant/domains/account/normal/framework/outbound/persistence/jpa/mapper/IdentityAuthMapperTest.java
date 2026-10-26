@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +31,15 @@ public class IdentityAuthMapperTest implements MemberAuthEntityTestUtils,
         MemberAuthEntity compare = createMemberAuthBasicUserEntityBuilder()
                 .member(createMemberBasicUserEntityWithUuid()).build();
         SignUpData testSign = SignUpData.create(MEMBER_AUTH_BASIC_USER_EMAIL,
-                MEMBER_AUTH_BASIC_USER_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
+                MEMBER_AUTH_BASIC_USER_RAW_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
                 MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         // when
-        MemberAuthEntity result = mapper.toSiteMemberAuthEntity(createMemberBasicUserEntityWithUuid(), testSign);
+        MemberAuthEntity result = mapper.toSiteMemberAuthEntity(createMemberBasicUserEntityWithUuid(), testSign,
+                MEMBER_AUTH_BASIC_USER_PW);
 
         // then
         assertThat(result).isEqualTo(compare);
+        assertThat(result.getPw()).isEqualTo(MEMBER_AUTH_BASIC_USER_PW);
     }
 }
