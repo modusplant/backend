@@ -2,8 +2,8 @@
 
 Architecture reference for how nGrinder is deployed and behaves on this host, and how to
 investigate a run directly from the filesystem/containers; consumed on demand, not
-path-auto-attached. Scripts under `.claude/scripts/*.groovy` are nGrinder Groovy scripts, not part
-of the Gradle build.
+path-auto-attached. nGrinder Groovy scripts are not stored in this repository and are not part of
+the Gradle build.
 
 ---
 
