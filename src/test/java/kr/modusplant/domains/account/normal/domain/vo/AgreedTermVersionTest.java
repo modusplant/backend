@@ -1,9 +1,9 @@
 package kr.modusplant.domains.account.normal.domain.vo;
 
 import kr.modusplant.domains.account.normal.common.util.domain.vo.AgreedTermVersionTestUtils;
-import kr.modusplant.domains.account.normal.domain.exception.EmptyValueException;
-import kr.modusplant.domains.account.normal.domain.exception.InvalidValueException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class AgreedTermVersionTest implements AgreedTermVersionTestUtils {
                 AgreedTermVersion.create(null));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.EMPTY_AGREED_TERMS_OF_VERSION, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.EMPTY_AGREED_TERM_VERSION, result.getErrorCode());
     }
 
     @Test
@@ -30,7 +30,7 @@ public class AgreedTermVersionTest implements AgreedTermVersionTestUtils {
                 AgreedTermVersion.create("va11223"));
 
         // when & then
-        assertEquals(NormalIdentityErrorCode.INVALID_AGREED_TERMS_OF_VERSION, result.getErrorCode());
+        assertEquals(NormalIdentityErrorCode.INVALID_AGREED_TERM_VERSION, result.getErrorCode());
     }
 
     @Test

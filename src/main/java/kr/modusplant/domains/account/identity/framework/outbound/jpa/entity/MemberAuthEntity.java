@@ -73,10 +73,6 @@ public class MemberAuthEntity {
 
     public void updatePassword(String password) { this.pw = password; }
 
-    public void updateProvider(AuthProvider provider) {
-        this.provider = provider;
-    }
-
     public void updateProviderId(String providerId) {
         this.providerId = providerId;
     }
