@@ -74,13 +74,13 @@ method does.
 
 ## 6. Test Body Convention (BDD Style)
 
-Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
+Follow the `given-when-then` pattern using `BDDMockito`.
 
 - **given:** Define one-time objects required for testing and setup stubbing using `given()`.
 - **when:** Execute the specific method under test (assign the return value to a variable if present).
 - **then:**
     - Use `Mockito.verify()` to verify that the mock object's methods were called with correct arguments.
-    - For exception testing, thoroughly verify that the exception code returned by `getErrorCode()`
+    - For exception testing, assert that the exception code returned by `getErrorCode()`
       — the `*ErrorCode` enum the class under test actually throws — matches the expected value.
       If the thrown exception is a raw `RuntimeException` or a JDK exception with no
       `getErrorCode()` contract, assert the exception type and, where it carries meaning, its
