@@ -49,8 +49,7 @@ member/
      ├─ outbound/jpa/adapter/      # *RepositoryJpaAdapter — mediates between the outbound port
      │                             #   implementation and the raw Spring Data JPA repository
      ├─ outbound/jpa/compositekey/ # Composite PK classes for @IdClass entities (join/report tables)
-     ├─ outbound/jooq/repository/  # DSLContext-based complex queries
-     └─ outbound/jooq/record/      # jOOQ composite parameter records
+     └─ outbound/jooq/repository/  # DSLContext-based complex queries
 ```
 
 ---
@@ -94,7 +93,7 @@ member/
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
 - Adapter converts raw types to domain VOs; naming: `*GetRecord`, `*OverrideRecord`, `*LikeRecord`, etc.
 - When an operation has multiple coexisting API versions, the record is suffixed accordingly (e.g. `*FooRecord_V1`, `*FooRecord_V2`) instead of one record serving every version
-- Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON) and `framework/outbound/jooq/record/` (jOOQ params)
+- Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON)
 
 **Response DTOs** (`usecase/response/`):
 - Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
@@ -167,4 +166,4 @@ member/
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models

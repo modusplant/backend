@@ -31,6 +31,7 @@ comment/
  ├─ adapter/
  │   ├─ controller/                       # Business orchestration
  │   ├─ helper/                           # Cross-aggregate write-precondition checks
+ │   ├─ listener/                         # Synchronous listeners for other domains' events
  │   └─ mapper/                           # Mapper port implementation
  └─ framework/
      ├─ inbound/web/rest/                 # HTTP entry point
@@ -126,6 +127,9 @@ comment/
 - Exposes single-purpose precondition checks
 - Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
 - Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local exception; the ownership failure maps to HTTP 403
+
+**Event Listener** (`adapter/listener/`) — `@Component @RequiredArgsConstructor`; `@EventListener` methods run in the publisher's transaction:
+- On another domain's abuse-report approval event, requires the event's member to hold the admin role (otherwise throws `NotAccessibleException` with `GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS`), runs the helper's parent-post and comment existence checks, then soft-deletes the comment without an author-ownership check
 
 **Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
 - Exposes a reply target as deleted with a null nickname when it is soft-deleted, or when its row is absent while the reply-target path is set; the reply-target path itself is returned as stored

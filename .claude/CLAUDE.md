@@ -75,7 +75,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
 - **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually.
 - **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or `@Mapping(target=..., ignore=true)` must be set.
-- **Redis**: Used for response caching and JWT refresh-token blacklisting.
+- **Redis**: Used for response caching and JWT access-token blacklisting.
 
 ### Project Conventions
 - **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.

@@ -12,5 +12,5 @@ The Group A / Group B lists below are relative to
   this domain. Evidence: no test file exists under
   `src/test/java/kr/modusplant/domains/member/framework/outbound/jooq/`.
 - **TestUtils shared constant paths:** `domains/member/common/constant`, `domains/post/common/constant`, `domains/comment/common/constant`
-- **Group A (fields):** `domain/event`, `domain/vo` (incl. `vo/nullobject`), `framework/outbound/jooq/record`, `framework/outbound/jpa/compositekey`, `framework/outbound/jpa/entity/record` (records only), `usecase/model/read`, `usecase/record`, `usecase/request`, `usecase/response`
+- **Group A (fields):** `domain/event`, `domain/vo` (incl. `vo/nullobject`), `framework/outbound/jpa/compositekey`, `framework/outbound/jpa/entity/record` (records only), `usecase/model/read`, `usecase/record`, `usecase/request`, `usecase/response`
 - **Group B (methods):** `domain/aggregate`, `domain/entity` (incl. `entity/nullobject`), `framework/outbound/jpa/entity` (excluding `entity/record`)
