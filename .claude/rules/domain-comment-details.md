@@ -90,8 +90,8 @@ comment/
 
 **Repository Ports** (`usecase/port/repository/`):
 - Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology; separate read-only lookup ports, each named after the referenced object (the author, the immediate parent post), cover cross-aggregate references
-- Parameters and return types use domain VOs/Aggregates on every port;
-- The query port may also declare an ownership check (whether a comment was written by a given author);
+- Parameters and return types use domain VOs/Aggregates on every port
+- The query port may also declare an ownership check (whether a comment was written by a given author)
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
 **Cache Port** (`usecase/port/repository/`):
@@ -136,8 +136,7 @@ comment/
 
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
 - HTTP concerns only: request parsing, response serialization, cache headers, validation
-- Extracts auth via `@AuthenticationPrincipal` (may nullable for endpoints with optional authentication); wraps parameters into a usecase call and delegates to the adapter Controller
-- `register`, `updateContent`, and `delete` accept `@AuthenticationPrincipal` and forward the caller's UUID for a downstream ownership/authorization check
+- Extracts auth via `@AuthenticationPrincipal` (nullable for endpoints with optional authentication); wraps parameters, including the caller's UUID for `register`, `updateContent`, and `delete`, into a usecase call and delegates to the adapter Controller
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
 

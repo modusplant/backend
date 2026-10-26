@@ -1,6 +1,6 @@
 ---
 name: reflect-code-change-into-test
-description: This file provides strict guidance on creating, modifying, and deleting tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
+description: Creates, modifies, and deletes tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
 agent: test-code-synchronizer
 background: false
 context: fork

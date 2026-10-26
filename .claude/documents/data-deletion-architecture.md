@@ -1,6 +1,6 @@
 # Data Deletion Architecture
 
-Architecture reference for how persisted data is deleted across domains; consumed on demand.
+Architecture reference for how persisted data is deleted across domains.
 
 Applies to every application flow that hard-deletes, soft-deletes, or archives PostgreSQL rows, to the Amazon S3 objects
 and Redis keys removed in the same flow, and to the cascade rules declared at the database and JPA levels.
@@ -13,9 +13,6 @@ and Redis keys removed in the same flow, and to the cascade rules declared at th
 |------------------------------|-------------|--------------------------------------------|
 | comment (`comm_comment`)     | soft-delete | `is_deleted` set to `true`; the row stays  |
 | every other table            | hard-delete | the row is removed                         |
-
-Member withdrawal hard-deletes all member-related data in one transaction, including the member's
-comments regardless of their soft-delete state.
 
 ---
 
@@ -78,7 +75,7 @@ the reported comment is soft-deleted (section 3), without the author check, sync
 
 ## 3. Soft-Delete Policy
 
-Comment deletion only sets `comm_comment.is_deleted` to `true`. The row are left as they are, and the post's comment list keeps returning it with `isDeleted` set.
+Comment deletion only sets `comm_comment.is_deleted` to `true`. The row is left as it is, and the post's comment list keeps returning it with `isDeleted` set.
 
 Comment counts are computed at read time; no counter column is stored:
 

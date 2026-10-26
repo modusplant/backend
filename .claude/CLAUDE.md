@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Run the application (local profile active by default)
 ./gradlew bootRun
 
-# Build (skips jOOQ codegen if DB is unavailable)
+# Build
 ./gradlew build
 
 # Run tests + generate JaCoCo coverage report
@@ -21,18 +21,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Database & Code Generation
 
-The build chain requires a live DB with schema migrations already applied: `processResources` → `jooqCodegen` → `compileJava`
+Compilation requires a live DB; its task chain and credentials are in `.claude/rules/db-migration-details.md`.
 
 ```bash
 # Regenerate jOOQ classes from the current schema
 ./gradlew jooqCodegen
-```
-
-DB credentials must be supplied via environment variables or `gradle.properties`:
-```
-JDBC_CONNECTION_URL / jdbcConnectionUrl
-JDBC_USERNAME       / jdbcUsername
-JDBC_PASSWORD       / jdbcPassword
 ```
 
 ### Single Test
@@ -80,7 +73,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 ### Technical Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
-- **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually — run `./gradlew jooqCodegen` to regenerate after schema changes.
+- **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually.
 - **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or `@Mapping(target=..., ignore=true)` must be set.
 - **Redis**: Used for response caching and JWT refresh-token blacklisting.
 
@@ -101,12 +94,11 @@ Detailed working rules live under `.claude/`:
 
 - `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
 - `.claude/documents/*.md` — on-demand reference docs: 
-  - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `test-code-synchronizer` agent, launched by the `reflect-code-change-into-test` skill)
-  - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; also referenced directly from `test-architecture-details.md`)
+  - `test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md` (per-area test features, consumed by the `test-code-synchronizer` agent)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for nGrinder Groovy scripts).
-  - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
-  - `data-deletion-architecture.md` (hard-delete/soft-delete policy, archiving, related-data handling per deletion flow, and cascade rules across domains; consumed by the `check-code-detail-quality` skill).
+  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
+  - `open-authentication-architecture.md` (OAuth 2.0 authorization-code flow across `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
+  - `data-deletion-architecture.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and cascade rules)
 - `.claude/skills/*/SKILL.md` — task workflows.
 - `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md`. Never read it — `SKILL.md` is canonical. Reading it is permitted only to update it to match `SKILL.md`.
 

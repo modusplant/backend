@@ -28,7 +28,6 @@ security/
 
 **Config** (`config/`):
 - A single `@Configuration` class assembles one `SecurityFilterChain` bean plus its supporting beans (password encoders, authentication manager, providers, handlers, filters, CORS source)
-- The profile-specific `CorsConfigurationSource` beans share a `@Qualifier("corsConfigurationSource")` qualifier; the filter chain bean injects that qualifier explicitly
 
 **Filter** (`filter/`):
 - Extend `OncePerRequestFilter` for cross-cutting, always-run concerns (JWT parsing/verification, chain-wide exception translation), or `AbstractAuthenticationProcessingFilter` for a filter dedicated to intercepting one login endpoint
@@ -74,7 +73,7 @@ Maps each custom component to the Spring Security type it implements or extends.
 | Login failure handler         | `AuthenticationFailureHandler`           | `WriteResponseLoginFailureHandler`                           |
 | Authentication exception root | `AuthenticationException`                | `BusinessAuthenticationException`                            |
 
-**Naming note:** `DefaultAuthProvider` (a Spring Security `AuthenticationProvider` implementation) shares a short name with the unrelated `AuthProvider` enum used elsewhere for social-login provider identifiers. Same short name, different concern — do not conflate them by name alone.
+**Naming note:** `DefaultAuthProvider` (a Spring Security `AuthenticationProvider` implementation) shares a short name with the unrelated `AuthProvider` enum used elsewhere for social-login provider identifiers.
 
 ---
 
@@ -96,8 +95,6 @@ A matched request passes through these filters in order:
 | 6 | `AnonymousAuthenticationFilter`     | Sets an anonymous authentication when the security context is still empty                                                                                                                        |
 | 7 | `ExceptionTranslationFilter`        | Translates `AuthorizationFilter` denials into `DefaultAuthenticationEntryPoint` (anonymous caller) or `DefaultAccessDeniedHandler` (authenticated caller)                                        |
 | 8 | `AuthorizationFilter`               | Applies the rules in §4.3                                                                                                                                                                        |
-
-After the chain, the request reaches `DispatcherServlet` and the controller.
 
 ### 4.2 Request Paths
 
@@ -145,7 +142,7 @@ After the chain, the request reaches `DispatcherServlet` and the controller.
 2. The permit-all map, keyed by `HttpMethod`: `SecurityConfig.PUBLIC_ENDPOINTS`, merged with `SecurityConfig.LOCAL_PUBLIC_ENDPOINTS` when the `local` profile is active
 3. `anyRequest().authenticated()`
 
-`SecurityExceptionHandlingFilter` and `ExceptionTranslationFilter` share `DefaultAuthenticationEntryPoint`, and `DefaultAccessDeniedHandler` uses the same `DataResponse` shape, so the error response shape is the same whichever stage catches the exception.
+`SecurityExceptionHandlingFilter` and `ExceptionTranslationFilter` share `DefaultAuthenticationEntryPoint`; it and `DefaultAccessDeniedHandler` both write a `DataResponse`.
 
 ---
 

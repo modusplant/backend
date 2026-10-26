@@ -65,7 +65,7 @@ member/
 **Entity** (`domain/entity/`):
 - `protected` constructor + `static create()` factory
 - Optional entities: Null Object pattern → singleton class under `entity/nullobject/`
-- May expose an additional overloaded `create(...)` factory that derives an omitted field internally from an already-validated field (e.g. parsing a filename VO out of a path VO's value) — mirrors the VO overload pattern above, avoiding duplicated parsing logic across callers
+- May expose an additional overloaded `create(...)` factory that derives an omitted field internally from an already-validated field (e.g. parsing a filename VO out of a path VO's value)
 
 **Value Object** (`domain/vo/`):
 - `@RequiredArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, regex, length, range)
@@ -118,7 +118,7 @@ member/
 **Helper** (`adapter/helper/`) — `@Component`:
 - Used only for controller
 - `*ValidationHelper`: DB-backed pre-condition checks via repository ports
-- `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`, so an S3 upload never confirmed by a DB write can later be cleaned up as an orphan
+- `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`
 - `*IOHelper` may also expose an S3-backed validation (e.g. `validateIfImageExistsInStorage`), complementing the DB-backed checks in `*ValidationHelper`
 
 **Listener** (`adapter/listener/`) — `@Component`:
