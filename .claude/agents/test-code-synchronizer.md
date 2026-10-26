@@ -1,6 +1,7 @@
 ---
 name: test-code-synchronizer
 description: Create, modify, and delete tests for every domain and infrastructure area touched by the current unpushed changes, batched per area (e.g. `comment`, `member`, `search` for domains; `security`, `jwt`, `config` for infrastructure areas).
+model: sonnet
 ---
 
 # Hard Constraints
