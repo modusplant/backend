@@ -70,8 +70,8 @@ Within this document, Korean is exceptionally allowed only in this section's dis
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
   - **Case 1:** `..._willProcessAction` -> `활동 수행`
-  - **Case 2:** `..._willThrowException` -> `예외 반환`
-  - **Case 3:** `..._willReturn<Type>` -> `<Type> 반환`
+  - **Case 2:** `..._willReturn<Type>` -> `<Type> 반환`
+  - **Case 3:** `..._willThrowException` -> `예외 반환`
 
 ---
 
