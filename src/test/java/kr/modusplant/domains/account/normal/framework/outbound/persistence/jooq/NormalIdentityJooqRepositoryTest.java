@@ -4,6 +4,7 @@ import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
+import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
 import kr.modusplant.shared.kernel.common.util.PasswordTestUtils;
@@ -62,6 +63,102 @@ public class NormalIdentityJooqRepositoryTest implements
 
         // then
         assertThat(result).isEqualTo(testNormalUserPassword.getValue());
+    }
+
+    @Test
+    @DisplayName("사용자의 식별자로 Email 반환")
+    void testGetMemberEmail_givenValidMemberId_willReturnEmail() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
+
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record1<String>> result = dsl.newResult(memberAuth.EMAIL);
+            result.add(
+                    dsl.newRecord(memberAuth.EMAIL).value1(testNormalUserEmail.getValue())
+            );
+
+            if (bindings[0].equals(testNormalMemberId.getValue())) {
+                return new MockResult[] {
+                        new MockResult(0, result)
+                };
+            }
+            return new MockResult[] { new MockResult(0, null) };
+        };
+
+        NormalIdentityJooqRepository repository = createRepository(provider);
+
+        // when
+        Email result = repository.getMemberEmail(testNormalMemberId);
+
+        // then
+        assertThat(result).isEqualTo(testNormalUserEmail);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 식별자로 null 반환")
+    void testGetMemberEmail_givenNotFoundMemberId_willReturnNull() {
+        // given
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            return new MockResult[] { new MockResult(0, dsl.newResult(memberAuth.EMAIL)) };
+        };
+
+        NormalIdentityJooqRepository repository = createRepository(provider);
+
+        // when
+        Email result = repository.getMemberEmail(testNormalMemberId);
+
+        // then
+        assertThat(result).isNull();
+    }
+
+    @Test
+    @DisplayName("사용자의 식별자로 인증 제공자 반환")
+    void testGetAuthProvider_givenValidMemberId_willReturnAuthProvider() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
+
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record1<String>> result = dsl.newResult(memberAuth.PROVIDER);
+            result.add(
+                    dsl.newRecord(memberAuth.PROVIDER).value1(AuthProvider.BASIC.name())
+            );
+
+            if (bindings[0].equals(testNormalMemberId.getValue())) {
+                return new MockResult[] {
+                        new MockResult(0, result)
+                };
+            }
+            return new MockResult[] { new MockResult(0, null) };
+        };
+
+        NormalIdentityJooqRepository repository = createRepository(provider);
+
+        // when
+        AuthProvider result = repository.getAuthProvider(testNormalMemberId);
+
+        // then
+        assertThat(result).isEqualTo(AuthProvider.BASIC);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 사용자의 식별자로 인증 제공자 조회 시 null 반환")
+    void testGetAuthProvider_givenNotFoundMemberId_willReturnNull() {
+        // given
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            return new MockResult[] { new MockResult(0, dsl.newResult(memberAuth.PROVIDER)) };
+        };
+
+        NormalIdentityJooqRepository repository = createRepository(provider);
+
+        // when
+        AuthProvider result = repository.getAuthProvider(testNormalMemberId);
+
+        // then
+        assertThat(result).isNull();
     }
 
     @Test

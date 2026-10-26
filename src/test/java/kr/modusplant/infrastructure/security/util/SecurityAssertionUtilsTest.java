@@ -1,13 +1,15 @@
 package kr.modusplant.infrastructure.security.util;
 
+import kr.modusplant.shared.exception.NotAccessibleException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.util.UUID;
 
+import static kr.modusplant.infrastructure.security.enums.SecurityErrorCode.AUTHORIZATION_FAILED;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class SecurityAssertionUtilsTest {
 
@@ -29,8 +31,9 @@ class SecurityAssertionUtilsTest {
         UUID targetUuid = UUID.randomUUID();
 
         // when & then
-        assertThatThrownBy(() -> SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid))
-                .isInstanceOf(AccessDeniedException.class)
-                .hasMessage("본인의 리소스만 접근할 수 있습니다.");
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                () -> SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 }

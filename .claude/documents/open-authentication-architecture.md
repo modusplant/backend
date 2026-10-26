@@ -89,9 +89,12 @@ narratively below for workflow completeness; its details are not tracked by this
    exchanged at request time, rather than reusing any previously obtained provider token.
 10. Account withdrawal is the only path that reaches this flow from outside
     `domains/account/social`: the withdrawal request carries the code obtained with the `SIGNOUT`
-    intent, and `domains/member`'s `MemberSocialTranslator` calls the social domain's
-    `SocialIdentityLinkController` to exchange the fresh code for a provider access token, then to
-    revoke it.
+    intent, and `domains/member`'s `MemberSocialTranslator` first verifies through the social
+    domain's `SocialIdentityRepository` that the account is a pure social account of the requested
+    provider, then calls `SocialIdentityLinkController` to exchange the fresh code for a provider
+    access token. The token is revoked by the social domain's `SocialEventListener` on a
+    `SocialAccessRevokeEvent` handled asynchronously after the withdrawal transaction commits; a
+    revocation failure is logged only.
 
 ---
 

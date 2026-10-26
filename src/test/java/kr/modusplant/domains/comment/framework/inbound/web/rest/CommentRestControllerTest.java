@@ -17,6 +17,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,6 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +36,7 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.infrastructure.security.enums.SecurityErrorCode.AUTHORIZATION_FAILED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -223,8 +224,10 @@ public class CommentRestControllerTest implements ParentPostIdTestUtils,
     @DisplayName("본인이 아닌 회원의 댓글 조회 시 예외 반환")
     void testGatherByAuthor_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, null, null, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test

@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.nullobject.EmptyCommentAuthorIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPageSizeTestUtils;

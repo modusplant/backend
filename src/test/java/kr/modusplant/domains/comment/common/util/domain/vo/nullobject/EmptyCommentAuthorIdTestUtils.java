@@ -1,4 +1,4 @@
-package kr.modusplant.domains.comment.common.util.domain.nullobject;
+package kr.modusplant.domains.comment.common.util.domain.vo.nullobject;
 
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyCommentAuthorId;
 

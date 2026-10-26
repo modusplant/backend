@@ -86,7 +86,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 ### Project Conventions
 - **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.
-- **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via Spring `ApplicationEvent`s defined in `shared/event/`.
+- **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via plain event objects published through Spring's `ApplicationEventPublisher`, defined in each domain's `domain/event/`, `infrastructure/<area>/event/`, and `shared/framework/<library>/event/`.
 - **Regex constants**: Regular expressions live in `shared/constant/Regex` — `REGEX_*` for annotations and the precompiled `PATTERN_*` for method bodies. Add new expressions there instead of writing them inline.
   Flyway Java migrations under `db/migration` are the exception and keep their own inline patterns.
 
