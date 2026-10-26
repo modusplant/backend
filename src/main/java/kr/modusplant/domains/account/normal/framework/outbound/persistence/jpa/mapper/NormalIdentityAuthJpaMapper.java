@@ -13,8 +13,8 @@ public interface NormalIdentityAuthJpaMapper {
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "member", source = "savedMember")
     @Mapping(target = "email", source = "sign.normalCredentials.email.value")
-    @Mapping(target = "pw", source = "sign.normalCredentials.password.value")
+    @Mapping(target = "pw", source = "encodedPassword")
     @Mapping(target = "provider", expression = "java( kr.modusplant.shared.enums.AuthProvider.BASIC )")
-    MemberAuthEntity toSiteMemberAuthEntity(MemberEntity savedMember, SignUpData sign);
+    MemberAuthEntity toSiteMemberAuthEntity(MemberEntity savedMember, SignUpData sign, String encodedPassword);
 
 }

@@ -53,7 +53,7 @@ identity/
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping("/api") @RequiredArgsConstructor @Validated`:
 - HTTP concerns only: path-variable validation, response wrapping in `DataResponse`
 - Member-scoped endpoints carry `@PreAuthorize("isAuthenticated()")`, take the caller via `@AuthenticationPrincipal(expression = "uuid")` with `@Parameter(hidden = true)`, and call `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)` before delegating to the adapter Controller
-- Endpoints handled by the Spring Security filter chain (e.g. logout) are declared as empty dummy methods documented with Javadoc, only so that Swagger UI lists them
+- Endpoints handled by the Spring Security filter chain (e.g. logout) are declared as empty dummy methods documented with Javadoc
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
 **jOOQ Repository** (`framework/outbound/jooq/`) — `@Repository @RequiredArgsConstructor`; implements the usecase port with `DSLContext`:

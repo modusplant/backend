@@ -9,7 +9,6 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -79,7 +78,7 @@ public class NormalIdentityController {
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         Email storedEmail = readRepository.getMemberEmail(AccountId.create(memberUuid));
         if (storedEmail == null) {
-            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT, TableName.SITE_MEMBER_AUTH);
         } else if (readRepository.getAuthProvider(AccountId.create(memberUuid)) != AuthProvider.BASIC) {
             throw new InvalidValueException(GeneralErrorCode.MISMATCH_INPUT_TYPE, "authProvider");
         } else if (!storedEmail.equals(Email.create(request.currentEmail()))) {
@@ -92,7 +91,7 @@ public class NormalIdentityController {
     @Transactional
     public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
-            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberUuid), Password.create(request.currentPw()))) {
             throw new InvalidValueException(SecurityErrorCode.BAD_PASSWORD, request.currentPw());
         } else {

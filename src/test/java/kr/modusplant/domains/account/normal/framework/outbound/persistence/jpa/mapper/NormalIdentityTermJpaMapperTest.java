@@ -9,7 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +25,7 @@ public class NormalIdentityTermJpaMapperTest implements MemberEntityTestUtils {
     public void testToSiteMemberTermEntity_givenValidSiteMemberEntityAndSignUpData_willReturnSiteMemberTermEntity() {
         // given
         SignUpData testSign = SignUpData.create(MEMBER_AUTH_BASIC_USER_EMAIL,
-                MEMBER_AUTH_BASIC_USER_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
+                MEMBER_AUTH_BASIC_USER_RAW_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
                 MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         // when

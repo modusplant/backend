@@ -27,6 +27,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
 import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.mockito.BDDMockito.given;
@@ -62,7 +63,7 @@ public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestU
     @BeforeEach
     void setUp() {
         sign = SignUpData.create(MEMBER_AUTH_BASIC_USER_EMAIL,
-                MEMBER_AUTH_BASIC_USER_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
+                MEMBER_AUTH_BASIC_USER_RAW_PW, MEMBER_BASIC_USER_NICKNAME, MEMBER_TERM_ADMIN_AGREED_TERMS_OF_USE_VERSION,
                 MEMBER_TERM_ADMIN_AGREED_PRIVACY_POLICY_VERSION, MEMBER_TERM_USER_AGREED_COMMUNITY_POLICY_VERSION);
 
         memberToBeSaved = MemberEntity.builder()
@@ -73,7 +74,7 @@ public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestU
         authEntityToBeSaved = createMemberAuthBasicUserEntityBuilder()
                 .member(createMemberBasicUserEntityWithUuid())
                 .email(sign.getNormalCredentials().getEmail().getValue())
-                .pw(sign.getNormalCredentials().getPassword().getValue())
+                .pw(MEMBER_AUTH_BASIC_USER_PW)
                 .provider(AuthProvider.BASIC).build();
 
         termEntityToBeSaved = createMemberTermUserEntityWithUuid();
@@ -86,7 +87,10 @@ public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestU
         given(identityMapper.toMemberEntity(sign.getNickname())).willReturn(memberToBeSaved);
         given(memberJpaRepository.save(memberToBeSaved)).willReturn(savedMember);
 
-        given(authMapper.toSiteMemberAuthEntity(savedMember, sign)).willReturn(authEntityToBeSaved);
+        String rawPassword = sign.getNormalCredentials().getPassword().getValue();
+        String encodedPassword = new BCryptPasswordEncoder().encode(rawPassword);
+        given(encoder.encode(rawPassword)).willReturn(encodedPassword);
+        given(authMapper.toSiteMemberAuthEntity(savedMember, sign, encodedPassword)).willReturn(authEntityToBeSaved);
         given(authJpaRepository.save(authEntityToBeSaved)).willReturn(null);
 
         given(termMapper.toSiteMemberTermEntity(savedMember, sign)).willReturn(termEntityToBeSaved);
@@ -99,7 +103,8 @@ public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestU
         Mockito.verify(identityMapper, times(1)).toMemberEntity(sign.getNickname());
         Mockito.verify(memberJpaRepository, times(1)).save(memberToBeSaved);
 
-        Mockito.verify(authMapper, times(1)).toSiteMemberAuthEntity(savedMember, sign);
+        Mockito.verify(encoder, times(1)).encode(rawPassword);
+        Mockito.verify(authMapper, times(1)).toSiteMemberAuthEntity(savedMember, sign, encodedPassword);
         Mockito.verify(authJpaRepository, times(1)).save(authEntityToBeSaved);
 
         Mockito.verify(termMapper, times(1)).toSiteMemberTermEntity(savedMember, sign);

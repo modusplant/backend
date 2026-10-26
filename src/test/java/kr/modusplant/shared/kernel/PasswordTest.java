@@ -7,7 +7,7 @@ import kr.modusplant.shared.kernel.enums.KernelErrorCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PasswordTest implements PasswordTestUtils {
@@ -52,7 +52,7 @@ public class PasswordTest implements PasswordTestUtils {
     @DisplayName("다른 프로퍼티 객체로 거짓 반환")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Password different = Password.create(MEMBER_AUTH_BASIC_USER_PW + "1");
+        Password different = Password.create(MEMBER_AUTH_BASIC_USER_RAW_PW + "1");
 
         // when & then
         assertNotEquals(testNormalUserPassword, different);
