@@ -15,8 +15,7 @@ Applies to `kr.modusplant.domains.account.normal` and its sub-packages.
 normal/
  ├─ domain/
  │   ├─ vo/                                  # Value Objects
- │   └─ exception/                           # Domain-local exception classes
- │       └─ enums/                           # Error code enums
+ │   └─ exception/enums/                     # Error code enums
  ├─ usecase/
  │   ├─ port/repository/                     # Create/Read/Update repository port interfaces
  │   ├─ port/mapper/                         # Request → domain mapper interface
@@ -38,13 +37,10 @@ normal/
 ## 2. domain/ Patterns
 
 **Value Object** (`domain/vo/`) — `@Getter @AllArgsConstructor(AccessLevel.PRIVATE)`:
-- `static create(...)` factory; a VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws a domain-local exception for null/blank input and for a mismatch with a `Regex` constant
+- `static create(...)` factory; a VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws the shared `EmptyValueException` for null/blank input and the shared `InvalidValueException` for a mismatch with a `Regex` constant, each with a `NormalIdentityErrorCode` and the field name
 - A composite VO built from shared kernel VOs (`Email`, `Password`, `Nickname`) exposes separate factories for raw strings (`createWithString`) and for already-built VOs (`createWithDomain`)
 - An aggregate-style VO (e.g. sign-up data) takes every raw input in one `create(...)` factory and builds each constituent VO itself
 - `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`, over the identifying fields only
-
-**Domain Exceptions** (`domain/exception/`):
-- Domain-local exception classes extending the shared `BusinessException`, each with an `(ErrorCode)` and an `(ErrorCode, String message)` constructor
 
 **Error Codes** (`domain/exception/enums/`):
 - `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`; HTTP status taken from `HttpStatus.*.value()`
@@ -72,7 +68,7 @@ normal/
 - Receives request DTOs and a raw `UUID`, converts them to domain VOs, calls the repository ports
 - Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then rejects a duplicate nickname, before saving the mapped sign-up data
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before calling the update port
-- Throws shared exceptions (`ExistsEntityException`, `NotFoundEntityException`, `InvalidValueException`) or domain-local ones, parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
+- Throws shared exceptions (`ExistsEntityException`, `ExistsValueException`, `NotFoundEntityException`, `InvalidValueException`), parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
 
 **Mapper** (`adapter/mapper/`) — `@Component`; implements the mapper port, building the domain VO from the raw request values
 
