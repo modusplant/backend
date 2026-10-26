@@ -63,10 +63,10 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 ### Predefined Domain & Infrastructure Area Names
 
-- Domains: `email`, `identity`, `normal-identity`, `social-identity` (all part of the larger `account` domain), `comment`, `member`, `notification`, `post`, `search`, `term`.
+- Domains: `email-identity`, `identity`, `normal-identity`, `social-identity` (all part of the larger `account` domain), `comment`, `member`, `notification`, `post`, `search`, `term`.
 - Path mapping for the `account` domain, where the domain name differs from its directory name:
-  - `email` → `domains/account/email/`
   - `identity` → `domains/account/identity/`
+  - `email-identity` → `domains/account/email/`
   - `normal-identity` → `domains/account/normal/`
   - `social-identity` → `domains/account/social/`
 - Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under `infrastructure/<area>/`).
