@@ -70,7 +70,7 @@ class PostRecentlyViewRedisRepositoryTest implements PostIdTestUtils {
         String key = String.format(KEY_FORMAT, MEMBER_BASIC_USER_UUID);
         int page = 0;
         int size = 2;
-        long offset = (long) page * size;
+        long offset = 0;
         Set<String> mockUlids = new LinkedHashSet<>();
         mockUlids.add(testPostId.getValue());
         mockUlids.add(testPostId2.getValue());
@@ -82,7 +82,7 @@ class PostRecentlyViewRedisRepositoryTest implements PostIdTestUtils {
 
         // then
         assertThat(results).hasSize(2);
-        assertThat(results.get(0).getValue()).isEqualTo(testPostId.getValue());
+        assertThat(results.getFirst().getValue()).isEqualTo(testPostId.getValue());
         assertThat(results)
                 .containsExactly(testPostId,testPostId2);
         verify(zSetOperations).reverseRange(key, offset,offset + size - 1);
@@ -95,7 +95,7 @@ class PostRecentlyViewRedisRepositoryTest implements PostIdTestUtils {
         String key = String.format(KEY_FORMAT, MEMBER_BASIC_USER_UUID);
         int page = 0;
         int size = 5;
-        long offset = (long) page * size;
+        long offset = 0;
         given(stringRedisTemplate.opsForZSet()).willReturn(zSetOperations);
         given(zSetOperations.reverseRange(key,offset,offset + size - 1)).willReturn(null);
 
