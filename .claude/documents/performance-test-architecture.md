@@ -105,5 +105,5 @@ at the source.
 3. Check `docker logs ngrinder-agent-1` for stop/shutdown events and their timing relative to the
    controller's own lifecycle log lines.
 4. Check `<testId>/report/output.csv` and the per-metric `.data` files for the console's own
-   aggregated view — cross-check against the worker log's raw call counts per Section 5 above
+   aggregated view — cross-check against the worker log's raw call counts per Section 4 above
    before trusting it as the delivered request count.
