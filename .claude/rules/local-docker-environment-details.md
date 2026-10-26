@@ -27,6 +27,6 @@ Applies to @Dockerfile, @.dockerignore, @docker-compose.yml, and @docker-compose
 
 ## 3. Workflow
 
-1. `./gradlew assembleDocker` — produce the jar in the build context.
+1. `./gradlew assembleDocker --no-daemon` — produce the jar in the build context.
 2. `docker compose build` — build the image from the jar.
 3. `docker compose up -d` — start the backend together with the included stacks.

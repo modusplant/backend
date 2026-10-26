@@ -93,7 +93,7 @@ Only look up a target path if actually needed for the test at hand.
 # Final Test Verification
 
 - After processing every bucket, or right after a Termination ends bucket processing, run all
-  tests (`./gradlew test`) and confirm that they pass.
+  tests and confirm that they pass.
 - Resolve every failing test, regardless of what `# Loading the Area Feature` specifies, except
   a test that fails because of a reported @src/main/ defect.
 
