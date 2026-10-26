@@ -7,16 +7,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Build & Run
 ```bash
 # Run the application (local profile active by default)
-./gradlew bootRun
+./gradlew bootRun --no-daemon
 
 # Build
-./gradlew build
+./gradlew build --no-daemon
 
 # Run tests + generate JaCoCo coverage report
-./gradlew test
+./gradlew test --no-daemon
 
 # Run tests with coverage task
-./gradlew testCoverage
+./gradlew testCoverage --no-daemon
 ```
 
 ### Database & Code Generation
@@ -25,12 +25,12 @@ Compilation requires a live DB; its task chain and credentials are in `.claude/r
 
 ```bash
 # Regenerate jOOQ classes from the current schema
-./gradlew jooqCodegen
+./gradlew jooqCodegen --no-daemon
 ```
 
 ### Single Test
 ```bash
-./gradlew test --tests "kr.modusplant.shared.constant.RegexTest"
+./gradlew test --tests "kr.modusplant.shared.constant.RegexTest" --no-daemon
 ```
 
 ## Architecture
