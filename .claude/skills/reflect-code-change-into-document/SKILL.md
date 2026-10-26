@@ -1,6 +1,6 @@
 ---
 name: reflect-code-change-into-document
-description: This skill applies the follow-up actions required in response to code changes.
+description: Updates the Claude Code documentation to match unpushed `.java` changes under `src/main/` and `src/test/`, plus the Docker, CI/CD, and observability docs for their matching files.
 disallowed-tools: Edit(/src/**)
 ---
 
