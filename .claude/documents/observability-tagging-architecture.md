@@ -1,7 +1,7 @@
 # Observability Tagging Architecture
 
 Architecture reference for how the backend's identity and correlation values reach the external
-monitoring stack; consumed on demand.
+monitoring stack.
 
 Applies to the identity and correlation tags the backend emits on traces, logs, and metrics, and
 to how the monitoring stack (OpenTelemetry Collector, Tempo, Loki via Promtail, Prometheus,
@@ -57,9 +57,7 @@ Request-scoped. They live in the log line body as `logfmt` tokens and are never 
 
 ## 5. Backend Emission Points
 
-- `application.yml` → `management.opentelemetry.resource-attributes` supplies `service.namespace`, `deployment.environment.name`, `service.instance.id`; `management.otlp.tracing.endpoint` and `management.otlp.tracing.transport` point the trace exporter at the OpenTelemetry Collector.
-- `management.metrics.tags` supplies `service_name` and `deployment_environment` as Micrometer common tags on every meter.
-- `application-*.yml` → each sets `app.deployment-environment`, the single source of the environment value.
+- `application.yml` → `management.opentelemetry.resource-attributes` also supplies `service.namespace`; `management.otlp.tracing.endpoint` and `management.otlp.tracing.transport` point the trace exporter at the OpenTelemetry Collector.
 - `logback-spring.xml` → the `FILE_JSON` encoder writes `service_name`, `deployment_environment`, `trace_id`, `span_id` alongside `message`, `timestamp`, `thread`, `level`, `logger`.
 
 ---

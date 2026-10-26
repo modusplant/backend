@@ -1,9 +1,7 @@
 # Performance Test Architecture
 
-Architecture reference for how nGrinder is deployed and behaves on this host, and how to
-investigate a run directly from the filesystem/containers; consumed on demand, not
-path-auto-attached. nGrinder Groovy scripts are not stored in this repository and are not part of
-the Gradle build.
+Architecture reference for how nGrinder is deployed and behaves on this host, and how to investigate a run directly 
+from the filesystem/containers. nGrinder Groovy scripts are not stored in this repository and are not part of the Gradle build.
 
 ---
 
@@ -85,11 +83,8 @@ at the source.
 - **Duration mode** (`grinder.duration=<ms>`, `grinder.runs=0`) runs to full, correct completion
   reliably when given adequate margin over the script's actual expected wall time (real per-thread
   setup time + intended load-profile duration).
-- The Run Count early-stop is suspected to be a downstream symptom of the Section 4
-  double-counting bug rather than an independent limitation of Run Count mode: the controller's
-  completion check most likely compares its received cumulative test count against
-  `grinder.runs × grinder.threads`, and an inflated received count would cross that target well
-  before every thread's real progress does. This root cause is unconfirmed.
+- The Run Count early-stop is suspected (unconfirmed) to be a downstream symptom of the Section 4
+  double-counting bug.
 - **Default**: use Duration mode, sized generously over the script's actual expected wall time,
   until Run Count mode has been re-verified on a script carrying the Section 4 fix.
 

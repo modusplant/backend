@@ -7,7 +7,7 @@ disable-model-invocation: true
 # Preconditions
 
 - Run this skill only after code changes under @src/main/ are complete and ready for verification and documentation.
-- This skill performs no work itself: it invokes the five skills below via the Skill tool, strictly in the order given, inside the current conversation — never as a forked or backgrounded subagent — so each step's findings (changed classes, test results, detected changes) carry forward into the next.
+- This skill performs no work itself: it invokes the five skills below via the Skill tool, strictly in the order given, inside the current conversation — never as a forked or backgrounded subagent.
 
 # Workflow
 
@@ -31,7 +31,3 @@ Wait for each invoked skill to finish before starting the next one.
   the remaining steps to run.
 - Report every skipped or stopped step and why, so the user can decide whether to re-run it
   manually once the underlying condition is fixed.
-
-# Hard Constraints
-
-- Always call invoked skills through the Skill tool, so this skill stays a thin, single source of truth for ordering only.

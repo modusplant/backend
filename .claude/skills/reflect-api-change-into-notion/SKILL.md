@@ -93,9 +93,7 @@ Target Classes: <comma-separated class simple names>
   <short excerpt, only the lines the facts above refer to>
   ```
 
-Necessary-only: omit any class/section with no actual change; never restate unchanged facts. A
-class section present at initial write may still be removed afterward by the Workflow's Coverage
-Check step, once it's confirmed to have zero Notion-observable impact.
+Necessary-only: omit any class/section with no actual change; never restate unchanged facts.
 
 # Reflected-Change File Format
 
@@ -104,8 +102,7 @@ Path: `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md` — one file per No
 only linkage between the two directories. Never derive a reflected-change file from any `detected-change` 
 file other than the one matching its own `RUN_ID`, and never apply to Notion a reflected-change file 
 that isn't the latest for its `<db-slug>__<page-slug>` pair. Every `## Provenance` entry must name
-its source class by fully-qualified name — the Workflow's Coverage Check step checks per-class
-coverage against these citations.
+its source class by fully-qualified name.
 
 ```markdown
 # Reflected Notion Change — <RUN_ID>
@@ -162,13 +159,6 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
 
 # Hard Constraints
 
-- Coverage is enforced per Workflow step 4: every class section in a detected-change file must be
-  traceable, by fully-qualified name, to a reflected-change file's Provenance.
-- English-only in this skill's own files; Korean is permitted only where a literal string must
-  round-trip exactly into/out of Notion (headings, column names, `필수`/`선택`, example values).
 - Never fabricate a fact not present in the actual source code or the current Notion page content.
-- Every file in `detected-change/` follows the exact schema above; every file in `reflected-change/`
-  follows its exact schema above — consistency is required within each directory, not across them.
 - Every reflected-change file is self-contained: it must be understandable and appliable without
   re-reading the detected-change file, beyond citing it for provenance.
-- Scope is limited to the 6 databases and domains/packages named in the "Codebase → Notion Mapping" table.

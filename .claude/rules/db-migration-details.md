@@ -15,11 +15,12 @@ Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, an
 
 ```
 src/main/resources/db/migration/
- ├─ schema/                 # DDL migrations
- └─ data/seed/              # Small, static seed DML
+ ├─ schema/                 # DDL only — table/column/constraint/index/function changes
+ └─ data/seed/              # Small, static, handwritten INSERT statements
 
 src/main/java/db/migration/
- └─ data/reference/         # Programmatic/bulk data migrations
+ └─ data/reference/         # Programmatic or bulk data work that plain SQL can't express cleanly
+                            #   (e.g. parsing an external file and batch-inserting derived rows)
 ```
 
 `schema/`, `data/seed/`, and `data/reference/` (Java) all draw from **one unified version sequence** — Flyway orders every migration across all three locations as a single timeline, not per-folder sequences.
@@ -39,27 +40,14 @@ Pattern: `V<major>.<minor>.<patch>__Description_With_Underscores.sql`
 
 ---
 
-## 3. Migration Purpose Split
-
-**Schema** (`src/main/resources/db/migration/schema/`):
-- DDL only — table/column/constraint/index/function changes.
-
-**Seed Data** (`src/main/resources/db/migration/data/seed/`):
-- Small, static, handwritten `INSERT` statements.
-
-**Java Migrations** (`src/main/java/db/migration/`):
-- Reserved for programmatic or bulk data work that plain SQL can't express cleanly — e.g. parsing an external file and batch-inserting derived rows.
-
----
-
-## 4. Java Migration Conventions
+## 3. Java Migration Conventions
 
 - Each class extends `org.flywaydb.core.api.migration.BaseJavaMigration` and overrides `migrate(Context context)`.
 - The filename uses underscores in place of dots (`V5_0_1__Insert_plant_table_default_data.java`).
 
 ---
 
-## 5. Build & Runtime Execution Surfaces
+## 4. Build & Runtime Execution Surfaces
 
 Flyway runs in two places with deliberately different scopes:
 
@@ -73,7 +61,7 @@ Gradle task chain: `flywayMigrate` depends on `processResources`; `jooqCodegen` 
 
 ---
 
-## 6. Environment & Credentials Configuration
+## 5. Environment & Credentials Configuration
 
 Gradle/Flyway/jOOQ build-time credentials are supplied via `JDBC_CONNECTION_URL`, `JDBC_USERNAME`, `JDBC_PASSWORD` (environment variables) or `jdbcConnectionUrl`, `jdbcUsername`, `jdbcPassword` (Gradle properties).
 

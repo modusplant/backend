@@ -14,7 +14,6 @@
     --text: #1f2430;
     --text-muted: #5c6470;
     --accent: #2f6fed;
-    --accent-soft: #eaf1ff;
     --read: #2f6fed;
     --read-soft: #eaf1ff;
     --write: #1f8a4c;
@@ -37,7 +36,6 @@
       --text: #e7e9ee;
       --text-muted: #9aa1ad;
       --accent: #6c9bff;
-      --accent-soft: #202b45;
       --read: #6c9bff;
       --read-soft: #1d2740;
       --write: #4dc37f;
@@ -54,7 +52,7 @@
   }
   :root[data-theme="dark"] {
     --bg: #14161c; --surface: #1b1e27; --surface-alt: #20242f; --border: #2c303c;
-    --text: #e7e9ee; --text-muted: #9aa1ad; --accent: #6c9bff; --accent-soft: #202b45;
+    --text: #e7e9ee; --text-muted: #9aa1ad; --accent: #6c9bff;
     --read: #6c9bff; --read-soft: #1d2740; --write: #4dc37f; --write-soft: #173024;
     --ext: #b48cff; --ext-soft: #2a2140; --stop: #ef6a6a; --stop-soft: #3a1c1f;
     --branch: #e0a542; --branch-soft: #33280f; --line: #3a4050; --code-bg: #262a36;
@@ -140,7 +138,6 @@
     position: absolute; top: -12px; left: 14px; padding: 2px 10px; border-radius: 999px;
     background: var(--bg); border: 2px dashed var(--line); font-size: 13px; font-weight: 600; color: var(--text-muted);
   }
-  .loop + .step, .flow > .loop:last-child { margin-bottom: 0; }
 
   details.more { margin: 10px 0 0; }
   details.more summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--accent); }
@@ -229,7 +226,7 @@
   <li><a class="node" href="#stage-5"><span class="num">5</span><strong>reflect-flyway-change-into-external-source</strong><span class="sub">Reflect schema changes into Confluence</span></a></li>
 </ol>
 <ul class="rules">
-  <li>This skill does no work itself. It only invokes the five skills through the Skill tool, in the conversation it runs in, never as a forked or background subagent. Each step's findings carry forward into the next.</li>
+  <li>This skill does no work itself. It only invokes the five skills through the Skill tool, in the conversation it runs in, never as a forked or background subagent.</li>
   <li>Each step starts only after the previous one finishes.</li>
   <li>Step 1 is a gate: <code>QUALITY CHECK PASSED</code> continues the chain; <code>QUALITY CHECK REJECTED</code> is reported as-is and the chain stops there.</li>
   <li>If a step terminates because its target set is empty (including after its own scope filter), it is skipped and the chain continues with the next step.</li>
@@ -321,13 +318,6 @@
     <div class="stop skip">No unpushed migration or entity change, or none that changes a rendered section.</div>
   </div>
 </section>
-
-<footer class="page-foot">
-  <h2>Guardrails</h2>
-  <ul>
-    <li>Invoked sub-skills are always called through the Skill tool. This skill is the single source of truth for their order only; each sub-skill owns its own rules.</li>
-  </ul>
-</footer>
 
 <script>
   window.addEventListener('message', function (e) {

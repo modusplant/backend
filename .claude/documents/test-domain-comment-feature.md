@@ -9,10 +9,7 @@ The Group A / Group B lists below are relative to
 - **Pure-Unit-Test path exceptions:** `framework/outbound/jpa/entity` (uses `@RepositoryOnlyContext`
   + `TestEntityManager` to verify `@PrePersist` defaulting and JPA-managed behavior),
   `framework/outbound/jpa/repository` (necessary to verify DB interaction via `@RepositoryOnlyContext`)
-- **jOOQ repository test policy:** `unit-test (jOOQ MockConnection/MockDataProvider)` — a pure
-  unit test that builds its own `DSLContext` over jOOQ's `MockConnection`/`MockDataProvider`
-  (`org.jooq.tools.jdbc`), asserting on bound parameters and returned `Result`s. No Spring
-  context, and `DSLContext` itself is never Mockito-mocked. Applies to `framework/outbound/jooq/repository`.
+- **jOOQ repository test policy:** `unit-test (jOOQ MockConnection/MockDataProvider)`. Applies to `framework/outbound/jooq/repository`.
   Evidence: `src/test/java/kr/modusplant/domains/comment/framework/outbound/jooq/repository/CommentJooqRepositoryTest.java`
 - **Redis repository test policy:** `unit-test (mocked StringRedisTemplate)` — a pure unit
   test that Mockito-mocks `StringRedisTemplate` and the `ValueOperations` returned by
@@ -21,5 +18,5 @@ The Group A / Group B lists below are relative to
   iterator-backed mocked `Cursor` per key pattern and records each `delete` batch as a copy at
   call time. No Spring context. Applies to `framework/outbound/redis`.
 - **TestUtils shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`, `domains/member/common/constant`, `domains/notification/common/constant`
-- **Group A (fields):** `domain/vo`, `domain/event`, `domain/aggregate`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey` (builder-based but treated as a simple field type)
+- **Group A (fields):** `domain/vo`, `domain/event`, `domain/aggregate`, `usecase/model`, `usecase/request`, `usecase/response`, `framework/inbound/web/cache/model`, `framework/outbound/jpa/compositekey`
 - **Group B (methods):** `framework/outbound/jpa/entity`

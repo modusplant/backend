@@ -143,7 +143,3 @@ tab-separated fields:
 - Preserve each page's existing format: heading style, table shape, column order, row order,
   section order, and separators.
 - Never fabricate a fact not present in the actual source files or the current Confluence content.
-- Never read, search, or edit `glossary/` directly (Read/Edit tools, or any other means);
-  use only `scripts/glossary.py`.
-- English-only in this skill's own files; Korean is permitted only where a literal string must
-  round-trip exactly into/out of Confluence.

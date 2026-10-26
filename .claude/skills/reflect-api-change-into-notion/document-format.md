@@ -1,19 +1,8 @@
 # Notion API Document Format
 
-This file defines the single canonical structure every page in the 6 target Notion API-specification databases must follow. It exists so the `reflect-api-change-into-notion` skill can know the expected shape of a Notion document without fetching it first.
+This file defines the single canonical structure every page in the 6 target Notion API-specification databases must follow.
 
-Section and column names below are literal strings that must appear verbatim in Notion (the workspace's documents are written in Korean); the surrounding explanations are in English.
-
-## Target databases
-
-| Domain                              | Notion database (breadcrumb under `API 명세`) |
-|-------------------------------------|---------------------------------------------|
-| `member`                            | `회원 API`                                    |
-| `member` (admin)                    | `어드민 API`                                   |
-| `comment`                           | `소통 댓글 API`                                 |
-| `search`                            | `검색 API`                                    |
-| `infrastructure.security`           | `인증 인가 API(일반과 소셜에 국한되지 않음)`                |
-| `infrastructure.security` (general) | `일반 인증 인가 API`                              |
+Section and column names below are literal strings that must appear verbatim in Notion.
 
 ## Canonical page skeleton
 

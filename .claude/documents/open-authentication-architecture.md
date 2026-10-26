@@ -1,7 +1,7 @@
 # Open Authentication Architecture
 
-Architecture reference for how this project implements the OAuth 2.0 authorization-code flow;
-consumed on demand. The backend implements the backend half of a hand-rolled OAuth 2.0 client — no
+Architecture reference for how this project implements the OAuth 2.0 authorization-code flow.
+The backend implements the backend half of a hand-rolled OAuth 2.0 client — no
 Spring Security OAuth2 support (`oauth2Login()`, `OAuth2AuthenticationToken`, `ClientRegistration`)
 is used anywhere.
 
