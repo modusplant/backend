@@ -4,17 +4,16 @@ The Group A list below is relative to `src/main/java/kr/modusplant/infrastructur
 mirrored 1:1 under `src/test/java/kr/modusplant/infrastructure/security/common/util/`.
 
 - **ErrorCode class:** `SecurityErrorCode`
-- **Excluded-classes additions:** `config/SecurityConfig` (pure bean-assembly `@Configuration`
-  class; no `infrastructure/config/*Config` class in this codebase carries a dedicated test)
+- **Excluded-classes additions:** `config/SecurityConfig`
+- **Endpoint authorization coverage:** `EndpointAuthorizationCoverageTest` (at the area test
+  root) is a pure reflection/classpath-scan test with no Spring context, so `@Profile` is not
+  evaluated and a `LOCAL_PUBLIC_ENDPOINTS` entry counts as public regardless of the active profile
 - **Pure-Unit-Test path exceptions:** `component/**` uses `@SpringBootTest` +
-  `@AutoConfigureMockMvc` + `@MockitoBean` — there is no pure-POJO way to exercise the assembled
-  `SecurityFilterChain` (JWT filter, exception translation, login/logout, authorization) end to
-  end. Evidence: `AuthorizationFlowTest`, `NormalLoginAuthenticationFlowTest`,
+  `@AutoConfigureMockMvc` + `@MockitoBean`. Evidence: `AuthorizationFlowTest`, `NormalLoginAuthenticationFlowTest`,
   `NormalLogoutFlowTest`.
 - **Servlet mock pattern:** filters/handlers/entry point outside `component/**` stay pure-POJO —
   `HttpServletRequest`/`HttpServletResponse`/`FilterChain` are inline-mocked via `Mockito.mock()`;
   where a written response body must be asserted, stub `response.getWriter()` to return a
   `PrintWriter` wrapping a `StringWriter` and assert on the captured JSON.
 - **TestUtils shared constant paths:** `domains/member/common/constant`
-- **Group A (fields):** `models` (`NormalLoginRequest`, `DefaultUserDetails`, `DefaultAuthToken` —
-  each constructed once via constructor/builder and never mutated afterward)
+- **Group A (fields):** `models` (`NormalLoginRequest`, `DefaultUserDetails`, `DefaultAuthToken`)

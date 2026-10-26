@@ -1,6 +1,6 @@
 package kr.modusplant.domains.post.usecase.port.repository;
 
-import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostAuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
@@ -11,9 +11,9 @@ import java.util.UUID;
 
 public interface PostQueryForMemberRepository {
 
-    Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(AuthorId authorId, int page, int size);
+    Page<PostSummaryReadModel> findPublishedByAuthMemberWithOffset(PostAuthorId postAuthorId, int page, int size);
 
-    Page<DraftPostReadModel> findDraftByAuthMemberWithOffset(AuthorId authorId, int page, int size);
+    Page<DraftPostReadModel> findDraftByAuthMemberWithOffset(PostAuthorId postAuthorId, int page, int size);
 
     List<PostSummaryReadModel> findByIds(List<PostId> postIds, UUID currentMemberUuid);
 

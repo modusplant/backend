@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.framework.outbound.redis;
 
-import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.shared.exception.ConnectionFailedException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
@@ -39,7 +39,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 
-public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, CommentPathTestUtils, AuthorTestUtils {
+public class CommentCacheRedisRepositoryTest implements ParentPostIdTestUtils, CommentPathTestUtils, CommentAuthorIdTestUtils {
     private final StringRedisTemplate stringRedisTemplate = Mockito.mock(StringRedisTemplate.class);
 
     @SuppressWarnings("unchecked")
@@ -75,7 +75,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         Optional<CommentPath> result = repository.reservePath(
-                testPostId, testCommentRootPath, testAuthorWithUuid, () -> 4);
+                testParentPostId, testCommentRootPath, testCommentAuthorId, () -> 4);
 
         // then
         assertThat(result).contains(CommentPath.create("5"));
@@ -94,7 +94,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         Optional<CommentPath> result = repository.reservePath(
-                testPostId, testCommentRootPath, testAuthorWithUuid, FAILING_DATABASE_LOOKUP);
+                testParentPostId, testCommentRootPath, testCommentAuthorId, FAILING_DATABASE_LOOKUP);
 
         // then
         assertThat(result).isEmpty();
@@ -113,7 +113,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         Optional<CommentPath> result = repository.reservePath(
-                testPostId, testCommentRootPath, testAuthorWithUuid, FAILING_DATABASE_LOOKUP);
+                testParentPostId, testCommentRootPath, testCommentAuthorId, FAILING_DATABASE_LOOKUP);
 
         // then
         assertThat(result).contains(CommentPath.create("3"));
@@ -132,7 +132,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         Optional<CommentPath> result = repository.reservePath(
-                testPostId, testCommentPath, testAuthorWithUuid, () -> 3);
+                testParentPostId, testCommentPath, testCommentAuthorId, () -> 3);
 
         // then
         assertThat(result).contains(CommentPath.create("1.4"));
@@ -149,7 +149,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         ConnectionFailedException ex = assertThrows(ConnectionFailedException.class,
-                () -> repository.reservePath(testPostId, testCommentRootPath, testAuthorWithUuid, () -> 0));
+                () -> repository.reservePath(testParentPostId, testCommentRootPath, testCommentAuthorId, () -> 0));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(GeneralErrorCode.CONNECTION_FAILED);
@@ -166,7 +166,7 @@ public class CommentCacheRedisRepositoryTest implements PostIdTestUtils, Comment
 
         // when
         ConnectionFailedException ex = assertThrows(ConnectionFailedException.class,
-                () -> repository.reservePath(testPostId, testCommentRootPath, testAuthorWithUuid, () -> 1));
+                () -> repository.reservePath(testParentPostId, testCommentRootPath, testCommentAuthorId, () -> 1));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(GeneralErrorCode.CONNECTION_FAILED);

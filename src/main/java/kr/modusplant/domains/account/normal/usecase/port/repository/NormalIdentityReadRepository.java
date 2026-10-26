@@ -9,6 +9,10 @@ public interface NormalIdentityReadRepository {
 
     String getMemberPassword(AccountId accountId);
 
+    Email getMemberEmail(AccountId accountId);
+
+    AuthProvider getAuthProvider(AccountId accountId);
+
     AuthProvider getAuthProvider(Email email);
 
     boolean existsByMemberId(AccountId accountId);

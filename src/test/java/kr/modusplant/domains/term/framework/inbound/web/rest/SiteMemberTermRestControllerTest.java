@@ -3,6 +3,7 @@ package kr.modusplant.domains.term.framework.inbound.web.rest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.modusplant.domains.term.adaptor.controller.SiteMemberTermController;
 import kr.modusplant.domains.term.usecase.response.SiteMemberTermResponse;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.BeforeAll;
@@ -11,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermCreateRequestTestUtils.testSiteMemberTermCreateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.request.SiteMemberTermUpdateRequestTestUtils.testSiteMemberTermUpdateRequest;
 import static kr.modusplant.domains.term.common.util.usecase.response.SiteMemberTermResponseTestUtils.testSiteMemberTermResponse;
+import static kr.modusplant.infrastructure.security.enums.SecurityErrorCode.AUTHORIZATION_FAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,8 +55,10 @@ class SiteMemberTermRestControllerTest {
     @DisplayName("본인이 아닌 회원의 사이트 회원 약관 등록 시 예외 반환")
     void testRegisterSiteMemberTerm_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> siteMemberTermRestController.registerSiteMemberTerm(testSiteMemberTermCreateRequest, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test
@@ -77,8 +80,10 @@ class SiteMemberTermRestControllerTest {
     @DisplayName("본인이 아닌 회원의 사이트 회원 약관 수정 시 예외 반환")
     void testUpdateSiteMemberTerm_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> siteMemberTermRestController.updateSiteMemberTerm(testSiteMemberTermUpdateRequest, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test
@@ -99,8 +104,10 @@ class SiteMemberTermRestControllerTest {
     @DisplayName("본인이 아닌 회원의 사이트 회원 약관 삭제 시 예외 반환")
     void testDeleteSiteMemberTerm_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> siteMemberTermRestController.deleteSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test
@@ -122,8 +129,10 @@ class SiteMemberTermRestControllerTest {
     @DisplayName("본인이 아닌 회원의 사이트 회원 약관 조회 시 예외 반환")
     void testGetSiteMemberTerm_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> siteMemberTermRestController.getSiteMemberTerm(MEMBER_BASIC_USER_UUID, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test

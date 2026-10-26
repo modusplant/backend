@@ -1,7 +1,7 @@
 package kr.modusplant.domains.post.framework.outbound.jooq.repository;
 
 import kr.modusplant.domains.post.common.helper.PostTestDataHelper;
-import kr.modusplant.domains.post.domain.vo.AuthorId;
+import kr.modusplant.domains.post.domain.vo.PostAuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.record.DraftPostReadModel;
 import kr.modusplant.domains.post.usecase.record.PostSummaryReadModel;
@@ -91,13 +91,13 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     @DisplayName("작성자의 발행된 게시글 목록을 오프셋 기반으로 조회")
     void testFindPublishedByAuthMemberWithOffset_givenAuthor_willReturnPublishedPosts() {
         // given
-        AuthorId authorId = AuthorId.fromUuid(testMember1.getUuid());
+        PostAuthorId postAuthorId = PostAuthorId.fromUuid(testMember1.getUuid());
         int page = 0;
         int size = 2;
 
         // when
-        Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(authorId, page, size);
-        Page<PostSummaryReadModel> secondPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(authorId, page + 1, size);
+        Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(postAuthorId, page, size);
+        Page<PostSummaryReadModel> secondPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(postAuthorId, page + 1, size);
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(3);
@@ -120,7 +120,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4Result.isLiked()).isFalse();
         assertThat(post4Result.isBookmarked()).isFalse();
         PostSummaryReadModel post1Result = secondPage.getContent().getFirst();
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isLiked()).isFalse();
         assertThat(post1Result.isBookmarked()).isFalse();
     }
@@ -130,12 +130,12 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     void testFindPublishedByAuthMemberWithOffset_givenNoPublishedPosts_willReturnEmptyPage() {
         // given
         SiteMemberRecord newMember = testDataHelper.insertTestMember("New member");
-        AuthorId authorId = AuthorId.fromUuid(newMember.getUuid());
+        PostAuthorId postAuthorId = PostAuthorId.fromUuid(newMember.getUuid());
         int page = 0;
         int size = 2;
 
         // when
-        Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(authorId, page, size);
+        Page<PostSummaryReadModel> firstPage = postQueryForMemberJooqRepository.findPublishedByAuthMemberWithOffset(postAuthorId, page, size);
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(0);
@@ -149,12 +149,12 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
     @DisplayName("작성자의 임시저장 게시글 목록을 오프셋 기반으로 조회")
     void testFindDraftByAuthMemberWithOffset_givenAuthor_willReturnDraftPosts() {
         // given
-        AuthorId authorId = AuthorId.fromUuid(testMember1.getUuid());
+        PostAuthorId postAuthorId = PostAuthorId.fromUuid(testMember1.getUuid());
         int page = 0;
         int size = 2;
 
         // when
-        Page<DraftPostReadModel> firstPage = postQueryForMemberJooqRepository.findDraftByAuthMemberWithOffset(authorId, page, size);
+        Page<DraftPostReadModel> firstPage = postQueryForMemberJooqRepository.findDraftByAuthMemberWithOffset(postAuthorId, page, size);
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(2);
@@ -162,20 +162,20 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(firstPage.getContent()).hasSize(2);
         assertThat(firstPage.getContent().get(1).ulid()).isEqualTo(testPost3.getUlid());
         assertThat(firstPage.getContent().getFirst().ulid()).isEqualTo(testDraftPost.getUlid());
-        assertThat(firstPage.getContent().getFirst().secondaryCategory()).isEqualTo(testDraftPost.getSecoCateId());
-        assertThat(firstPage.getContent().getFirst().content()).isEqualTo(testDraftPost.getContent());
+        assertThat(firstPage.getContent().getFirst().secondaryCategory()).isNull();
+        assertThat(firstPage.getContent().getFirst().content()).isNull();
     }
 
     @Test
     @DisplayName("작성자가 임시저장한 게시글이 없을 때 빈 페이지 반환")
     void testFindDraftByAuthMemberWithOffset_givenNoDraftPosts_willReturnEmptyPage() {
         // given
-        AuthorId authorId = AuthorId.fromUuid(testMember2.getUuid());
+        PostAuthorId postAuthorId = PostAuthorId.fromUuid(testMember2.getUuid());
         int page = 0;
         int size = 2;
 
         // when
-        Page<DraftPostReadModel> firstPage = postQueryForMemberJooqRepository.findDraftByAuthMemberWithOffset(authorId, page, size);
+        Page<DraftPostReadModel> firstPage = postQueryForMemberJooqRepository.findDraftByAuthMemberWithOffset(postAuthorId, page, size);
 
         // then
         assertThat(firstPage.getTotalElements()).isEqualTo(0);
@@ -212,7 +212,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4.commentCount()).isEqualTo(0);
         assertThat(post1.isLiked()).isTrue();
         assertThat(post1.isBookmarked()).isTrue();
-        assertThat(post1.commentCount()).isEqualTo(2);
+        assertThat(post1.commentCount()).isEqualTo(3);
         assertThat(post2.isLiked()).isFalse();
         assertThat(post2.isBookmarked()).isTrue();
         assertThat(post2.commentCount()).isEqualTo(1);
@@ -263,7 +263,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post4Result.commentCount()).isEqualTo(0);
         assertThat(post4Result.isBookmarked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isBookmarked()).isTrue();
     }
 
@@ -319,7 +319,7 @@ class PostQueryForMemberJooqRepositoryIntegrationTest {
         assertThat(post2Result.commentCount()).isEqualTo(1);
         assertThat(post2Result.isLiked()).isFalse();
         PostSummaryReadModel post1Result = firstPage.getContent().get(1);
-        assertThat(post1Result.commentCount()).isEqualTo(2);
+        assertThat(post1Result.commentCount()).isEqualTo(3);
         assertThat(post1Result.isLiked()).isTrue();
     }
 

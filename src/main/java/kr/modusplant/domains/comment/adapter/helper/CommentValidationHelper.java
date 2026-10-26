@@ -1,17 +1,16 @@
 package kr.modusplant.domains.comment.adapter.helper;
 
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
-import kr.modusplant.domains.comment.domain.vo.Author;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
-import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
+import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
-import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.domains.comment.usecase.port.repository.ParentPostRepository;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.exception.NotFoundValueException;
 import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
 import kr.modusplant.shared.persistence.constant.TableName;
 import lombok.RequiredArgsConstructor;
@@ -21,57 +20,56 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CommentValidationHelper {
     private final CommentQueryRepository queryRepository;
-    private final CommentJpaRepository commentJpaRepository;
-    private final PostJpaRepository postJpaRepository;
-    private final MemberJpaRepository memberJpaRepository;
+    private final CommentAuthorRepository authorRepository;
+    private final ParentPostRepository parentPostRepository;
 
-    public void validateIfAuthorExists(Author author) {
-        if (!memberJpaRepository.existsById(author.getUuid())) {
-            throw new NotFoundEntityException(CommentErrorCode.NOT_EXIST_AUTHOR, "author");
+    public void validateIfAuthorExists(CommentAuthorId commentAuthorId) {
+        if (!authorRepository.isExists(commentAuthorId)) {
+            throw new NotFoundValueException(CommentErrorCode.NOT_FOUND_COMMENT_AUTHOR, "commentAuthor");
         }
     }
 
-    public void validateIfPostExists(PostId postUlid) {
-        if (!postJpaRepository.existsByUlid(postUlid.getValue())) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_POST, "post");
+    public void validateIfParentPostExists(ParentPostId postUlid) {
+        if (!parentPostRepository.isParentPostExists(postUlid)) {
+            throw new NotFoundValueException(CommentErrorCode.NOT_FOUND_PARENT_POST, "parentPost");
         }
     }
 
-    public void validateIfPostIsPublished(PostId postId) {
-        if (!queryRepository.isPostPublished(postId)) {
-            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "post");
+    public void validateIfParentPostIsPublished(ParentPostId parentPostId) {
+        if (!parentPostRepository.isParentPostPublished(parentPostId)) {
+            throw new InvalidValueException(CommentErrorCode.NOT_PUBLISHED_POST, "parentPost");
         }
     }
 
-    public void validateIfCommentExists(PostId postId, CommentPath path) {
-        if (!queryRepository.isCommentExists(postId, path)) {
-            throw new NotFoundEntityException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
+    public void validateIfCommentExists(ParentPostId parentPostId, CommentPath path) {
+        if (!queryRepository.isCommentExists(parentPostId, path)) {
+            throw new NotFoundValueException(EntityErrorCode.NOT_FOUND_COMMENT, TableName.COMM_COMMENT);
         }
     }
 
-    public void validateIfCommentIsNotDeleted(PostId postId, CommentPath path) {
-        if (queryRepository.isCommentDeleted(postId, path)) {
+    public void validateIfCommentIsNotDeleted(ParentPostId parentPostId, CommentPath path) {
+        if (queryRepository.isCommentDeleted(parentPostId, path)) {
             throw new DeletedReplyToCommentException();
         }
     }
 
-    public void validateIfCommentWrittenByAuthor(PostId postId, CommentPath path, Author author) {
-        if (!commentJpaRepository.existsByPostUlidAndPathAndAuthMemberUuid(postId.getValue(), path.getValue(), author.getUuid())) {
-            throw new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "comment", path.getValue());
+    public void validateIfCommentWrittenByAuthor(ParentPostId parentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+        if (!queryRepository.isCommentWrittenByAuthor(parentPostId, path, commentAuthorId)) {
+            throw new NotAccessibleException(CommentErrorCode.NOT_WRITTEN_COMMENT_BY_AUTHOR, "commentAuthorId", path.getValue());
         }
     }
 
-    public void validateIfAuthorCanWriteWithinPost(PostId postId, Author author) {
-        validateIfAuthorExists(author);
-        validateIfPostExists(postId);
-        validateIfPostIsPublished(postId);
+    public void validateIfAuthorCanWriteWithinPost(ParentPostId parentPostId, CommentAuthorId commentAuthorId) {
+        validateIfAuthorExists(commentAuthorId);
+        validateIfParentPostExists(parentPostId);
+        validateIfParentPostIsPublished(parentPostId);
     }
 
-    public void validateIfAuthorCanWriteCommentWithinPost(PostId postId, CommentPath path, Author author) {
-        validateIfAuthorExists(author);
-        validateIfPostExists(postId);
-        validateIfPostIsPublished(postId);
-        validateIfCommentExists(postId, path);
-        validateIfCommentWrittenByAuthor(postId, path, author);
+    public void validateIfAuthorCanWriteCommentWithinPost(ParentPostId parentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+        validateIfAuthorExists(commentAuthorId);
+        validateIfParentPostExists(parentPostId);
+        validateIfParentPostIsPublished(parentPostId);
+        validateIfCommentExists(parentPostId, path);
+        validateIfCommentWrittenByAuthor(parentPostId, path, commentAuthorId);
     }
 }

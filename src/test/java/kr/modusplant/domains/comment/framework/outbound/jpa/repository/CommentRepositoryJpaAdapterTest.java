@@ -1,16 +1,16 @@
 package kr.modusplant.domains.comment.framework.outbound.jpa.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.compositekey.CommentCompositeKeyTestUtils;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentContent;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
-import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.CommentJpaMapper;
+import kr.modusplant.domains.comment.framework.outbound.jpa.mapper.supers.CommentJpaMapper;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
+public class CommentRepositoryJpaAdapterTest implements ParentPostIdTestUtils,
         CommentResponseTestUtils, MemberIdTestUtils,
-        AuthorTestUtils, CommentTestUtils, CommentPathTestUtils,
+        CommentAuthorIdTestUtils, CommentTestUtils, CommentPathTestUtils,
         CommentEntityTestUtils, CommentCompositeKeyTestUtils {
     @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
@@ -55,8 +55,8 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         PostEntity postEntity = Mockito.mock(PostEntity.class);
         CommentEntity commentEntity = createCommentEntityBuilder().build();
 
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
-        given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.of(postEntity));
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(postRepository.findByUlid(testValidComment.getParentPostId().getValue())).willReturn(Optional.of(postEntity));
         given(mapper.toCommCommentEntity(testValidComment, memberEntity, postEntity)).willReturn(commentEntity);
 
         // when
@@ -70,14 +70,14 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     @DisplayName("존재하지 않는 작성자로 댓글 저장 시 예외 반환")
     public void testSave_givenNonExistentAuthor_willThrowException() {
         // given
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.empty());
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.empty());
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
                 () -> jpaAdapter.save(testValidComment));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_AUTHOR);
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_FOUND_COMMENT_AUTHOR);
     }
 
     @Test
@@ -85,15 +85,15 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
     public void testSave_givenNonExistentPost_willThrowException() {
         // given
         MemberEntity memberEntity = Mockito.mock(MemberEntity.class);
-        given(memberRepository.findByUuid(testValidComment.getAuthor().getUuid())).willReturn(Optional.of(memberEntity));
-        given(postRepository.findByUlid(testValidComment.getPostId().getValue())).willReturn(Optional.empty());
+        given(memberRepository.findByUuid(testValidComment.getCommentAuthorId().getValue())).willReturn(Optional.of(memberEntity));
+        given(postRepository.findByUlid(testValidComment.getParentPostId().getValue())).willReturn(Optional.empty());
 
         // when
         InvalidValueException ex = assertThrows(InvalidValueException.class,
                 () -> jpaAdapter.save(testValidComment));
 
         // then
-        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_EXIST_POST);
+        assertThat(ex.getErrorCode()).isEqualTo(CommentErrorCode.NOT_FOUND_PARENT_POST);
     }
 
     @Test
@@ -108,7 +108,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(commentRepository.save(afterUpdate)).willReturn(null);
 
         // when
-        jpaAdapter.updateContent(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent()));
+        jpaAdapter.updateContent(ParentPostIdTestUtils.testParentPostId, testCommentPath, CommentContent.create(afterUpdate.getContent()));
 
         // then
         verify(commentRepository, times(1)).findById(TEST_COMMENT_ID);
@@ -125,7 +125,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
 
         // when
         NotFoundEntityException ex = assertThrows(
-                NotFoundEntityException.class, () -> jpaAdapter.updateContent(PostIdTestUtils.testPostId, testCommentPath, CommentContent.create(afterUpdate.getContent())));
+                NotFoundEntityException.class, () -> jpaAdapter.updateContent(ParentPostIdTestUtils.testParentPostId, testCommentPath, CommentContent.create(afterUpdate.getContent())));
 
         // then
         assertThat(ex.getErrorCode()).isEqualTo(EntityErrorCode.NOT_FOUND_COMMENT);
@@ -140,7 +140,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.of(commentEntity));
 
         // when
-        jpaAdapter.deleteComment(PostIdTestUtils.testPostId, testCommentPath);
+        jpaAdapter.deleteComment(ParentPostIdTestUtils.testParentPostId, testCommentPath);
 
         // then
         assertThat(commentEntity.getIsDeleted()).isTrue();
@@ -154,7 +154,7 @@ public class CommentRepositoryJpaAdapterTest implements PostIdTestUtils,
         given(commentRepository.findById(TEST_COMMENT_ID)).willReturn(Optional.empty());
 
         // when
-        jpaAdapter.deleteComment(PostIdTestUtils.testPostId, testCommentPath);
+        jpaAdapter.deleteComment(ParentPostIdTestUtils.testParentPostId, testCommentPath);
 
         // then
         verify(commentRepository, never()).save(org.mockito.ArgumentMatchers.any());

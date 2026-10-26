@@ -19,7 +19,7 @@ security/
  ├─ models/       # Authentication principal, token, and login-request models
  ├─ enums/        # Security-specific error code enum
  ├─ exception/    # Authentication exception hierarchy
- └─ util/         # Static helper classes (logging, response writing)
+ └─ util/         # Static helper classes (logging, response writing, authorization assertions)
 ```
 
 ---
@@ -28,7 +28,6 @@ security/
 
 **Config** (`config/`):
 - A single `@Configuration` class assembles one `SecurityFilterChain` bean plus its supporting beans (password encoders, authentication manager, providers, handlers, filters, CORS source)
-- The profile-specific `CorsConfigurationSource` beans share a `@Qualifier("corsConfigurationSource")` qualifier; the filter chain bean injects that qualifier explicitly
 
 **Filter** (`filter/`):
 - Extend `OncePerRequestFilter` for cross-cutting, always-run concerns (JWT parsing/verification, chain-wide exception translation), or `AbstractAuthenticationProcessingFilter` for a filter dedicated to intercepting one login endpoint
@@ -74,27 +73,79 @@ Maps each custom component to the Spring Security type it implements or extends.
 | Login failure handler         | `AuthenticationFailureHandler`           | `WriteResponseLoginFailureHandler`                           |
 | Authentication exception root | `AuthenticationException`                | `BusinessAuthenticationException`                            |
 
-**Naming note:** `DefaultAuthProvider` (a Spring Security `AuthenticationProvider` implementation) shares a short name with the unrelated `AuthProvider` enum used elsewhere for social-login provider identifiers. Same short name, different concern — do not conflate them by name alone.
+**Naming note:** `DefaultAuthProvider` (a Spring Security `AuthenticationProvider` implementation) shares a short name with the unrelated `AuthProvider` enum used elsewhere for social-login provider identifiers.
 
 ---
 
 ## 4. Workflow & Filter Chain
 
-One `SecurityFilterChain` is registered, scoped to a single API path prefix. A request passes through custom filters in this order before reaching Spring's standard chain:
+### 4.1 Chain Scope & Filter Order
 
-1. **Chain-wide exception translation filter** — wraps every downstream filter in a try/catch. Any exception raised further down (authentication failures, business exceptions, or anything uncaught) is caught here and converted into a structured JSON error response, delegating to the custom authentication entry point for authentication-type failures.
-2. **JWT authentication filter** — opportunistically authenticates every request carrying a bearer token: validates the token, checks a blacklist, and populates the security context when valid. Requests without a token, or with an invalid one, either proceed unauthenticated or raise an exception that is caught by step 1.
-3. **Login processing filter** — matches only the dedicated login endpoint. Deserializes and validates the login request, then delegates credential verification to the authentication manager, which resolves to the custom authentication provider and, in turn, the custom user details service. The outcome is routed to a dedicated success or failure handler that writes the response body (and, on success, issues tokens).
-4. **Standard Spring Security filters** take over afterward:
-   - An authorization filter denies by default (`anyRequest().authenticated()`), carving out two path-based exceptions ahead of it: admin-only routes (`hasAuthority('ADMIN')`) and the permit-all map, keyed by `HttpMethod`, resolved from the static `SecurityConfig.PUBLIC_ENDPOINTS` merged with `SecurityConfig.LOCAL_PUBLIC_ENDPOINTS` when the `local` profile is active.
-   - Every non-public endpoint additionally carries an explicit method-security annotation (`@PreAuthorize`/`@PostAuthorize`/`@Secured`) rather than relying solely on the path-based default; a reflection-based test (`EndpointAuthorizationCoverageTest`, no Spring context, so `@Profile` is not evaluated) fails the build if a `@RestController` endpoint has neither a method-security annotation nor an entry in `PUBLIC_ENDPOINTS` or `LOCAL_PUBLIC_ENDPOINTS`.
-   - A logout filter, matched to a dedicated logout endpoint, delegates token revocation to the custom logout handler and response writing to the custom logout success handler.
-   - The exception-translation stage falls back to the same custom entry point and access-denied handler used in step 1, so error response shape stays consistent whether an exception is caught early by the custom filter or later by the standard chain.
+`SecurityConfig.defaultChain` registers the single `SecurityFilterChain`, matched by `securityMatcher("/api/**")`. The chain is stateless (no HTTP session), CSRF-disabled, and applies CORS through the `@Qualifier("corsConfigurationSource")` bean.
 
-The chain is stateless (no HTTP session) and CSRF-disabled, consistent with a bearer-token-only API.
+A matched request passes through these filters in order:
+
+| # | Filter                              | Role                                                                                                                                                                                             |
+|---|-------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | `CorsFilter`                        | Applies the profile-specific CORS configuration                                                                                                                                                  |
+| 2 | `SecurityExceptionHandlingFilter`   | Wraps every downstream filter in a try/catch: `AuthenticationException` → `DefaultAuthenticationEntryPoint`; `BusinessException` → its error code; any other exception → `AUTHENTICATION_FAILED` |
+| 3 | `LogoutFilter`                      | Matches `/api/auth/logout`; runs the logout handlers and ends the chain                                                                                                                          |
+| 4 | `JwtAuthenticationFilter`           | Authenticates any request carrying an `Authorization` header                                                                                                                                     |
+| 5 | `EmailPasswordAuthenticationFilter` | Matches `POST /api/auth/login`; performs normal login and ends the chain                                                                                                                         |
+| 6 | `AnonymousAuthenticationFilter`     | Sets an anonymous authentication when the security context is still empty                                                                                                                        |
+| 7 | `ExceptionTranslationFilter`        | Translates `AuthorizationFilter` denials into `DefaultAuthenticationEntryPoint` (anonymous caller) or `DefaultAccessDeniedHandler` (authenticated caller)                                        |
+| 8 | `AuthorizationFilter`               | Applies the rules in §4.3                                                                                                                                                                        |
+
+### 4.2 Request Paths
+
+**Outside `/api/**`**
+- Not matched by `securityMatcher`, so no filter of this chain runs.
+
+**Login success** (`POST /api/auth/login`)
+- `SecurityExceptionHandlingFilter` → `LogoutFilter` (no match) → `JwtAuthenticationFilter` → `EmailPasswordAuthenticationFilter` → `AuthenticationManager` → `DefaultAuthProvider` → `DefaultUserDetailsService` → `WriteResponseLoginSuccessHandler`
+- `EmailPasswordAuthenticationFilter` deserializes and validates `NormalLoginRequest`, then passes an unauthenticated `DefaultAuthToken` to the manager. `DefaultUserDetailsService` loads `DefaultUserDetails` by email; `DefaultAuthProvider` checks the password (BCrypt), the linked social provider, and the banned/active state, then returns an authenticated `DefaultAuthToken`.
+- `WriteResponseLoginSuccessHandler` updates the member's last login time, issues a token pair through `TokenService`, writes the access token in the JSON body and the refresh token as a `Set-Cookie` header. The chain ends here.
+
+**Login failure** (`POST /api/auth/login`)
+- `EmailPasswordAuthenticationFilter` → (`AuthenticationManager` → `DefaultAuthProvider` → `DefaultUserDetailsService`) → `WriteResponseLoginFailureHandler`
+- Any `AuthenticationException` raised during the attempt reaches `WriteResponseLoginFailureHandler`, which writes the error code of a `BusinessAuthenticationException` or `AUTHENTICATION_FAILED` otherwise:
+  - Request validation: `BAD_PASSWORD_FORMAT`, `BAD_EMAIL_FORMAT`, or `AUTHENTICATION_FAILED`
+  - Lookup in `DefaultUserDetailsService`: `AccountStateException` (member auth or member not found)
+  - Checks in `DefaultAuthProvider`: `BAD_PASSWORD`, `FORBIDDEN_GOOGLE_LINKED_ACCOUNT` / `FORBIDDEN_KAKAO_LINKED_ACCOUNT`, `BannedException`, `InactiveException`
+- Exceptions that are not `AuthenticationException` (an unreadable request body, or a failure inside `WriteResponseLoginSuccessHandler`) propagate to `SecurityExceptionHandlingFilter` instead.
+
+**Logout** (`/api/auth/logout`)
+- `SecurityExceptionHandlingFilter` → `LogoutFilter` → `JwtClearingLogoutHandler` → `WriteResponseLogoutSuccessHandler`
+- `LogoutFilter` runs before `JwtAuthenticationFilter`, so the access token is not validated on this path; `JwtClearingLogoutHandler` reads the `refreshToken` cookie and the `Authorization` header directly, removes the refresh token, and blacklists the access token. `WriteResponseLogoutSuccessHandler` writes a success body. The chain ends here.
+- A missing cookie or header raises `BadCredentialException(BAD_CREDENTIALS)`, and a header without the `Bearer ` prefix raises `BadCredentialException(INVALID_TOKEN_FORMAT)` before the refresh token is removed; both go → `SecurityExceptionHandlingFilter` → `DefaultAuthenticationEntryPoint`.
+
+**Request with an `Authorization` header** (any other endpoint)
+- Valid token: `JwtAuthenticationFilter` → … → `AuthorizationFilter` → controller. `JwtAuthenticationFilter` builds `DefaultUserDetails` from the token claims (subject UUID, nickname, role) and stores an authenticated `DefaultAuthToken` in the security context.
+- Invalid token: `JwtAuthenticationFilter` → `SecurityExceptionHandlingFilter` → `DefaultAuthenticationEntryPoint`. A header without the `Bearer ` prefix raises `INVALID_TOKEN_FORMAT`, a token that fails validation raises `EXPIRED_TOKEN`, and a blacklisted token raises `BLACKLISTED_TOKEN`, all as `BadCredentialException`. This applies to permit-all endpoints as well.
+
+**No token, permit-all endpoint**
+- `JwtAuthenticationFilter` (skipped) → `AnonymousAuthenticationFilter` → `AuthorizationFilter` (permits) → controller.
+
+**No token, protected endpoint**
+- `AnonymousAuthenticationFilter` → `AuthorizationFilter` (denies) → `ExceptionTranslationFilter` → `DefaultAuthenticationEntryPoint`, which writes `AUTHENTICATION_FAILED`.
+
+**Authenticated caller without `ADMIN` on `/api/admin/**`**
+- `JwtAuthenticationFilter` → `AuthorizationFilter` (denies) → `ExceptionTranslationFilter` → `DefaultAccessDeniedHandler`, which writes `ACCESS_DENIED`.
+
+**Exceptions after the chain**
+- Exceptions thrown from controllers and below are handled by `GlobalExceptionHandler` (`infrastructure/advice`), not by the security handlers above.
+
+### 4.3 Authorization Rules
+
+`AuthorizationFilter` evaluates these rules in order:
+1. `/api/admin/**` → `hasAuthority('ADMIN')`
+2. The permit-all map, keyed by `HttpMethod`: `SecurityConfig.PUBLIC_ENDPOINTS`, merged with `SecurityConfig.LOCAL_PUBLIC_ENDPOINTS` when the `local` profile is active
+3. `anyRequest().authenticated()`
+
+`SecurityExceptionHandlingFilter` and `ExceptionTranslationFilter` share `DefaultAuthenticationEntryPoint`; it and `DefaultAccessDeniedHandler` both write a `DataResponse`.
 
 ---
 
 ## 5. Self-Ownership Checks
 
-`SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid)` is a static helper (throws `AccessDeniedException` on mismatch) that REST controllers call directly to enforce that a caller only accesses their own resource, complementing the path- and method-level authorization described above.
+`SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid)` is a static helper (throws `NotAccessibleException` with `AUTHORIZATION_FAILED` on mismatch) that REST controllers call directly to enforce that a caller only accesses their own resource, complementing the path- and method-level authorization described above.

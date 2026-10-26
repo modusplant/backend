@@ -1,13 +1,13 @@
 package kr.modusplant.domains.comment.framework.inbound.web.rest;
 
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegisterRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.request.CommentUpdateRequestTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentCursorPageResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOfPostResponseTestUtils;
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentOffsetPageResponseTestUtils;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
@@ -17,6 +17,7 @@ import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
 import kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,6 @@ import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +36,7 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.infrastructure.security.enums.SecurityErrorCode.AUTHORIZATION_FAILED;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,7 +46,7 @@ import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 
-public class CommentRestControllerTest implements PostIdTestUtils,
+public class CommentRestControllerTest implements ParentPostIdTestUtils,
         CommentOfPostResponseTestUtils, CommentRegisterRequestTestUtils,
         CommentUpdateRequestTestUtils, MemberIdTestUtils,
         CommentOffsetPageResponseTestUtils, CommentCursorPageResponseTestUtils {
@@ -61,7 +62,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
 
         // when
@@ -79,7 +80,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, null))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, null))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, MEMBER_BASIC_USER_UUID))
                 .willReturn(List.of(testCommentOfPostResponse));
@@ -100,7 +101,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V1_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(ParentPostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V1(TEST_POST_ULID, null)).willReturn(List.of(testCommentOfPostResponse));
 
         // when
@@ -115,7 +116,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenCacheableResult_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), true);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), null, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
 
         // when
@@ -133,7 +134,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenNotCacheableResultWithAuthenticatedMember_willReturnResponseEntity() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, PostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
+        given(cacheService.getCacheData(testIfNoneMatch, testIfModifiedSince, ParentPostId.create(TEST_POST_ULID), TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE))
                 .willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, TEST_COMMENT_PATH, TEST_COMMENT_PAGE_SIZE, MEMBER_BASIC_USER_UUID))
                 .willReturn(testCommentCursorPageResponse);
@@ -154,7 +155,7 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     void testGatherByPost_V2_givenAnonymousUser_willProcessAction() {
         // given
         CommentCacheData cacheData = new CommentCacheData("etag", LocalDateTime.now(), false);
-        given(cacheService.getCacheData(any(), any(), any(PostId.class), any(), any())).willReturn(cacheData);
+        given(cacheService.getCacheData(any(), any(), any(ParentPostId.class), any(), any())).willReturn(cacheData);
         given(controller.gatherByPost_V2(TEST_POST_ULID, null, TEST_COMMENT_PAGE_SIZE, null))
                 .willReturn(testCommentCursorPageResponse);
 
@@ -223,8 +224,10 @@ public class CommentRestControllerTest implements PostIdTestUtils,
     @DisplayName("본인이 아닌 회원의 댓글 조회 시 예외 반환")
     void testGatherByAuthor_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> restController.gatherByAuthor(MEMBER_BASIC_USER_UUID, 1, 8, null, null, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test

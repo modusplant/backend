@@ -1,10 +1,11 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.vo.Author;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPageSize;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
+import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyCommentAuthorId;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
@@ -22,8 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.jooq.impl.DSL.count;
-
 @Repository
 @RequiredArgsConstructor
 public class CommentJooqRepository implements CommentQueryRepository {
@@ -39,20 +38,20 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
     private final Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-    public List<CommentOfPostReadModel> findByPost(PostId postId, Author nullableAuthor) {
+    public List<CommentOfPostReadModel> findByPost(ParentPostId parentPostId, CommentAuthorId commentAuthorId) {
         return dsl.select(getCommentOfPostFields())
-                .from(getCommentOfPostTable(nullableAuthor))
-                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .from(getCommentOfPostTable(commentAuthorId))
+                .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                 .orderBy(getCommentOfPostOrder())
                 .fetch(this::toCommentOfPostReadModel);
     }
 
     @Override
     public List<CommentOfPostReadModel> findByPost(
-            PostId postId, @Nullable CommentPath lastPath, CommentPageSize pageSize, Author nullableAuthor) {
+            ParentPostId parentPostId, @Nullable CommentPath lastPath, CommentPageSize pageSize, CommentAuthorId commentAuthorId) {
         SelectSeekStepN<Record> orderedComments = dsl.select(getCommentOfPostFields())
-                .from(getCommentOfPostTable(nullableAuthor))
-                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .from(getCommentOfPostTable(commentAuthorId))
+                .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                 .orderBy(getCommentOfPostOrder());
 
         if (lastPath == null) { // 첫 댓글부터 조회
@@ -64,7 +63,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
         // 특정 lastPath 댓글의 정렬 키 이후부터 조회
         Record lastCommentSortKey = dsl.select(commComment.PATH_1_DEPTH_VALUE, commComment.PATH_2_DEPTH_VALUE)
                 .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                 .and(commComment.PATH.eq(lastPath.getValue()))
                 .fetchOne();
         if (lastCommentSortKey == null) {
@@ -88,15 +87,17 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 commComment.IS_DELETED,
                 commComment.EDITED_AT,
                 commComment.REPLY_TO_PATH,
-                replyToMember.NICKNAME);
+                replyToComment.PATH,
+                replyToMember.NICKNAME,
+                replyToComment.IS_DELETED);
     }
 
-    private Table<?> getCommentOfPostTable(Author nullableAuthor) {
-        Condition likeJoinCondition = nullableAuthor != null
-                ? commComment.POST_ULID.eq(commentLike.POST_ULID)
+    private Table<?> getCommentOfPostTable(CommentAuthorId commentAuthorId) {
+        Condition likeJoinCondition = commentAuthorId instanceof EmptyCommentAuthorId
+                ? DSL.falseCondition()
+                : commComment.POST_ULID.eq(commentLike.POST_ULID)
                 .and(commComment.PATH.eq(commentLike.PATH))
-                .and(commentLike.MEMB_UUID.eq(nullableAuthor.getUuid()))
-                : DSL.falseCondition();
+                .and(commentLike.MEMB_UUID.eq(commentAuthorId.getValue()));
 
         return commComment
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
@@ -126,16 +127,19 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
                 record.getValue(commComment.IS_DELETED),
                 record.getValue(commComment.REPLY_TO_PATH),
-                record.getValue(replyToMember.NICKNAME)
+                record.getValue(replyToComment.PATH) != null, // 답글 대상 행이 없으면 NULL → false
+                record.getValue(replyToMember.NICKNAME),
+                Boolean.TRUE.equals(record.getValue(replyToComment.IS_DELETED)) // 답글 대상이 없으면 NULL → false
         );
     }
 
-    public PageImpl<CommentOfAuthorReadModel> findByAuthor(Author author, Pageable pageable) {
+    public PageImpl<CommentOfAuthorReadModel> findByAuthor(CommentAuthorId commentAuthorId, Pageable pageable) {
 
         Optional<Record1<Integer>> totalComments = dsl.selectCount()
                 .from(commComment)
                 .join(siteMember).on(commComment.AUTH_MEMB_UUID.eq(siteMember.UUID))
-                .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
+                .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue())
+                        .and(commComment.IS_DELETED.isFalse()))
                 .fetchOptional();
 
         if(totalComments.isPresent()) {
@@ -143,10 +147,9 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
             Field<Boolean> isLiked = DSL.when(commentLike.MEMB_UUID.isNotNull(), true).otherwise(false);
 
-            Field<Integer> totalCommentsOfPost = dsl.select(count())
+            Field<Integer> totalCommentsOfPost = dsl.selectCount()
                     .from(commComment)
-                    .where(commComment.POST_ULID.eq(commPost.ULID)
-                            .and(commComment.IS_DELETED.eq(false)))
+                    .where(commComment.POST_ULID.eq(commPost.ULID))
                     .asField();
 
             List<CommentOfAuthorReadModel> commentList = dsl.select(commComment.CONTENT,
@@ -157,8 +160,8 @@ public class CommentJooqRepository implements CommentQueryRepository {
                     .join(commPost).on(commComment.POST_ULID.eq(commPost.ULID))
                     .leftJoin(commentLike).on(commComment.POST_ULID.eq(commentLike.POST_ULID)
                             .and(commComment.PATH.eq(commentLike.PATH)))
-                    .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
-                    .and(commComment.IS_DELETED.eq(false))
+                    .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
+                    .and(commComment.IS_DELETED.isFalse())
                     .groupBy(commComment.CONTENT, commComment.CREATED_AT,
                             commPost.TITLE, commPost.ULID, commentLike.MEMB_UUID)
                     .orderBy(commComment.CREATED_AT.desc())
@@ -177,27 +180,27 @@ public class CommentJooqRepository implements CommentQueryRepository {
     }
 
     @Override
-    public Optional<LocalDateTime> findLatestUpdatedAtByPost(PostId postId) {
+    public Optional<LocalDateTime> findLatestUpdatedAtByPost(ParentPostId parentPostId) {
         return Optional.ofNullable(
                 dsl.select(DSL.max(commComment.UPDATED_AT))
                         .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                         .fetchOne(DSL.max(commComment.UPDATED_AT))
         );
     }
 
     @Override
-    public Optional<LocalDateTime> findLatestUpdatedAtByAuthor(Author author) {
+    public Optional<LocalDateTime> findLatestUpdatedAtByAuthor(CommentAuthorId commentAuthorId) {
         return Optional.ofNullable(
                 dsl.select(DSL.max(commComment.UPDATED_AT))
                         .from(commComment)
-                        .where(commComment.AUTH_MEMB_UUID.eq(author.getUuid()))
+                        .where(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
                         .fetchOne(DSL.max(commComment.UPDATED_AT))
         );
     }
 
     @Override
-    public int findMaximumSiblingPathOrder(PostId postId, CommentPath path) {
+    public int findMaximumSiblingPathOrder(ParentPostId parentPostId, CommentPath path) {
         String pathValue = path.getValue();
         int dotIndex = pathValue.indexOf('.');
 
@@ -214,51 +217,41 @@ public class CommentJooqRepository implements CommentQueryRepository {
 
         Integer maximumOrder = dsl.select(maximumSiblingOrder)
                 .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getValue()))
+                .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                 .and(siblingCondition)
                 .fetchOne(maximumSiblingOrder);
         return maximumOrder == null ? 0 : maximumOrder;
     }
 
     @Override
-    public int countPostComment(PostId postId) {
-        return dsl.selectCount()
-                .from(commComment)
-                .where(commComment.POST_ULID.eq(postId.getValue()))
-                .fetchOptional()
-                .map(Record1::value1)
-                .orElse(0);
-    }
-
-    @Override
-    public boolean isCommentExists(PostId postId, CommentPath path) {
+    public boolean isCommentExists(ParentPostId parentPostId, CommentPath path) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                         .and(commComment.PATH.eq(path.getValue()))
         );
     }
 
     @Override
-    public boolean isCommentDeleted(PostId postId, CommentPath path) {
+    public boolean isCommentDeleted(ParentPostId parentPostId, CommentPath path) {
         return dsl.fetchExists(
                 dsl.selectOne()
                         .from(commComment)
-                        .where(commComment.POST_ULID.eq(postId.getValue()))
+                        .where(commComment.POST_ULID.eq(parentPostId.getValue()))
                         .and(commComment.PATH.eq(path.getValue()))
-                        .and(commComment.IS_DELETED.eq(true))
+                        .and(commComment.IS_DELETED.isTrue())
         );
     }
 
     @Override
-    public boolean isPostPublished(PostId postIdVO) {
-        String postId = postIdVO.getValue();
-        return postId != null && Boolean.TRUE.equals(
-                dsl.select(commPost.IS_PUBLISHED)
-                        .from(commPost)
-                        .where(commPost.ULID.eq(postId))
-                        .fetchOne(commPost.IS_PUBLISHED)
+    public boolean isCommentWrittenByAuthor(ParentPostId parentPostId, CommentPath path, CommentAuthorId commentAuthorId) {
+        return dsl.fetchExists(
+                dsl.selectOne()
+                        .from(commComment)
+                        .where(commComment.POST_ULID.eq(parentPostId.getValue()))
+                        .and(commComment.PATH.eq(path.getValue()))
+                        .and(commComment.AUTH_MEMB_UUID.eq(commentAuthorId.getValue()))
         );
     }
 }

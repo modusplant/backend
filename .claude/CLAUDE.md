@@ -7,37 +7,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Build & Run
 ```bash
 # Run the application (local profile active by default)
-./gradlew bootRun
+./gradlew bootRun --no-daemon
 
-# Build (skips jOOQ codegen if DB is unavailable)
-./gradlew build
+# Build
+./gradlew build --no-daemon
 
 # Run tests + generate JaCoCo coverage report
-./gradlew test
+./gradlew test --no-daemon
 
 # Run tests with coverage task
-./gradlew testCoverage
+./gradlew testCoverage --no-daemon
 ```
 
 ### Database & Code Generation
 
-The build chain requires a live DB with schema migrations already applied: `processResources` → `jooqCodegen` → `compileJava`
+Compilation requires a live DB; its task chain and credentials are in `.claude/rules/db-migration-details.md`.
 
 ```bash
 # Regenerate jOOQ classes from the current schema
-./gradlew jooqCodegen
-```
-
-DB credentials must be supplied via environment variables or `gradle.properties`:
-```
-JDBC_CONNECTION_URL / jdbcConnectionUrl
-JDBC_USERNAME       / jdbcUsername
-JDBC_PASSWORD       / jdbcPassword
+./gradlew jooqCodegen --no-daemon
 ```
 
 ### Single Test
 ```bash
-./gradlew test --tests "kr.modusplant.shared.constant.RegexTest"
+./gradlew test --tests "kr.modusplant.shared.constant.RegexTest" --no-daemon
 ```
 
 ## Architecture
@@ -57,7 +50,8 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 ```
 [domain]
- ├─ adapter    # Orchestration controllers (inbound use-case calls, NO framework deps)
+ ├─ adapter    # Orchestration controllers (inbound use-case calls, NO framework deps;
+               #   `shared.framework` belongs to `shared` first, so depending on it is allowed)
  ├─ domain     # Pure business logic: aggregates, entities, VOs, validation
  ├─ usecase    # Ports (interfaces), request/response DTOs, read/write models
  └─ framework  # Technical implementations:
@@ -77,14 +71,17 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `social-identity` → `domains/account/social/`
 - Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under `infrastructure/<area>/`).
 
-### Key Design Decisions
+### Technical Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins (eliminates N+1).
-- **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually — run `./gradlew jooqCodegen` to regenerate after schema changes.
+- **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package. Never edit manually.
 - **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or `@Mapping(target=..., ignore=true)` must be set.
+- **Redis**: Used for response caching and JWT access-token blacklisting.
+
+### Project Conventions
 - **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the entity.
-- **Redis**: Used for response caching and JWT refresh-token blacklisting.
-- **Async**: Virtual threads (Java 21) power asynchronous push notifications via Firebase FCM.
-- **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via Spring `ApplicationEvent`s defined in `shared/event/`.
+- **Events**: Domain side effects (image removal, abuse-report dashboards, notifications) are decoupled via plain event objects published through Spring's `ApplicationEventPublisher`, defined in each domain's `domain/event/`, `infrastructure/<area>/event/`, and `shared/framework/<library>/event/`.
+- **Regex constants**: Regular expressions live in `shared/constant/Regex` — `REGEX_*` for annotations and the precompiled `PATTERN_*` for method bodies. Add new expressions there instead of writing them inline.
+  Flyway Java migrations under `db/migration` are the exception and keep their own inline patterns.
 
 ### Spring Profiles
 - `local` (default): `application-local.yml` + `application-secrets.yml` — debug logging, Swagger enabled
@@ -97,13 +94,13 @@ Detailed working rules live under `.claude/`:
 
 - `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
 - `.claude/documents/*.md` — on-demand reference docs: 
-  - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `reflect-code-change-into-test` skill)
-  - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; also referenced directly from `test-architecture-details.md`)
+  - `test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md` (per-area test features, consumed by the `test-code-synchronizer` agent)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
-  - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
+  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
+  - `open-authentication-architecture.md` (OAuth 2.0 authorization-code flow across `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
+  - `data-deletion-architecture.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and cascade rules)
 - `.claude/skills/*/SKILL.md` — task workflows.
-- `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md`. Never read it — `SKILL.md` is canonical.
+- `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md`. Never read it — `SKILL.md` is canonical. Reading it is permitted only to update it to match `SKILL.md`.
 
 ## Precaution
 

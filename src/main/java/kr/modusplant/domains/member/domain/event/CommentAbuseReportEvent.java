@@ -1,7 +1,7 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ public class CommentAbuseReportEvent {
 
     public static CommentAbuseReportEvent create(String postUlid, String path, LocalDateTime createdAt) {
         if (StringUtils.isBlank(postUlid)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "postUlid");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "postUlid");
         } else if (StringUtils.isBlank(path)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "path");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "path");
         } else if (createdAt == null) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_COMMENT, "createdAt");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "createdAt");
         }
         return new CommentAbuseReportEvent(postUlid, path, createdAt);
     }

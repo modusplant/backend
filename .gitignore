@@ -5,6 +5,8 @@
 /.claude/output-styles/
 /.claude/temp/
 /.claude/skills/fetch-community-webpage-url/url/candidate-url.json
+/.claude/skills/reflect-api-change-into-notion/detected-change
+/.claude/skills/reflect-api-change-into-notion/reflected-change
 /.claude/skills/report-performance-optimization/result
 /.claude/skills/visualize-docker-container-dependency/result
 /.claude/skills/write-portfolio/

@@ -8,16 +8,15 @@ paths:
 Applies to every test class under @src/test/.
 
 This rule is the complete baseline for every test in the tree. A task-specific workflow may
-supply a narrower, pre-resolved set of paths and names for one area; when it does, those values
-win for that run, and nothing here depends on such a workflow being present.
+supply pre-resolved paths, names, path exceptions, or Group A / Group B path lists for one area;
+when it does, those values win for that run.
 
 ---
 
 ## 1. Pure Unit Test Baseline
 
 Unit tests must maintain a pure POJO state. **Do not use** Spring Context (`@SpringBootTest`,
-`@WebMvcTest`) or Mockito Extension (`@ExtendWith(MockitoExtension.class)`), except where a
-task-specific workflow supplies explicit path exceptions for the area under test. Absent such
+`@WebMvcTest`) or Mockito Extension (`@ExtendWith(MockitoExtension.class)`). Absent path
 exceptions, every class — services, adapters, controllers, mappers, value objects, entities — is
 a pure POJO test.
 
@@ -65,13 +64,11 @@ method does.
 
 ## 5. Test Method Display Name Convention
 
-Within this document, Korean is exceptionally allowed only in this section's display-name values.
-
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
   - **Case 1:** `..._willProcessAction` -> `활동 수행`
-  - **Case 2:** `..._willThrowException` -> `예외 반환`
-  - **Case 3:** `..._willReturn<Type>` -> `<Type> 반환`
+  - **Case 2:** `..._willReturn<Type>` -> `<Type> 반환`
+  - **Case 3:** `..._willThrowException` -> `예외 반환`
 
 ---
 
@@ -93,8 +90,7 @@ Strictly adhere to the `given-when-then` pattern using `BDDMockito`.
 
 ## 7. Test Utility (`TestUtils`) Convention
 
-To prevent code duplication, highly encourage reusing or creating Test Utility classes when
-instantiating domain objects or models.
+Reuse or create Test Utility classes when instantiating domain objects or models.
 
 ### Path Mapping Rule
 
@@ -123,10 +119,8 @@ Shared parameter constants follow the same mapping into `.../common/constant/`.
 ### Categorized Strategy
 
 The Group A / Group B split below is a **classification rule**, not a path list — apply it to
-whatever subpackages a given area actually has. A package's role does not change without a
-matching source refactor, so this split is stable across runs. Where a task-specific workflow
-maintains a pre-computed path list for an area, use it; otherwise derive the split directly from
-the actual package layout.
+whatever subpackages a given area actually has. Absent a pre-computed path list, derive the split
+directly from the actual package layout.
 
 #### Group A: Immutable/Data Objects (Fields)
 - **Applies to:** value objects, domain events, read models, records (request/response/model/
@@ -158,13 +152,6 @@ the actual package layout.
                   .status(AbuseReportStatus.UNCHECKED)
                   .firstReportedAt(TEST_REPORT_CREATED_AT)
                   .lastReportedAt(TEST_REPORT_CREATED_AT);
-      }
-
-      default PostAbuseReportDashboardEntityBuilder createPostAbuseReportDashboardDismissedEntityBuilder() {
-          return PostAbuseReportDashboardEntity.builder()
-                  .status(AbuseReportStatus.DISMISSED)
-                  .firstReportedAt(TEST_REPORT_CREATED_AT)
-                  .lastReportedAt(TEST_REPORT_DISMISSED_AT);
       }
 
       // ...

@@ -1,5 +1,7 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
+import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.comment.common.util.framework.outbound.jpa.entity.CommentEntityTestUtils;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
@@ -16,10 +18,12 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
+import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
+import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportImagePath;
@@ -39,7 +43,6 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithIm
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.jwt.service.TokenService;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
@@ -126,7 +129,6 @@ class MemberControllerTest implements
     private final ApplicationEventPublisher applicationEventPublisher = Mockito.mock(ApplicationEventPublisher.class);
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
-    private final TokenService tokenService = Mockito.mock(TokenService.class);
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
@@ -143,7 +145,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, tokenService, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -1221,17 +1223,36 @@ class MemberControllerTest implements
         // given
         given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
         given(memberJpaRepository.existsByUuid(MEMBER_BASIC_USER_UUID)).willReturn(true);
+        willDoNothing().given(memberSocialTranslator).validateIfSocialAccountDeletable(SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
         given(memberSocialTranslator.getSocialAccessToken(any(), any())).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
-        willDoNothing().given(memberSocialTranslator).deleteSocialAccountWithSocialAccessToken(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN, SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
-        willDoNothing().given(tokenService).blacklistAccessToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN);
         willDoNothing().given(memberRepository).withdraw(any(), any(), any());
 
         // when
         memberController.withdraw(testKakaoMemberWithdrawalRecord);
 
         // then
-        verify(tokenService, times(1)).blacklistAccessToken(any());
+        verify(memberSocialTranslator, times(1)).validateIfSocialAccountDeletable(SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
         verify(memberRepository, times(1)).withdraw(any(), any(), any());
+        verify(applicationEventPublisher, times(1)).publishEvent(any(SocialAccessRevokeEvent.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(AccessTokenBlacklistEvent.class));
+    }
+
+    @Test
+    @DisplayName("탈퇴할 수 없는 소셜 계정으로 인해 withdraw로 예외 반환")
+    void testWithdraw_givenNotDeletableSocialAccount_willThrowException() {
+        // given
+        given(jwtTokenProvider.getMemberUuidFromToken(MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN)).willReturn(MEMBER_BASIC_USER_UUID);
+        willThrow(new SocialAccountConflictException(SocialIdentityErrorCode.PROVIDER_MISMATCH))
+                .given(memberSocialTranslator).validateIfSocialAccountDeletable(SocialProvider.KAKAO.getValue(), MEMBER_BASIC_USER_UUID);
+
+        // when
+        SocialAccountConflictException socialAccountConflictException = assertThrows(SocialAccountConflictException.class,
+                () -> memberController.withdraw(testKakaoMemberWithdrawalRecord));
+
+        // then
+        assertThat(socialAccountConflictException.getErrorCode()).isEqualTo(SocialIdentityErrorCode.PROVIDER_MISMATCH);
+        verify(memberRepository, times(0)).withdraw(any(), any(), any());
+        verify(applicationEventPublisher, times(0)).publishEvent(any(Object.class));
     }
 
     @Test

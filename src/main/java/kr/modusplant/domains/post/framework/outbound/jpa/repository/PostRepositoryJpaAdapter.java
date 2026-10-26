@@ -2,6 +2,8 @@ package kr.modusplant.domains.post.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.post.domain.aggregate.Post;
@@ -36,12 +38,14 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     private final PostViewCountRedisRepository postViewCountRedisRepository;
     private final PostLikeJpaRepository postLikeJpaRepository;
     private final PostBookmarkJpaRepository postBookmarkJpaRepository;
+    private final PostAbuseReportJpaRepository postAbuseReportJpaRepository;
+    private final PostAbuseReportDashboardJpaRepository postAbuseReportDashboardJpaRepository;
     private final PostRecentlyViewRedisRepository postRecentlyViewRedisRepository;
 
     @Override
     public void save(Post post) {
         // post : category id, title, content는 null일수도 있음
-        MemberEntity authorEntity = authorJpaRepository.findByUuid(post.getAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
+        MemberEntity authorEntity = authorJpaRepository.findByUuid(post.getPostAuthorId().getValue()).orElseThrow(AuthorNotFoundException::new);
         PrimaryCategoryEntity primaryCategoryEntity = post.getPrimaryCategoryId() != null
                 ? primaryCategoryJpaRepository.findById(post.getPrimaryCategoryId().getValue()).orElseThrow(() -> new InvalidValueException(PostErrorCode.INVALID_CATEGORY_ID))
                 : null;
@@ -110,6 +114,16 @@ public class PostRepositoryJpaAdapter implements PostRepository {
     @Override
     public void deletePostBookmarkByPostId(PostId postId) {
         postBookmarkJpaRepository.deleteByPostId(postId.getValue());
+    }
+
+    @Override
+    public void deletePostAbuseReportByPostId(PostId postId) {
+        postAbuseReportJpaRepository.deleteByPostId(postId.getValue());
+    }
+
+    @Override
+    public void deletePostAbuseReportDashboardByPostId(PostId postId) {
+        postAbuseReportDashboardJpaRepository.deleteByPostUlid(postId.getValue());
     }
 
     @Override

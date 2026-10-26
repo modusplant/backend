@@ -26,6 +26,7 @@ import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -334,8 +335,9 @@ class MemberAdminControllerTest {
         PostAbuseReportDashboardReadModel readModel = memberAdminController.dismissPostAbuse(testPostAbuseReportDismissRecord);
 
         // then
-        verify(reportDashboardRepository, times(1)).dismissPostAbuseReport(any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportDismissEvent.class));
+        InOrder inOrder = inOrder(reportDashboardRepository, applicationEventPublisher);
+        inOrder.verify(reportDashboardRepository, times(1)).dismissPostAbuseReport(any());
+        inOrder.verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }
 
@@ -384,8 +386,9 @@ class MemberAdminControllerTest {
         PostAbuseReportDashboardReadModel readModel = memberAdminController.approvePostAbuse(testPostAbuseReportApproveRecord);
 
         // then
-        verify(reportDashboardRepository, times(1)).approvePostAbuseReport(any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportApproveEvent.class));
+        InOrder inOrder = inOrder(reportDashboardRepository, applicationEventPublisher);
+        inOrder.verify(reportDashboardRepository, times(1)).approvePostAbuseReport(any());
+        inOrder.verify(applicationEventPublisher, times(1)).publishEvent(any(PostAbuseReportApproveEvent.class));
         assertThat(readModel).isEqualTo(testPostAbuseReportDashboardReadModel);
     }
 
@@ -527,8 +530,9 @@ class MemberAdminControllerTest {
         CommentAbuseReportDashboardReadModel readModel = memberAdminController.dismissCommentAbuse(testCommentAbuseReportDismissRecord);
 
         // then
-        verify(reportDashboardRepository, times(1)).dismissCommentAbuseReport(any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportDismissEvent.class));
+        InOrder inOrder = inOrder(reportDashboardRepository, applicationEventPublisher);
+        inOrder.verify(reportDashboardRepository, times(1)).dismissCommentAbuseReport(any());
+        inOrder.verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportDismissEvent.class));
         assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
     }
 
@@ -577,8 +581,9 @@ class MemberAdminControllerTest {
         CommentAbuseReportDashboardReadModel readModel = memberAdminController.approveCommentAbuse(testCommentAbuseReportApproveRecord);
 
         // then
-        verify(reportDashboardRepository, times(1)).approveCommentAbuseReport(any());
-        verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportApproveEvent.class));
+        InOrder inOrder = inOrder(reportDashboardRepository, applicationEventPublisher);
+        inOrder.verify(reportDashboardRepository, times(1)).approveCommentAbuseReport(any());
+        inOrder.verify(applicationEventPublisher, times(1)).publishEvent(any(CommentAbuseReportApproveEvent.class));
         assertThat(readModel).isEqualTo(testCommentAbuseReportDashboardReadModel);
     }
 

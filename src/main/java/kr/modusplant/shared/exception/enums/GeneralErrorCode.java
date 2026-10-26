@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum GeneralErrorCode implements ErrorCode {
+    ADMIN_ROLE_REQUIRED_TO_ACCESS(HttpStatus.FORBIDDEN.value(), "admin_role_required_to_access", "접근을 위해서는 관리자 역할이 필요합니다"),
     CACHE_NOT_INITIALIZED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "cache_not_initialized", "캐시가 초기화되지 않았습니다"),
     CONNECTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR.value(), "connection_failed", "통신이 예기치 않게 실패하였습니다"),
     CONSTRAINT_VIOLATION(HttpStatus.BAD_REQUEST.value(), "constraint_violation", "데이터의 조건이 위배되었습니다"),

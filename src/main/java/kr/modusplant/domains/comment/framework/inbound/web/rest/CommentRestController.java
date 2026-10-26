@@ -8,7 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import kr.modusplant.domains.comment.adapter.controller.CommentController;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.CommentCacheService;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
@@ -84,7 +84,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), null, null);
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, ParentPostId.create(postUlid), null, null);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();
@@ -146,7 +146,7 @@ public class CommentRestController {
             @AuthenticationPrincipal
             DefaultUserDetails userDetails
             ) {
-        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, PostId.create(postUlid), lastPath, size);
+        CommentCacheData cacheData = cacheService.getCacheData(ifNoneMatch, ifModifiedSince, ParentPostId.create(postUlid), lastPath, size);
         if (cacheData.isCacheable()) {
             return buildFixedCacheResponsePart(cacheData)
                     .build();

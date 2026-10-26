@@ -94,20 +94,20 @@ public class PostController {
 
     @Transactional
     public void createPost(PostRequest postRequest, boolean isPublished, UUID currentMemberUuid) throws IOException {
-        AuthorId authorId = AuthorId.fromUuid(currentMemberUuid);
+        PostAuthorId postAuthorId = PostAuthorId.fromUuid(currentMemberUuid);
         Post post;
         if (isPublished) {  // 발행 게시글 생성
             PrimaryCategoryId primaryCategoryId = PrimaryCategoryId.create(postRequest.primaryCategoryId());
             SecondaryCategoryId secondaryCategoryId = SecondaryCategoryId.create(postRequest.secondaryCategoryId());
             ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), List.of());
-            post = Post.createPublished(authorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()));
+            post = Post.createPublished(postAuthorId, primaryCategoryId, secondaryCategoryId,  PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()));
         } else {            // 임시저장 게시글 생성
             PrimaryCategoryId primaryCategoryId = postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null;
             SecondaryCategoryId secondaryCategoryId = postRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postRequest.secondaryCategoryId()) : null;
             ContentProcessRecord result = (postRequest.contentText() == null && postRequest.contentFiles() == null)
                     ? new ContentProcessRecord(null,null)
                     : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), List.of());
-            post = Post.createDraft(authorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath()));
+            post = Post.createDraft(postAuthorId, primaryCategoryId, secondaryCategoryId, PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath()));
         }
         postRepository.save(post);
         pendingFileService.untrackPendingFiles(extractFileKeys(postRequest.contentFiles()));
@@ -116,7 +116,7 @@ public class PostController {
     @Transactional
     public void updatePost(String ulid, PostRequest postRequest, boolean isPublished, UUID currentMemberUuid) throws IOException {
         Post post = postRepository.getPostByUlid(PostId.create(ulid))
-                .filter(p -> p.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))).orElseThrow();
+                .filter(p -> p.getPostAuthorId().equals(PostAuthorId.fromUuid(currentMemberUuid))).orElseThrow();
         // 기존 filekey 목록 미리 추출
         List<String> oldFileKeys = contentDataProcessorPort.extractFileKeysFromContent(post.getPostContent().getContent());
 
@@ -124,7 +124,7 @@ public class PostController {
         if (isPublished) {
             ContentProcessRecord result = contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), oldFileKeys);
             post.update(
-                    AuthorId.fromUuid(currentMemberUuid),
+                    PostAuthorId.fromUuid(currentMemberUuid),
                     PrimaryCategoryId.create(postRequest.primaryCategoryId()),
                     SecondaryCategoryId.create(postRequest.secondaryCategoryId()),
                     PostContent.create(postRequest.title(), result.content(), result.thumbnailPath()),
@@ -135,7 +135,7 @@ public class PostController {
                     ? new ContentProcessRecord(null,null)
                     : contentDataProcessorPort.generateContentJson(postRequest.contentText(), postRequest.contentFiles(), postRequest.thumbnailFilename(), oldFileKeys);
             post.updateDraft(
-                    AuthorId.fromUuid(currentMemberUuid),
+                    PostAuthorId.fromUuid(currentMemberUuid),
                     postRequest.primaryCategoryId() != null ? PrimaryCategoryId.create(postRequest.primaryCategoryId()) : null,
                     postRequest.secondaryCategoryId() != null ? SecondaryCategoryId.create(postRequest.secondaryCategoryId()) : null,
                     PostContent.createDraft(postRequest.title(), result.content(), result.thumbnailPath())
@@ -151,13 +151,15 @@ public class PostController {
     @Transactional
     public void deletePost(String ulid, UUID currentMemberUuid) {
         Post post = postRepository.getPostByUlid(PostId.create(ulid)).orElseThrow(PostNotFoundException::new);
-        if (!post.getAuthorId().equals(AuthorId.fromUuid(currentMemberUuid))) {
+        if (!post.getPostAuthorId().equals(PostAuthorId.fromUuid(currentMemberUuid))) {
             throw new PostAccessDeniedException();
         }
         if (post.getStatus().isPublished()) {
             postArchiveRepository.save(PostId.create(ulid));
             postRepository.deletePostLikeByPostId(post.getPostId());
             postRepository.deletePostBookmarkByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportByPostId(post.getPostId());
+            postRepository.deletePostAbuseReportDashboardByPostId(post.getPostId());
             postRepository.deletePostRecentlyViewRecordByPostId(post.getPostId());
         }
         contentDataProcessorPort.deleteFiles(post.getPostContent().getContent());
@@ -192,13 +194,13 @@ public class PostController {
 
     public OffsetPageResponse<PostSummaryResponse> getByMemberUuid(UUID memberUuid, int page, int size) {
         return OffsetPageResponse.from(
-                postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(AuthorId.fromUuid(memberUuid),page,size)
+                postQueryForMemberRepository.findPublishedByAuthMemberWithOffset(PostAuthorId.fromUuid(memberUuid),page,size)
                         .map(postModel -> postMapper.toPostSummaryResponse(postModel,getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath()))));
     }
 
     public OffsetPageResponse<DraftPostResponse> getDraftByMemberUuid(UUID currentMemberUuid, int page, int size) {
         return OffsetPageResponse.from(
-                postQueryForMemberRepository.findDraftByAuthMemberWithOffset(AuthorId.fromUuid(currentMemberUuid),page,size)
+                postQueryForMemberRepository.findDraftByAuthMemberWithOffset(PostAuthorId.fromUuid(currentMemberUuid),page,size)
                         .map(postModel -> postMapper.toDraftPostResponse(postModel, getJsonNodeContentPreview(postModel.content(),postModel.thumbnailPath()))));
     }
 

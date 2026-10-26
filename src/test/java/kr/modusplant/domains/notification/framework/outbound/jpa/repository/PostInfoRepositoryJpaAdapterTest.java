@@ -24,7 +24,7 @@ class PostInfoRepositoryJpaAdapterTest implements NotificationTestUtils {
 
     @Nested
     @DisplayName("getAuthorIdByPostId 테스트")
-    class GetAuthorIdTests {
+    class GetCommentPostAuthorIdTests {
 
         @Test
         @DisplayName("유효한 게시글 ID로 UUID 반환")

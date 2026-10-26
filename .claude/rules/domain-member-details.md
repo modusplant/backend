@@ -49,8 +49,7 @@ member/
      ├─ outbound/jpa/adapter/      # *RepositoryJpaAdapter — mediates between the outbound port
      │                             #   implementation and the raw Spring Data JPA repository
      ├─ outbound/jpa/compositekey/ # Composite PK classes for @IdClass entities (join/report tables)
-     ├─ outbound/jooq/repository/  # DSLContext-based complex queries
-     └─ outbound/jooq/record/      # jOOQ composite parameter records
+     └─ outbound/jooq/repository/  # DSLContext-based complex queries
 ```
 
 ---
@@ -65,7 +64,7 @@ member/
 **Entity** (`domain/entity/`):
 - `protected` constructor + `static create()` factory
 - Optional entities: Null Object pattern → singleton class under `entity/nullobject/`
-- May expose an additional overloaded `create(...)` factory that derives an omitted field internally from an already-validated field (e.g. parsing a filename VO out of a path VO's value) — mirrors the VO overload pattern above, avoiding duplicated parsing logic across callers
+- May expose an additional overloaded `create(...)` factory that derives an omitted field internally from an already-validated field (e.g. parsing a filename VO out of a path VO's value)
 
 **Value Object** (`domain/vo/`):
 - `@RequiredArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, regex, length, range)
@@ -94,7 +93,7 @@ member/
 - Java records for REST Controller → adapter Controller data transfer; carry raw types (UUID, String, Integer, List<String>, MultipartFile)
 - Adapter converts raw types to domain VOs; naming: `*GetRecord`, `*OverrideRecord`, `*LikeRecord`, etc.
 - When an operation has multiple coexisting API versions, the record is suffixed accordingly (e.g. `*FooRecord_V1`, `*FooRecord_V2`) instead of one record serving every version
-- Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON) and `framework/outbound/jooq/record/` (jOOQ params)
+- Distinct from `framework/outbound/jpa/entity/record/` (JPA JSON)
 
 **Response DTOs** (`usecase/response/`):
 - Java records; multi-item responses commonly include a static `of(...)` factory (e.g. paginated lists: `of(List, cursor, hasNext)`; an id plus its related list: `of(id, List)`)
@@ -118,7 +117,7 @@ member/
 **Helper** (`adapter/helper/`) — `@Component`:
 - Used only for controller
 - `*ValidationHelper`: DB-backed pre-condition checks via repository ports
-- `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`, so an S3 upload never confirmed by a DB write can later be cleaned up as an orphan
+- `*IOHelper`: external I/O operations (S3 upload/delete, etc.); a presigned-URL issuance method also registers the returned file key as pending via the global `PendingFileService`
 - `*IOHelper` may also expose an S3-backed validation (e.g. `validateIfImageExistsInStorage`), complementing the DB-backed checks in `*ValidationHelper`
 
 **Listener** (`adapter/listener/`) — `@Component`:
@@ -167,4 +166,4 @@ member/
 **Repository Adapter** (`framework/outbound/`) — `@Repository`; implements usecase port by combining JPA + jOOQ:
 - Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models; composite parameters via `jooq/record/`
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository`; DSLContext directly for bulk cascades, complex joins, paginated read models

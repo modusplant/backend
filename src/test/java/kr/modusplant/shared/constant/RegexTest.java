@@ -112,6 +112,28 @@ class RegexTest {
     }
 
     @Test
+    @DisplayName("유효한 검증 코드 문자열로 참 반환")
+    void testPatternVerifyCode_givenValidVerifyCodeString_willReturnTrue() {
+        // given & when & then
+        assertTrue(PATTERN_VERIFY_CODE.matcher("12cA56").matches());
+        assertTrue(PATTERN_VERIFY_CODE.matcher("abcdef").matches());
+        assertTrue(PATTERN_VERIFY_CODE.matcher("a_1B_2").matches());
+    }
+
+    @Test
+    @DisplayName("유효하지 않은 검증 코드 문자열로 거짓 반환")
+    void testPatternVerifyCode_givenInvalidVerifyCodeString_willReturnFalse() {
+        // given & when & then
+        // 5자리 이하
+        assertFalse(PATTERN_VERIFY_CODE.matcher("12cA5").matches());
+        // 7자리 이상
+        assertFalse(PATTERN_VERIFY_CODE.matcher("12cA567").matches());
+        // 영문, 숫자, 밑줄 이외의 문자 포함
+        assertFalse(PATTERN_VERIFY_CODE.matcher("12cA5!").matches());
+        assertFalse(PATTERN_VERIFY_CODE.matcher("12 A56").matches());
+    }
+
+    @Test
     @DisplayName("유효한 버전 문자열로 참 반환")
     void testPatternVersion_givenValidVersionString_willReturnTrue() {
         // given & when & then

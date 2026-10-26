@@ -1,10 +1,13 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
+import kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.*;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,8 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CommentTest implements
-        CommentTestUtils, PostIdTestUtils, CommentPathTestUtils, ReplyToCommentPathTestUtils, AuthorTestUtils,
+        CommentTestUtils, ParentPostIdTestUtils, CommentPathTestUtils, ReplyToCommentPathTestUtils, CommentAuthorIdTestUtils, EmptyCommentAuthorIdTestUtils,
         CommentContentTestUtils, CommentStatusTestUtils {
+    @SuppressWarnings("unused")
+    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
     @Test
     @DisplayName("null인 게시글 id로 댓글 생성 시 예외 반환")
@@ -21,7 +26,7 @@ public class CommentTest implements
         // given
         EmptyValueException result = assertThrows(
                 EmptyValueException.class, () -> Comment.create(null, testCommentPath, testReplyToCommentPath,
-                        testAuthor, testCommentContent)
+                        testCommentAuthorId, testCommentContent)
         );
 
         // when & then
@@ -33,8 +38,8 @@ public class CommentTest implements
     void testCreate_givenNullCommentPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, null, testReplyToCommentPath,
-                        testAuthor, testCommentContent)
+                EmptyValueException.class, () -> Comment.create(testParentPostId, null, testReplyToCommentPath,
+                        testCommentAuthorId, testCommentContent)
         );
 
         // when & then
@@ -46,8 +51,8 @@ public class CommentTest implements
     void testCreate_givenNullReplyToPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
-                        testAuthor, testCommentContent)
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, null,
+                        testCommentAuthorId, testCommentContent)
         );
 
         // when & then
@@ -59,8 +64,8 @@ public class CommentTest implements
     void testCreateWithStatus_givenNullReplyToPath_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, null,
-                        testAuthor, testCommentContent, testCommentStatusValid)
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, null,
+                        testCommentAuthorId, testCommentContent, testCommentStatusValid)
         );
 
         // when & then
@@ -72,12 +77,25 @@ public class CommentTest implements
     void testCreate_givenNullAuthor_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, testReplyToCommentPath,
                         null, testCommentContent)
         );
 
         // when & then
-        assertThat(result.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_AUTHOR);
+        assertThat(result.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_COMMENT_AUTHOR);
+    }
+
+    @Test
+    @DisplayName("비어 있는 작성자 id로 댓글 생성 시 예외 반환")
+    void testCreate_givenEmptyCommentAuthorId_willThrowException() {
+        // given
+        EmptyValueException result = assertThrows(
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, testReplyToCommentPath,
+                        testEmptyCommentAuthorId, testCommentContent)
+        );
+
+        // when & then
+        assertThat(result.getErrorCode()).isEqualTo(CommentErrorCode.EMPTY_COMMENT_AUTHOR);
     }
 
     @Test
@@ -85,8 +103,8 @@ public class CommentTest implements
     void testCreate_givenNullContent_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
-                        testAuthor, null)
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, testReplyToCommentPath,
+                        testCommentAuthorId, null)
         );
 
         // when & then
@@ -98,8 +116,8 @@ public class CommentTest implements
     void testCreate_givenNullStatus_willThrowException() {
         // given
         EmptyValueException result = assertThrows(
-                EmptyValueException.class, () -> Comment.create(testPostId, testCommentPath, testReplyToCommentPath,
-                        testAuthor, testCommentContent, null)
+                EmptyValueException.class, () -> Comment.create(testParentPostId, testCommentPath, testReplyToCommentPath,
+                        testCommentAuthorId, testCommentContent, null)
         );
 
         // when & then
@@ -110,7 +128,7 @@ public class CommentTest implements
     @DisplayName("비어 있는 답글 대상 경로로 댓글 생성 시 Comment 반환")
     void testCreate_givenEmptyReplyToPath_willReturnComment() {
         // when
-        Comment result = Comment.create(testPostId, testCommentPath, EmptyReplyToCommentPath.create(), testAuthor, testCommentContent);
+        Comment result = Comment.create(testParentPostId, testCommentPath, EmptyReplyToCommentPath.create(), testCommentAuthorId, testCommentContent);
 
         // then
         assertThat(result.getReplyToPath()).isSameAs(EmptyReplyToCommentPath.create());
@@ -138,7 +156,7 @@ public class CommentTest implements
     @DisplayName("동일하고 다른 프로퍼티를 지닌 객체로 동등성 비교")
     void testEquals_givenDifferentProperty_willReturnFalse() {
         // given
-        Comment compare = Comment.create(testPostId, CommentPath.create("1"), EmptyReplyToCommentPath.create(), testAuthor, testCommentContent);
+        Comment compare = Comment.create(testParentPostId, CommentPath.create("1"), EmptyReplyToCommentPath.create(), testCommentAuthorId, testCommentContent);
 
         assertNotEquals(testValidComment, compare);
     }

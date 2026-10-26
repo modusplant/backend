@@ -85,7 +85,7 @@ class PostIdTest implements PostTestUtils {
         @DisplayName("다른 클래스 인스턴스로 거짓 반환")
         void testEquals_givenObjectOfDifferentClass_willReturnFalse() {
             // when & then
-            assertNotEquals(testPostId,testAuthorId);
+            assertNotEquals(testPostId, testPostAuthorId);
         }
 
         @Test

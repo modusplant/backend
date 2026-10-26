@@ -120,8 +120,9 @@ public class MemberAdminController {
         if (reportDashboardRepository.isDismissedInPostAbuseReportDashboard(postId)) {
             throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_DISMISSED, "status");
         }
+        PostAbuseReportDashboardReadModel readModel = reportDashboardRepository.dismissPostAbuseReport(postId);
         applicationEventPublisher.publishEvent(PostAbuseReportDismissEvent.create(postId.getValue()));
-        return reportDashboardRepository.dismissPostAbuseReport(postId);
+        return readModel;
     }
 
     public PostAbuseReportDashboardReadModel approvePostAbuse(PostAbuseReportApproveRecord record) {
@@ -130,8 +131,9 @@ public class MemberAdminController {
         if (reportDashboardRepository.isApprovedInPostAbuseReportDashboard(postId)) {
             throw new ExistsValueException(EXISTS_POST_ABUSE_REPORT_BLINDED, "status");
         }
-        applicationEventPublisher.publishEvent(PostAbuseReportApproveEvent.create(postId.getValue()));
-        return reportDashboardRepository.approvePostAbuseReport(postId);
+        PostAbuseReportDashboardReadModel readModel = reportDashboardRepository.approvePostAbuseReport(postId);
+        applicationEventPublisher.publishEvent(PostAbuseReportApproveEvent.create(postId.getValue(), record.memberId()));
+        return readModel;
     }
 
     public CommentAbuseReportDashboardResponse getCommentAbuseReport(CommentAbuseReportGetRecord record) {
@@ -177,9 +179,10 @@ public class MemberAdminController {
         if (reportDashboardRepository.isDismissedInCommentAbuseReportDashboard(commentId)) {
             throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_DISMISSED, "status");
         }
+        CommentAbuseReportDashboardReadModel readModel = reportDashboardRepository.dismissCommentAbuseReport(commentId);
         applicationEventPublisher.publishEvent(
                 CommentAbuseReportDismissEvent.create(postId.getValue(), commentPath.getValue()));
-        return reportDashboardRepository.dismissCommentAbuseReport(commentId);
+        return readModel;
     }
 
     public CommentAbuseReportDashboardReadModel approveCommentAbuse(CommentAbuseReportApproveRecord record) {
@@ -190,8 +193,9 @@ public class MemberAdminController {
         if (reportDashboardRepository.isApprovedInCommentAbuseReportDashboard(commentId)) {
             throw new ExistsValueException(EXISTS_COMMENT_ABUSE_REPORT_BLINDED, "status");
         }
+        CommentAbuseReportDashboardReadModel readModel = reportDashboardRepository.approveCommentAbuseReport(commentId);
         applicationEventPublisher.publishEvent(
-                CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue()));
-        return reportDashboardRepository.approveCommentAbuseReport(commentId);
+                CommentAbuseReportApproveEvent.create(postId.getValue(), commentPath.getValue(), record.memberId()));
+        return readModel;
     }
 }

@@ -3,6 +3,8 @@ package kr.modusplant.domains.post.framework.outbound.redis;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.repository.PostRecentlyViewRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.Cursor;
+import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +17,8 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class PostRecentlyViewRedisRepository implements PostRecentlyViewRepository {
     private static final String KEY_FORMAT = "recentlyView:member:%s:posts";
+    private static final String KEY_PATTERN = "recentlyView:member:*:posts";
+    private static final int SCAN_BATCH_SIZE = 1000;
     private static final long TTL_DAYS = 7;          // TTL 7일
 
     private final StringRedisTemplate stringRedisTemplate;
@@ -58,11 +62,10 @@ public class PostRecentlyViewRedisRepository implements PostRecentlyViewReposito
     }
 
     public void removePostFromAllMembers(PostId postId) {
-        Set<String> keys = stringRedisTemplate.keys("recentlyView:member:*:posts");
-
-        if (keys != null) {
-            for (String key : keys) {
-                stringRedisTemplate.opsForZSet().remove(key, postId.getValue());
+        ScanOptions scanOptions = ScanOptions.scanOptions().match(KEY_PATTERN).count(SCAN_BATCH_SIZE).build();
+        try (Cursor<String> cursor = stringRedisTemplate.scan(scanOptions)) {
+            while (cursor.hasNext()) {
+                stringRedisTemplate.opsForZSet().remove(cursor.next(), postId.getValue());
             }
         }
     }

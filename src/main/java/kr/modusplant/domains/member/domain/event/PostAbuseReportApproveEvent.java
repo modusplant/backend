@@ -1,21 +1,26 @@
 package kr.modusplant.domains.member.domain.event;
 
-import kr.modusplant.shared.exception.InvalidValueException;
-import kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode;
+import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.UUID;
+
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostAbuseReportApproveEvent {
     private final String postUlid;
+    private final UUID memberId;
 
-    public static PostAbuseReportApproveEvent create(String postUlid) {
+    public static PostAbuseReportApproveEvent create(String postUlid, UUID memberId) {
         if (StringUtils.isBlank(postUlid)) {
-            throw new InvalidValueException(EntityErrorCode.NOT_FOUND_POST, "postUlid");
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "postUlid");
+        } else if (memberId == null) {
+            throw new EmptyValueException(GeneralErrorCode.EMPTY_VALUE, "memberId");
         }
-        return new PostAbuseReportApproveEvent(postUlid);
+        return new PostAbuseReportApproveEvent(postUlid, memberId);
     }
 }

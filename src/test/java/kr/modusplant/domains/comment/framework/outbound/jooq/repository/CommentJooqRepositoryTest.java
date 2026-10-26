@@ -1,12 +1,14 @@
 package kr.modusplant.domains.comment.framework.outbound.jooq.repository;
 
-import kr.modusplant.domains.comment.common.util.domain.vo.AuthorTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentContentTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPageSizeTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils;
-import kr.modusplant.domains.comment.common.util.domain.vo.PostIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.ParentPostIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.ReplyToCommentPathTestUtils;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
+import kr.modusplant.domains.comment.usecase.model.CommentOfAuthorReadModel;
 import kr.modusplant.domains.comment.usecase.model.CommentOfPostReadModel;
 import org.jooq.*;
 import org.jooq.Record;
@@ -16,6 +18,8 @@ import org.jooq.tools.jdbc.MockDataProvider;
 import org.jooq.tools.jdbc.MockResult;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -25,8 +29,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CommentJooqRepositoryTest implements
-        PostIdTestUtils, AuthorTestUtils, CommentPathTestUtils,
-        CommentContentTestUtils, ReplyToCommentPathTestUtils, CommentPageSizeTestUtils {
+        ParentPostIdTestUtils, CommentPathTestUtils,
+        CommentContentTestUtils, ReplyToCommentPathTestUtils, CommentPageSizeTestUtils,
+        CommentAuthorIdTestUtils, EmptyCommentAuthorIdTestUtils {
 
     private final LocalDateTime testDateTime = LocalDateTime.parse("2025-10-16 14:30:45", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
@@ -43,7 +48,7 @@ public class CommentJooqRepositoryTest implements
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
 
-            if (bindings[0].equals(testPostId.getValue()) && bindings[1].equals(testCommentPath.getValue())) {
+            if (bindings[0].equals(testParentPostId.getValue()) && bindings[1].equals(testCommentPath.getValue())) {
                 DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
                 Field<Boolean> existsField = DSL.field("exists", Boolean.class);
                 Result<Record1<Boolean>> result = dsl.newResult(existsField);
@@ -56,7 +61,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentExists(testPostId, testCommentPath);
+        boolean result = repository.isCommentExists(testParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(true);
@@ -66,21 +71,22 @@ public class CommentJooqRepositoryTest implements
     @DisplayName("게시글의 식별자와 댓글 경로로 삭제된 댓글인지 확인 시 True 반환")
     void testIsCommentDeleted_givenDeletedComment_willReturnTrue() {
         // given
+        // isTrue()는 true를 바인딩하지 않고 SQL에 인라인으로 렌더링한다
         MockDataProvider provider = ctx -> {
             Object[] bindings = ctx.bindings();
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
             Field<Boolean> existsField = DSL.field("exists", Boolean.class);
             Result<Record1<Boolean>> result = dsl.newResult(existsField);
             result.add(dsl.newRecord(existsField).values(
-                    bindings[0].equals(testPostId.getValue())
+                    bindings[0].equals(testParentPostId.getValue())
                             && bindings[1].equals(testCommentPath.getValue())
-                            && bindings[2].equals(true)));
+                            && ctx.sql().toLowerCase().contains("\"is_deleted\" = true")));
             return new MockResult[] { new MockResult(0, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+        boolean result = repository.isCommentDeleted(testParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(true);
@@ -100,7 +106,51 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        boolean result = repository.isCommentDeleted(testPostId, testCommentPath);
+        boolean result = repository.isCommentDeleted(testParentPostId, testCommentPath);
+
+        // then
+        assertThat(result).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("게시글의 식별자, 댓글 경로, 작성자 식별자로 작성자 본인의 댓글인지 확인 시 True 반환")
+    void testIsCommentWrittenByAuthor_givenCommentWrittenByAuthor_willReturnTrue() {
+        // given
+        MockDataProvider provider = ctx -> {
+            Object[] bindings = ctx.bindings();
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(
+                    bindings[0].equals(testParentPostId.getValue())
+                            && bindings[1].equals(testCommentPath.getValue())
+                            && bindings[2].equals(testCommentAuthorId.getValue())));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentWrittenByAuthor(testParentPostId, testCommentPath, testCommentAuthorId);
+
+        // then
+        assertThat(result).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("게시글의 식별자, 댓글 경로, 작성자 식별자로 작성자 본인의 댓글이 아닌지 확인 시 False 반환")
+    void testIsCommentWrittenByAuthor_givenCommentNotWrittenByAuthor_willReturnFalse() {
+        // given
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Field<Boolean> existsField = DSL.field("exists", Boolean.class);
+            Result<Record1<Boolean>> result = dsl.newResult(existsField);
+            result.add(dsl.newRecord(existsField).values(false));
+            return new MockResult[] { new MockResult(0, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        boolean result = repository.isCommentWrittenByAuthor(testParentPostId, testCommentPath, testCommentAuthorId);
 
         // then
         assertThat(result).isEqualTo(false);
@@ -110,7 +160,7 @@ public class CommentJooqRepositoryTest implements
     @DisplayName("게시글의 식별자로 댓글 읽기 모델 목록 가져오기")
     void testFindByPost_givenValidPostId_willReturnCommentOfPostReadModelList() {
         // given: column order must match CommentJooqRepository#findByPost's select list
-        // (profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt, replyToPath, replyToNickname)
+        // (profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt, replyToPath, replyToIsExisted, replyToNickname, replyToIsDeleted)
         Field<String> profileImage = DSL.field("profile_image", String.class);
         Field<String> nickname = DSL.field("nickname", String.class);
         Field<String> path = DSL.field("path", String.class);
@@ -121,24 +171,26 @@ public class CommentJooqRepositoryTest implements
         Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
         Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
         Field<String> replyToPath = DSL.field("reply_to_path", String.class);
+        Field<String> replyToCommentPath = DSL.field("reply_to_comment_path", String.class);
         Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
 
         MockDataProvider provider = ctx -> {
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record11<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String>> result =
+            Result<Record13<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, String, Boolean>> result =
                     dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname);
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted);
             result.add(dsl.newRecord(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname)
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted)
                     .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
                             3, true, testDateTime, false, testDateTime,
-                            testReplyToCommentPath.getValue(), "replyToNickname"));
+                            testReplyToCommentPath.getValue(), testReplyToCommentPath.getValue(), "replyToNickname", true));
             return new MockResult[] { new MockResult(1, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        List<CommentOfPostReadModel> result = repository.findByPost(testPostId, testAuthorWithUuid);
+        List<CommentOfPostReadModel> result = repository.findByPost(testParentPostId, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -153,7 +205,97 @@ public class CommentJooqRepositoryTest implements
         assertThat(readModel.updatedAt()).isEqualTo(testDateTime.withNano(0));
         assertThat(readModel.isDeleted()).isFalse();
         assertThat(readModel.replyToPath()).isEqualTo(testReplyToCommentPath.getValue());
+        assertThat(readModel.replyToIsExisted()).isTrue();
         assertThat(readModel.replyToNickname()).isEqualTo("replyToNickname");
+        assertThat(readModel.replyToIsDeleted()).isTrue();
+    }
+
+    @Test
+    @DisplayName("답글 대상 삭제 여부가 NULL인 경우 CommentOfPostReadModelList 반환")
+    void testFindByPost_givenNullReplyToIsDeleted_willReturnCommentOfPostReadModelList() {
+        // given: a root comment has no reply target, so the LEFT JOIN yields NULL for reply_to_is_deleted
+        Field<String> profileImage = DSL.field("profile_image", String.class);
+        Field<String> nickname = DSL.field("nickname", String.class);
+        Field<String> path = DSL.field("path", String.class);
+        Field<String> content = DSL.field("content", String.class);
+        Field<Integer> likeCount = DSL.field("like_count", Integer.class);
+        Field<Boolean> isLiked = DSL.field("is_liked", Boolean.class);
+        Field<LocalDateTime> createdAt = DSL.field("created_at", LocalDateTime.class);
+        Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
+        Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
+        Field<String> replyToPath = DSL.field("reply_to_path", String.class);
+        Field<String> replyToCommentPath = DSL.field("reply_to_comment_path", String.class);
+        Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
+
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record13<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, String, Boolean>> result =
+                    dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted);
+            result.add(dsl.newRecord(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted)
+                    .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
+                            3, true, testDateTime, false, testDateTime,
+                            null, null, null, null));
+            return new MockResult[] { new MockResult(1, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        List<CommentOfPostReadModel> result = repository.findByPost(testParentPostId, testCommentAuthorId);
+
+        // then
+        assertThat(result).hasSize(1);
+        CommentOfPostReadModel readModel = result.getFirst();
+        assertThat(readModel.replyToPath()).isNull();
+        assertThat(readModel.replyToIsExisted()).isFalse();
+        assertThat(readModel.replyToNickname()).isNull();
+        assertThat(readModel.replyToIsDeleted()).isFalse();
+    }
+
+    @Test
+    @DisplayName("답글 대상 행이 없는 경우 답글 대상 존재 여부가 false인 CommentOfPostReadModelList 반환")
+    void testFindByPost_givenMissingReplyToComment_willReturnCommentOfPostReadModelList() {
+        // given: the reply target was hard-deleted, so the LEFT JOIN yields NULL for every reply-target column
+        Field<String> profileImage = DSL.field("profile_image", String.class);
+        Field<String> nickname = DSL.field("nickname", String.class);
+        Field<String> path = DSL.field("path", String.class);
+        Field<String> content = DSL.field("content", String.class);
+        Field<Integer> likeCount = DSL.field("like_count", Integer.class);
+        Field<Boolean> isLiked = DSL.field("is_liked", Boolean.class);
+        Field<LocalDateTime> createdAt = DSL.field("created_at", LocalDateTime.class);
+        Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
+        Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
+        Field<String> replyToPath = DSL.field("reply_to_path", String.class);
+        Field<String> replyToCommentPath = DSL.field("reply_to_comment_path", String.class);
+        Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
+
+        MockDataProvider provider = ctx -> {
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            Result<Record13<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, String, Boolean>> result =
+                    dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted);
+            result.add(dsl.newRecord(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted)
+                    .values("profile.png", "nickname", testCommentPath.getValue(), testCommentContent.getValue(),
+                            3, true, testDateTime, false, testDateTime,
+                            testReplyToCommentPath.getValue(), null, null, null));
+            return new MockResult[] { new MockResult(1, result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        List<CommentOfPostReadModel> result = repository.findByPost(testParentPostId, testCommentAuthorId);
+
+        // then
+        assertThat(result).hasSize(1);
+        CommentOfPostReadModel readModel = result.getFirst();
+        assertThat(readModel.replyToPath()).isEqualTo(testReplyToCommentPath.getValue());
+        assertThat(readModel.replyToIsExisted()).isFalse();
+        assertThat(readModel.replyToNickname()).isNull();
+        assertThat(readModel.replyToIsDeleted()).isFalse();
     }
 
     @Test
@@ -171,21 +313,23 @@ public class CommentJooqRepositoryTest implements
         Field<Boolean> isDeleted = DSL.field("is_deleted", Boolean.class);
         Field<LocalDateTime> editedAt = DSL.field("edited_at", LocalDateTime.class);
         Field<String> replyToPath = DSL.field("reply_to_path", String.class);
+        Field<String> replyToCommentPath = DSL.field("reply_to_comment_path", String.class);
         Field<String> replyToNickname = DSL.field("reply_to_nickname", String.class);
+        Field<Boolean> replyToIsDeleted = DSL.field("reply_to_is_deleted", Boolean.class);
 
         String[] capturedSql = new String[1];
         MockDataProvider provider = ctx -> {
             capturedSql[0] = ctx.sql().toLowerCase();
             DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
-            Result<Record11<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String>> result =
+            Result<Record13<String, String, String, String, Integer, Boolean, LocalDateTime, Boolean, LocalDateTime, String, String, String, Boolean>> result =
                     dsl.newResult(profileImage, nickname, path, content, likeCount, isLiked, createdAt, isDeleted, editedAt,
-                            replyToPath, replyToNickname);
+                            replyToPath, replyToCommentPath, replyToNickname, replyToIsDeleted);
             return new MockResult[] { new MockResult(0, result) };
         };
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        repository.findByPost(testPostId, testAuthorWithUuid);
+        repository.findByPost(testParentPostId, testCommentAuthorId);
 
         // then
         String sql = capturedSql[0];
@@ -195,6 +339,29 @@ public class CommentJooqRepositoryTest implements
         assertThat(orderByClause).doesNotContain("desc");
         assertThat(orderByClause).containsSubsequence(
                 "\"path_1_depth_value\" asc", "\"path_2_depth_value\" asc nulls first");
+    }
+
+    @Test
+    @DisplayName("빈 작성자 식별자로 게시글의 댓글 조회 시 활동 수행")
+    void testFindByPost_givenEmptyCommentAuthorId_willProcessAction() {
+        // given
+        List<String> capturedSql = new ArrayList<>();
+        List<Object[]> capturedBindings = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            capturedBindings.add(ctx.bindings());
+            Result<Record> result = createCommentOfPostResult(testCommentPath.getValue());
+            return new MockResult[] { new MockResult(result.size(), result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        List<CommentOfPostReadModel> result = repository.findByPost(testParentPostId, testEmptyCommentAuthorId);
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(capturedSql.getFirst()).doesNotContain("\"memb_uuid\" = ?");
+        assertThat(capturedBindings.getFirst()).doesNotContainNull();
     }
 
     @Test
@@ -213,7 +380,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, null, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testParentPostId, null, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
@@ -236,7 +403,7 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).isEmpty();
@@ -266,13 +433,13 @@ public class CommentJooqRepositoryTest implements
 
         // when
         List<CommentOfPostReadModel> result =
-                repository.findByPost(testPostId, testCommentRootPath, testCommentPageSize, testAuthorWithUuid);
+                repository.findByPost(testParentPostId, testCommentRootPath, testCommentPageSize, testCommentAuthorId);
 
         // then
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().path()).isEqualTo(testCommentPath.getValue());
         assertThat(capturedSql).hasSize(2);
-        assertThat(capturedBindings.getFirst()).contains(testPostId.getValue(), testCommentRootPath.getValue());
+        assertThat(capturedBindings.getFirst()).contains(testParentPostId.getValue(), testCommentRootPath.getValue());
         assertThat(capturedSql.get(1)).contains("fetch next ? rows only");
         assertThat(capturedSql.get(1)).contains("\"path_2_depth_value\" is not null");
         assertThat(capturedBindings.get(1)).contains(1);
@@ -293,13 +460,15 @@ public class CommentJooqRepositoryTest implements
                 DSL.field("is_deleted", Boolean.class),
                 DSL.field("edited_at", LocalDateTime.class),
                 DSL.field("reply_to_path", String.class),
-                DSL.field("reply_to_nickname", String.class)
+                DSL.field("reply_to_comment_path", String.class),
+                DSL.field("reply_to_nickname", String.class),
+                DSL.field("reply_to_is_deleted", Boolean.class)
         };
         Result<Record> result = dsl.newResult(fields);
         Record record = dsl.newRecord(fields);
         record.fromArray("profile.png", "nickname", commentPath,
                 testCommentContent.getValue(), 3, true, testDateTime, false, testDateTime,
-                testReplyToCommentPath.getValue(), "replyToNickname");
+                testReplyToCommentPath.getValue(), testReplyToCommentPath.getValue(), "replyToNickname", false);
         result.add(record);
         return result;
     }
@@ -327,7 +496,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+        int result = repository.findMaximumSiblingPathOrder(testParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(5);
@@ -348,7 +517,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+        int result = repository.findMaximumSiblingPathOrder(testParentPostId, CommentPath.create("3"));
 
         // then
         assertThat(result).isEqualTo(12);
@@ -364,7 +533,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, testCommentPath);
+        int result = repository.findMaximumSiblingPathOrder(testParentPostId, testCommentPath);
 
         // then
         assertThat(result).isEqualTo(0);
@@ -382,7 +551,7 @@ public class CommentJooqRepositoryTest implements
         CommentJooqRepository repository = createRepository(provider);
 
         // when
-        int result = repository.findMaximumSiblingPathOrder(testPostId, CommentPath.create("3"));
+        int result = repository.findMaximumSiblingPathOrder(testParentPostId, CommentPath.create("3"));
 
         // then
         assertThat(result).isEqualTo(0);
@@ -399,9 +568,88 @@ public class CommentJooqRepositoryTest implements
         return new MockResult(1, result);
     }
 
-    // findByAuthor issues two sequential statements (a selectCount() pre-check, then a grouped,
-    // paginated join with a nested totalCommentsOfPost subquery). Reliably distinguishing both
-    // statements through MockDataProvider's positional field-matching would be too brittle to
-    // maintain here; this method is left to the jOOQ Repository Unit Test policy's discretion
-    // rather than forcing a fragile mock.
+    @Test
+    @DisplayName("작성자로 PageImpl 반환")
+    void testFindByAuthor_givenAuthorWithComments_willReturnPageImpl() {
+        // given: 첫 번째 쿼리는 전체 댓글 수, 두 번째 쿼리는 댓글 목록을 조회한다
+        List<String> capturedSql = new ArrayList<>();
+        List<Object[]> capturedBindings = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            capturedBindings.add(ctx.bindings());
+            DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+            if (capturedSql.size() == 1) {
+                Field<Integer> count = DSL.field("count", Integer.class);
+                Result<Record1<Integer>> result = dsl.newResult(count);
+                result.add(dsl.newRecord(count).values(3));
+                return new MockResult[] { new MockResult(1, result) };
+            }
+            Result<Record> result = createCommentOfAuthorResult();
+            return new MockResult[] { new MockResult(result.size(), result) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        PageImpl<CommentOfAuthorReadModel> result =
+                repository.findByAuthor(testCommentAuthorId, PageRequest.of(1, 1));
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(3);
+        assertThat(result.getContent()).hasSize(1);
+        CommentOfAuthorReadModel readModel = result.getContent().getFirst();
+        assertThat(readModel.content()).isEqualTo(testCommentContent.getValue());
+        assertThat(readModel.createdAt()).isEqualTo(testDateTime.withNano(0));
+        assertThat(readModel.postTitle()).isEqualTo("postTitle");
+        assertThat(readModel.postId()).isEqualTo(testParentPostId.getValue());
+        assertThat(readModel.isLiked()).isTrue();
+        assertThat(readModel.totalCommentsOfPost()).isEqualTo(4);
+
+        assertThat(capturedSql).hasSize(2);
+        assertThat(capturedBindings.getFirst()).contains(testCommentAuthorId.getValue());
+        assertThat(capturedSql.getFirst()).contains("\"is_deleted\" = false");
+        assertThat(capturedBindings.get(1)).contains(testCommentAuthorId.getValue());
+        // 작성자 댓글 목록만 삭제된 댓글을 제외하고, 게시글 댓글 수 서브쿼리는 삭제된 댓글을 포함한다
+        assertThat(capturedSql.get(1).split("\"is_deleted\" = false", -1)).hasSize(2);
+        assertThat(capturedSql.get(1)).contains("offset ? rows fetch next ? rows only");
+    }
+
+    @Test
+    @DisplayName("전체 댓글 수 조회 결과가 없는 경우 PageImpl 반환")
+    void testFindByAuthor_givenNoCountRecord_willReturnPageImpl() {
+        // given
+        List<String> capturedSql = new ArrayList<>();
+        MockDataProvider provider = ctx -> {
+            capturedSql.add(ctx.sql().toLowerCase());
+            Field<Integer> count = DSL.field("count", Integer.class);
+            return new MockResult[] { new MockResult(0, DSL.using(SQLDialect.POSTGRES).newResult(count)) };
+        };
+        CommentJooqRepository repository = createRepository(provider);
+
+        // when
+        PageImpl<CommentOfAuthorReadModel> result =
+                repository.findByAuthor(testCommentAuthorId, PageRequest.of(0, 5));
+
+        // then
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        assertThat(result.getContent()).isEmpty();
+        assertThat(capturedSql).hasSize(1);
+    }
+
+    // 컬럼 순서는 CommentJooqRepository#findByAuthor의 목록 조회 select 순서와 일치해야 한다
+    private Result<Record> createCommentOfAuthorResult() {
+        DSLContext dsl = DSL.using(SQLDialect.POSTGRES);
+        Field<?>[] fields = {
+                DSL.field("content", String.class),
+                DSL.field("created_at", LocalDateTime.class),
+                DSL.field("title", String.class),
+                DSL.field("ulid", String.class),
+                DSL.field("is_liked", Boolean.class),
+                DSL.field("total_comments_of_post", Integer.class)
+        };
+        Result<Record> result = dsl.newResult(fields);
+        Record record = dsl.newRecord(fields);
+        record.fromArray(testCommentContent.getValue(), testDateTime, "postTitle", testParentPostId.getValue(), true, 4);
+        result.add(record);
+        return result;
+    }
 }

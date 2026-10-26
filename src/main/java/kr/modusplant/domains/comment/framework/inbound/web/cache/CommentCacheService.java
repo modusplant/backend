@@ -2,8 +2,8 @@ package kr.modusplant.domains.comment.framework.inbound.web.cache;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import kr.modusplant.domains.comment.domain.vo.Author;
-import kr.modusplant.domains.comment.domain.vo.PostId;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
+import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.framework.inbound.web.cache.model.CommentCacheData;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentQueryRepository;
 import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
@@ -56,7 +56,7 @@ public class CommentCacheService {
     public CommentCacheData getCacheData(
             @Nullable String ifNoneMatch,
             @Nullable String ifModifiedSince,
-            @Nonnull PostId postUlid,
+            @Nonnull ParentPostId postUlid,
             @Nullable String lastPath,
             @Nullable Integer size
     ) {
@@ -94,7 +94,7 @@ public class CommentCacheService {
 
         // 작성자 댓글의 최신 변경 시각 조회
         LocalDateTime latestCommentUpdatedAt = commentQueryRepository.findLatestUpdatedAtByAuthor(
-                        Author.create(memberId.getValue()))
+                        CommentAuthorId.fromUuid(memberId.getValue()))
                 .orElse(LocalDateTime.MIN);
 
         // member와 댓글 변경 시각 중 더 최신 것을 기준으로 함

@@ -36,8 +36,15 @@ public class AsyncConfig implements AsyncConfigurer {
     /* 회원 도메인 전용 executor : 가상 스레드 */
     @Bean(name = "memberDomainExecutor")
     public Executor memberDomainExecutor() {
-        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-domain-member-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
+    /* 소셜 도메인 전용 executor : 가상 스레드 */
+    @Bean(name = "socialDomainExecutor")
+    public Executor socialDomainExecutor() {
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-domain-social-");
         executor.setVirtualThreads(true);
         return executor;
     }
@@ -45,7 +52,6 @@ public class AsyncConfig implements AsyncConfigurer {
     /* AWS 전용 executor : 가상 스레드 */
     @Bean(name = "awsExecutor")
     public Executor awsExecutor() {
-        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-aws-");
         executor.setVirtualThreads(true);
         return executor;
@@ -54,8 +60,15 @@ public class AsyncConfig implements AsyncConfigurer {
     /* Redis 전용 executor : 가상 스레드 */
     @Bean(name = "redisExecutor")
     public Executor redisExecutor() {
-        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-redis-");
+        executor.setVirtualThreads(true);
+        return executor;
+    }
+
+    /* JWT 전용 executor : 가상 스레드 */
+    @Bean(name = "jwtExecutor")
+    public Executor jwtExecutor() {
+        SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-jwt-");
         executor.setVirtualThreads(true);
         return executor;
     }
@@ -63,7 +76,6 @@ public class AsyncConfig implements AsyncConfigurer {
     /* 알림 전용 executor : 가상 스레드 */
     @Bean(name = "notificationExecutor")
     public Executor notificationExecutor() {
-        // SimpleAsyncTaskExecutor + executor.setVirtualThreads(true) => VirtualThreadTaskExecutor
         SimpleAsyncTaskExecutor executor = new SimpleAsyncTaskExecutor("virtual-notification-");
         executor.setVirtualThreads(true);
         return executor;

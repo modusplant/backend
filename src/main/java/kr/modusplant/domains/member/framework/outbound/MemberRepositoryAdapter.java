@@ -3,28 +3,31 @@ package kr.modusplant.domains.member.framework.outbound;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
+import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
+import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
 import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
-import kr.modusplant.domains.member.framework.outbound.jooq.record.ActivitySubjectCommentIdRecord;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberWithdrawEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.mapper.supers.MemberJpaMapper;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberWithdrawJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.MemberRepository;
+import kr.modusplant.domains.post.framework.outbound.jooq.record.PostIsPublishedAndContentRecord;
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.aws.event.ImageRemoveTask;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -37,20 +40,16 @@ import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCod
 @Repository
 @RequiredArgsConstructor
 public class MemberRepositoryAdapter implements MemberRepository {
-    private final StringRedisTemplate stringRedisTemplate;
     private final ApplicationEventPublisher eventPublisher;
 
     private final MemberJpaMapper memberJpaMapper;
     private final MemberJpaRepository memberJpaRepository;
 
-    private final PostLikeJpaRepository postLikeJpaRepository;
-    private final CommentLikeJpaRepository commentLikeJpaRepository;
     private final MemberWithdrawJpaRepository memberWithdrawJpaRepository;
 
     private final ActivitySubjectPostJooqRepository activitySubjectPostJooqRepository;
     private final ActivitySubjectCommentJooqRepository activitySubjectCommentJooqRepository;
     private final MemberJooqRepository memberJooqRepository;
-    private final MemberProfileJpaRepository memberProfileJpaRepository;
     private final PostJooqRepository postJooqRepository;
 
     @Override
@@ -103,14 +102,15 @@ public class MemberRepositoryAdapter implements MemberRepository {
         String reason = reasonEnum.name();
         String opinion = opinionVO.getValue();
 
-        stringRedisTemplate.unlink("recentlyView:member:%s:posts".formatted(memberId));     // 최근에 본 게시글 데이터 삭제
+        List<PostIsPublishedAndContentRecord> posts = postJooqRepository.getPostIsPublishedAndContentsByMemberId(memberId);
+        String[] publishedPostUlids = posts.stream()
+                .filter(PostIsPublishedAndContentRecord::isPublished)
+                .map(PostIsPublishedAndContentRecord::ulid)
+                .toArray(String[]::new);
 
-        String[] publishedPostUlids = postJooqRepository.getPublishedPostUlidsByMemberId(memberId);
-        List<JsonNode> publishedPostContents =
-                postJooqRepository.getPostContentsFromPublishedPostUlids(publishedPostUlids);
-
-        List<String> fileKeysToDelete = new ArrayList<>();      // 컨텐츠로부터 파일 키 수집
-        for (JsonNode content : publishedPostContents) {
+        List<String> fileKeysToDelete = new ArrayList<>();
+        for (PostIsPublishedAndContentRecord post : posts) {
+            JsonNode content = post.content();
             if (content == null || !content.isArray()) {
                 continue;
             }
@@ -120,38 +120,46 @@ public class MemberRepositoryAdapter implements MemberRepository {
                 }
             }
         }
+        fileKeysToDelete.addAll(memberJooqRepository.getPlantInfoPhotoPathsByMemberId(memberId));
+        String memberProfileImageFileKey = memberJooqRepository.getProfileImagePathByMemberId(memberId);
+        if (!StringUtils.isBlank(memberProfileImageFileKey)) {
+            fileKeysToDelete.add(memberProfileImageFileKey);
+        }
         if (!fileKeysToDelete.isEmpty()) {
             eventPublisher.publishEvent(ImagesRemoveTask.create(fileKeysToDelete));
         }
+
         if (!ArrayUtils.isEmpty(publishedPostUlids)) {
             eventPublisher.publishEvent(RecentlyViewPostRemoveEvent.create(publishedPostUlids));
+            eventPublisher.publishEvent(PostViewCountRemoveEvent.create(publishedPostUlids));
         }
+        eventPublisher.publishEvent(RecentlyViewMemberRemoveEvent.create(memberId));
+        eventPublisher.publishEvent(MemberSearchHistoryRemoveEvent.create(memberId));
 
-        if (publishedPostUlids.length != 0) {       // 게시글 아카이빙 및 삭제
+        // 게시글·댓글 삭제 전에 수행되어야 하는 작업(하위 쿼리로 게시글·댓글 참조)
+        memberJooqRepository.deleteNotificationsByMemberIdAndPostUlids(memberId, publishedPostUlids);
+        if (publishedPostUlids.length != 0) {
+            activitySubjectPostJooqRepository.deleteRelatedRecordsByPostUlids(publishedPostUlids);
             activitySubjectPostJooqRepository.archiveAllByPostUlids(publishedPostUlids);
-            activitySubjectPostJooqRepository.deleteAllAndRelatedRecordsByMemberIdAndPostUlids(memberId, publishedPostUlids);
         }
-        List<String> likedPostIds =
-                activitySubjectPostJooqRepository.getPostUlidsLikedByMemberId(memberId);
-        activitySubjectPostJooqRepository.decreaseLikeCountByPostUlids(likedPostIds);     // 게시글 좋아요 감소
-        List<ActivitySubjectCommentIdRecord> likedCommentIds =
-                activitySubjectCommentJooqRepository.getCommentIdsLikedByMemberId(memberId);
-        activitySubjectCommentJooqRepository.decreaseLikeCountByCommentIds(likedCommentIds);        // 댓글 좋아요 감소
-        postLikeJpaRepository.deleteByMemberId(memberId);
-        commentLikeJpaRepository.deleteByMemberId(memberId);
+        activitySubjectCommentJooqRepository.deleteRelatedRecordsByMemberIdAndPostUlids(memberId, publishedPostUlids);
+        activitySubjectCommentJooqRepository.archiveAllByMemberIdAndPostUlids(memberId, publishedPostUlids);
 
-        String memberProfileImageFileKey = memberProfileJpaRepository.findByUuid(memberId).orElseThrow().getImagePath();
-        if (memberProfileImageFileKey != null) {
-            eventPublisher.publishEvent(ImageRemoveTask.create(memberProfileImageFileKey));
+        activitySubjectCommentJooqRepository.deleteAllByMemberIdAndPostUlids(memberId, publishedPostUlids);
+        if (!posts.isEmpty()) {
+            activitySubjectPostJooqRepository.deleteAllByMemberId(memberId);
         }
+
+        activitySubjectPostJooqRepository.decreaseLikeCountOfPostsLikedByMemberId(memberId);
+        activitySubjectCommentJooqRepository.decreaseLikeCountOfCommentsLikedByMemberId(memberId);
+
         memberWithdrawJpaRepository.save(
                 MemberWithdrawEntity.builder()
-                        .member(memberJpaRepository.findByUuid(memberId).orElseThrow())
+                        .member(memberJpaRepository.getReferenceById(memberId))
                         .reason(reason)
                         .opinion(opinion)
                         .build());
-        activitySubjectCommentJooqRepository.markAsWithdrawnByMemberId(memberId);
-        memberJooqRepository.updateMemberIdToNullByMemberId(memberId);        // 회원 식별자 정리
-        memberJooqRepository.deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(memberId); // 남은 회원 데이터 제거
+        memberJooqRepository.updateMemberIdToNullByMemberId(memberId);
+        memberJooqRepository.deleteMemberRelatedRecordsExceptOfPostAndCommentByMemberId(memberId);
     }
 }

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.domains.comment.common.util.domain.vo.CommentPathTestUtils.testCommentPath;
 import static kr.modusplant.domains.comment.common.util.domain.vo.ReplyToCommentPathTestUtils.testReplyToCommentPath;
-import static kr.modusplant.domains.comment.common.util.domain.nullobject.EmptyReplyToCommentPathTestUtils.testEmptyReplyToCommentPath;
+import static kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyReplyToCommentPathTestUtils.testEmptyReplyToCommentPath;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
