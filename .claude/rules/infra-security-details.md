@@ -19,7 +19,7 @@ security/
  ├─ models/       # Authentication principal, token, and login-request models
  ├─ enums/        # Security-specific error code enum
  ├─ exception/    # Authentication exception hierarchy
- └─ util/         # Static helper classes (logging, response writing)
+ └─ util/         # Static helper classes (logging, response writing, authorization assertions)
 ```
 
 ---
