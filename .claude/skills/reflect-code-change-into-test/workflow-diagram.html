@@ -184,7 +184,7 @@
   <span><i class="l-loop"></i>Repeated per item</span>
 </div>
 
-<div class="note" style="margin: 0 0 22px;">The skill runs in a forked <code>test-code-synchronizer</code> agent in the foreground (<code>context: fork</code>, <code>background: false</code>): the invoking turn waits for it, and the agent's final report is the skill's result. Steps 1–7 run inside the agent.</div>
+<div class="note" style="margin: 0 0 22px;">The skill runs in a forked <code>test-code-synchronizer</code> agent in the foreground (<code>context: fork</code>, <code>background: false</code>): the invoking turn waits for it, and the agent's final report is the skill's result. Steps 1–8 run inside the agent.</div>
 
 <ol class="flow">
   <li class="step">
@@ -194,7 +194,7 @@
       <p><strong>Primary:</strong> collect every <code>.java</code> class under <code>src/main/java/</code> not yet pushed: uncommitted changes (<code>git status --porcelain</code>) combined with committed-but-unpushed ones (<code>git diff</code> against the upstream, or <code>origin/main</code> if none).</p>
       <p><strong>Affected:</strong> add every <code>src/main/java/</code> class that uses a Primary class (<code>git grep -lw '&lt;SimpleName&gt;' -- 'src/main/java/*.java'</code>) and whose behavior or tests the change reaches. Deleted classes are searched by their old name.</p>
       <div class="note">Primary and Affected classes together are the Target Classes.</div>
-      <div class="stop">The Primary list is empty.</div>
+      <div class="stop skip">The Primary list is empty. Steps 2–6 are skipped and step 7 runs.</div>
     </div>
   </li>
 
@@ -207,7 +207,7 @@
         <div class="doc read"><span class="tag">Read</span><span class="path">.claude/CLAUDE.md</span><span class="what">Area names and the <code>account</code> sub-domain path mapping (e.g. <code>normal-identity</code> → <code>domains/account/normal/</code>).</span></div>
       </div>
       <div class="note">Classes matching neither pattern are dropped and reported as unmatched. An unmatched Primary class still seeds the Affected lookup in step 1.</div>
-      <div class="stop">Every class was dropped as unmatched.</div>
+      <div class="stop skip">Every class was dropped as unmatched. Steps 3–6 are skipped and step 7 runs.</div>
     </div>
   </li>
 
@@ -268,6 +268,7 @@
           <div class="docs">
             <div class="doc write"><span class="tag">Write</span><span class="path">src/test/java/kr/modusplant/…</span><span class="what">Test classes created, modified, or deleted for this bucket.</span></div>
           </div>
+          <div class="note">If a <code>src/main/</code> defect is found, the workflow still runs to the end and the run counts as a test synchronization failure. For every defect, a test is created or modified to assert the correct behavior directly, and it stays failing. No defect goes without such a test.</div>
         </div>
       </li>
     </ol>
@@ -276,8 +277,36 @@
   <li class="step">
     <span class="badge">7</span>
     <div class="card">
+      <h3>Run the Full Test Suite</h3>
+      <p>Runs after every bucket, or right after a termination in step 1 or 2. Run all tests with <code>./gradlew test</code> and confirm that they pass.</p>
+      <p>Resolve every failing test, including tests in areas skipped in step 3. The only exception is a test that fails because of a reported <code>src/main/</code> defect.</p>
+      <div class="docs">
+        <div class="doc write"><span class="tag">Write</span><span class="path">src/test/java/kr/modusplant/…</span><span class="what">Fixes for failing tests.</span></div>
+      </div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">8</span>
+    <div class="card">
       <h3>Return the Summary to the Main Session</h3>
-      <p>A concise final message, with no test diffs or file contents: for each processed area, the classes whose tests were created, modified, or deleted. It also lists skipped areas with their unprocessed classes, and the unmatched classes dropped in step 2.</p>
+      <p>A concise final message, with no test diffs or file contents.</p>
+      <div class="branch"><strong>Verdict, on the first line</strong>
+        <ul>
+          <li><code>TEST SYNC PASSED</code>: the final test run passed and no <code>src/main/</code> defect was found.</li>
+          <li><code>TEST SYNC FAILED</code>: otherwise.</li>
+        </ul>
+      </div>
+      <div class="branch"><strong>Remaining contents, in order</strong>
+        <ol>
+          <li><code>Final test run: PASSED</code> or <code>Final test run: FAILED (&lt;failed&gt; of &lt;total&gt; tests failed)</code>.</li>
+          <li>On a termination in step 1 or 2: <code>Bucket processing terminated: &lt;reason&gt;</code>.</li>
+          <li>For each processed area, the classes whose tests were created, modified, or deleted.</li>
+          <li>Skipped areas with their unprocessed classes.</li>
+          <li>Unmatched classes dropped in step 2.</li>
+          <li>On a failed run, <code>Failing tests:</code> with each test's <code>src/test</code> path, line, and class, plus the problem. The <code>src/main</code> path, line, and class are added only when the failure comes from a <code>src/main/</code> defect.</li>
+        </ol>
+      </div>
     </div>
   </li>
 </ol>

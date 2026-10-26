@@ -217,7 +217,7 @@
 <ol class="strip" aria-label="Run order">
   <li><a class="node" href="#stage-1"><span class="num">1</span><strong>check-code-detail-quality</strong><span class="sub">Gate on code quality check items</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
-  <li><a class="node" href="#stage-2"><span class="num">2</span><strong>reflect-code-change-into-test</strong><span class="sub">Reflect changes into tests</span></a></li>
+  <li><a class="node" href="#stage-2"><span class="num">2</span><strong>reflect-code-change-into-test</strong><span class="sub">Reflect changes into tests, then gate on the test sync verdict</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
   <li><a class="node" href="#stage-3"><span class="num">3</span><strong>reflect-code-change-into-document</strong><span class="sub">Reflect changes into Claude docs</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
@@ -229,6 +229,8 @@
   <li>This skill does no work itself. It only invokes the five skills through the Skill tool, in the conversation it runs in, never as a forked or background subagent.</li>
   <li>Each step starts only after the previous one finishes.</li>
   <li>Step 1 is a gate: <code>QUALITY CHECK PASSED</code> continues the chain; <code>QUALITY CHECK REJECTED</code> is reported as-is and the chain stops there.</li>
+  <li>Step 2 is a gate: <code>TEST SYNC PASSED</code> continues the chain; <code>TEST SYNC FAILED</code> is reported as-is and the chain stops there.</li>
+  <li>When a step returns a gate verdict, that verdict alone decides whether the chain continues. The skip and stop rules below apply only to a step that ends without a gate verdict.</li>
   <li>If a step terminates because its target set is empty (including after its own scope filter), it is skipped and the chain continues with the next step.</li>
   <li>If a step terminates early for any other reason, the chain stops there.</li>
   <li>The report names every skipped or stopped step and the reason, so the user can re-run it manually.</li>
@@ -273,8 +275,8 @@
 
 <div class="handoff">
   <span class="down" aria-hidden="true">↓</span>
-  <span class="ok">Step 2 finished → start step 3</span>
-  <div class="stop skip">Step 2 had an empty target set. Step 3 starts.</div>
+  <span class="ok"><code>TEST SYNC PASSED</code> → start step 3</span>
+  <div class="stop"><code>TEST SYNC FAILED</code> is reported as-is. Steps 3–5 do not run.</div>
   <div class="stop">Step 2 terminated early for another reason. Steps 3–5 do not run.</div>
 </div>
 
