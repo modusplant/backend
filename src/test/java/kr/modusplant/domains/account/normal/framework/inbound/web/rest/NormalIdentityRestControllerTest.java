@@ -6,6 +6,7 @@ import kr.modusplant.domains.account.normal.common.util.usecase.request.NormalSi
 import kr.modusplant.domains.account.normal.common.util.usecase.request.PasswordModificationRequestTestUtils;
 import kr.modusplant.infrastructure.jwt.common.util.entity.RefreshTokenEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
@@ -14,11 +15,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_ADMIN_UUID;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
+import static kr.modusplant.infrastructure.security.enums.SecurityErrorCode.AUTHORIZATION_FAILED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -62,8 +63,10 @@ public class NormalIdentityRestControllerTest implements
     @DisplayName("본인이 아닌 회원의 이메일 갱신 시 예외 반환")
     public void testModifyEmail_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> restController.modifyEmail(MEMBER_BASIC_USER_UUID, testEmailModificationRequest, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
     @Test
@@ -81,8 +84,10 @@ public class NormalIdentityRestControllerTest implements
     @DisplayName("본인이 아닌 회원의 비밀번호 갱신 시 예외 반환")
     public void testModifyPassword_givenNonSelfCaller_willThrowException() {
         // given & when & then
-        assertThrows(AccessDeniedException.class,
+        NotAccessibleException exception = assertThrows(NotAccessibleException.class,
                 () -> restController.modifyPassword(MEMBER_BASIC_USER_UUID, testPasswordModificationRequest, MEMBER_BASIC_ADMIN_UUID));
+
+        assertThat(exception.getErrorCode()).isEqualTo(AUTHORIZATION_FAILED);
     }
 
 }

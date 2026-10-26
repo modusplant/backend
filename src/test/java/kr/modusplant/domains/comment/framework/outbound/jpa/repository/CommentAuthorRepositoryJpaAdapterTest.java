@@ -5,7 +5,7 @@ import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
+import kr.modusplant.shared.exception.NotFoundValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,12 +45,12 @@ class CommentAuthorRepositoryJpaAdapterTest implements CommentAuthorIdTestUtils,
         given(memberRepository.findByUuid(testCommentAuthorId.getValue())).willReturn(Optional.empty());
 
         // when
-        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+        NotFoundValueException exception = assertThrows(NotFoundValueException.class,
                 () -> commentAuthorRepositoryJpaAdapter.getRole(testCommentAuthorId));
 
         // then
         assertThat(exception.getErrorCode()).isEqualTo(CommentErrorCode.NOT_FOUND_COMMENT_AUTHOR);
-        assertThat(exception.getEntityName()).isEqualTo("author");
+        assertThat(exception.getMessage()).contains("[valueName: commentAuthorId]");
     }
 
     @Test

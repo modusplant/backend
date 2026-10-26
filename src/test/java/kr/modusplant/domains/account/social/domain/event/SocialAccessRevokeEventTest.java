@@ -1,9 +1,7 @@
 package kr.modusplant.domains.account.social.domain.event;
 
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.exception.InvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,11 +33,11 @@ class SocialAccessRevokeEventTest {
         @DisplayName("memberId가 null일 때 예외 반환")
         void testCreate_givenNullMemberId_willThrowException() {
             // given & when
-            InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
+            EmptyValueException emptyValueException = assertThrows(EmptyValueException.class, () ->
                     SocialAccessRevokeEvent.create(null, SocialProvider.KAKAO.getValue(), TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN));
 
             // then
-            assertThat(invalidValueException.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
+            assertThat(emptyValueException.getErrorCode()).isEqualTo(EMPTY_VALUE);
         }
 
         @Test

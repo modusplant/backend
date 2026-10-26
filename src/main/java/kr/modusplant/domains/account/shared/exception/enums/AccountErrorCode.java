@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum AccountErrorCode implements ErrorCode {
     EMPTY_ACCOUNT_ID(HttpStatus.BAD_REQUEST.value(), "empty_account_id", "계정의 식별자가 비어 있습니다"),
-    INVALID_ACCOUNT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_account_id", "계정의 식별자가 유효하지 않습니다");
+    INVALID_ACCOUNT_ID(HttpStatus.BAD_REQUEST.value(), "invalid_account_id", "계정의 식별자가 유효하지 않습니다"),
+    NOT_FOUND_ACCOUNT(HttpStatus.NOT_FOUND.value(), "not_found_account", "계정을 찾을 수 없습니다");
 
     private final int httpStatus;
     private final String code;

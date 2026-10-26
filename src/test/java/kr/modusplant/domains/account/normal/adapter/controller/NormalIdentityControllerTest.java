@@ -13,10 +13,14 @@ import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdenti
 import kr.modusplant.domains.account.normal.usecase.request.EmailModificationRequest;
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
+import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
@@ -27,7 +31,9 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static kr.modusplant.domains.account.shared.kernel.common.util.AccountIdTestUtils.testNormalMemberId;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -143,15 +149,60 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
         // given
         EmailModificationRequest request = testEmailModificationRequest;
 
-        given(readRepository.existsByEmail(Email.create(request.currentEmail()))).willReturn(true);
+        given(readRepository.getMemberEmail(testNormalMemberId)).willReturn(testNormalUserEmail);
+        given(readRepository.getAuthProvider(testNormalMemberId)).willReturn(AuthProvider.BASIC);
         doNothing().when(updateRepository).updateEmail(testNormalMemberId, Email.create(request.newEmail()));
 
         // when
         controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest);
 
         // then
-        verify(readRepository, times(1)).existsByEmail(testNormalUserEmail);
+        verify(readRepository, times(1)).getMemberEmail(testNormalMemberId);
         verify(updateRepository, times(1)).updateEmail(testNormalMemberId, Email.create(request.newEmail()));
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원의 이메일 변경 시 예외 반환")
+    public void testModifyEmail_givenNotFoundMember_willThrowException() {
+        // given
+        given(readRepository.getMemberEmail(testNormalMemberId)).willReturn(null);
+
+        // when & then
+        NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                () -> controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest));
+
+        assertThat(exception.getErrorCode()).isEqualTo(MemberErrorCode.NOT_FOUND_MEMBER);
+        verify(updateRepository, never()).updateEmail(any(), any());
+    }
+
+    @Test
+    @DisplayName("일반 회원이 아닌 회원의 이메일 변경 시 예외 반환")
+    public void testModifyEmail_givenNonBasicAuthProvider_willThrowException() {
+        // given
+        given(readRepository.getMemberEmail(testNormalMemberId)).willReturn(testNormalUserEmail);
+        given(readRepository.getAuthProvider(testNormalMemberId)).willReturn(AuthProvider.KAKAO);
+
+        // when & then
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest));
+
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.MISMATCH_INPUT_TYPE);
+        verify(updateRepository, never()).updateEmail(any(), any());
+    }
+
+    @Test
+    @DisplayName("회원의 이메일과 다른 현재 이메일로 이메일 변경 시 예외 반환")
+    public void testModifyEmail_givenMismatchingCurrentEmail_willThrowException() {
+        // given
+        given(readRepository.getMemberEmail(testNormalMemberId)).willReturn(testKakaoUserEmail);
+        given(readRepository.getAuthProvider(testNormalMemberId)).willReturn(AuthProvider.BASIC);
+
+        // when & then
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> controller.modifyEmail(testNormalMemberId.getValue(), testEmailModificationRequest));
+
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.INVALID_INPUT);
+        verify(updateRepository, never()).updateEmail(any(), any());
     }
 
     @Test

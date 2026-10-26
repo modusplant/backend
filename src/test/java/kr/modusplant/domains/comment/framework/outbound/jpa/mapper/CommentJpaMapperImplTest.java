@@ -17,14 +17,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTestUtils,
+public class CommentJpaMapperImplTest implements CommentTestUtils, CommentEntityTestUtils,
         MemberEntityTestUtils {
     @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
     private final CommentJpaMapper mapper = new CommentJpaMapperImpl();
 
     @Test
-    @DisplayName("유효한 댓글을 댓글 엔티티로 전환")
+    @DisplayName("유효한 댓글로 엔티티 변환 시 CommentEntity 반환")
     public void testToCommentEntity_givenValidComment_willReturnCommentEntity() {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
@@ -43,7 +43,7 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
     }
 
     @Test
-    @DisplayName("답글 대상 경로가 없는 댓글을 댓글 엔티티로 전환")
+    @DisplayName("답글 대상 경로가 없는 댓글로 엔티티 변환 시 CommentEntity 반환")
     public void testToCommentEntity_givenCommentWithoutReplyToPath_willReturnCommentEntity() {
         // given
         MemberEntity memberEntity = createMemberBasicUserEntity();
@@ -59,4 +59,19 @@ public class CommentJpaMapperTest implements CommentTestUtils, CommentEntityTest
         assertThat(result.getReplyToPath()).isNull();
     }
 
+    @Test
+    @DisplayName("삭제된 댓글로 엔티티 변환 시 CommentEntity 반환")
+    public void testToCommentEntity_givenDeletedComment_willReturnCommentEntity() {
+        // given
+        MemberEntity memberEntity = createMemberBasicUserEntity();
+        PostEntity postEntity = createPublishedPostEntityBuilder().build();
+
+        // when
+        CommentEntity result = mapper.toCommCommentEntity(testInvalidComment, memberEntity, postEntity);
+
+        // then
+        assertThat(result.getIsDeleted()).isTrue();
+        assertThat(result.getPost()).isEqualTo(postEntity);
+        assertThat(result.getAuthMember()).isEqualTo(memberEntity);
+    }
 }

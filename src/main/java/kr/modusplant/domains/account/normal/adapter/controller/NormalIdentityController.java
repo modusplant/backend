@@ -15,6 +15,7 @@ import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.InvalidValueException;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Email;
@@ -76,8 +77,13 @@ public class NormalIdentityController {
 
     @Transactional
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
-        if(!readRepository.existsByEmail(Email.create(request.currentEmail()))) {
+        Email storedEmail = readRepository.getMemberEmail(AccountId.create(memberUuid));
+        if (storedEmail == null) {
             throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+        } else if (readRepository.getAuthProvider(AccountId.create(memberUuid)) != AuthProvider.BASIC) {
+            throw new InvalidValueException(GeneralErrorCode.MISMATCH_INPUT_TYPE, "authProvider");
+        } else if (!storedEmail.equals(Email.create(request.currentEmail()))) {
+            throw new InvalidValueException(GeneralErrorCode.INVALID_INPUT, "currentEmail");
         } else {
             updateRepository.updateEmail(AccountId.create(memberUuid), Email.create(request.newEmail()));
         }

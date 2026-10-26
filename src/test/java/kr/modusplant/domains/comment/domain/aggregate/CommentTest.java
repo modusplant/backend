@@ -1,6 +1,6 @@
 package kr.modusplant.domains.comment.domain.aggregate;
 
-import kr.modusplant.domains.comment.common.util.domain.nullobject.EmptyCommentAuthorIdTestUtils;
+import kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils;
 import kr.modusplant.domains.comment.common.util.domain.vo.*;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;

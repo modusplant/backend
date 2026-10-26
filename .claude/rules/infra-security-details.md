@@ -151,4 +151,4 @@ After the chain, the request reaches `DispatcherServlet` and the controller.
 
 ## 5. Self-Ownership Checks
 
-`SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid)` is a static helper (throws `AccessDeniedException` on mismatch) that REST controllers call directly to enforce that a caller only accesses their own resource, complementing the path- and method-level authorization described above.
+`SecurityAssertionUtils.requireSelf(authenticatedUuid, targetUuid)` is a static helper (throws `NotAccessibleException` with `AUTHORIZATION_FAILED` on mismatch) that REST controllers call directly to enforce that a caller only accesses their own resource, complementing the path- and method-level authorization described above.

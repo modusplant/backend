@@ -31,6 +31,24 @@ public class NormalIdentityJooqRepository implements
     }
 
     @Override
+    public Email getMemberEmail(AccountId accountId) {
+        String fetchedEmail = dsl.select(memberAuth.EMAIL)
+                .from(memberAuth)
+                .where(memberAuth.UUID.eq(accountId.getValue()))
+                .fetchOne(memberAuth.EMAIL);
+        return fetchedEmail == null ? null : Email.create(fetchedEmail);
+    }
+
+    @Override
+    public AuthProvider getAuthProvider(AccountId accountId) {
+        String authProvider = dsl.select(memberAuth.PROVIDER)
+                .from(memberAuth)
+                .where(memberAuth.UUID.eq(accountId.getValue()))
+                .fetchOne(memberAuth.PROVIDER);
+        return authProvider == null ? null : AuthProvider.valueOf(authProvider);
+    }
+
+    @Override
     public AuthProvider getAuthProvider(Email email) {
         String fetchedAuthProvider = dsl.select(memberAuth.PROVIDER)
                 .from(memberAuth)
@@ -38,7 +56,6 @@ public class NormalIdentityJooqRepository implements
                 .fetchOne(0, String.class);
         return AuthProvider.valueOf(fetchedAuthProvider);
     }
-
 
     @Override
     public boolean existsByMemberId(AccountId accountId) {
