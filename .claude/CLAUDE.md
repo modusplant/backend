@@ -104,7 +104,7 @@ Detailed working rules live under `.claude/`:
   - per-domain and per-infra-area test features (`test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md`, consumed by the `test-code-synchronizer` agent, launched by the `reflect-code-change-into-test` skill)
   - `test-infra-security-feature.md` (test conventions for `infrastructure/security`; also referenced directly from `test-architecture-details.md`)
   - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for `.claude/scripts/*.groovy`).
+  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and script-writing gotchas for nGrinder Groovy scripts).
   - `open-authentication-architecture.md` (how this project implements the OAuth 2.0 authorization-code flow, spanning `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`).
   - `data-deletion-architecture.md` (hard-delete/soft-delete policy, archiving, related-data handling per deletion flow, and cascade rules across domains; consumed by the `check-code-detail-quality` skill).
 - `.claude/skills/*/SKILL.md` — task workflows.
