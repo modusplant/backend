@@ -20,6 +20,7 @@ import kr.modusplant.domains.post.usecase.request.PostFileUploadRequest;
 import kr.modusplant.domains.post.usecase.request.PostRequest;
 import kr.modusplant.domains.post.usecase.response.*;
 import kr.modusplant.infrastructure.security.models.DefaultUserDetails;
+import kr.modusplant.infrastructure.security.util.SecurityAssertionUtils;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Range;
@@ -250,7 +251,10 @@ public class PostRestController {
             description = "사이트 회원별 컨텐츠 게시글의 목록과 페이지 정보를 조회합니다."
     )
     @GetMapping("/member/{memberUuid}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<DataResponse<OffsetPageResponse<PostSummaryResponse>>> getPostsByMember(
+            @AuthenticationPrincipal DefaultUserDetails userDetails,
+
             @Parameter(schema = @Schema(description = "회원의 식별자", example = "038ae842-3c93-484f-b526-7c4645a195a7"))
             @PathVariable
             @NotNull(message = "회원 식별자가 비어 있습니다.")
@@ -266,6 +270,7 @@ public class PostRestController {
             @Range(min = 1, max = 50)
             Integer size
     ) {
+        SecurityAssertionUtils.requireSelf(userDetails.getUuid(), memberUuid);
         return ResponseEntity.ok().body(DataResponse.ok(postController.getByMemberUuid(memberUuid, page-1, size)));
     }
 

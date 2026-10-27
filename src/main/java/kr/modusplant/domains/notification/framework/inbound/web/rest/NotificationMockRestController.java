@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/notifications/mock")
 @RequiredArgsConstructor
+@Validated
 @SecurityRequirement(name = "Authorization")
 @Profile({"local", "dev"})
 @PreAuthorize("isAuthenticated()")

@@ -1,4 +1,4 @@
-package kr.modusplant.domains.term.adaptor.controller;
+package kr.modusplant.domains.term.adapter.controller;
 
 import jakarta.transaction.Transactional;
 import kr.modusplant.domains.term.domain.aggregate.SiteMemberTerm;

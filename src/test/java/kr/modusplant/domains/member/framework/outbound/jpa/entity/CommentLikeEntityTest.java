@@ -87,7 +87,7 @@ public class CommentLikeEntityTest implements CommentLikeEntityTestUtils {
 
         // then
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(commentLikeEntity, testMemberId);
+        assertNotEquals(testMemberId, commentLikeEntity);
     }
 
     @Test
@@ -98,6 +98,12 @@ public class CommentLikeEntityTest implements CommentLikeEntityTestUtils {
         // then
         assertEquals(CommentLikeEntity.of(commentLikeEntity.getPostId(), commentLikeEntity.getPath(), commentLikeEntity.getMemberId()),
                 CommentLikeEntity.of(commentLikeEntity.getPostId(), commentLikeEntity.getPath(), commentLikeEntity.getMemberId()));
+    }
+
+    @Test
+    @DisplayName("다른 키를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentKey_willReturnFalse() {
+        assertNotEquals(CommentLikeEntity.of(postId, path, memberId), CommentLikeEntity.of(postId, path + ".1", memberId));
     }
 
     @Test

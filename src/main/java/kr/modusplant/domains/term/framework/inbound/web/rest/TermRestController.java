@@ -2,7 +2,7 @@ package kr.modusplant.domains.term.framework.inbound.web.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.modusplant.domains.term.adaptor.controller.TermController;
+import kr.modusplant.domains.term.adapter.controller.TermController;
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;
 import lombok.RequiredArgsConstructor;

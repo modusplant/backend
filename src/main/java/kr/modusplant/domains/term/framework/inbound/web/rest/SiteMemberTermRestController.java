@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import kr.modusplant.domains.term.adaptor.controller.SiteMemberTermController;
+import kr.modusplant.domains.term.adapter.controller.SiteMemberTermController;
 import kr.modusplant.domains.term.domain.vo.SiteMemberTermId;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermCreateRequest;
 import kr.modusplant.domains.term.usecase.request.SiteMemberTermUpdateRequest;

@@ -1,6 +1,6 @@
-package kr.modusplant.domains.term.adaptor.controller;
+package kr.modusplant.domains.term.adapter.controller;
 
-import kr.modusplant.domains.term.adaptor.mapper.TermMapperImpl;
+import kr.modusplant.domains.term.adapter.mapper.TermMapperImpl;
 import kr.modusplant.domains.term.common.util.domain.aggregate.TermTestUtils;
 import kr.modusplant.domains.term.domain.exception.TermNotFoundException;
 import kr.modusplant.domains.term.domain.exception.enums.TermErrorCode;

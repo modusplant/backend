@@ -1,7 +1,7 @@
 package kr.modusplant.domains.term.framework.inbound.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.term.adaptor.controller.SiteMemberTermController;
+import kr.modusplant.domains.term.adapter.controller.SiteMemberTermController;
 import kr.modusplant.domains.term.usecase.response.SiteMemberTermResponse;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;

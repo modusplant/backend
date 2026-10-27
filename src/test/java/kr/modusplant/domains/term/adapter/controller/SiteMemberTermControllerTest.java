@@ -1,6 +1,6 @@
-package kr.modusplant.domains.term.adaptor.controller;
+package kr.modusplant.domains.term.adapter.controller;
 
-import kr.modusplant.domains.term.adaptor.mapper.SiteMemberTermMapperImpl;
+import kr.modusplant.domains.term.adapter.mapper.SiteMemberTermMapperImpl;
 import kr.modusplant.domains.term.common.util.domain.aggregate.SiteMemberTermTestUtils;
 import kr.modusplant.domains.term.domain.exception.AlreadySiteMemberTermException;
 import kr.modusplant.domains.term.domain.exception.SiteMemberNotFoundException;

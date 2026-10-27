@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,7 +19,6 @@ import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_NOTIFICATION;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_NOTIFICATION)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
