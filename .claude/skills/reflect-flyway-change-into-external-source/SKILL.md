@@ -8,8 +8,9 @@ disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-sourc
 # Preconditions
 
 - This skill only reads Flyway migrations, JPA entity classes, their referenced constant classes,
-  git metadata, and, only to choose the page for a table absent from the Table Index, the code
-  that uses the table's entity (controllers and repositories). It only writes under its own
+  and git metadata, plus the code that uses a table's entity (controllers and repositories) only
+  to choose the page for a table absent from the Table Index, and the code that initializes a
+  table's record values only to judge a removed default. It only writes under its own
   `confluence-result/`, to its own `glossary/` (through `scripts/glossary.py`) and
   `confluence-structure.md`, and to the Confluence pages listed in `confluence-structure.md` via
   the Atlassian MCP tools.
@@ -33,9 +34,17 @@ disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-sourc
 
 # Change Derivation
 
-Derive only the changes each Target Source itself requires, and reflect them as they are. Read
-other migrations only to resolve a dropped constraint or index (below) and in Workflow step 5's
-diagnosis, never to reconstruct a table's state.
+Derive only the changes each Target Source itself requires, and reflect them as they are. The
+Defaults Section documents the value a column receives on insert, not where it is set, so:
+
+- A current value with the same meaning as the derived one counts as already reflected (e.g. `0`
+  for `0L`).
+- A removed default (`DROP DEFAULT` or a removed entity default) keeps its row while the code
+  that initializes the table's record values still assigns that value (e.g. `LocalDateTime.now()`
+  for `현재 시각`).
+
+Read other migrations only to resolve a dropped constraint or index (below) and in Workflow
+step 5's diagnosis, never to reconstruct a table's state.
 Render every value per `naming-convention.md`'s Rendering Rules.
 
 ## Migration Changes

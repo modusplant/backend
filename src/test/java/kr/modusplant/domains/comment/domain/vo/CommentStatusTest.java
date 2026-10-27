@@ -41,4 +41,12 @@ public class CommentStatusTest implements CommentStatusTestUtils {
         // when & then
         assertEquals(CommentErrorCode.INVALID_COMMENT_STATUS, result.getErrorCode());
     }
+
+    @Test
+    @DisplayName("대문자 값으로 댓글 상태 반환")
+    public void testCreate_givenUpperCaseValue_willReturnCommentStatus() {
+        // given & when & then
+        assertEquals(CommentStatus.active(), CommentStatus.create("ACTIVE"));
+        assertEquals(CommentStatus.deleted(), CommentStatus.create("Deleted"));
+    }
 }
