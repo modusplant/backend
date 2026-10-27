@@ -41,9 +41,6 @@ security/
 - `Default*` prefix marks the normal-login (non-social-login) principal/token implementations (`DefaultAuthToken`, `DefaultUserDetails`)
 - Login request DTOs use a plain `*Request` suffix (e.g. `NormalLoginRequest`)
 
-**Enums** (`enums/`):
-- `SecurityErrorCode` follows the shared `*ErrorCode implements ErrorCode` convention used across the codebase
-
 **Exception** (`exception/`):
 - All extend a single package-local root that itself extends Spring Security's `AuthenticationException`
 - Naming describes the specific business condition (`Banned*`, `Inactive*`, `DisabledByLinking*`, `BadCredential*`, `AccountState*`)

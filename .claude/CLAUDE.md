@@ -92,13 +92,14 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 Detailed working rules live under `.claude/`:
 
-- `.claude/rules/*.md` — per-area convention specs, auto-attached by path glob.
-- `.claude/documents/*.md` — on-demand reference docs: 
-  - `test-domain-<domain>-feature.md` / `test-infra-<area>-feature.md` (per-area test features, consumed by the `test-code-synchronizer` agent)
-  - `observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `performance-test-architecture.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
-  - `open-authentication-architecture.md` (OAuth 2.0 authorization-code flow across `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
-  - `data-deletion-architecture.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and cascade rules)
+- `.claude/rules/*.md` — convention specs, auto-attached by path glob:
+  - `main-architecture-details.md` / `test-architecture-details.md` (baselines for all main / test code)
+  - `main-<kind>-<area>-details.md` / `test-<kind>-<area>-details.md` (per-area main / test conventions, `<kind>` being `domain` or `infra`)
+- `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by type:
+  - `policy/data-deletion-policy.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and cascade rules)
+  - `architecture/observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
+  - `tech-stack/open-authentication-implementation.md` (OAuth 2.0 authorization-code flow across `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
+  - `guide/performance-test-guide.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
 - `.claude/skills/*/SKILL.md` — task workflows.
 - `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md`. Never read it — `SKILL.md` is canonical. Reading it is permitted only to update it to match `SKILL.md`.
 

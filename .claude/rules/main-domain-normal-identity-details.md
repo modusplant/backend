@@ -37,13 +37,13 @@ normal/
 ## 2. domain/ Patterns
 
 **Value Object** (`domain/vo/`) — `@Getter @AllArgsConstructor(AccessLevel.PRIVATE)`:
-- `static create(...)` factory; a VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws the shared `EmptyValueException` for null/blank input and the shared `InvalidValueException` for a mismatch with a `Regex` constant, each with a `NormalIdentityErrorCode` and the field name
+- A VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws the shared `EmptyValueException` for null/blank input and the shared `InvalidValueException` for a mismatch with a `Regex` constant, each with a `NormalIdentityErrorCode` and the field name
 - A composite VO built from shared kernel VOs (`Email`, `Password`, `Nickname`) exposes separate factories for raw strings (`createWithString`) and for already-built VOs (`createWithDomain`)
 - An aggregate-style VO (e.g. sign-up data) takes every raw input in one `create(...)` factory and builds each constituent VO itself
 - `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`, over the identifying fields only
 
 **Error Codes** (`domain/exception/enums/`):
-- `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`; HTTP status taken from `HttpStatus.*.value()`
+- HTTP status taken from `HttpStatus.*.value()`
 
 ---
 
@@ -57,20 +57,18 @@ normal/
 - Declares request DTO → domain VO construction
 
 **Request DTOs** (`usecase/request/`):
-- Java records carrying Bean Validation annotations (`@NotBlank`, `@Pattern`) and Swagger `@Schema`; patterns reference `Regex.REGEX_*` constants
-- Override `toString()` to mask personal data (`MaskUtils.maskEmail`, `MaskUtils.maskAnyString`)
+- `@Pattern` patterns reference `Regex.REGEX_*` constants
 
 ---
 
 ## 4. adapter/ Patterns
 
 **Controller** (`adapter/controller/`) — `@Service`, explicit constructor injecting `@Qualifier("bcryptPasswordEncoder") PasswordEncoder`; write methods are `@Transactional`:
-- Receives request DTOs and a raw `UUID`, converts them to domain VOs, calls the repository ports
 - Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then rejects a duplicate nickname, before saving the mapped sign-up data
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before calling the update port
 - Throws shared exceptions (`ExistsEntityException`, `ExistsValueException`, `NotFoundEntityException`, `InvalidValueException`), parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
 
-**Mapper** (`adapter/mapper/`) — `@Component`; implements the mapper port, building the domain VO from the raw request values
+**Mapper** (`adapter/mapper/`): builds the domain VO from the raw request values
 
 ---
 
@@ -80,9 +78,8 @@ normal/
 - Each mapping carries its full path (no class-level `@RequestMapping`); request bodies use `@RequestBody @Valid`; responses wrap in `DataResponse`
 - Member-scoped endpoints carry `@PreAuthorize("isAuthenticated()")`, take the caller via `@AuthenticationPrincipal(expression = "uuid")` with `@Parameter(hidden = true)`, and call `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)` before delegating to the adapter Controller
 - Endpoints handled by a Spring Security filter (e.g. email-password login) are declared as empty dummy methods documented with Javadoc
-- Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
-**jOOQ Repository** (`framework/outbound/persistence/jooq/`) — `@Repository`, explicit constructor; implements the read port with `DSLContext`:
+**jOOQ Repository** (`framework/outbound/persistence/jooq/`) — explicit constructor; implements the read port:
 - Holds generated table references as fields (`SiteMemberAuth.SITE_MEMBER_AUTH`, `SiteMember.SITE_MEMBER`)
 - Single-column lookups via `fetchOne(...)`, converting the result into a domain VO or `AuthProvider` and returning `null` when the row is absent; existence checks via `dsl.fetchExists(dsl.selectOne()...)`
 

@@ -35,8 +35,7 @@ identity/
 - Parameters use the account-shared `AccountId` VO; a read port may return a response DTO directly, with `null` for an absent row
 
 **Response DTOs** (`usecase/response/`):
-- Java records; field types: String, `AuthProvider`, LocalDate
-- Override `toString()` to mask personal data (e.g. `MaskUtils.maskEmail`)
+- Field types: String, `AuthProvider`, LocalDate
 
 ---
 
@@ -51,12 +50,11 @@ identity/
 ## 4. framework/ Patterns
 
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping("/api") @RequiredArgsConstructor @Validated`:
-- HTTP concerns only: path-variable validation, response wrapping in `DataResponse`
+- Validates path variables and wraps responses in `DataResponse`
 - Member-scoped endpoints carry `@PreAuthorize("isAuthenticated()")`, take the caller via `@AuthenticationPrincipal(expression = "uuid")` with `@Parameter(hidden = true)`, and call `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)` before delegating to the adapter Controller
 - Endpoints handled by the Spring Security filter chain (e.g. logout) are declared as empty dummy methods documented with Javadoc
-- Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
-**jOOQ Repository** (`framework/outbound/jooq/`) — `@Repository @RequiredArgsConstructor`; implements the usecase port with `DSLContext`:
+**jOOQ Repository** (`framework/outbound/jooq/`) — `@Repository @RequiredArgsConstructor`; implements the usecase port:
 - Holds generated table references as fields (e.g. `SiteMemberAuth.SITE_MEMBER_AUTH`, `SiteMember.SITE_MEMBER`)
 - Joins the member-auth and member tables on their shared UUID and maps the record straight into the response DTO inside `fetchOne(...)`, converting the stored provider string with `AuthProvider.valueOf`
 
@@ -64,7 +62,7 @@ identity/
 - Table and audit-column names come from `TableName` / `TableColumnName` constants
 - Primary key shared with the member entity: `@MapsId` + `@OneToOne(fetch = LAZY, optional = false)` with `foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)`
 - `@ToString.Include` only on non-sensitive fields, so email and password stay out of `toString()`
-- Auditing: `@LastModifiedDate` timestamp column; optimistic locking via `@Version versionNumber`
+- Optimistic locking via `@Version versionNumber`
 - Exposes conditional-GET helpers (an ETag source built from the UUID and version number, a last-modified timestamp truncated to seconds)
 - Exposes intent-named `update*` mutation methods rather than public setters
 - `equals`/`hashCode` over the associated member via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
