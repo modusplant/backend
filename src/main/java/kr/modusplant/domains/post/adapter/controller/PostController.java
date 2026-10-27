@@ -115,8 +115,10 @@ public class PostController {
 
     @Transactional
     public void updatePost(String ulid, PostRequest postRequest, boolean isPublished, UUID currentMemberUuid) throws IOException {
-        Post post = postRepository.getPostByUlid(PostId.create(ulid))
-                .filter(p -> p.getPostAuthorId().equals(PostAuthorId.fromUuid(currentMemberUuid))).orElseThrow();
+        Post post = postRepository.getPostByUlid(PostId.create(ulid)).orElseThrow(PostNotFoundException::new);
+        if (!post.getPostAuthorId().equals(PostAuthorId.fromUuid(currentMemberUuid))) {
+            throw new PostAccessDeniedException();
+        }
         // 기존 filekey 목록 미리 추출
         List<String> oldFileKeys = contentDataProcessorPort.extractFileKeysFromContent(post.getPostContent().getContent());
 

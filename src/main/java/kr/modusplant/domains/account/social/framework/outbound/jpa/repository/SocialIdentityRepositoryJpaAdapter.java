@@ -74,7 +74,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
         if (memberAuthEntity.getProvider().equals(socialCredentials.getProvider())) {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_LINKED);
         }
-        memberAuthEntity.updateProvider(socialCredentials.getProvider());
+        memberAuthEntity.updateAuthProvider(socialCredentials.getProvider());
         memberAuthEntity.updateProviderId(socialCredentials.getProviderId());
         memberAuthEntity = memberAuthJpaRepository.save(memberAuthEntity);
         MemberEntity memberEntity = memberJpaRepository.findByUuid(memberAuthEntity.getUuid())
@@ -88,7 +88,7 @@ public class SocialIdentityRepositoryJpaAdapter implements SocialIdentityReposit
     public void updateSocialUnlinkedMember(AccountId accountId) {
         MemberAuthEntity memberAuthEntity = memberAuthJpaRepository.findByUuid(accountId.getValue())
                 .orElseThrow(() -> new NotFoundEntityException(EntityErrorCode.NOT_FOUND_MEMBER_AUTH, TableName.SITE_MEMBER_AUTH));
-        memberAuthEntity.updateProvider(AuthProvider.BASIC);
+        memberAuthEntity.updateAuthProvider(AuthProvider.BASIC);
         memberAuthEntity.updateProviderId(null);
         memberAuthJpaRepository.save(memberAuthEntity);
     }

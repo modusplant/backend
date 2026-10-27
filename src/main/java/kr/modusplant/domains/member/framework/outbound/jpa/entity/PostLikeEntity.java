@@ -3,6 +3,8 @@ package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.framework.outbound.jpa.compositekey.PostLikeCompositeKey;
 import lombok.*;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,7 +21,6 @@ import static kr.modusplant.shared.persistence.constant.TableName.COMM_POST_LIKE
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-@EqualsAndHashCode
 public class PostLikeEntity {
     @Id
     @Column(name = POST_ULID, nullable = false)
@@ -40,5 +41,23 @@ public class PostLikeEntity {
 
     public static PostLikeEntity of(String postId, UUID memberId) {
         return new PostLikeEntity(postId, memberId);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PostLikeEntity that)) return false;
+        return new EqualsBuilder()
+                .append(getPostId(), that.getPostId())
+                .append(getMemberId(), that.getMemberId())
+                .isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder(17, 37)
+                .append(getPostId())
+                .append(getMemberId())
+                .toHashCode();
     }
 }

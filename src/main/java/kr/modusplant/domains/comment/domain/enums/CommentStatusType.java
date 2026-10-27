@@ -13,7 +13,7 @@ public enum CommentStatusType {
 
     public static boolean contains(String input) {
         for (CommentStatusType type : CommentStatusType.values()) {
-            if(type.getValue().equals(input)) {
+            if(type.name().equals(input)) {
                 return true;
             }
         }

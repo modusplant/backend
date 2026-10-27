@@ -8,13 +8,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberAuthConstant {
     public static final String MEMBER_AUTH_BASIC_ADMIN_EMAIL = "testAdmin1@gmail.com";
-    public static final String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode("testPw12@");
+    public static final String MEMBER_AUTH_BASIC_ADMIN_RAW_PW = "testPw12@";
+    public static final String MEMBER_AUTH_BASIC_ADMIN_PW = new BCryptPasswordEncoder().encode(MEMBER_AUTH_BASIC_ADMIN_RAW_PW);
     public static final AuthProvider MEMBER_AUTH_BASIC_ADMIN_PROVIDER = AuthProvider.BASIC;
     public static final String MEMBER_AUTH_BASIC_ADMIN_ACCESS_TOKEN = "member_auth_basic_admin.access.token";
     public static final String MEMBER_AUTH_BASIC_ADMIN_AUTHORIZATION = "Bearer " + MEMBER_AUTH_BASIC_ADMIN_ACCESS_TOKEN;
 
     public static final String MEMBER_AUTH_BASIC_USER_EMAIL = "TestBasicUser2@naver.com";
-    public static final String MEMBER_AUTH_BASIC_USER_PW = new BCryptPasswordEncoder().encode("Test!Pw14@");
+    public static final String MEMBER_AUTH_BASIC_USER_RAW_PW = "Test!Pw14@";
+    public static final String MEMBER_AUTH_BASIC_USER_PW = new BCryptPasswordEncoder().encode(MEMBER_AUTH_BASIC_USER_RAW_PW);
     public static final AuthProvider MEMBER_AUTH_BASIC_USER_PROVIDER = AuthProvider.BASIC;
     public static final String MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN = "member_auth_basic_user.access.token";
     public static final String MEMBER_AUTH_BASIC_USER_AUTHORIZATION = "Bearer " + MEMBER_AUTH_BASIC_USER_ACCESS_TOKEN;

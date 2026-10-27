@@ -4,6 +4,7 @@ import kr.modusplant.domains.comment.domain.enums.CommentStatusType;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentStatus {
     private final CommentStatusType value;
 
@@ -19,6 +20,7 @@ public class CommentStatus {
         if (StringUtils.isBlank(value)) {
             throw new EmptyValueException(CommentErrorCode.EMPTY_COMMENT_STATUS, "status");
         }
+        value = value.toUpperCase();
         if (!CommentStatusType.contains(value)) {
             throw new InvalidValueException(CommentErrorCode.INVALID_COMMENT_STATUS, "status");
         }

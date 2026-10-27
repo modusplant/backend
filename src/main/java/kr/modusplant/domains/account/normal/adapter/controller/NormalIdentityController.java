@@ -1,7 +1,5 @@
 package kr.modusplant.domains.account.normal.adapter.controller;
 
-import jakarta.transaction.Transactional;
-import kr.modusplant.domains.account.normal.domain.exception.DataAlreadyExistsException;
 import kr.modusplant.domains.account.normal.domain.exception.enums.NormalIdentityErrorCode;
 import kr.modusplant.domains.account.normal.usecase.port.mapper.NormalIdentityMapper;
 import kr.modusplant.domains.account.normal.usecase.port.repository.NormalIdentityCreateRepository;
@@ -11,9 +9,9 @@ import kr.modusplant.domains.account.normal.usecase.request.EmailModificationReq
 import kr.modusplant.domains.account.normal.usecase.request.NormalSignUpRequest;
 import kr.modusplant.domains.account.normal.usecase.request.PasswordModificationRequest;
 import kr.modusplant.domains.account.shared.kernel.AccountId;
-import kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode;
 import kr.modusplant.infrastructure.security.enums.SecurityErrorCode;
 import kr.modusplant.shared.enums.AuthProvider;
+import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -26,6 +24,7 @@ import kr.modusplant.shared.persistence.constant.TableName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -69,7 +68,7 @@ public class NormalIdentityController {
             }
         } else {
             if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
-                throw new DataAlreadyExistsException(KernelErrorCode.EXISTS_NICKNAME);
+                throw new ExistsValueException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
             }
             createRepository.save(mapper.toSignUpData(request));
         }
@@ -79,7 +78,7 @@ public class NormalIdentityController {
     public void modifyEmail(UUID memberUuid, EmailModificationRequest request) {
         Email storedEmail = readRepository.getMemberEmail(AccountId.create(memberUuid));
         if (storedEmail == null) {
-            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT, TableName.SITE_MEMBER_AUTH);
         } else if (readRepository.getAuthProvider(AccountId.create(memberUuid)) != AuthProvider.BASIC) {
             throw new InvalidValueException(GeneralErrorCode.MISMATCH_INPUT_TYPE, "authProvider");
         } else if (!storedEmail.equals(Email.create(request.currentEmail()))) {
@@ -92,7 +91,7 @@ public class NormalIdentityController {
     @Transactional
     public void modifyPassword(UUID memberUuid, PasswordModificationRequest request) {
         if(!readRepository.existsByMemberId(AccountId.create(memberUuid))) {
-            throw new NotFoundEntityException(MemberErrorCode.NOT_FOUND_MEMBER, TableName.SITE_MEMBER_AUTH);
+            throw new NotFoundEntityException(NormalIdentityErrorCode.NOT_FOUND_ACCOUNT, TableName.SITE_MEMBER_AUTH);
         } else if(!isPasswordsMatch(AccountId.create(memberUuid), Password.create(request.currentPw()))) {
             throw new InvalidValueException(SecurityErrorCode.BAD_PASSWORD, request.currentPw());
         } else {
@@ -101,8 +100,6 @@ public class NormalIdentityController {
     }
 
     private boolean isPasswordsMatch(AccountId memberUuid, Password currentPassword) {
-        Password storedPw = Password.create(readRepository.getMemberPassword(memberUuid));
-
-        return encoder.matches(currentPassword.getValue(), storedPw.getValue());
+        return encoder.matches(currentPassword.getValue(), readRepository.getMemberPassword(memberUuid));
     }
 }

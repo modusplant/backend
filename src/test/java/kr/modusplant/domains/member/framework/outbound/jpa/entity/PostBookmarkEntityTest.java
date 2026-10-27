@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -84,7 +85,7 @@ public class PostBookmarkEntityTest implements PostBookmarkEntityTestUtils {
 
         // then
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(postBookmarkEntity, testMemberId);
+        assertNotEquals(testMemberId, postBookmarkEntity);
     }
 
     @Test
@@ -99,6 +100,12 @@ public class PostBookmarkEntityTest implements PostBookmarkEntityTestUtils {
     }
 
     @Test
+    @DisplayName("다른 키를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentKey_willReturnFalse() {
+        assertNotEquals(PostBookmarkEntity.of(postId, memberId), PostBookmarkEntity.of(TEST_POST_ULID2, memberId));
+    }
+
+    @Test
     @DisplayName("같은 객체에 대한 hashcode 동일성 보장")
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         // when
@@ -106,5 +113,17 @@ public class PostBookmarkEntityTest implements PostBookmarkEntityTestUtils {
 
         // then
         assertEquals(postBookmarkEntity.hashCode(), postBookmarkEntity.hashCode());
+    }
+
+    @Test
+    @DisplayName("다른 회원 식별자를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentMemberId_willReturnFalse() {
+        assertNotEquals(PostBookmarkEntity.of(postId, memberId), PostBookmarkEntity.of(postId, UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("같은 키를 갖는 인스턴스에 대한 hashcode 동일성 보장")
+    void testHashCode_givenObjectContainingSameKey_willReturnSameHashCode() {
+        assertEquals(PostBookmarkEntity.of(postId, memberId).hashCode(), PostBookmarkEntity.of(postId, memberId).hashCode());
     }
 }

@@ -217,20 +217,20 @@
       <li class="step">
         <span class="badge">3</span>
         <div class="card">
-          <h3>Load the Area Feature</h3>
+          <h3>Load the Area Test Rule</h3>
           <p>Load the area's test settings: ErrorCode class, path exceptions, TestUtils paths, and so on.</p>
           <div class="branch"><strong>Fallback order</strong>
             <ol>
-              <li>Use the feature file if it exists.</li>
-              <li>Otherwise, derive the same facts from the area's rule file plus the actual <code>src/main</code> / <code>src/test</code> layout.</li>
+              <li>Use the area's test rule file if it exists.</li>
+              <li>Otherwise, derive the same facts from the area's main rule file plus the actual <code>src/main</code> / <code>src/test</code> layout.</li>
               <li>If neither file exists, skip this bucket and continue with the next one.</li>
             </ol>
           </div>
           <div class="docs">
-            <div class="doc read"><span class="tag">Read ①</span><span class="path">.claude/documents/test-&lt;kind&gt;-&lt;area&gt;-feature.md</span><span class="what">Per-area test feature: the preferred source.</span></div>
-            <div class="doc read"><span class="tag">Read ②</span><span class="path">.claude/rules/&lt;kind&gt;-&lt;area&gt;-details.md</span><span class="what">Per-area convention rules: the fallback source.</span></div>
+            <div class="doc read"><span class="tag">Read ①</span><span class="path">.claude/rules/test-&lt;kind&gt;-&lt;area&gt;-details.md</span><span class="what">Per-area test conventions: the preferred source.</span></div>
+            <div class="doc read"><span class="tag">Read ②</span><span class="path">.claude/rules/main-&lt;kind&gt;-&lt;area&gt;-details.md</span><span class="what">Per-area main-code conventions: the fallback source.</span></div>
           </div>
-          <div class="stop skip">Neither file exists. The area and its classes are reported, and the user is asked to create the rule file first.</div>
+          <div class="stop skip">Neither file exists. The area and its classes are reported, and the user is asked to create the test rule file first.</div>
         </div>
       </li>
 
@@ -238,7 +238,7 @@
         <span class="badge">4</span>
         <div class="card">
           <h3>Apply Excluded Classes</h3>
-          <p>Never generate tests for enum classes, exception classes, constructor-only classes, or anything listed under the feature's <code>Excluded-classes additions</code>.</p>
+          <p>Never generate tests for enum classes, exception classes, constructor-only classes, or anything listed in the test rule's <code>Excluded Classes</code> section.</p>
         </div>
       </li>
 
@@ -246,11 +246,11 @@
         <span class="badge">5</span>
         <div class="card">
           <h3>Apply the Test Architecture &amp; Strategy</h3>
-          <p>Start from the Pure Unit Test baseline, then apply the area-specific adjustments from the feature: ErrorCode assertions, path exceptions that may use a real Spring context or DB, and the servlet mock pattern.</p>
+          <p>Start from the Pure Unit Test baseline, then apply the area-specific adjustments from the test rule: ErrorCode assertions, path exceptions that may use a real Spring context or DB, and the servlet mock pattern.</p>
           <div class="docs">
             <div class="doc read"><span class="tag">Read</span><span class="path">.claude/rules/test-architecture-details.md</span><span class="what">Project-wide test baseline, read by the agent.</span></div>
           </div>
-          <div class="branch"><strong>jOOQ repository test policy</strong> (for <code>framework/outbound/jooq/repository</code>, if the feature names one)
+          <div class="branch"><strong>jOOQ repository test policy</strong> (for <code>framework/outbound/jooq/repository</code>, if the test rule names one)
             <ul>
               <li><code>excluded</code>: generate no test.</li>
               <li><code>integration-test</code>: <code>@SpringBootTest</code> with a real <code>DSLContext</code> and seeded data.</li>
@@ -264,7 +264,7 @@
         <span class="badge">6</span>
         <div class="card">
           <h3>Write tests using the TestUtils convention</h3>
-          <p>Reuse constants from the area's <code>common/constant</code> path and from the feature's shared constant paths, creating any that are missing. Place helpers per the feature's Group A (fields) and Group B (methods) target paths.</p>
+          <p>Reuse constants from the area's <code>common/constant</code> path and from the test rule's shared constant paths, creating any that are missing. Place helpers per the test rule's Group A (fields) and Group B (methods) target paths.</p>
           <div class="docs">
             <div class="doc write"><span class="tag">Write</span><span class="path">src/test/java/kr/modusplant/…</span><span class="what">Test classes created, modified, or deleted for this bucket.</span></div>
           </div>

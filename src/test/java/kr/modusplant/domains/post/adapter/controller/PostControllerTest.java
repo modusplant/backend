@@ -11,7 +11,9 @@ import kr.modusplant.domains.post.common.util.usecase.response.PostFileUploadUrl
 import kr.modusplant.domains.post.common.util.usecase.response.PostResponseTestUtils;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.EmptyValueException;
+import kr.modusplant.domains.post.domain.exception.PostAccessDeniedException;
 import kr.modusplant.domains.post.domain.exception.PostNotFoundException;
+import kr.modusplant.domains.post.domain.exception.enums.PostErrorCode;
 import kr.modusplant.domains.post.domain.vo.PostAuthorId;
 import kr.modusplant.domains.post.domain.vo.PostId;
 import kr.modusplant.domains.post.usecase.port.mapper.PostMapper;
@@ -431,6 +433,35 @@ class PostControllerTest implements PostTestUtils, PostReadModelTestUtils, PostR
         // when & then
         assertThrows(EmptyValueException.class, () -> postController.updatePost(TEST_POST_ULID, invalidUpdateRequest, false, MEMBER_BASIC_USER_UUID));
         verify(contentDataProcessorPort,never()).generateContentJson(anyString(),anyList(),any(String.class),anyList());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글 수정 시 예외 반환")
+    void testUpdatePost_givenNotFoundPost_willThrowException() {
+        // given
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.empty());
+
+        // when
+        PostNotFoundException exception = assertThrows(PostNotFoundException.class, () -> postController.updatePost(TEST_POST_ULID, requestAllTypes, true, MEMBER_BASIC_USER_UUID));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(PostErrorCode.POST_NOT_FOUND);
+        verify(postRepository, never()).update(any(Post.class));
+    }
+
+    @Test
+    @DisplayName("작성자가 아닌 회원이 게시글 수정 시 예외 반환")
+    void testUpdatePost_givenNonAuthor_willThrowException() {
+        // given
+        Post existingPost = createPublishedPost2();
+        given(postRepository.getPostByUlid(any(PostId.class))).willReturn(Optional.of(existingPost));
+
+        // when
+        PostAccessDeniedException exception = assertThrows(PostAccessDeniedException.class, () -> postController.updatePost(TEST_POST_ULID, requestAllTypes, true, UUID.randomUUID()));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(PostErrorCode.POST_ACCESS_DENIED);
+        verify(postRepository, never()).update(any(Post.class));
     }
 
     @Test

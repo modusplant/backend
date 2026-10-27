@@ -59,7 +59,8 @@ public class NormalIdentityRepositoryJpaAdapter implements NormalIdentityCreateR
     @Override
     public void save(SignUpData signUpData) {
         MemberEntity savedMember = memberJpaRepository.save(identityMapper.toMemberEntity(signUpData.getNickname()));
-        authJpaRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData));
+        authJpaRepository.save(authMapper.toSiteMemberAuthEntity(savedMember, signUpData,
+                passwordEncoder.encode(signUpData.getNormalCredentials().getPassword().getValue())));
         termJpaRepository.save(termMapper.toSiteMemberTermEntity(savedMember, signUpData));
         profileJpaRepository.save(profileMapper.toSiteMemberProfileEntity(savedMember));
     }
