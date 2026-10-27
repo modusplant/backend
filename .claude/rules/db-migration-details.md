@@ -7,7 +7,8 @@ paths:
 
 # DB Migration Conventions
 
-Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, and the Flyway/jOOQ configuration in `application*.yml`.
+Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, and the Flyway/jOOQ configuration in
+`application*.yml`.
 
 ---
 
@@ -15,15 +16,16 @@ Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, an
 
 ```
 src/main/resources/db/migration/
- ├─ schema/                 # DDL only — table/column/constraint/index/function changes
- └─ data/seed/              # Small, static, handwritten INSERT statements
+├ schema/ # DDL only — table/column/constraint/index/function changes
+└ data/seed/ # Small, static, handwritten INSERT statements
 
 src/main/java/db/migration/
- └─ data/reference/         # Programmatic or bulk data work that plain SQL can't express cleanly
-                            #   (e.g. parsing an external file and batch-inserting derived rows)
+└ data/reference/ # Programmatic or bulk data work that plain SQL can't express cleanly
+  # (e.g. parsing an external file and batch-inserting derived rows)
 ```
 
-`schema/`, `data/seed/`, and `data/reference/` (Java) all draw from **one unified version sequence** — Flyway orders every migration across all three locations as a single timeline, not per-folder sequences.
+`schema/`, `data/seed/`, and `data/reference/` (Java) all draw from **one unified version sequence** — Flyway orders
+every migration across all three locations as a single timeline, not per-folder sequences.
 
 ---
 
@@ -33,8 +35,10 @@ Pattern: `V<major>.<minor>.<patch>__Description_With_Underscores.sql`
 
 - Version is a 3-part dotted, semver-style number — never timestamp-based.
 - Double underscore (`__`) separates the version from the description.
-- The description is `Capitalized_Snake_Case`, starting with a verb that names the migration's action (e.g. `Create`, `Alter`, `Add`, `Remove`, `Insert`, `Delete`, `Rename`, `Migrate`); any other verb may be adopted as needed.
-- Examples: `V0.2.0__Migrate_category_uuid_to_serial.sql`, `V0.12.0__Create_site_member_withdraw_table.sql`, `V1.3.1__Insert_common_code.sql`.
+- The description is `Capitalized_Snake_Case`, starting with a verb that names the migration's action (e.g. `Create`,
+  `Alter`, `Add`, `Remove`, `Insert`, `Delete`, `Rename`, `Migrate`); any other verb may be adopted as needed.
+- Examples: `V0.2.0__Migrate_category_uuid_to_serial.sql`, `V0.12.0__Create_site_member_withdraw_table.sql`,
+  `V1.3.1__Insert_common_code.sql`.
 
 **Baseline exception**: `B0.0.0__Create_initial_table.sql` uses Flyway's `B` (baseline) prefix instead of `V`.
 
@@ -52,17 +56,23 @@ Pattern: `V<major>.<minor>.<patch>__Description_With_Underscores.sql`
 Flyway runs in two places with deliberately different scopes:
 
 **Gradle plugin** (`build.gradle`, `flyway {}` block) — prepares a live schema for jOOQ codegen at build time:
-- `locations = ['classpath:db/migration/data/seed', 'classpath:db/migration/schema']` — **SQL-only**, excludes the Java migration classes
+- `locations = ['classpath:db/migration/data/seed', 'classpath:db/migration/schema']` — **SQL-only**, excludes the Java
+  migration classes
 
-**Spring Boot runtime** (`application.yml`, `spring.flyway`) — the actual source of truth, applied at application startup in every environment:
-- `locations: [classpath:db/migration]` — the **whole tree**, SQL and Java together; this is what actually executes Java migrations
+**Spring Boot runtime** (`application.yml`, `spring.flyway`) — the actual source of truth, applied at application
+startup in every environment:
+- `locations: [classpath:db/migration]` — the **whole tree**, SQL and Java together; this is what actually executes Java
+  migrations
 
-Gradle task chain: `flywayMigrate` depends on `processResources`; `jooqCodegen` depends on `flywayMigrate`; `compileJava` and `compileTestJava` depend on `jooqCodegen`.
+Gradle task chain: `flywayMigrate` depends on `processResources`; `jooqCodegen` depends on `flywayMigrate`;
+`compileJava` and `compileTestJava` depend on `jooqCodegen`.
 
 ---
 
 ## 5. Environment & Credentials Configuration
 
-Gradle/Flyway/jOOQ build-time credentials are supplied via `JDBC_CONNECTION_URL`, `JDBC_USERNAME`, `JDBC_PASSWORD` (environment variables) or `jdbcConnectionUrl`, `jdbcUsername`, `jdbcPassword` (Gradle properties).
+Gradle/Flyway/jOOQ build-time credentials are supplied via `JDBC_CONNECTION_URL`, `JDBC_USERNAME`, `JDBC_PASSWORD`
+(environment variables) or `jdbcConnectionUrl`, `jdbcUsername`, `jdbcPassword` (Gradle properties).
 
-These are distinct from Spring's runtime datasource variables — `DB_CONNECTION_URL`, `DB_USERNAME`, `DB_PASSWORD` (`application.yml`'s `spring.datasource` block).
+These are distinct from Spring's runtime datasource variables — `DB_CONNECTION_URL`, `DB_USERNAME`, `DB_PASSWORD`
+(`application.yml`'s `spring.datasource` block).
