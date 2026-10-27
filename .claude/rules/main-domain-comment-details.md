@@ -14,37 +14,37 @@ Applies to `kr.modusplant.domains.comment` and its sub-packages.
 ```
 comment/
  ├─ domain/
- │   ├─ aggregate/                        # Aggregate root
+ │   ├─ aggregate/
  │   ├─ enums/                            # Status-style backing enums
- │   ├─ event/                            # Domain events
+ │   ├─ event/
  │   ├─ exception/                        # Domain-local exception classes
- │   │   └─ enums/                        # Error code enums
- │   └─ vo/                               # Value Objects
- │       └─ nullobject/                   # Null-object subclasses of optional VOs
+ │   │   └─ enums/
+ │   └─ vo/
+ │       └─ nullobject/
  ├─ usecase/
- │   ├─ model/                            # Read models for jOOQ query mapping
+ │   ├─ model/
  │   ├─ port/
- │   │   ├─ mapper/                       # Domain → DTO mapper interface
+ │   │   ├─ mapper/
  │   │   └─ repository/                   # Query/Command/Cache/lookup repository port interfaces
- │   ├─ request/                          # Inbound REST DTOs (Bean Validation)
- │   └─ response/                         # Outbound REST DTOs
+ │   ├─ request/
+ │   └─ response/
  ├─ adapter/
- │   ├─ controller/                       # Business orchestration
+ │   ├─ controller/
  │   ├─ helper/                           # Cross-aggregate write-precondition checks
  │   ├─ listener/                         # Synchronous listeners for other domains' events
- │   └─ mapper/                           # Mapper port implementation
+ │   └─ mapper/
  └─ framework/
-     ├─ inbound/web/rest/                 # HTTP entry point
+     ├─ inbound/web/rest/
      ├─ inbound/web/cache/                # ETag / Last-Modified conditional-GET support
      │   └─ model/                        # Cache result carrier record
      ├─ inbound/flyway/                   # Flyway callbacks reacting to applied migrations
      └─ outbound/
          ├─ jooq/
-         │   └─ repository/               # DSLContext-based read repository
+         │   └─ repository/
          ├─ redis/                        # Redis-backed idempotency + sibling-order allocation
          └─ jpa/
-             ├─ entity/                    # @Entity classes
-             ├─ compositekey/              # Composite PK class for @IdClass entities
+             ├─ entity/
+             ├─ compositekey/
              ├─ mapper/                    # Domain ↔ JPA Entity mapping implementation
              │   └─ supers/                # Domain ↔ JPA Entity mapping interface
              └─ repository/                # Spring Data JPA interface + write-port adapter
@@ -55,20 +55,18 @@ comment/
 ## 2. domain/ Patterns
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)`; an optional reference VO (e.g. the reply target's path) is passed to `create(...)` as its null-object subclass rather than null
+- An optional reference VO (e.g. the reply target's path) is passed to `create(...)` as its null-object subclass rather than null
 - May expose an overloaded `create(...)` factory that accepts an explicit optional field alongside the primary factory that derives it internally with a default
-- `equals`/`hashCode` based on the composite identity fields (the referenced post and the comment's own positional identifier), via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
+- Equality is based on the composite identity fields (the referenced post and the comment's own positional identifier)
 
 **Value Object** (`domain/vo/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)`; `create()` validates null, blank, regex, or length
-- An identity VO wrapping a UUID exposes `fromUuid(...)` / `fromString(...)` factories instead of `create()`, plus a nullable-tolerant `fromNullableUuid(...)` that returns its null-object subclass for null input in contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
+- An identity VO wrapping a UUID offers a nullable-tolerant `fromNullableUuid(...)` that returns its null-object subclass for null input in contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
 - A bounded numeric VO (e.g. a page size) rejects null and values outside a fixed inclusive range
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
-- `@RequiredArgsConstructor(AccessLevel.PRIVATE)`; `create(...)` validates the required fields
 - May derive a classification field (e.g. an action-type string) internally from the shape of another field rather than accepting it as a parameter
 
 **Domain Exceptions** (`domain/exception/`):
@@ -82,12 +80,8 @@ comment/
 
 ## 3. usecase/ Patterns
 
-**Read Models** (`usecase/model/`):
-- Placed directly under `model/`; named with a `*ReadModel` suffix
-
 **Repository Ports** (`usecase/port/repository/`):
 - Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology; separate read-only lookup ports, each named after the referenced object (the author, the immediate parent post), cover cross-aggregate references
-- Return types use domain VOs/Aggregates on every port
 - The query port may also declare an ownership check (whether a comment was written by a given author)
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
@@ -101,13 +95,12 @@ comment/
 
 **Response DTOs** (`usecase/response/`):
 - A generic offset-paginated wrapper carries the page/size/total metadata, and a cursor-paginated wrapper carries the items, the last item's path as the next cursor, a has-next flag, and the item count
-- Field types: Java primitives, String, boolean, LocalDateTime
 
 ---
 
 ## 4. adapter/ Patterns
 
-**Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
+**Controller** (`adapter/controller/`):
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
 - When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists and is not soft-deleted
@@ -115,36 +108,35 @@ comment/
 - Reserves the server-authoritative path (idempotency marker plus next-sibling ordinal) through the cache port before constructing the aggregate
 - Publishes a domain event after a successful write via `ApplicationEventPublisher`
 
-**Validation Helper** (`adapter/helper/`) — `@Component @RequiredArgsConstructor`:
+**Validation Helper** (`adapter/helper/`):
 - Exposes single-purpose precondition checks
 - Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
 - Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local exception; the ownership failure maps to HTTP 403
 
-**Event Listener** (`adapter/listener/`) — `@Component @RequiredArgsConstructor`; `@EventListener` methods run in the publisher's transaction:
+**Event Listener** (`adapter/listener/`) — `@EventListener` methods run in the publisher's transaction:
 - On another domain's abuse-report approval event, requires the event's member to hold the admin role (otherwise throws `NotAccessibleException` with `GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS`), runs the helper's parent-post and comment existence checks, then soft-deletes the comment without an author-ownership check
 
-**Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`:
+**Mapper** (`adapter/mapper/`):
 - Exposes a reply target as deleted with a null nickname when it is soft-deleted, or when its row is absent while the reply-target path is set; the reply-target path itself is returned as stored
 
 ---
 
 ## 5. framework/ Patterns
 
-**REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
+**REST Controller** (`framework/inbound/web/rest/`):
 - Extracts auth via `@AuthenticationPrincipal` (nullable for endpoints with optional authentication); wraps parameters, including the caller's UUID for `register`, `updateContent`, and `delete`, into a usecase call and delegates to the adapter Controller
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
-- Swagger additionally uses `@SecurityRequirement`
 
-**HTTP Cache** (`framework/inbound/web/cache/`) — `@Service @Transactional @Slf4j`:
+**HTTP Cache** (`framework/inbound/web/cache/`):
 - ETag comparison uses a one-way hash/encoder match rather than literal string equality
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
 
-**Flyway Callback** (`framework/inbound/flyway/`) — `@Component @RequiredArgsConstructor @Slf4j`; implements Flyway's `Callback` and is auto-registered by Spring Boot's Flyway auto-configuration:
+**Flyway Callback** (`framework/inbound/flyway/`) — implements Flyway's `Callback` and is auto-registered by Spring Boot's Flyway auto-configuration:
 - Records on `AFTER_EACH_MIGRATE` whether a specific migration version was applied in the current run
 - Acts on `AFTER_MIGRATE` / `AFTER_MIGRATE_ERROR` only when that version was applied, delegating the side effect (e.g. cache eviction) to a usecase port
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
+**jOOQ Repository** (`framework/outbound/jooq/repository/`):
 - Serves joined reads, aggregate counts, and paginated read models
 - Cursor-paginated reads use keyset seek on the shared sort key, first reading the cursor row's sort-key values (an empty list when it is absent)
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
@@ -152,24 +144,20 @@ comment/
 - May implement the ownership check as an existence query matching the comment's identity and its author
 - May expose a highest-child-ordinal lookup beneath a given parent path as a `MAX` aggregate over per-depth ordinal columns (root-level: the first-depth column among rows without a second-depth value; nested: the second-depth column among rows sharing the root's first-depth value), returning 0 when no sibling exists
 
-**Redis Repository** (`framework/outbound/redis/`) — `@Repository @RequiredArgsConstructor`; implements the cache port over a `StringRedisTemplate`:
+**Redis Repository** (`framework/outbound/redis/`) — implements the cache port over a `StringRedisTemplate`:
 - Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a bounded, slidingly-refreshed TTL
 - The reservation runs a set-if-absent idempotency guard (a lost race yields an empty `Optional`), then draws the next ordinal from an atomic increment counter that is set from the caller-supplied database lower bound before its first increment, so a cold counter cannot collide with existing rows
 - Bulk eviction walks each key family with cursor-based `SCAN` (never `KEYS`) and deletes the matches in fixed-size batches
 - Null replies and data-access errors are rethrown as a shared connection-failure exception
 
-**JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:
-- Foreign-key associations may be declared with `foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)` where no DB-level FK constraint is enforced
-- Exposes intent-named mutation methods (e.g. increment/decrement a counter floored at zero, mark as deleted) rather than public setters
+**JPA Entity** (`framework/outbound/jpa/entity/`):
+- Mutation methods include incrementing/decrementing a counter floored at zero and marking the comment as deleted
 - `@PrePersist` callback defaults nullable numeric/boolean columns before insert
-- Manual static nested builder class alongside the Lombok-generated accessors
 
-**Composite Key** (`framework/outbound/jpa/compositekey/`) — `equals`/`hashCode` over all key fields; manual static nested builder including a copy-from-existing-instance factory
+**JPA Mapper** (`framework/outbound/jpa/mapper/`) — `*Impl` class implementing an interface in `mapper/supers/`: domain Aggregate (+ related entities resolved by the caller) → JPA Entity via the entity's builder, setting only the fields derived from its inputs; a `private` method translates a domain status VO into a persisted boolean flag
 
-**JPA Mapper** (`framework/outbound/jpa/mapper/`) — `@Component` `*Impl` class implementing an interface in `mapper/supers/`: domain Aggregate (+ related entities resolved by the caller) → JPA Entity via the entity's builder, setting only the fields derived from its inputs; a `private` method translates a domain status VO into a persisted boolean flag
+**JPA Repository** (`framework/outbound/jpa/repository/`) — extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
-**JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class; derived query methods keyed by the natural composite fields (not the JPA-internal key type)
+**Repository Adapter** (`framework/outbound/jpa/repository/`) — implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving
 
-**Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements the usecase write port: resolves related entities by their business identifiers, maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving
-
-**Lookup Repository Adapter** (`framework/outbound/jpa/repository/`) — `@Repository @RequiredArgsConstructor`; implements a read-only lookup port over the referenced domain's Spring Data repository; a lookup that must return a value throws a not-found exception parameterized with a `domain/exception/enums` error code when the referenced row is absent, and a state check returns false for an absent row
+**Lookup Repository Adapter** (`framework/outbound/jpa/repository/`) — implements a read-only lookup port over the referenced domain's Spring Data repository; a lookup that must return a value throws a not-found exception parameterized with a `domain/exception/enums` error code when the referenced row is absent, and a state check returns false for an absent row

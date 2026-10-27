@@ -13,6 +13,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class CommentStatusTest implements CommentStatusTestUtils {
 
     @Test
+    @DisplayName("유효한 값으로 댓글 상태 반환")
+    public void testCreate_givenValidValue_willReturnCommentStatus() {
+        // given & when & then
+        assertEquals(CommentStatus.active(), CommentStatus.create("active"));
+        assertEquals(CommentStatus.deleted(), CommentStatus.create("deleted"));
+    }
+
+    @Test
     @DisplayName("빈 값으로 댓글 상태 생성 시 예외 반환")
     public void testCreate_givenBlankPath_willThrowException() {
         // given

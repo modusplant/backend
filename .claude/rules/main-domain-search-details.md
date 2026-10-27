@@ -14,43 +14,39 @@ Applies to `kr.modusplant.domains.search` and its sub-packages.
 ```
 search/
  ├─ domain/
- │   ├─ aggregate/                    # Aggregates
- │   ├─ entity/                       # Entities
- │   ├─ vo/                           # Value Objects; nullobject/ for optional VOs (Empty*)
- │   ├─ enums/                        # Domain status/condition enums
- │   └─ exception/enums/              # Error code enums
+ │   ├─ aggregate/
+ │   ├─ entity/
+ │   ├─ vo/
+ │   ├─ enums/                        # Search condition/target/sort enums
+ │   └─ exception/enums/
  ├─ usecase/
- │   ├─ port/repository/              # Repository port interfaces
- │   ├─ port/mapper/                  # Domain → DTO mapper interfaces
+ │   ├─ port/repository/
+ │   ├─ port/mapper/
  │   ├─ port/cache/                   # Cache port interfaces
- │   ├─ record/                       # Data-transfer records (REST Controller → adapter)
- │   ├─ response/                     # Response DTOs (Java records)
- │   └─ model/read/                   # Read models for jOOQ query mapping
+ │   ├─ record/
+ │   ├─ response/
+ │   └─ model/read/
  ├─ adapter/
- │   ├─ controller/                   # Business orchestration (*Controller)
- │   ├─ mapper/                       # Mapper port implementations
- │   └─ translator/                   # External system abstractions
+ │   ├─ controller/
+ │   ├─ mapper/
+ │   └─ translator/
  └─ framework/
-     ├─ inbound/web/rest/             # @RestController (HTTP entry point)
+     ├─ inbound/web/rest/
      └─ outbound/
-         ├─ jooq/repository/          # DSLContext-based complex queries
-         │   └─ mapper/supers/        # Shared base jOOQ mapper interfaces
-         ├─ jpa/repository/           # Spring Data JPA interfaces for condition/lookup queries
+         ├─ jooq/
+         │   ├─ repository/
+         │   └─ mapper/supers/        # jOOQ record → read model mapper
+         ├─ jpa/repository/           # Category-condition lookups
          ├─ caffeine/                 # In-memory cache implementations of usecase/port/cache/
-         └─ redis/                    # Redis-backed repositories (e.g. search history)
+         └─ redis/                    # Search-history repository
 ```
 
 ---
 
 ## 2. domain/ Patterns
 
-**Aggregate** (`domain/aggregate/`):
-- `equals/hashCode` based on the ID VO
-
 **Value Object** (`domain/vo/`):
-- `@RequiredArgsConstructor(AccessLevel.PRIVATE)`; `create()` validates null, regex, length, range
-- `Empty*` null-object VOs use `@NoArgsConstructor(AccessLevel.PROTECTED, force = true)`
-- ID VO generation — UUID type: `generate()` · `fromUuid(UUID)` · `fromString(String)`; ULID type: `generate()` · `create(String)`
+- Score-like VOs (`SearchKeywordSimilarity`, `SearchPostImportance`) return an internal empty singleton for null input, marked by an `empty` flag or an `EMPTY` enum constant instead of a null-object subclass; `isEmpty()` reports it, and `getValueIfNotEmpty()` throws `InvalidValueException` with a `SearchErrorCode` on an empty instance
 
 **Enums** (`domain/enums/`):
 - Search condition/target/sort values as enums
@@ -60,38 +56,23 @@ search/
 ## 3. usecase/ Patterns
 
 **Repository Ports** (`usecase/port/repository/`):
-- Return types use only domain VOs/Aggregates
+- The post-search port exposes one keyword search per sort order (latest, relevance), each returning read models
+- The condition port checks that the requested primary/secondary category IDs exist
 
 **Cache Ports** (`usecase/port/cache/`):
-- Abstracts a cache lookup/store operation over domain VOs; implemented in `framework/outbound/caffeine/`
-
-**Records** (`usecase/record/`):
-- Raw types carried: String, Integer, etc.
+- Serves the transliterated plant names used for plant-name search; implemented in `framework/outbound/caffeine/`
 
 **Response DTOs** (`usecase/response/`):
-- Multi-item responses include a page/relevance-sorted factory where applicable
-- Field types: Java primitives, String, UUID, LocalDateTime, JsonNode
+- A relevance-sorted page response carries its own `of(...)` factory
 
 ---
 
-## 4. adapter/ Patterns
+## 4. framework/ Patterns
 
-**Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — serves keyword searches sorted by latest or by relevance, returning paginated read models
 
-**Mapper** (`adapter/mapper/`): domain Aggregate → Response DTO
+**JPA Repository** (`framework/outbound/jpa/repository/`) — serves the category-condition existence checks against a JPA-managed table
 
----
+**Cache Adapter** (`framework/outbound/caffeine/`) — implements a `usecase/port/cache/` interface with an in-memory Caffeine cache
 
-## 5. framework/ Patterns
-
-**REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
-- Wraps the request into a usecase record
-
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — serves complex joins, relevance-sorted/paginated read models
-- `mapper/supers/` holds base jOOQ mapper interfaces shared across repositories in this domain
-
-**JPA Repository** (`framework/outbound/jpa/repository/`) — used for condition/lookup queries against a JPA-managed table
-
-**Cache Adapter** (`framework/outbound/caffeine/`) — `@Component`; implements a `usecase/port/cache/` interface with an in-memory Caffeine cache
-
-**Redis Repository** (`framework/outbound/redis/`) — `@Repository`; reads/writes Redis directly (e.g. recording and retrieving search history) without an intervening usecase port
+**Redis Repository** (`framework/outbound/redis/`) — implements the search-history port, recording and retrieving a searcher's history in Redis

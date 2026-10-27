@@ -19,18 +19,22 @@ Each pattern applies wherever the area has that layer.
 ### 1.1 domain/
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE or PROTECTED)` + `static create(...)` factory with internal null checks
+- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory with internal null checks
+- `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
 **Entity** (`domain/entity/`):
 - `protected` constructor + `static create()` factory
 
 **Value Object** (`domain/vo/`):
 - Private constructor + `static create(...)` factory that validates its input
+- `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 - Optional VOs (blank/null input allowed): `create()` returns the VO's null-object subclass
-  (`vo/nullobject/Empty*`), a singleton whose `getValue()` returns `null`
+  (`vo/nullobject/Empty*`), a singleton whose `getValue()` returns `null`; the parent VO carries
+  `@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)` so the subclass can extend it
 
 **Domain Events** (`domain/event/`):
-- `static create(...)` factory
+- `@RequiredArgsConstructor(access = AccessLevel.PRIVATE)` + `static create(...)` factory that
+  validates the required fields
 
 ### 1.2 usecase/
 
@@ -63,6 +67,11 @@ Each pattern applies wherever the area has that layer.
 
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequiredArgsConstructor @Validated`:
 - HTTP concerns only (request parsing, validation, response serialization); delegates to the adapter Controller
+- Response bodies are built with `DataResponse`, except a 304 response (headers only)
+- An endpoint whose path carries a member UUID calls `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)`
+  before delegating, so a caller can reach only their own member resource
+- An endpoint served by a Spring Security filter is declared as an empty dummy method documented
+  with Javadoc, so it still appears in Swagger
 - Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`
 
 **HTTP Cache** (`framework/inbound/web/cache/`):
@@ -71,8 +80,14 @@ Each pattern applies wherever the area has that layer.
 
 **jOOQ Repository** (`framework/outbound/jooq/`) — `@Repository`; uses `DSLContext` directly
 
-**JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor @Getter`:
-- Auditing timestamp columns via `@CreatedDate` / `@LastModifiedDate`
+**JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @NoArgsConstructor(access = AccessLevel.PROTECTED) @Getter`:
+- Table name from a `TableName` constant
+- Auditing timestamp columns via `@CreatedDate` / `@LastModifiedDate`; an entity with either carries
+  `@EntityListeners(AuditingEntityListener.class)`, without which the columns stay unset
+- No setters; state changes go through intent-named mutation methods
+- Associations declare `foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)`
+- An entity with more than 4 fields has a manual static nested builder
+- `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
 **Composite Key** (`framework/outbound/jpa/compositekey/`) — plain class implementing `Serializable`,
 paired 1:1 with an `@IdClass` entity
@@ -83,7 +98,8 @@ paired 1:1 with an `@IdClass` entity
 
 ## 2. Error Codes
 
-Every `*ErrorCode` enum implements `ErrorCode` with three fields: `httpStatus(int)`, `code(String)`, `message(String)`.
+Every `*ErrorCode` enum is `@Getter @RequiredArgsConstructor` and implements `ErrorCode` with three
+fields: `httpStatus(int)`, taken from `HttpStatus.*.value()`, `code(String)`, `message(String)`.
 
 ---
 

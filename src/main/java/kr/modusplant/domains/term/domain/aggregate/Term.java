@@ -44,11 +44,11 @@ public class Term {
         if (this == o) return true;
         if (!(o instanceof Term term)) return false;
 
-        return new EqualsBuilder().append(getTermId(), term.getTermId()).isEquals();
+        return new EqualsBuilder().append(getTermName(), term.getTermName()).isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getTermId()).toHashCode();
+        return new HashCodeBuilder(17, 37).append(getTermName()).toHashCode();
     }
 }

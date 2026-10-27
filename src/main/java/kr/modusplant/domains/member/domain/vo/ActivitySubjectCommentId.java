@@ -31,11 +31,17 @@ public class ActivitySubjectCommentId {
 
         if (!(o instanceof ActivitySubjectCommentId memberId)) return false;
 
-        return new EqualsBuilder().append(getActivitySubjectCommentPath(), memberId.getActivitySubjectCommentPath()).isEquals();
+        return new EqualsBuilder()
+                .append(getActivitySubjectPostId(), memberId.getActivitySubjectPostId())
+                .append(getActivitySubjectCommentPath(), memberId.getActivitySubjectCommentPath())
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder(17, 37).append(getActivitySubjectCommentPath()).toHashCode();
+        return new HashCodeBuilder(17, 37)
+                .append(getActivitySubjectPostId())
+                .append(getActivitySubjectCommentPath())
+                .toHashCode();
     }
 }

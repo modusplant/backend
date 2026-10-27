@@ -1,7 +1,7 @@
 package kr.modusplant.domains.term.framework.inbound.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.modusplant.domains.term.adaptor.controller.TermController;
+import kr.modusplant.domains.term.adapter.controller.TermController;
 import kr.modusplant.domains.term.usecase.response.TermResponse;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
 import kr.modusplant.shared.framework.jackson.http.response.DataResponse;

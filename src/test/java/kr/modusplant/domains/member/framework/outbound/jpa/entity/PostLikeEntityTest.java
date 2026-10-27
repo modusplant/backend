@@ -14,6 +14,7 @@ import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -84,7 +85,7 @@ public class PostLikeEntityTest implements PostLikeEntityTestUtils {
 
         // then
         //noinspection AssertBetweenInconvertibleTypes
-        assertNotEquals(postLikeEntity, testMemberId);
+        assertNotEquals(testMemberId, postLikeEntity);
     }
 
     @Test
@@ -96,6 +97,12 @@ public class PostLikeEntityTest implements PostLikeEntityTestUtils {
         // then
         assertEquals(PostLikeEntity.of(postLikeEntity.getPostId(), postLikeEntity.getMemberId()),
                 PostLikeEntity.of(postLikeEntity.getPostId(), postLikeEntity.getMemberId()));
+    }
+
+    @Test
+    @DisplayName("다른 키를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentKey_willReturnFalse() {
+        assertNotEquals(PostLikeEntity.of(postId, memberId), PostLikeEntity.of(TEST_POST_ULID2, memberId));
     }
 
     @Test

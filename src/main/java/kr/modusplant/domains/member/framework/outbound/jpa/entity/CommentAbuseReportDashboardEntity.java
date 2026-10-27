@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +16,6 @@ import static kr.modusplant.shared.persistence.constant.TableColumnName.*;
 import static kr.modusplant.shared.persistence.constant.TableName.COMM_COMMENT_ABUSE_REPORT_DASHBOARD;
 
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @Table(name = COMM_COMMENT_ABUSE_REPORT_DASHBOARD)
 @IdClass(CommentAbuseReportDashboardCompositeKey.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

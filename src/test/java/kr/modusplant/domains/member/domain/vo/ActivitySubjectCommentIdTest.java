@@ -9,6 +9,7 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentPathTestUtils.testActivitySubjectCommentPath;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,6 +56,12 @@ class ActivitySubjectCommentIdTest {
     @DisplayName("다른 프로퍼티를 갖는 인스턴스에 대한 equals 호출")
     void testEquals_givenObjectContainingDifferentProperty_willReturnFalse() {
         assertNotEquals(testActivitySubjectCommentId, ActivitySubjectCommentId.create(testActivitySubjectPostId, ActivitySubjectCommentPath.create(TEST_COMMENT_PATH + "1")));
+    }
+
+    @Test
+    @DisplayName("다른 게시글의 같은 경로를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentPostId_willReturnFalse() {
+        assertNotEquals(testActivitySubjectCommentId, ActivitySubjectCommentId.create(ActivitySubjectPostId.create(TEST_POST_ULID2), testActivitySubjectCommentPath));
     }
 
     @Test

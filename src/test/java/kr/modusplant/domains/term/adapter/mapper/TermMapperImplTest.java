@@ -1,4 +1,4 @@
-package kr.modusplant.domains.term.adaptor.mapper;
+package kr.modusplant.domains.term.adapter.mapper;
 
 import kr.modusplant.domains.term.common.util.domain.aggregate.TermTestUtils;
 import kr.modusplant.domains.term.usecase.port.mapper.TermMapper;

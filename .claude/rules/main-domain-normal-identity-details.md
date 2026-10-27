@@ -14,19 +14,19 @@ Applies to `kr.modusplant.domains.account.normal` and its sub-packages.
 ```
 normal/
  ├─ domain/
- │   ├─ vo/                                  # Value Objects
- │   └─ exception/enums/                     # Error code enums
+ │   ├─ vo/
+ │   └─ exception/enums/
  ├─ usecase/
- │   ├─ port/repository/                     # Create/Read/Update repository port interfaces
+ │   ├─ port/repository/                     # Create/Read/Update ports
  │   ├─ port/mapper/                         # Request → domain mapper interface
- │   └─ request/                             # Inbound REST DTOs (Bean Validation)
+ │   └─ request/
  ├─ adapter/
- │   ├─ controller/                          # Business orchestration
- │   └─ mapper/                              # Mapper port implementation
+ │   ├─ controller/
+ │   └─ mapper/
  └─ framework/
-     ├─ inbound/web/rest/                    # @RestController (HTTP entry point)
+     ├─ inbound/web/rest/
      └─ outbound/persistence/
-         ├─ jooq/                            # DSLContext-based read port implementation
+         ├─ jooq/                            # Read port implementation
          └─ jpa/
              ├─ mapper/                      # MapStruct Domain → JPA Entity mappers
              └─ repository/                  # *RepositoryJpaAdapter (write port implementation)
@@ -36,14 +36,11 @@ normal/
 
 ## 2. domain/ Patterns
 
-**Value Object** (`domain/vo/`) — `@Getter @AllArgsConstructor(AccessLevel.PRIVATE)`:
+**Value Object** (`domain/vo/`):
 - A VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws the shared `EmptyValueException` for null/blank input and the shared `InvalidValueException` for a mismatch with a `Regex` constant, each with a `NormalIdentityErrorCode` and the field name
 - A composite VO built from shared kernel VOs (`Email`, `Password`, `Nickname`) exposes separate factories for raw strings (`createWithString`) and for already-built VOs (`createWithDomain`)
 - An aggregate-style VO (e.g. sign-up data) takes every raw input in one `create(...)` factory and builds each constituent VO itself
-- `equals`/`hashCode` via Apache Commons `EqualsBuilder`/`HashCodeBuilder`, over the identifying fields only
-
-**Error Codes** (`domain/exception/enums/`):
-- HTTP status taken from `HttpStatus.*.value()`
+- Equality covers the identifying fields only
 
 ---
 
@@ -56,37 +53,29 @@ normal/
 **Mapper Port** (`usecase/port/mapper/`):
 - Declares request DTO → domain VO construction
 
-**Request DTOs** (`usecase/request/`):
-- `@Pattern` patterns reference `Regex.REGEX_*` constants
-
 ---
 
 ## 4. adapter/ Patterns
 
-**Controller** (`adapter/controller/`) — `@Service`, explicit constructor injecting `@Qualifier("bcryptPasswordEncoder") PasswordEncoder`; write methods are `@Transactional`:
+**Controller** (`adapter/controller/`) — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor; write methods are `@Transactional`:
 - Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then rejects a duplicate nickname, before saving the mapped sign-up data
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before calling the update port
 - Throws shared exceptions (`ExistsEntityException`, `ExistsValueException`, `NotFoundEntityException`, `InvalidValueException`), parameterized with error codes from this or other domains (`NormalIdentityErrorCode`, `SecurityErrorCode`, `KernelErrorCode`, `GeneralErrorCode`)
-
-**Mapper** (`adapter/mapper/`): builds the domain VO from the raw request values
 
 ---
 
 ## 5. framework/ Patterns
 
-**REST Controller** (`framework/inbound/web/rest/`) — `@RestController @Slf4j @RequiredArgsConstructor @Validated`:
-- Each mapping carries its full path (no class-level `@RequestMapping`); request bodies use `@RequestBody @Valid`; responses wrap in `DataResponse`
-- Member-scoped endpoints carry `@PreAuthorize("isAuthenticated()")`, take the caller via `@AuthenticationPrincipal(expression = "uuid")` with `@Parameter(hidden = true)`, and call `SecurityAssertionUtils.requireSelf(callerUuid, memberUuid)` before delegating to the adapter Controller
-- Endpoints handled by a Spring Security filter (e.g. email-password login) are declared as empty dummy methods documented with Javadoc
+**REST Controller** (`framework/inbound/web/rest/`):
+- Each mapping carries its full path (no class-level `@RequestMapping`)
 
-**jOOQ Repository** (`framework/outbound/persistence/jooq/`) — explicit constructor; implements the read port:
-- Holds generated table references as fields (`SiteMemberAuth.SITE_MEMBER_AUTH`, `SiteMember.SITE_MEMBER`)
-- Single-column lookups via `fetchOne(...)`, converting the result into a domain VO or `AuthProvider` and returning `null` when the row is absent; existence checks via `dsl.fetchExists(dsl.selectOne()...)`
+**jOOQ Repository** (`framework/outbound/persistence/jooq/`):
+- Single-column lookups convert the result into a domain VO or `AuthProvider` and return `null` when the row is absent
 
 **JPA Mapper** (`framework/outbound/persistence/jpa/mapper/`) — MapStruct `@Mapper` interfaces, one per target JPA entity:
 - Every method uses `@BeanMapping(ignoreByDefault = true)` and maps each field explicitly with `@Mapping`, reading VO values through `source = "...value"` paths
 - Takes the already-saved member entity as a source parameter for entities that reference it; fixed values use `expression = "java( ... )"` (e.g. `AuthProvider.BASIC`)
 
-**Repository Adapter** (`framework/outbound/persistence/jpa/repository/`) — `@Repository`, explicit constructor injecting `@Qualifier("bcryptPasswordEncoder") PasswordEncoder`; implements the create and update ports:
+**Repository Adapter** (`framework/outbound/persistence/jpa/repository/`) — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor; implements the create and update ports:
 - Sign-up saves the member entity first, then the member-auth, member-term, and member-profile entities built from it through the JPA mappers; the raw password is encoded here and passed to the member-auth mapper
 - Updates load the member and its member-auth entity (throwing `NotFoundEntityException` when absent), apply the entity's intent-named `update*` methods (encoding a new password first), then save
