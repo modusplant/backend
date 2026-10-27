@@ -1,6 +1,6 @@
-# Data Deletion Architecture
+# Data Deletion Policy
 
-Architecture reference for how persisted data is deleted across domains.
+Policy that defines which delete type each kind of persisted data receives, what is archived, and which related data each deletion flow removes.
 
 Applies to every application flow that hard-deletes, soft-deletes, or archives PostgreSQL rows, to the Amazon S3 objects
 and Redis keys removed in the same flow, and to the cascade rules declared at the database and JPA levels.

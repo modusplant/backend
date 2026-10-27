@@ -55,29 +55,25 @@ comment/
 ## 2. domain/ Patterns
 
 **Aggregate** (`domain/aggregate/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory validating that every constituent VO is non-null; an optional reference VO (e.g. the reply target's path) is passed as its null-object subclass rather than null
+- `@AllArgsConstructor(AccessLevel.PRIVATE)`; an optional reference VO (e.g. the reply target's path) is passed to `create(...)` as its null-object subclass rather than null
 - May expose an overloaded `create(...)` factory that accepts an explicit optional field alongside the primary factory that derives it internally with a default
 - `equals`/`hashCode` based on the composite identity fields (the referenced post and the comment's own positional identifier), via Apache Commons `EqualsBuilder`/`HashCodeBuilder`
 
 **Value Object** (`domain/vo/`):
-- `@AllArgsConstructor(AccessLevel.PRIVATE)` + `static create()` factory (validates null, blank, regex, or length)
+- `@AllArgsConstructor(AccessLevel.PRIVATE)`; `create()` validates null, blank, regex, or length
 - An identity VO wrapping a UUID exposes `fromUuid(...)` / `fromString(...)` factories instead of `create()`, plus a nullable-tolerant `fromNullableUuid(...)` that returns its null-object subclass for null input in contexts where the value is genuinely optional (e.g. an unauthenticated viewer)
 - ID-style VOs validate against a fixed-format identifier pattern (length + regex) rather than parsing structured components
 - A path-style VO may validate a delimited, hierarchical string format (digit segments separated by a fixed delimiter) with additional structural constraints (no leading-zero segments, 1-based indexing, a capped maximum nesting depth)
-- An optional VO's `create(...)` returns its null-object subclass (`vo/nullobject/Empty*`) for blank input instead of throwing; the null object is a singleton whose `getValue()` returns null
 - A bounded numeric VO (e.g. a page size) rejects null and values outside a fixed inclusive range
 - Status VOs wrap a backing enum and expose named convenience factories (e.g. `active()`, `deleted()`) alongside the raw `create(String)` factory
 
 **Domain Events** (`domain/event/`):
-- `@RequiredArgsConstructor(AccessLevel.PRIVATE)` + `static create(...)` factory with internal validation of required fields
+- `@RequiredArgsConstructor(AccessLevel.PRIVATE)`; `create(...)` validates the required fields
 - May derive a classification field (e.g. an action-type string) internally from the shape of another field rather than accepting it as a parameter
 
 **Domain Exceptions** (`domain/exception/`):
 - Validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error code
 - A failure with no matching shared kernel exception (e.g. a soft-deleted reply target) has a domain-local exception extending the shared `BusinessException`, whose no-argument constructor fixes its error code
-
-**Error Codes** (`domain/exception/enums/`):
-- `*ErrorCode implements ErrorCode` enum with three fields: `httpStatus(int)`, `code(String)`, `message(String)`
 
 **Enums** (`domain/enums/`):
 - Backing enums for status-style VOs; expose a static helper to check whether a raw string is a recognized value
@@ -87,11 +83,11 @@ comment/
 ## 3. usecase/ Patterns
 
 **Read Models** (`usecase/model/`):
-- Java records optimized for specific views, direct targets of jOOQ query mapping; placed directly under `model/`; named with a `*ReadModel` suffix
+- Placed directly under `model/`; named with a `*ReadModel` suffix
 
 **Repository Ports** (`usecase/port/repository/`):
 - Split by responsibility into a query-side port (`*QueryRepository`), a command-side port (`*CommandRepository`) (CQRS-style), and a cache-side port (`*CacheRepository`) implemented over a key-value store, each implemented by a different framework technology; separate read-only lookup ports, each named after the referenced object (the author, the immediate parent post), cover cross-aggregate references
-- Parameters and return types use domain VOs/Aggregates on every port
+- Return types use domain VOs/Aggregates on every port
 - The query port may also declare an ownership check (whether a comment was written by a given author)
 - The query port may expose a lookup for the highest existing child ordinal beneath a given parent path, used to set an external counter
 
@@ -103,11 +99,8 @@ comment/
 **Mapper Port** (`usecase/port/mapper/`):
 - Declares domain construction (raw VOs → Aggregate) and read-model-to-response mapping, including converting a paginated read model's zero-based page index to a one-based index for API consumers; implemented by a handwritten (non-generated) adapter class
 
-**Request DTOs** (`usecase/request/`):
-- Java records carrying Bean Validation annotations (e.g. `@NotBlank`) and Swagger `@Schema` documentation; deserialized directly from external input
-
 **Response DTOs** (`usecase/response/`):
-- Java records; a generic offset-paginated wrapper carries the page/size/total metadata, and a cursor-paginated wrapper carries the items, the last item's path as the next cursor, a has-next flag, and the item count
+- A generic offset-paginated wrapper carries the page/size/total metadata, and a cursor-paginated wrapper carries the items, the last item's path as the next cursor, a has-next flag, and the item count
 - Field types: Java primitives, String, boolean, LocalDateTime
 
 ---
@@ -115,7 +108,6 @@ comment/
 ## 4. adapter/ Patterns
 
 **Controller** (`adapter/controller/`) — `@Service @Transactional @Slf4j @RequiredArgsConstructor`:
-- Receives usecase request DTOs, converts to domain VOs, calls repository ports, returns response DTOs
 - Delegates cross-aggregate precondition checks to a dedicated validation helper; `updateContent` and `delete` additionally require the caller to be the comment's author via the helper's ownership check
 - For hierarchically-addressed records (a delimited path identifying position in a tree), verifies the parent position exists before inserting a nested record; the record's final positional index is assigned server-side rather than taken from the request
 - When an optional reply target path is given, validates that both it and the new record's path are depth-2 paths under the same root, then verifies through the helper that the reply target exists and is not soft-deleted
@@ -131,7 +123,7 @@ comment/
 **Event Listener** (`adapter/listener/`) — `@Component @RequiredArgsConstructor`; `@EventListener` methods run in the publisher's transaction:
 - On another domain's abuse-report approval event, requires the event's member to hold the admin role (otherwise throws `NotAccessibleException` with `GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS`), runs the helper's parent-post and comment existence checks, then soft-deletes the comment without an author-ownership check
 
-**Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`; implements the mapper port
+**Mapper** (`adapter/mapper/`) — `@Component @RequiredArgsConstructor`:
 - Exposes a reply target as deleted with a null nickname when it is soft-deleted, or when its row is absent while the reply-target path is set; the reply-target path itself is returned as stored
 
 ---
@@ -139,13 +131,11 @@ comment/
 ## 5. framework/ Patterns
 
 **REST Controller** (`framework/inbound/web/rest/`) — `@RestController @RequestMapping @RequiredArgsConstructor @Validated @Slf4j`:
-- HTTP concerns only: request parsing, response serialization, cache headers, validation
 - Extracts auth via `@AuthenticationPrincipal` (nullable for endpoints with optional authentication); wraps parameters, including the caller's UUID for `register`, `updateContent`, and `delete`, into a usecase call and delegates to the adapter Controller
 - Implements conditional GET (`If-None-Match` / `If-Modified-Since`) by delegating cache-state computation to a dedicated cache service, then returning either a 304 (headers only) or a 200 (full body) response
-- Swagger: `@Tag`, `@Operation`, `@Parameter`, `@Schema`, `@SecurityRequirement`
+- Swagger additionally uses `@SecurityRequirement`
 
 **HTTP Cache** (`framework/inbound/web/cache/`) — `@Service @Transactional @Slf4j`:
-- Computes an ETag and last-modified timestamp for a resource, comparing against request headers to decide cacheability
 - ETag comparison uses a one-way hash/encoder match rather than literal string equality
 - May expose multiple overloads keyed by different addressing schemes (e.g. by parent resource vs. by author) for the same conditional-GET pattern
 - `model/`: a record carrying the computed `(entityTag, lastModifiedAt, isCacheable)` outcome
@@ -155,7 +145,7 @@ comment/
 - Acts on `AFTER_MIGRATE` / `AFTER_MIGRATE_ERROR` only when that version was applied, delegating the side effect (e.g. cache eviction) to a usecase port
 
 **jOOQ Repository** (`framework/outbound/jooq/repository/`) — `@Repository @RequiredArgsConstructor`:
-- DSLContext directly for joined reads, aggregate counts, and paginated read models
+- Serves joined reads, aggregate counts, and paginated read models
 - Cursor-paginated reads use keyset seek on the shared sort key, first reading the cursor row's sort-key values (an empty list when it is absent)
 - Conditionally adjusts joins/computed fields based on whether an optional viewer-identity parameter is present
 - Resolves an optional same-table self-reference (the reply target addressed by path within the same post) and its author through aliased left joins
@@ -169,14 +159,12 @@ comment/
 - Null replies and data-access errors are rethrown as a shared connection-failure exception
 
 **JPA Entity** (`framework/outbound/jpa/entity/`) — `@Entity @Table @EntityListeners(AuditingEntityListener.class) @NoArgsConstructor(AccessLevel.PROTECTED) @Getter`:
-- Composite PK via `@IdClass` referencing a dedicated composite-key class in `compositekey/`
 - Foreign-key associations may be declared with `foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)` where no DB-level FK constraint is enforced
 - Exposes intent-named mutation methods (e.g. increment/decrement a counter floored at zero, mark as deleted) rather than public setters
 - `@PrePersist` callback defaults nullable numeric/boolean columns before insert
-- Auditing: `@CreatedDate` / `@LastModifiedDate` timestamp columns
 - Manual static nested builder class alongside the Lombok-generated accessors
 
-**Composite Key** (`framework/outbound/jpa/compositekey/`) — plain class implementing `Serializable`, paired 1:1 with an `@IdClass` entity; `equals`/`hashCode` over all key fields; manual static nested builder including a copy-from-existing-instance factory
+**Composite Key** (`framework/outbound/jpa/compositekey/`) — `equals`/`hashCode` over all key fields; manual static nested builder including a copy-from-existing-instance factory
 
 **JPA Mapper** (`framework/outbound/jpa/mapper/`) — `@Component` `*Impl` class implementing an interface in `mapper/supers/`: domain Aggregate (+ related entities resolved by the caller) → JPA Entity via the entity's builder, setting only the fields derived from its inputs; a `private` method translates a domain status VO into a persisted boolean flag
 

@@ -215,7 +215,7 @@
 </div>
 
 <ol class="strip" aria-label="Run order">
-  <li><a class="node" href="#stage-1"><span class="num">1</span><strong>check-code-detail-quality</strong><span class="sub">Gate on code quality check items</span></a></li>
+  <li><a class="node" href="#stage-1"><span class="num">1</span><strong>check-code-detail-quality</strong><span class="sub">Gate on main-architecture rules</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
   <li><a class="node" href="#stage-2"><span class="num">2</span><strong>reflect-code-change-into-test</strong><span class="sub">Reflect changes into tests, then gate on the test sync verdict</span></a></li>
   <li class="arrow" aria-hidden="true">→</li>
@@ -240,21 +240,21 @@
   <div class="stage-head"><span class="num">1</span><h2>Code quality gate</h2></div>
   <div class="card">
     <h3>check-code-detail-quality</h3>
-    <p>Checks the unpushed changes under <code>src/main/java/</code> against each code quality check item, with one Haiku subagent per item launched in parallel. Read-only; writes nothing.</p>
+    <p>Checks the unpushed changes under <code>src/main/java/</code> against <code>.claude/rules/main-architecture-details.md</code>, with one Haiku subagent. Read-only; writes nothing.</p>
     <div class="docs">
       <div class="doc read"><span class="tag">Read</span><span class="path">src/main/java/**/*.java</span><span class="what">Uncommitted and committed-but-unpushed changes</span></div>
-      <div class="doc read"><span class="tag">Read</span><span class="path">check-code-detail-quality/SKILL.md § Code Quality Check Items</span><span class="what">Each item's full text, passed verbatim to its subagent</span></div>
+      <div class="doc read"><span class="tag">Read</span><span class="path">.claude/rules/main-architecture-details.md</span><span class="what">Read in full by the subagent, with every document it requires</span></div>
     </div>
-    <div class="branch"><strong>Per-item subagent reply</strong>
+    <div class="branch"><strong>Subagent reply</strong>
       <ul>
-        <li><code>PASS</code> alone, when the changes satisfy the item or the item does not apply to them.</li>
-        <li><code>REJECT</code> with every violation: <code>file_path:line</code>, the failed requirement, and what is missing or wrong.</li>
+        <li><code>PASS</code> alone, when the changes satisfy every rule they fall under.</li>
+        <li><code>REJECT</code> with every violation, grouped by rule section: <code>file_path:line</code>, the failed requirement, and what is missing or wrong.</li>
       </ul>
     </div>
-    <div class="branch"><strong>Gate result, after every subagent replies</strong>
+    <div class="branch"><strong>Gate result</strong>
       <ul>
-        <li>No <code>REJECT</code> → <code>QUALITY CHECK PASSED</code>.</li>
-        <li>Any <code>REJECT</code> → <code>QUALITY CHECK REJECTED</code> with the violations grouped by item.</li>
+        <li><code>PASS</code> → <code>QUALITY CHECK PASSED</code>.</li>
+        <li><code>REJECT</code> → <code>QUALITY CHECK REJECTED</code> with the grouped violations.</li>
       </ul>
     </div>
     <div class="stop skip">No unpushed change under <code>src/main/java/</code>.</div>

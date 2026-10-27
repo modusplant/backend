@@ -7,9 +7,9 @@ paths:
 
 Applies to every test class under @src/test/.
 
-This rule is the complete baseline for every test in the tree. A task-specific workflow may
-supply pre-resolved paths, names, path exceptions, or Group A / Group B path lists for one area;
-when it does, those values win for that run.
+This rule is the complete baseline for every test in the tree. A per-area test rule
+(`test-<kind>-<area>-details.md`) may supply names, excluded classes, path exceptions, or Group A / Group B path
+lists for its area; its values win for that area.
 
 ---
 
@@ -20,12 +20,19 @@ Unit tests must maintain a pure POJO state. **Do not use** Spring Context (`@Spr
 exceptions, every class — services, adapters, controllers, mappers, value objects, entities — is
 a pure POJO test.
 
-**Path exception:** `infrastructure/security/component/**` — see
-@.claude/documents/test-infra-security-feature.md for the specific context/mocking strategy.
+---
+
+## 2. Excluded Classes
+
+Never generate tests for:
+
+- Enum classes
+- Exception classes
+- Classes that contain only constructors
 
 ---
 
-## 2. Mocking Strategy
+## 3. Mocking Strategy
 
 All dependent classes, except for the explicit instance containing the method under test, must
 be mocked using inline mocking via `Mockito.mock()`. Do not use `@Mock` or `@InjectMocks`
@@ -33,14 +40,14 @@ annotations.
 
 ---
 
-## 3. REST Controller Unit Test
+## 4. REST Controller Unit Test
 
 Covers unit tests that verify method calls, return values, and exceptions by injecting mock
 dependencies into the controller instance, without using MockMvc.
 
 ---
 
-## 4. Test Method Naming Convention
+## 5. Test Method Naming Convention
 
 - **Format:** `testMethodName_givenCondition_willDoAction`
 - **Conciseness:** Should not be overly verbose. Use clear and simple language that gets to the heart of the matter.
@@ -62,7 +69,7 @@ method does.
 
 ---
 
-## 5. Test Method Display Name Convention
+## 6. Test Method Display Name Convention
 
 - **Coherence:** Must share the same context with the method name. Should not include any additional information beyond what the method name implies.
 - **Interpretation Rules For The Will-Clause on Method Names:**
@@ -72,7 +79,7 @@ method does.
 
 ---
 
-## 6. Test Body Convention (BDD Style)
+## 7. Test Body Convention (BDD Style)
 
 Follow the `given-when-then` pattern using `BDDMockito`.
 
@@ -88,7 +95,7 @@ Follow the `given-when-then` pattern using `BDDMockito`.
 
 ---
 
-## 7. Test Utility (`TestUtils`) Convention
+## 8. Test Utility (`TestUtils`) Convention
 
 Reuse or create Test Utility classes when instantiating domain objects or models.
 
@@ -160,6 +167,6 @@ directly from the actual package layout.
 
 ---
 
-## 8. Post-Generation Verification
+## 9. Post-Generation Verification
 
 Once test codes are generated, they must be verified and validated by running them.

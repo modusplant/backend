@@ -29,7 +29,7 @@ Classification follows `CLAUDE.md`; determine which section each class belongs t
 - Not associated with any domain:
   - Local Docker-related (e.g. @docker-compose.yml): @.claude/rules/local-docker-environment-details.md only.
   - CI/CD-related (e.g. @.github/workflows/modusplant-backend-ci-cd.yml): @.claude/rules/prod-dev-ci-cd-pipeline-details.md only.
-  - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/documents/observability-tagging-architecture.md only.
+  - Grafana-related (e.g. @src/main/resources/logback-spring.xml): @.claude/documents/architecture/observability-tagging-architecture.md only.
 
 # Update Strategy
 
