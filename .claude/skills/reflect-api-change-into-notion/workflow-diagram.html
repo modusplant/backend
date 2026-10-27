@@ -275,12 +275,14 @@
     <span class="badge">6</span>
     <div class="card">
       <h3>Apply to Notion</h3>
-      <p>For each affected page, take its <strong>latest</strong> reflected-change file by <code>RUN_ID</code>. Search the named database for the page, fetch its current content, then insert or replace only what <code>## Notion Content</code> specifies. Nothing else on the page is changed.</p>
+      <p>For each affected page, take its <strong>latest</strong> reflected-change file by <code>RUN_ID</code>. One <code>notion-mcp-connector</code> background subagent receives all of them in a prompt built from the skill's <em>Notion Connector Prompt Format</em>. It searches the named database for each page, fetches its current content, then inserts or replaces only what <code>## Notion Content</code> specifies. Nothing else on the page is changed, and the skill itself never calls Notion MCP.</p>
       <div class="docs">
-        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/reflected-change/&lt;RUN_ID&gt;__&lt;db-slug&gt;__&lt;page-slug&gt;.md</span><span class="what">The edit to apply, plus any exception in its <code>Note:</code> field.</span></div>
-        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/document-format.md</span><span class="what">Skeleton order and Reconciliation Rules for where the content goes.</span></div>
-        <div class="doc ext"><span class="tag">Notion MCP</span><span class="path">API 명세 › &lt;Notion DB&gt; › &lt;page&gt;</span><span class="what">The live API-spec page: found by search, fetched first, then edited.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/reflected-change/&lt;RUN_ID&gt;__&lt;db-slug&gt;__&lt;page-slug&gt;.md</span><span class="what">Read by the subagent: the edit to apply, plus any exception in its <code>Note:</code> field.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/document-format.md</span><span class="what">Read by the subagent: skeleton order and Reconciliation Rules for where the content goes.</span></div>
+        <div class="doc ext"><span class="tag">Notion MCP</span><span class="path">API 명세 › &lt;Notion DB&gt; › &lt;page&gt;</span><span class="what">The live API-spec page: found by search, fetched first, then edited, all by the subagent.</span></div>
       </div>
+      <div class="branch"><strong><code>SUCCEEDED</code></strong>: the subagent's summary of Notion changes is reported.</div>
+      <div class="stop"><strong><code>FAILED</code></strong>: the cause and any Notion changes already made are reported, and the run ends with no direct Notion retry.</div>
     </div>
   </li>
 </ol>

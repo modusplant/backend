@@ -8,7 +8,8 @@ disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) 
 # Preconditions
 
 - This skill only reads source under `src/main/java/` and only writes under its own `detected-change/` and
-  `reflected-change/` subdirectories, plus Notion pages via the Notion MCP tools.
+  `reflected-change/` subdirectories, plus Notion pages through the `notion-mcp-connector` subagent only; never call a
+  Notion MCP tool directly.
 - `@.claude/skills/reflect-api-change-into-notion/document-format.md` is the finalized, canonical Notion page shape.
   Treat it as read-only — only reference it when composing `## Notion Content` blocks below.
 
@@ -97,8 +98,7 @@ Necessary-only: omit any class/section with no actual change; never restate unch
 Path: `reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md` — one file per Notion page, per run. `<RUN_ID>` **must
 equal** the `detected-change` file's `RUN_ID` it was derived from — this is the only linkage between the two
 directories. Never derive a reflected-change file from any `detected-change` file other than the one matching its own
-`RUN_ID`, and never apply to Notion a reflected-change file that isn't the latest for its `<db-slug>__<page-slug>` pair.
-Every `## Provenance` entry must name its source class by fully-qualified name.
+`RUN_ID`. Every `## Provenance` entry must name its source class by fully-qualified name.
 
 ```markdown
 # Reflected Notion Change — <RUN_ID>
@@ -109,8 +109,8 @@ Target Notion Database: <literal Korean DB name>
 Target Notion Page: <page title>
 Notion Page State: <Existing (fetch before editing) | New (create)>
 Change Summary: <one sentence>
-Note: <optional, one line — only when this page's apply procedure deviates from "Notion Update
-  Procedure" below, e.g. an already-present-but-empty heading, or existing content to leave
+Note: <optional, one line — only when this page's apply procedure deviates from the "Notion
+  Connector Prompt Format" workflow below, e.g. an already-present-but-empty heading, or existing content to leave
   untouched unless redundant>
 
 ## Notion Content
@@ -136,21 +136,33 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
      detected-change file and drop the class from the file's `Target Classes` line.
    - If this empties the detected-change file of every class section, delete the file via the scoped `rm` and terminate
      the run — do not proceed to step 5.
-5. For each affected page, take its latest reflected-change file by `RUN_ID` and apply it per the "Notion Update
-   Procedure" below.
+5. Call the Agent tool once with `subagent_type: notion-mcp-connector` and the "Notion Connector Prompt Format" below,
+   listing each affected page's latest reflected-change file by `RUN_ID`, then wait for its completion notification:
+   - `SUCCEEDED`: report the returned summary of Notion changes.
+   - `FAILED`: report the returned cause and the Notion changes already made, then terminate the run.
 
-# Notion Update Procedure
+# Notion Connector Prompt Format
 
-- Locate each target page by searching inside its named Notion database first — never guess or reuse a page URL from a
-  prior run.
-- Fetch the page's current content before editing; `document-format.md` never substitutes for the actual current
-  content.
-- Insert or replace only what `## Notion Content` specifies, positioned per `document-format.md`'s skeleton order; touch
-  no other section. Use `document-format.md`'s Reconciliation Rules for any structural (non-factual) adjustments needed
-  to fit the existing page into the canonical skeleton.
-- Follow any exception in the reflected-change file's `Note:` field, if present.
-- Never write a fact into Notion that isn't traceable through the reflected-change file's `## Provenance` section back
-  to a `detected-change` bullet.
+Fill in the `<...>` placeholders and send the rest verbatim:
+
+````markdown
+Apply the reflected-change files below to their Notion pages.
+
+Inputs:
+- Canonical page shape: <absolute path of .claude/skills/reflect-api-change-into-notion/document-format.md>
+- Reflected-change files, one per page:
+  - <absolute path of reflected-change/<RUN_ID>__<db-slug>__<page-slug>.md>
+
+Workflow, per reflected-change file:
+1. Search the database named by `Target Notion Database:` (under `API 명세`) for the page titled by
+   `Target Notion Page:`, never guessing or reusing a page URL from a prior run; if `Notion Page State:` is
+   `New (create)`, create the page in that database instead.
+2. Fetch the page's current content before editing; `document-format.md` never substitutes for it.
+3. Insert or replace only what `## Notion Content` specifies, positioned per `document-format.md`'s skeleton order;
+   touch no other section beyond the structural (non-factual) adjustments its Reconciliation Rules allow.
+4. Follow any exception in `Note:`, if present.
+5. Write no fact into Notion that isn't traceable through `## Provenance`.
+````
 
 # Hard Constraints
 
