@@ -7,7 +7,8 @@ disable-model-invocation: true
 # Preconditions
 
 - Run this skill only after code changes under @src/main/ are complete and ready for verification and documentation.
-- This skill performs no work itself: it invokes the five skills below via the Skill tool, strictly in the order given, inside the current conversation — never as a forked or backgrounded subagent.
+- This skill performs no work itself: it invokes the five skills below via the Skill tool, strictly in the order given,
+  inside the current conversation — never as a forked or backgrounded subagent.
 
 # Workflow
 
@@ -22,17 +23,15 @@ Wait for each invoked skill to finish before starting the next one.
 # Termination
 
 - Each invoked skill enforces its own termination rules (see its own `SKILL.md`).
-- Quality gate: if `check-code-detail-quality` returns `QUALITY CHECK PASSED`, continue with the
-  next step. If it returns `QUALITY CHECK REJECTED`, report that response as-is and stop the
-  workflow there.
-- Test gate: if `reflect-code-change-into-test` returns `TEST SYNC PASSED`, continue with the
-  next step. If it returns `TEST SYNC FAILED`, report that response as-is and stop the workflow
-  there.
-- Precedence: when a step returns a gate verdict, that verdict alone decides whether the workflow
-  continues. Skip and Stop below apply only to a step that ends without a gate verdict.
-- Skip: if a step terminates because its target set is empty — including a set left empty by
-  that skill's own scope filter — treat the step as skipped and continue with the next step.
-- Stop: if a step terminates early for any other reason, stop the workflow there — do not force
-  the remaining steps to run.
-- Report every skipped or stopped step and why, so the user can decide whether to re-run it
-  manually once the underlying condition is fixed.
+- Quality gate: if `check-code-detail-quality` returns `QUALITY CHECK PASSED`, continue with the next step. If it
+  returns `QUALITY CHECK REJECTED`, report that response as-is and stop the workflow there.
+- Test gate: if `reflect-code-change-into-test` returns `TEST SYNC PASSED`, continue with the next step. If it returns
+  `TEST SYNC FAILED`, report that response as-is and stop the workflow there.
+- Precedence: when a step returns a gate verdict, that verdict alone decides whether the workflow continues. Skip and
+  Stop below apply only to a step that ends without a gate verdict.
+- Skip: if a step terminates because its target set is empty — including a set left empty by that skill's own scope
+  filter — treat the step as skipped and continue with the next step.
+- Stop: if a step terminates early for any other reason, stop the workflow there — do not force the remaining steps to
+  run.
+- Report every skipped or stopped step and why, so the user can decide whether to re-run it manually once the underlying
+  condition is fixed.
