@@ -2,11 +2,14 @@ package kr.modusplant.domains.member.adapter.listener;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseCacheRemoveEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentId;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectCommentPath;
 import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostCacheRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,12 +24,14 @@ import java.util.Arrays;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+@SuppressWarnings("LoggingSimilarMessage")
 @Component
 @Slf4j
 public class MemberEventListener {
     private final Semaphore adminSemaphore;
     private final MemberValidationHelper memberValidationHelper;
     private final ReportDashboardRepository reportDashboardRepository;
+    private final ActivitySubjectPostCacheRepository activitySubjectPostCacheRepository;
     private final TransactionTemplate transactionTemplate;
 
     @Value("${app.semaphore.datasource.bulkhead.admin.timeout-ms}")
@@ -34,11 +39,42 @@ public class MemberEventListener {
 
     public MemberEventListener(@Qualifier("adminSemaphore") Semaphore adminSemaphore,
                                MemberValidationHelper memberValidationHelper,
-                               ReportDashboardRepository reportDashboardRepository, TransactionTemplate transactionTemplate) {
+                               ReportDashboardRepository reportDashboardRepository,
+                               ActivitySubjectPostCacheRepository activitySubjectPostCacheRepository,
+                               TransactionTemplate transactionTemplate) {
         this.adminSemaphore = adminSemaphore;
         this.memberValidationHelper = memberValidationHelper;
         this.reportDashboardRepository = reportDashboardRepository;
+        this.activitySubjectPostCacheRepository = activitySubjectPostCacheRepository;
         this.transactionTemplate = transactionTemplate;
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_ROLLBACK)
+    public void removeChosenCommentCache(CommentChooseCacheRemoveEvent event) {
+        try {
+            activitySubjectPostCacheRepository.removeChooseCache(
+                    ActivitySubjectCommentId.create(
+                            ActivitySubjectPostId.create(event.getPostUlid()),
+                            ActivitySubjectCommentPath.create(event.getCommentPath())));
+        } catch (Exception e) {
+            log.error("[Member Domain] 댓글 채택 캐시 제거 실패 - postUlid = {}, commentPath = {}",
+                    event.getPostUlid(), event.getCommentPath());
+        }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void removeChosenCommentCaches(CommentChooseCachesRemoveEvent event) {
+        event.getChosenCommentPathsByPostUlid().forEach((postUlid, commentPath) -> {
+            try {
+                activitySubjectPostCacheRepository.removeChooseCache(
+                        ActivitySubjectCommentId.create(
+                                ActivitySubjectPostId.create(postUlid),
+                                ActivitySubjectCommentPath.create(commentPath)));
+            } catch (Exception e) {
+                log.error("[Member Domain] 댓글 채택 캐시 제거 실패 - postUlid = {}, commentPath = {}",
+                        postUlid, commentPath);
+            }
+        });
     }
 
     @Async("memberDomainExecutor")

@@ -2,11 +2,14 @@ package kr.modusplant.domains.member.adapter.listener;
 
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.common.util.domain.event.CommentAbuseReportEventTestUtils;
+import kr.modusplant.domains.member.common.util.domain.event.CommentChooseCacheRemoveEventTestUtils;
+import kr.modusplant.domains.member.common.util.domain.event.CommentChooseCachesRemoveEventTestUtils;
 import kr.modusplant.domains.member.common.util.domain.event.PostAbuseReportEventTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils;
 import kr.modusplant.domains.member.common.util.domain.vo.ReportTimeTestUtils;
 import kr.modusplant.domains.member.domain.vo.ReportTime;
+import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostCacheRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ReportDashboardRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,15 +35,19 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class MemberEventListenerTest implements PostAbuseReportEventTestUtils, CommentAbuseReportEventTestUtils,
-        ActivitySubjectPostIdTestUtils, ActivitySubjectCommentIdTestUtils, ReportTimeTestUtils {
+        CommentChooseCacheRemoveEventTestUtils, CommentChooseCachesRemoveEventTestUtils, ActivitySubjectPostIdTestUtils, ActivitySubjectCommentIdTestUtils,
+        ReportTimeTestUtils {
     private static final long TIMEOUT_MS = 1000L;
 
     private final Semaphore adminSemaphore = Mockito.mock(Semaphore.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final ReportDashboardRepository reportDashboardRepository = Mockito.mock(ReportDashboardRepository.class);
+    private final ActivitySubjectPostCacheRepository activitySubjectPostCacheRepository =
+            Mockito.mock(ActivitySubjectPostCacheRepository.class);
     private final TransactionTemplate transactionTemplate = Mockito.mock(TransactionTemplate.class);
     private final MemberEventListener memberEventListener = new MemberEventListener(
-            adminSemaphore, memberValidationHelper, reportDashboardRepository, transactionTemplate);
+            adminSemaphore, memberValidationHelper, reportDashboardRepository, activitySubjectPostCacheRepository,
+            transactionTemplate);
 
     @BeforeEach
     @SuppressWarnings("unchecked")
@@ -127,5 +134,47 @@ class MemberEventListenerTest implements PostAbuseReportEventTestUtils, CommentA
         assertTrue(Thread.interrupted());
         verify(transactionTemplate, never()).executeWithoutResult(any());
         verify(adminSemaphore, never()).release();
+    }
+
+    @Test
+    @DisplayName("댓글 채택 캐시 제거 이벤트로 채택 캐시 제거 시 활동 수행")
+    void testRemoveChosenCommentCache_givenCommentChooseCacheRemoveEvent_willProcessAction() {
+        // when
+        memberEventListener.removeChosenCommentCache(testCommentChooseCacheRemoveEvent);
+
+        // then
+        verify(activitySubjectPostCacheRepository).removeChooseCache(testActivitySubjectCommentId);
+    }
+
+    @Test
+    @DisplayName("캐시 제거 실패 상태로 채택 캐시 제거 시 활동 수행")
+    void testRemoveChosenCommentCache_givenCacheFailure_willProcessAction() {
+        // given
+        doThrow(new RuntimeException()).when(activitySubjectPostCacheRepository)
+                .removeChooseCache(testActivitySubjectCommentId);
+
+        // when & then
+        assertDoesNotThrow(() -> memberEventListener.removeChosenCommentCache(testCommentChooseCacheRemoveEvent));
+    }
+
+    @Test
+    @DisplayName("댓글 채택 캐시 일괄 제거 이벤트로 채택 캐시 제거 시 활동 수행")
+    void testRemoveChosenCommentCaches_givenCommentChooseCachesRemoveEvent_willProcessAction() {
+        // when
+        memberEventListener.removeChosenCommentCaches(testCommentChooseCachesRemoveEvent);
+
+        // then
+        verify(activitySubjectPostCacheRepository).removeChooseCache(testActivitySubjectCommentId);
+    }
+
+    @Test
+    @DisplayName("캐시 제거 실패 상태로 채택 캐시 일괄 제거 시 활동 수행")
+    void testRemoveChosenCommentCaches_givenCacheFailure_willProcessAction() {
+        // given
+        doThrow(new RuntimeException()).when(activitySubjectPostCacheRepository)
+                .removeChooseCache(testActivitySubjectCommentId);
+
+        // when & then
+        assertDoesNotThrow(() -> memberEventListener.removeChosenCommentCaches(testCommentChooseCachesRemoveEvent));
     }
 }

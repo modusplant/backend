@@ -10,6 +10,12 @@ public interface ActivitySubjectCommentRepository {
 
     boolean isUnliked(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
+    boolean isDeleted(ActivitySubjectCommentId activitySubjectCommentId);
+
+    boolean isWrittenByMember(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
+
+    void choose(ActivitySubjectCommentId activitySubjectCommentId);
+
     void like(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);
 
     void unlike(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId);

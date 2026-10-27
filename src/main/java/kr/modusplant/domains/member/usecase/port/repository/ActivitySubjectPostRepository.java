@@ -8,6 +8,8 @@ public interface ActivitySubjectPostRepository {
 
     boolean isPublished(ActivitySubjectPostId activitySubjectPostId);
 
+    boolean isInQnaPrimaryCategory(ActivitySubjectPostId activitySubjectPostId);
+
     boolean isLiked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
     boolean isUnliked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
@@ -15,6 +17,8 @@ public interface ActivitySubjectPostRepository {
     boolean isBookmarked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
     boolean isNotBookmarked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
+
+    boolean isWrittenByMember(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 
     void like(MemberId memberId, ActivitySubjectPostId activitySubjectPostId);
 

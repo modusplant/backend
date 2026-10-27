@@ -123,6 +123,7 @@ public class PostTestDataHelper {
                 .set(COMM_COMMENT.CONTENT,content)
                 .set(COMM_COMMENT.LIKE_COUNT,2)
                 .set(COMM_COMMENT.IS_DELETED,isDeleted)
+                .set(COMM_COMMENT.IS_CHOSEN,false)
                 .set(COMM_COMMENT.CREATED_AT,LocalDateTime.now().plusDays(1))
                 .set(COMM_COMMENT.UPDATED_AT,LocalDateTime.now().plusDays(1))
                 .returning()

@@ -85,6 +85,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 isLiked,
                 commComment.CREATED_AT,
                 commComment.IS_DELETED,
+                commComment.IS_CHOSEN,
                 commComment.EDITED_AT,
                 commComment.REPLY_TO_PATH,
                 replyToComment.PATH,
@@ -126,6 +127,7 @@ public class CommentJooqRepository implements CommentQueryRepository {
                 record.getValue(commComment.CREATED_AT).withNano(0),
                 record.getValue(commComment.EDITED_AT) == null ? null : record.getValue(commComment.EDITED_AT).withNano(0),
                 record.getValue(commComment.IS_DELETED),
+                record.getValue(commComment.IS_CHOSEN),
                 record.getValue(commComment.REPLY_TO_PATH),
                 record.getValue(replyToComment.PATH) != null, // 답글 대상 행이 없으면 NULL → false
                 record.getValue(replyToMember.NICKNAME),

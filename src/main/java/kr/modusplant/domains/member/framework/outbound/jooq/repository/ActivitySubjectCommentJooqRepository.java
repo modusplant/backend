@@ -8,6 +8,7 @@ import org.jooq.Select;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 import static kr.modusplant.jooq.Tables.*;
@@ -18,6 +19,29 @@ import static org.jooq.impl.DSL.*;
 public class ActivitySubjectCommentJooqRepository {
     private final DSLContext dsl;
 
+    // 게시글당 채택된 댓글은 하나이므로 게시글 ULID를 키로 사용
+    public Map<String, String> getChosenCommentPathsByMemberId(UUID memberId) {
+        return dsl.select(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH)
+                .from(COMM_COMMENT)
+                .where(COMM_COMMENT.AUTH_MEMB_UUID.eq(memberId)
+                        .and(COMM_COMMENT.IS_CHOSEN.isTrue()))
+                .fetchMap(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH);
+    }
+
+    public void decreaseLikeCountOfCommentsLikedByMemberId(UUID memberId) {
+        dsl.update(COMM_COMMENT)
+                .set(COMM_COMMENT.LIKE_COUNT, COMM_COMMENT.LIKE_COUNT.minus(1))
+                .set(COMM_COMMENT.UPDATED_AT, LocalDateTime.now())
+                .where(
+                        row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH).in(
+                                        select(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
+                                                .from(COMM_COMMENT_LIKE)
+                                                .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId)))
+                                .and(COMM_COMMENT.LIKE_COUNT.gt(0))   // 좋아요 수가 1 이상일 때만 좋아요 수 감소
+                )
+                .execute();
+    }
+
     // 대상 댓글: 회원의 모든 댓글 + 발행된 게시글에 포함된 댓글
     public void archiveAllByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
         dsl.insertInto(COMM_COMMENT_ARCHIVE,
@@ -26,6 +50,7 @@ public class ActivitySubjectCommentJooqRepository {
                         COMM_COMMENT_ARCHIVE.AUTH_MEMB_UUID,
                         COMM_COMMENT_ARCHIVE.CONTENT,
                         COMM_COMMENT_ARCHIVE.IS_DELETED,
+                        COMM_COMMENT_ARCHIVE.IS_CHOSEN,
                         COMM_COMMENT_ARCHIVE.CREATED_AT,
                         COMM_COMMENT_ARCHIVE.UPDATED_AT,
                         COMM_COMMENT_ARCHIVE.EDITED_AT,
@@ -38,6 +63,7 @@ public class ActivitySubjectCommentJooqRepository {
                                 COMM_COMMENT.AUTH_MEMB_UUID,
                                 COMM_COMMENT.CONTENT,
                                 COMM_COMMENT.IS_DELETED,
+                                COMM_COMMENT.IS_CHOSEN,
                                 COMM_COMMENT.CREATED_AT,
                                 COMM_COMMENT.UPDATED_AT,
                                 COMM_COMMENT.EDITED_AT,
@@ -70,20 +96,6 @@ public class ActivitySubjectCommentJooqRepository {
     public void deleteAllByMemberIdAndPostUlids(UUID memberId, String[] publishedPostUlids) {
         dsl.deleteFrom(COMM_COMMENT)
                 .where(isTargetComment(memberId, publishedPostUlids))
-                .execute();
-    }
-
-    public void decreaseLikeCountOfCommentsLikedByMemberId(UUID memberId) {
-        dsl.update(COMM_COMMENT)
-                .set(COMM_COMMENT.LIKE_COUNT, COMM_COMMENT.LIKE_COUNT.minus(1))
-                .set(COMM_COMMENT.UPDATED_AT, LocalDateTime.now())
-                .where(
-                        row(COMM_COMMENT.POST_ULID, COMM_COMMENT.PATH).in(
-                                        select(COMM_COMMENT_LIKE.POST_ULID, COMM_COMMENT_LIKE.PATH)
-                                                .from(COMM_COMMENT_LIKE)
-                                                .where(COMM_COMMENT_LIKE.MEMB_UUID.eq(memberId)))
-                                .and(COMM_COMMENT.LIKE_COUNT.gt(0))   // 좋아요 수가 1 이상일 때만 좋아요 수 감소
-                )
                 .execute();
     }
 
