@@ -20,6 +20,8 @@ import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
 import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseCacheRemoveEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseEvent;
 import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
@@ -45,6 +47,7 @@ import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.Post
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
@@ -84,6 +87,7 @@ import static kr.modusplant.domains.member.common.util.domain.vo.MemberStatusTes
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportTimeTestUtils.testReportTime;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentChooseRecordTestUtils.testMemberCommentChooseRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameCheckRecordTestUtils.testMemberNicknameCheckRecord;
@@ -141,11 +145,12 @@ class MemberControllerTest implements
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepositoryJpaAdapter.class);
     private final ActivitySubjectPostRepository activitySubjectPostRepository = Mockito.mock(ActivitySubjectPostRepositoryJpaAdapter.class);
     private final ActivitySubjectCommentRepository activitySubjectCommentRepository = Mockito.mock(ActivitySubjectCommentRepositoryJpaAdapter.class);
+    private final ActivitySubjectPostCacheRepository activitySubjectPostCacheRepository = Mockito.mock(ActivitySubjectPostCacheRepository.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, activitySubjectPostCacheRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -963,6 +968,185 @@ class MemberControllerTest implements
         assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
     }
 
+    @Nested
+    @DisplayName("chooseComment로 댓글 채택")
+    class ChooseCommentTest {
+        private void givenValidChoice() {
+            willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+            willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+            willDoNothing().given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+            willDoNothing().given(memberValidationHelper).validateIfMemberWrotePost(any(), any());
+            given(activitySubjectPostRepository.isInQnaPrimaryCategory(any())).willReturn(true);
+            given(activitySubjectCommentRepository.isWrittenByMember(any(), any())).willReturn(false);
+            given(activitySubjectCommentRepository.isDeleted(any())).willReturn(false);
+            given(activitySubjectPostCacheRepository.hasChosenCommentWithDifferentPath(any())).willReturn(false);
+            willDoNothing().given(activitySubjectPostCacheRepository).cacheBeforeChoose(any());
+        }
+
+        @Test
+        @DisplayName("유효한 파라미터로 댓글 채택 활동 수행")
+        void testChooseComment_givenValidParameter_willProcessAction() {
+            // given
+            givenValidChoice();
+
+            // when
+            memberController.chooseComment(testMemberCommentChooseRecord);
+
+            // then
+            verify(activitySubjectPostCacheRepository, times(1)).cacheBeforeChoose(any());
+            verify(activitySubjectCommentRepository, times(1)).choose(any());
+            verify(applicationEventPublisher, times(1)).publishEvent(any(CommentChooseCacheRemoveEvent.class));
+            verify(applicationEventPublisher, times(1)).publishEvent(any(CommentChooseEvent.class));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 회원으로 인해 예외 반환")
+        void testChooseComment_givenNotFoundMemberId_willThrowException() {
+            // given
+            willThrow(notFoundEntityExceptionForMember).given(memberValidationHelper).validateIfMemberExists(any());
+
+            // when
+            NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 대상 게시글로 인해 예외 반환")
+        void testChooseComment_givenNotFoundActivitySubjectPost_willThrowException() {
+            // given
+            willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+            willThrow(notFoundEntityExceptionForActivitySubjectPost).given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+
+            // when
+            NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 대상 댓글로 인해 예외 반환")
+        void testChooseComment_givenNotFoundActivitySubjectComment_willThrowException() {
+            // given
+            willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
+            willDoNothing().given(memberValidationHelper).validateIfActivitySubjectPostExists(any());
+            willThrow(notFoundEntityExceptionForActivitySubjectComment).given(memberValidationHelper).validateIfActivitySubjectCommentExists(any());
+
+            // when
+            NotFoundEntityException exception = assertThrows(NotFoundEntityException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_FOUND_ACTIVITY_SUBJECT_COMMENT_ID);
+        }
+
+        @Test
+        @DisplayName("게시글 작성자가 아닌 회원으로 인해 예외 반환")
+        void testChooseComment_givenMemberNotWrotePost_willThrowException() {
+            // given
+            givenValidChoice();
+            willThrow(new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "activitySubjectPostId", "postId"))
+                    .given(memberValidationHelper).validateIfMemberWrotePost(any(), any());
+
+            // when
+            NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_COMMENT_CHOICE);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+        }
+
+        @Test
+        @DisplayName("Q&A 카테고리가 아닌 게시글로 인해 예외 반환")
+        void testChooseComment_givenPostNotInQnaCategory_willThrowException() {
+            // given
+            givenValidChoice();
+            given(activitySubjectPostRepository.isInQnaPrimaryCategory(any())).willReturn(false);
+
+            // when
+            NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_COMMENT_CHOICE);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+        }
+
+        @Test
+        @DisplayName("회원 본인이 작성한 댓글로 인해 예외 반환")
+        void testChooseComment_givenCommentWrittenByMember_willThrowException() {
+            // given
+            givenValidChoice();
+            given(activitySubjectCommentRepository.isWrittenByMember(any(), any())).willReturn(true);
+
+            // when
+            NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_COMMENT_CHOICE);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+        }
+
+        @Test
+        @DisplayName("삭제된 댓글로 인해 예외 반환")
+        void testChooseComment_givenDeletedComment_willThrowException() {
+            // given
+            givenValidChoice();
+            given(activitySubjectCommentRepository.isDeleted(any())).willReturn(true);
+
+            // when
+            NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_COMMENT_CHOICE);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+        }
+
+        @Test
+        @DisplayName("이미 채택된 다른 댓글로 인해 예외 반환")
+        void testChooseComment_givenAlreadyChosenOtherComment_willThrowException() {
+            // given
+            givenValidChoice();
+            given(activitySubjectPostCacheRepository.hasChosenCommentWithDifferentPath(any())).willReturn(true);
+
+            // when
+            ExistsValueException exception = assertThrows(ExistsValueException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(EXISTS_CHOSEN_COMMENT);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+            verify(applicationEventPublisher, times(0)).publishEvent(any(CommentChooseEvent.class));
+        }
+
+        @Test
+        @DisplayName("동시 채택 경합에서 다른 댓글이 먼저 캐시를 선점하여 예외 반환")
+        void testChooseComment_givenCacheClaimedByOtherComment_willThrowException() {
+            // given
+            givenValidChoice();
+            willThrow(new ExistsValueException(EXISTS_CHOSEN_COMMENT, "activitySubjectCommentPath"))
+                    .given(activitySubjectPostCacheRepository).cacheBeforeChoose(any());
+
+            // when
+            ExistsValueException exception = assertThrows(ExistsValueException.class,
+                    () -> memberController.chooseComment(testMemberCommentChooseRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(EXISTS_CHOSEN_COMMENT);
+            verify(activitySubjectCommentRepository, times(0)).choose(any());
+            verify(applicationEventPublisher, times(1)).publishEvent(any(CommentChooseCacheRemoveEvent.class));
+            verify(applicationEventPublisher, times(0)).publishEvent(any(CommentChooseEvent.class));
+        }
+    }
+
     @Test
     @DisplayName("unlikeComment로 댓글 좋아요 취소")
     void testUnlikeComment_givenValidParameter_willUnlikeComment() {
@@ -1314,4 +1498,4 @@ class MemberControllerTest implements
             assertThat(invalidValueException.getErrorCode()).isEqualTo(MISMATCHED_AUTH_INFO);
         }
     }
-}
+}

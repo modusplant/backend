@@ -14,6 +14,8 @@ public final class CommentConstant {
     public static final Integer TEST_COMMENT_PAGE_SIZE = 20;
     public static final Boolean TEST_COMMENT_IS_DELETED_TRUE = true;
     public static final Boolean TEST_COMMENT_IS_DELETED_FALSE = false;
+    public static final Boolean TEST_COMMENT_IS_CHOSEN_TRUE = true;
+    public static final Boolean TEST_COMMENT_IS_CHOSEN_FALSE = false;
     public static final LocalDateTime TEST_COMMENT_CREATED_AT = LocalDateTime.of(2026, 4, 25, 0, 0);
     public static final LocalDateTime TEST_COMMENT_UPDATED_AT = LocalDateTime.of(2026, 4, 27, 12, 0);
     public static final LocalDateTime TEST_COMMENT_EDITED_AT = LocalDateTime.of(2026, 4, 28, 5, 0);

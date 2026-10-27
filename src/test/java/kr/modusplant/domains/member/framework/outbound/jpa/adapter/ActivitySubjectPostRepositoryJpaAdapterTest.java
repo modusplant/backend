@@ -1,18 +1,22 @@
 package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostBookmarkEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostLikeEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
+import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.enums.PostType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
@@ -66,6 +70,94 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
 
         // when & then
         assertThat(activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("isInQnaPrimaryCategory로 true 반환")
+    void testIsInQnaPrimaryCategory_givenQnaCategory_willReturnTrue() {
+        // given
+        PostEntity mockPost = mock(PostEntity.class);
+        PrimaryCategoryEntity mockCategory = mock(PrimaryCategoryEntity.class);
+        given(mockCategory.getCategory()).willReturn(PostType.QNA.getValue());
+        given(mockPost.getPrimaryCategory()).willReturn(mockCategory);
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(mockPost));
+
+        // when & then
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isInQnaPrimaryCategory로 false 반환")
+    void testIsInQnaPrimaryCategory_givenOtherCategory_willReturnFalse() {
+        // given
+        PostEntity mockPost = mock(PostEntity.class);
+        PrimaryCategoryEntity mockCategory = mock(PrimaryCategoryEntity.class);
+        given(mockCategory.getCategory()).willReturn(PostType.TIP.getValue());
+        given(mockPost.getPrimaryCategory()).willReturn(mockCategory);
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(mockPost));
+
+        // when & then
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("대표 카테고리가 없을 때 isInQnaPrimaryCategory로 false 반환")
+    void testIsInQnaPrimaryCategory_givenNullCategory_willReturnFalse() {
+        // given
+        PostEntity mockPost = mock(PostEntity.class);
+        given(mockPost.getPrimaryCategory()).willReturn(null);
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(mockPost));
+
+        // when & then
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글로 인해 isInQnaPrimaryCategory 실행 실패")
+    void testIsInQnaPrimaryCategory_givenNotFoundPost_willThrowException() {
+        // given
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId));
+    }
+
+    @Test
+    @DisplayName("isWrittenByMember로 true 반환")
+    void testIsWrittenByMember_givenPostWrittenByMember_willReturnTrue() {
+        // given
+        PostEntity mockPost = mock(PostEntity.class);
+        MemberEntity mockAuthMember = mock(MemberEntity.class);
+        given(mockAuthMember.getUuid()).willReturn(testMemberId.getValue());
+        given(mockPost.getAuthMember()).willReturn(mockAuthMember);
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(mockPost));
+
+        // when & then
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectPostId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isWrittenByMember로 false 반환")
+    void testIsWrittenByMember_givenPostWrittenByOtherMember_willReturnFalse() {
+        // given
+        PostEntity mockPost = mock(PostEntity.class);
+        MemberEntity mockAuthMember = mock(MemberEntity.class);
+        given(mockAuthMember.getUuid()).willReturn(UUID.randomUUID());
+        given(mockPost.getAuthMember()).willReturn(mockAuthMember);
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.of(mockPost));
+
+        // when & then
+        assertThat(activitySubjectPostIdRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectPostId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글로 인해 isWrittenByMember 실행 실패")
+    void testIsWrittenByMember_givenNotFoundPost_willThrowException() {
+        // given
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectPostId));
     }
 
     @Test

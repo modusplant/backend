@@ -1,6 +1,7 @@
 package kr.modusplant.domains.member.adapter.helper;
 
 import kr.modusplant.domains.member.usecase.port.repository.*;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
@@ -85,6 +86,34 @@ class MemberValidationHelperTest {
 
             // then
             assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+        }
+    }
+
+    @Nested
+    @DisplayName("회원의 게시글 작성 여부 검증")
+    class ValidateIfMemberWrotePostTest {
+        @Test
+        @DisplayName("회원이 게시글을 작성했을 때 작성 검증 활동 수행")
+        void testValidateIfMemberWrotePost_givenWriter_willProcessAction() {
+            // given
+            given(activitySubjectPostRepository.isWrittenByMember(testMemberId, testActivitySubjectPostId)).willReturn(true);
+
+            // when & then
+            assertDoesNotThrow(() -> memberValidationHelper.validateIfMemberWrotePost(testMemberId, testActivitySubjectPostId));
+        }
+
+        @Test
+        @DisplayName("회원이 게시글을 작성하지 않았을 때 예외 반환")
+        void testValidateIfMemberWrotePost_givenNotWriter_willThrowException() {
+            // given
+            given(activitySubjectPostRepository.isWrittenByMember(testMemberId, testActivitySubjectPostId)).willReturn(false);
+
+            // when
+            NotAccessibleException exception = assertThrows(NotAccessibleException.class,
+                    () -> memberValidationHelper.validateIfMemberWrotePost(testMemberId, testActivitySubjectPostId));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(NOT_ACCESSIBLE_COMMENT_CHOICE);
         }
     }
 

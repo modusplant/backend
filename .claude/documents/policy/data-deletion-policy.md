@@ -26,7 +26,7 @@ Archiving copies the row into its archive table, stamped with `archived_at`, bef
 | Source | Archive | Archived by |
 |---|---|---|
 | `comm_post` | `comm_post_archive` | post deletion, post abuse-report approval, and member withdrawal; published posts only |
-| `comm_comment` | `comm_comment_archive` | member withdrawal only; the member's comments and every comment in the member's published posts, with `is_deleted` copied as it stands |
+| `comm_comment` | `comm_comment_archive` | member withdrawal only; the member's comments and every comment in the member's published posts, with `is_deleted` and `is_chosen` copied as they stand |
 | `prop_bug_rep` | `prop_bug_rep_archive` | proposal/bug report removal; checked reports only |
 
 On member withdrawal, the member identifier is set to `null` in `comm_post_archive`, `comm_comment_archive`,
@@ -51,6 +51,8 @@ Every other hard-deleted row is removed without a copy, including:
 - Published post: archived, then its likes, bookmarks, abuse reports, abuse-report dashboard, and Redis recently-viewed
   entries are deleted.
 - Draft and published post: its content's S3 files are deleted synchronously, then the post row is deleted.
+- The post's comment-choice cache key (`choose:post:{ulid}:comment-path`) is not deleted and expires by its TTL; outside
+  member withdrawal, the key is deleted only when a comment-choice transaction rolls back.
 
 **Post abuse-report approval**: the dashboard is marked `BLINDED` and its read model is captured for the response before
 the event is published. Then, after verifying that the approving member (`memberId` on the event) has the `ADMIN` role,
@@ -65,7 +67,8 @@ transaction.
 member's published posts:
 1. S3 objects (every image of the member's published and draft posts, every plant information photo, the profile image)
    and Redis keys (other members' recently-viewed entries and view counts of the published posts; the member's
-   recently-viewed entries and search history) are removed by events handled after the transaction commits.
+   recently-viewed entries and search history) are removed by events handled after the transaction commits; the
+   comment-choice cache keys of the member's chosen comments are removed the same way, synchronously.
 2. Notifications whose actor or recipient is the member, that target one of the member's published posts or a comment in
    one of them, or that target one of the member's comments are deleted; this runs before posts and comments are
    deleted.

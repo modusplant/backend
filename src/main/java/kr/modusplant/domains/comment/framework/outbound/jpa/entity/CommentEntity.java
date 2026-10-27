@@ -55,6 +55,9 @@ public class CommentEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted;
 
+    @Column(name = "is_chosen", nullable = false)
+    private Boolean isChosen;
+
     @Column(name = CREATED_AT, nullable = false)
     @CreatedDate
     private LocalDateTime createdAt;
@@ -76,6 +79,10 @@ public class CommentEntity {
 
     public void markAsDeleted() {
         this.isDeleted = true;
+    }
+
+    public void markAsChosen() {
+        this.isChosen = true;
     }
 
     public void updateContent(String content) { this.content = content; }
@@ -109,12 +116,15 @@ public class CommentEntity {
         if (this.isDeleted == null) {
             this.isDeleted = false;
         }
+        if (this.isChosen == null) {
+            this.isChosen = false;
+        }
     }
 
     private CommentEntity(
             PostEntity post, String path, String replyToPath,
             MemberEntity authMember, Integer likeCount,
-            String content, Boolean isDeleted
+            String content, Boolean isDeleted, Boolean isChosen
     ) {
         this.post = post;
         this.path = path;
@@ -123,6 +133,7 @@ public class CommentEntity {
         this.likeCount = likeCount;
         this.content = content;
         this.isDeleted = isDeleted;
+        this.isChosen = isChosen;
     }
 
     public static CommentEntityBuilder builder() {
@@ -137,6 +148,7 @@ public class CommentEntity {
         private Integer likeCount;
         private String content;
         private Boolean isDeleted;
+        private Boolean isChosen;
 
         public CommentEntityBuilder post(final PostEntity post) {
             this.post = post;
@@ -173,6 +185,11 @@ public class CommentEntity {
             return this;
         }
 
+        public CommentEntityBuilder isChosen(final Boolean isChosen) {
+            this.isChosen = isChosen;
+            return this;
+        }
+
         public CommentEntityBuilder comment(final CommentEntity commentEntity) {
             this.post = commentEntity.getPost();
             this.path = commentEntity.getPath();
@@ -181,12 +198,13 @@ public class CommentEntity {
             this.likeCount = commentEntity.getLikeCount();
             this.content = commentEntity.getContent();
             this.isDeleted = commentEntity.getIsDeleted();
+            this.isChosen = commentEntity.getIsChosen();
             return this;
         }
 
         public CommentEntity build() {
-            return new CommentEntity(this.post, this.path, this.replyToPath, this.authMember, this.likeCount, this.content, this.isDeleted
+            return new CommentEntity(this.post, this.path, this.replyToPath, this.authMember, this.likeCount, this.content, this.isDeleted, this.isChosen
             );
         }
     }
-}
+}

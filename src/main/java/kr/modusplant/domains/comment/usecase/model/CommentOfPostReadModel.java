@@ -12,6 +12,7 @@ public record CommentOfPostReadModel(
         LocalDateTime createdAt,
         LocalDateTime updatedAt,
         boolean isDeleted,
+        boolean isChosen,
         String replyToPath,
         boolean replyToIsExisted,
         String replyToNickname,

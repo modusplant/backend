@@ -4,6 +4,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
 import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
 import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
 import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
@@ -28,8 +29,10 @@ import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
+import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_ROLE;
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
@@ -214,11 +217,14 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         given(memberJooqRepository.getPlantInfoPhotoPathsByMemberId(any())).willReturn(List.of());
         given(memberJooqRepository.getProfileImagePathByMemberId(any())).willReturn(MEMBER_PROFILE_BASIC_USER_IMAGE_PATH);
         given(memberJpaRepository.getReferenceById(any())).willReturn(createMemberBasicUserEntityWithUuid());
+        given(activitySubjectCommentJooqRepository.getChosenCommentPathsByMemberId(any()))
+                .willReturn(Map.of(TEST_POST_ULID, TEST_COMMENT_PATH));
 
         // when
         memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
+        verify(eventPublisher, times(1)).publishEvent(any(CommentChooseCachesRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(ImagesRemoveTask.class));
         verify(eventPublisher, times(1)).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, times(1)).publishEvent(any(PostViewCountRemoveEvent.class));
@@ -251,6 +257,7 @@ class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntit
         memberRepositoryAdapter.withdraw(testMemberId, MemberWithdrawReason.UNCOMFORTABLE_TO_USE, testMemberWithdrawOpinion);
 
         // then
+        verify(eventPublisher, never()).publishEvent(any(CommentChooseCachesRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(ImagesRemoveTask.class));
         verify(eventPublisher, never()).publishEvent(any(RecentlyViewPostRemoveEvent.class));
         verify(eventPublisher, never()).publishEvent(any(PostViewCountRemoveEvent.class));

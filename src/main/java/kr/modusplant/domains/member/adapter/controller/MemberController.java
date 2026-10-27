@@ -10,6 +10,8 @@ import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
 import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseCacheRemoveEvent;
+import kr.modusplant.domains.member.domain.event.CommentChooseEvent;
 import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
 import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
 import kr.modusplant.domains.member.domain.event.PostLikeEvent;
@@ -23,6 +25,7 @@ import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
+import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
@@ -62,6 +65,7 @@ public class MemberController {
     private final MemberProfileRepository memberProfileRepository;
     private final ActivitySubjectPostRepository activitySubjectPostRepository;
     private final ActivitySubjectCommentRepository activitySubjectCommentRepository;
+    private final ActivitySubjectPostCacheRepository activitySubjectPostCacheRepository;
     private final ReportRepository reportRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -224,6 +228,29 @@ public class MemberController {
         }
     }
 
+    public void chooseComment(MemberCommentChooseRecord record) {
+        MemberId memberId = MemberId.fromUuid(record.memberId());
+        ActivitySubjectCommentId activitySubjectCommentId = ActivitySubjectCommentId.create(
+                ActivitySubjectPostId.create(record.postUlid()), ActivitySubjectCommentPath.create(record.path()));
+        validateBeforeChooseComment(memberId, activitySubjectCommentId);
+
+        applicationEventPublisher.publishEvent(
+                CommentChooseCacheRemoveEvent.create(
+                        activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()
+                )
+        );
+        activitySubjectPostCacheRepository.cacheBeforeChoose(activitySubjectCommentId);
+        activitySubjectCommentRepository.choose(activitySubjectCommentId);
+        applicationEventPublisher.publishEvent(
+                CommentChooseEvent.create(
+                        memberId.getValue(),
+                        activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()
+                )
+        );
+    }
+
     public ProposalOrBugReportPrepareResponse prepareProposalOrBugReportImage(ProposalOrBugReportImagePrepareRecord_V2 record) {
         MemberId memberId = MemberId.fromUuid(record.memberId());
         List<String> filenames = record.filenames();
@@ -337,6 +364,28 @@ public class MemberController {
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
             throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", activitySubjectPostId.getValue());
+        }
+    }
+
+    private void validateBeforeChooseComment(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
+        ActivitySubjectPostId activitySubjectPostId = activitySubjectCommentId.getActivitySubjectPostId();
+        String commentPath = activitySubjectCommentId.getActivitySubjectCommentPath().getValue();
+        memberValidationHelper.validateIfMemberExists(memberId);
+        memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
+        memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
+        memberValidationHelper.validateIfMemberWrotePost(memberId, activitySubjectPostId);
+        if (!activitySubjectPostRepository.isInQnaPrimaryCategory(activitySubjectPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", activitySubjectPostId.getValue());
+        }
+        if (activitySubjectCommentRepository.isWrittenByMember(memberId, activitySubjectCommentId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", commentPath);
+        }
+        if (activitySubjectCommentRepository.isDeleted(activitySubjectCommentId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", commentPath);
+        }
+        if (activitySubjectPostCacheRepository.hasChosenCommentWithDifferentPath(activitySubjectCommentId)) {
+            throw new ExistsValueException(EXISTS_CHOSEN_COMMENT,
+                    "activitySubjectCommentPath", activitySubjectCommentId.getActivitySubjectCommentPath().getValue());
         }
     }
 

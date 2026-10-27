@@ -46,6 +46,7 @@ public class CommentMapperImplTest implements
         assertThat(result.createdAt()).isEqualTo(testCommentOfPostReadModel.createdAt());
         assertThat(result.editedAt()).isEqualTo(testCommentOfPostReadModel.updatedAt());
         assertThat(result.isDeleted()).isEqualTo(testCommentOfPostReadModel.isDeleted());
+        assertThat(result.isChosen()).isEqualTo(testCommentOfPostReadModel.isChosen());
         assertThat(result.replyToPath()).isEqualTo(testCommentOfPostReadModel.replyToPath());
         assertThat(result.replyToIsExisted()).isTrue();
         assertThat(result.replyToNickname()).isEqualTo(testCommentOfPostReadModel.replyToNickname());
@@ -61,7 +62,7 @@ public class CommentMapperImplTest implements
                 testCommentOfPostReadModel.content(), testCommentOfPostReadModel.likeCount(),
                 testCommentOfPostReadModel.isLiked(), testCommentOfPostReadModel.createdAt(),
                 testCommentOfPostReadModel.updatedAt(), testCommentOfPostReadModel.isDeleted(),
-                testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToIsExisted(),
+                testCommentOfPostReadModel.isChosen(), testCommentOfPostReadModel.replyToPath(), testCommentOfPostReadModel.replyToIsExisted(),
                 testCommentOfPostReadModel.replyToNickname(), testCommentOfPostReadModel.replyToIsDeleted());
 
         // when
@@ -149,7 +150,7 @@ public class CommentMapperImplTest implements
                 testCommentOfPostReadModel.path(), testCommentOfPostReadModel.content(),
                 testCommentOfPostReadModel.likeCount(), testCommentOfPostReadModel.isLiked(),
                 testCommentOfPostReadModel.createdAt(), testCommentOfPostReadModel.updatedAt(),
-                testCommentOfPostReadModel.isDeleted(),
+                testCommentOfPostReadModel.isDeleted(), testCommentOfPostReadModel.isChosen(),
                 replyToPath, replyToIsExisted, replyToNickname, replyToIsDeleted);
     }
 }

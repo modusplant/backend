@@ -8,7 +8,8 @@ disable-model-invocation: true
 
 - Run this skill only after code changes under @src/main/ are complete and ready for verification and documentation.
 - This skill performs no work itself: it invokes the five skills below via the Skill tool, strictly in the order given,
-  inside the current conversation — never as a forked or backgrounded subagent.
+  inside the current conversation — never by spawning a subagent for a step itself. A step whose own frontmatter runs it
+  as a fork (`context: fork`) is still invoked via the Skill tool.
 
 # Workflow
 
@@ -32,6 +33,7 @@ Wait for each invoked skill to finish before starting the next one.
 - Skip: if a step terminates because its target set is empty — including a set left empty by that skill's own scope
   filter — treat the step as skipped and continue with the next step.
 - Stop: if a step terminates early for any other reason, stop the workflow there — do not force the remaining steps to
-  run.
+  run. This includes a gate step that returns without its gate verdict, e.g. reporting its work as still in progress:
+  treat it as stopped, not pending, because the returned step guarantees no later report to this conversation.
 - Report every skipped or stopped step and why, so the user can decide whether to re-run it manually once the underlying
   condition is fixed.
