@@ -69,4 +69,11 @@ class ActivitySubjectCommentIdTest {
     void testHashCode_givenSameObject_willReturnSameHashCode() {
         assertEquals(testActivitySubjectCommentId.hashCode(), testActivitySubjectCommentId.hashCode());
     }
+
+    @Test
+    @DisplayName("같은 프로퍼티를 갖는 인스턴스에 대한 hashcode 동일성 보장")
+    void testHashCode_givenObjectContainingSameProperty_willReturnSameHashCode() {
+        assertEquals(testActivitySubjectCommentId.hashCode(),
+                ActivitySubjectCommentId.create(testActivitySubjectPostId, testActivitySubjectCommentPath).hashCode());
+    }
 }

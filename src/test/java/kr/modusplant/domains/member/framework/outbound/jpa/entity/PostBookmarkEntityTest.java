@@ -114,4 +114,16 @@ public class PostBookmarkEntityTest implements PostBookmarkEntityTestUtils {
         // then
         assertEquals(postBookmarkEntity.hashCode(), postBookmarkEntity.hashCode());
     }
+
+    @Test
+    @DisplayName("다른 회원 식별자를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentMemberId_willReturnFalse() {
+        assertNotEquals(PostBookmarkEntity.of(postId, memberId), PostBookmarkEntity.of(postId, UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("같은 키를 갖는 인스턴스에 대한 hashcode 동일성 보장")
+    void testHashCode_givenObjectContainingSameKey_willReturnSameHashCode() {
+        assertEquals(PostBookmarkEntity.of(postId, memberId).hashCode(), PostBookmarkEntity.of(postId, memberId).hashCode());
+    }
 }

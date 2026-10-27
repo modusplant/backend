@@ -114,4 +114,16 @@ public class PostLikeEntityTest implements PostLikeEntityTestUtils {
         // then
         assertEquals(postLikeEntity.hashCode(), postLikeEntity.hashCode());
     }
+
+    @Test
+    @DisplayName("다른 회원 식별자를 갖는 인스턴스에 대한 equals 호출")
+    void testEquals_givenObjectContainingDifferentMemberId_willReturnFalse() {
+        assertNotEquals(PostLikeEntity.of(postId, memberId), PostLikeEntity.of(postId, UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("같은 키를 갖는 인스턴스에 대한 hashcode 동일성 보장")
+    void testHashCode_givenObjectContainingSameKey_willReturnSameHashCode() {
+        assertEquals(PostLikeEntity.of(postId, memberId).hashCode(), PostLikeEntity.of(postId, memberId).hashCode());
+    }
 }
