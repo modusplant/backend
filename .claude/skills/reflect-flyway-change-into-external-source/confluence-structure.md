@@ -5,8 +5,7 @@
 - Site: `https://modusplant-project.atlassian.net`
 - cloudId: `a9962cac-b27a-410d-9cee-0268a2bae694`
 - Space key: `MODUSPLANT`
-- Folder: `테이블 정의서` (folder id `819470`; a folder, not a page — list its pages with CQL `ancestor = 819470`, not with
-  `getConfluencePageDescendants`)
+- Folder: `테이블 정의서`
 
 ## Pages
 
@@ -19,9 +18,6 @@
 | `user-activity` | `테이블 정의서(유저 활동)` | `24870913` | `https://modusplant-project.atlassian.net/wiki/spaces/mp/pages/24870913` |
 | `server-function` | `테이블 정의서(서버 기능)` | `819225` | `https://modusplant-project.atlassian.net/wiki/spaces/mp/pages/819225` |
 | `policy-implementation` | `테이블 정의서(정책 구현)` | `24051715` | `https://modusplant-project.atlassian.net/wiki/spaces/mp/pages/24051715` |
-
-If a page id stops resolving, re-locate the pages with CQL `ancestor = 819470` and report the mismatch instead of
-guessing.
 
 ## Table Index
 

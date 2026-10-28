@@ -1,8 +1,8 @@
 ---
 name: reflect-flyway-change-into-external-source
 description: Detects unpushed Flyway migration and JPA entity changes, then reflects their table-column and default-value facts into the Confluence `테이블 정의서` pages.
-allowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-result/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md) Bash(python3 .claude/skills/reflect-flyway-change-into-external-source/scripts/glossary.py*)
-disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/SKILL.md) Edit(/src/**) Read(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**)
+allowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-result/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md) Bash(python3 .claude/skills/reflect-flyway-change-into-external-source/scripts/glossary.py*) Bash(rm -f .claude/temp/reflect-flyway-change-into-external-source__*.html) Edit(/.claude/temp/reflect-flyway-change-into-external-source-prompt-to-*.md) Bash(rm .claude/temp/reflect-flyway-change-into-external-source-prompt-to-*.md)
+disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-source/SKILL.md) Edit(/.claude/skills/reflect-flyway-change-into-external-source/prompt-template.md) Edit(/src/**) Read(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**) Edit(/.claude/skills/reflect-flyway-change-into-external-source/glossary/**)
 ---
 
 # Preconditions
@@ -11,8 +11,11 @@ disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-sourc
   the code that uses a table's entity (controllers and repositories) only to choose the page for a table absent from the
   Table Index, and the code that initializes a table's record values only to judge a removed default. It only writes
   under its own `confluence-result/`, to its own `glossary/` (through `scripts/glossary.py`) and
-  `confluence-structure.md`, and to the Confluence pages listed in `confluence-structure.md` via the Atlassian MCP
-  tools.
+  `confluence-structure.md`, to its own prompt files under `.claude/temp/`, and to the Confluence pages listed in
+  `confluence-structure.md` through the `atlassian-mcp-connector` subagent only; never call an Atlassian MCP tool
+  directly.
+- The temp files `.claude/temp/reflect-flyway-change-into-external-source__<page-slug>.html` hold only the current
+  run's fetched pages and are deleted only with the scoped `rm -f`, each by its exact path.
 - @.claude/skills/reflect-flyway-change-into-external-source/confluence-structure.md is the canonical page locator,
   section skeleton, and placement rule set.
 - @.claude/skills/reflect-flyway-change-into-external-source/naming-convention.md is the canonical rendering rule set
@@ -95,8 +98,13 @@ reconstruct a table's state. Render every value per `naming-convention.md`'s Ren
 2. Run Change Derivation for each Target Source.
 3. Locate each table's page through `confluence-structure.md`'s Table Index. For a table absent from the index, use its
    Prefix Map; if no prefix matches, propose a page per the Prefix Map's page kinds and ask the user which page to use.
-4. Fetch each target page in `html` content format. Skip every derived change already reflected in its current content,
-   and run the Effect Scope Termination check.
+4. Fetch every target page into its temp file by calling `atlassian-mcp-connector` once with the `# Fetch Prompt` in
+   @.claude/skills/reflect-flyway-change-into-external-source/prompt-template.md, then handle its result:
+   - `SUCCEEDED`: report the returned summary.
+   - `FAILED`: report the returned cause and the Confluence changes already made, then terminate.
+
+   Then read the temp files, skip every derived change already reflected in a page's current content, and run the
+   Effect Scope Termination check.
 5. Plan each page's edit per `confluence-structure.md`'s Section Skeleton and Placement Rules, keeping every row outside
    the derived changes as-is. For a change that cannot be applied to the current content (e.g. a missing or mismatched
    row or section), analyze the Flyway history of its table (`git grep -lw '<table>'` over the migration pathspecs, in
@@ -104,16 +112,21 @@ reconstruct a table's state. Render every value per `naming-convention.md`'s Ren
    - document error (the page departs from the history) → leave the change out of the edit and report it in a separate
      section of the final report;
    - migration defect (the migration contradicts the history) → apply nothing, append no result line, report the defect,
-     and terminate. Run `scripts/glossary.py lookup` for every table and column in the edit, then `draft` for each
-     `MISSING` one, and complete each draft candidate's unresolved fragments.
+     and terminate.
+
+   Then run `scripts/glossary.py lookup` for every table and column in the edit, then `draft` for each `MISSING` one,
+   and complete each draft candidate's unresolved fragments.
 6. Show the user the full edit per page — every added, changed, or removed row and section, and every drafted Korean
    label marked as drafted — and get explicit approval via AskUserQuestion. Apply nothing that was not approved; on
    rejection, adjust per the user's answer and ask again.
-7. Apply each approved page edit with `updateConfluencePage` in `html` content format, carrying over the fetched content
-   for everything outside the edit.
+7. Apply every approved page edit by calling `atlassian-mcp-connector` once with the `# Apply Prompt` in
+   `prompt-template.md`, then handle its result as in step 4, except that on `FAILED` steps 8–9 run first for the
+   pages reported as changed.
 8. Register every approved new Korean label with `scripts/glossary.py add`, and add every newly placed or removed table
    to `confluence-structure.md`'s Table Index.
 9. Append the result lines (see Result Log Format).
+10. Delete the temp files written in step 4 and the prompt files written in steps 4 and 7, each by its exact path. Every
+    termination from step 4 on runs this step first.
 
 # Result Log Format
 
