@@ -275,14 +275,28 @@
     <span class="badge">6</span>
     <div class="card">
       <h3>Apply to Notion</h3>
-      <p>For each affected page, take its <strong>latest</strong> reflected-change file by <code>RUN_ID</code>. One <code>notion-mcp-connector</code> background subagent receives all of them in a prompt built from the skill's <em>Notion Connector Prompt Format</em>. It searches the named database for each page, fetches its current content, then inserts or replaces only what <code>## Notion Content</code> specifies. Nothing else on the page is changed, and the skill itself never calls Notion MCP.</p>
+      <p>For each affected page, take its <strong>latest</strong> reflected-change file by <code>RUN_ID</code>. The skill fills in <code>prompt-template.md</code> with all of them, writes it as a prompt file, and calls one <code>notion-mcp-connector</code> background subagent with only that file's path. The subagent searches the named database for each page, fetches its current content, then inserts or replaces only what <code>## Notion Content</code> specifies. Nothing else on the page is changed, and the skill itself never calls Notion MCP.</p>
       <div class="docs">
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/rules/subagent-call-details.md</span><span class="what">Prompt file name, shape, and call procedure.</span></div>
+        <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/prompt-template.md</span><span class="what">The connector prompt, with <code>&lt;...&gt;</code> placeholders.</span></div>
+        <div class="doc write"><span class="tag">Write</span><span class="path">.claude/temp/reflect-api-change-into-notion-prompt-to-notion-mcp-connector-&lt;yy-mm-dd-hh-mm-ss&gt;.md</span><span class="what">The filled-in prompt, read by the subagent and carried out exactly as written.</span></div>
         <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/reflected-change/&lt;RUN_ID&gt;__&lt;db-slug&gt;__&lt;page-slug&gt;.md</span><span class="what">Read by the subagent: the edit to apply, plus any exception in its <code>Note:</code> field.</span></div>
         <div class="doc read"><span class="tag">Read</span><span class="path">.claude/skills/reflect-api-change-into-notion/document-format.md</span><span class="what">Read by the subagent: skeleton order and Reconciliation Rules for where the content goes.</span></div>
         <div class="doc ext"><span class="tag">Notion MCP</span><span class="path">API 명세 › &lt;Notion DB&gt; › &lt;page&gt;</span><span class="what">The live API-spec page: found by search, fetched first, then edited, all by the subagent.</span></div>
       </div>
       <div class="branch"><strong><code>SUCCEEDED</code></strong>: the subagent's summary of Notion changes is reported.</div>
-      <div class="stop"><strong><code>FAILED</code></strong>: the cause and any Notion changes already made are reported, and the run ends with no direct Notion retry.</div>
+      <div class="stop"><strong><code>FAILED</code></strong>: the cause and any Notion changes already made are reported, and the run ends with no direct Notion retry, after step 7.</div>
+    </div>
+  </li>
+
+  <li class="step">
+    <span class="badge">7</span>
+    <div class="card">
+      <h3>Delete the prompt file</h3>
+      <p>Delete the prompt file written in step 6 by its exact path, never by wildcard, so prompt files of parallel runs are kept. A termination in step 6 runs this step first.</p>
+      <div class="docs">
+        <div class="doc write"><span class="tag">Delete</span><span class="path">.claude/temp/reflect-api-change-into-notion-prompt-to-notion-mcp-connector-&lt;yy-mm-dd-hh-mm-ss&gt;.md</span><span class="what">This run's prompt file only.</span></div>
+      </div>
     </div>
   </li>
 </ol>
@@ -290,7 +304,7 @@
 <footer class="page-foot">
   <h2>Guardrails</h2>
   <ul>
-    <li>Writes only under its own <code>detected-change/</code> and <code>reflected-change/</code> directories, plus Notion pages. Its <code>SKILL.md</code> and <code>document-format.md</code> are read-only.</li>
+    <li>Writes only under its own <code>detected-change/</code> and <code>reflected-change/</code> directories and its own prompt files under <code>.claude/temp/</code>, plus Notion pages. Its <code>SKILL.md</code>, <code>document-format.md</code>, and <code>prompt-template.md</code> are read-only.</li>
     <li>Every fact written to Notion must trace back through <code>## Provenance</code> to the actual source code. No fact is ever invented.</li>
   </ul>
 </footer>
