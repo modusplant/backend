@@ -36,6 +36,21 @@ public class ActivitySubjectCommentRepositoryJpaAdapter implements ActivitySubje
     }
 
     @Override
+    public boolean isDeleted(ActivitySubjectCommentId activitySubjectCommentId) {
+        return commentJpaRepository.findByPostUlidAndPath(
+                activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow().getIsDeleted().equals(true);
+    }
+
+    @Override
+    public boolean isWrittenByMember(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
+        return commentJpaRepository.findByPostUlidAndPath(
+                        activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow()
+                .getAuthMember().getUuid().equals(memberId.getValue());
+    }
+
+    @Override
     public void like(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         String postId = activitySubjectCommentId.getActivitySubjectPostId().getValue();
         String path = activitySubjectCommentId.getActivitySubjectCommentPath().getValue();
@@ -51,5 +66,12 @@ public class ActivitySubjectCommentRepositoryJpaAdapter implements ActivitySubje
 
         commentLikeJpaRepository.delete(CommentLikeEntity.of(postId, path, memberId.getValue()));
         commentJpaRepository.findByPostUlidAndPath(postId, path).orElseThrow().decreaseLikeCount();
+    }
+
+    @Override
+    public void choose(ActivitySubjectCommentId activitySubjectCommentId) {
+        commentJpaRepository.findByPostUlidAndPath(
+                activitySubjectCommentId.getActivitySubjectPostId().getValue(),
+                activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow().markAsChosen();
     }
 }

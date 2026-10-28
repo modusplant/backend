@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -155,6 +156,44 @@ public class CommentJpaRepositoryTest implements
 
         // then
         assertThat(result.contains(savedCommentEntity)).isTrue();
+    }
+
+    @Test
+    @DisplayName("채택된 댓글이 있는 게시글에서 채택된 댓글 반환")
+    void testFindFirstByPostUlidAndIsChosenTrue_givenChosenComment_willReturnOptional() {
+        // given
+        CommentEntity chosenComment = createCommentEntityBuilder()
+                .post(savedPostEntity)
+                .authMember(savedMemberEntity)
+                .isDeleted(false)
+                .isChosen(true)
+                .build();
+        CommentEntity savedCommentEntity = commentRepository.save(chosenComment);
+
+        // when
+        Optional<CommentEntity> result = commentRepository.findFirstByPostUlidAndIsChosenTrue(savedPostEntity.getUlid());
+
+        // then
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.orElseThrow()).isEqualTo(savedCommentEntity);
+    }
+
+    @Test
+    @DisplayName("채택된 댓글이 없는 게시글에서 빈 Optional 반환")
+    void testFindFirstByPostUlidAndIsChosenTrue_givenNoChosenComment_willReturnOptional() {
+        // given
+        commentRepository.save(createCommentEntityBuilder()
+                .post(savedPostEntity)
+                .authMember(savedMemberEntity)
+                .isDeleted(false)
+                .isChosen(false)
+                .build());
+
+        // when
+        Optional<CommentEntity> result = commentRepository.findFirstByPostUlidAndIsChosenTrue(savedPostEntity.getUlid());
+
+        // then
+        assertThat(result.isPresent()).isFalse();
     }
 
     @Test

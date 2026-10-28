@@ -70,6 +70,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
                 .authMember(member)
                 .likeCount(null)
                 .isDeleted(null)
+                .isChosen(null)
                 .build();
 
         // when
@@ -80,6 +81,7 @@ public class CommentEntityTest implements CommentEntityTestUtils {
         // then
         assertThat(commentEntity.getLikeCount()).isEqualTo(0);
         assertThat(commentEntity.getIsDeleted()).isEqualTo(false);
+        assertThat(commentEntity.getIsChosen()).isEqualTo(false);
     }
 
     @Test
@@ -90,6 +92,16 @@ public class CommentEntityTest implements CommentEntityTestUtils {
 
         // then
         assertEquals(true, commentEntity.getIsDeleted());
+    }
+
+    @Test
+    @DisplayName("markAsChosen으로 isChosen을 true로 전환")
+    void testMarkAsChosen_givenNothing_willConvertIsChosenToTrue() {
+        // given & when
+        commentEntity.markAsChosen();
+
+        // then
+        assertEquals(true, commentEntity.getIsChosen());
     }
 
     @Test

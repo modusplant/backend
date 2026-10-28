@@ -5,6 +5,7 @@ import kr.modusplant.domains.member.domain.vo.ActivitySubjectPostId;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.ReportId;
 import kr.modusplant.domains.member.usecase.port.repository.*;
+import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Nickname;
@@ -32,6 +33,12 @@ public class MemberValidationHelper {
     public void validateIfMemberProfileExists(MemberId memberId) {
         if (!memberProfileRepository.isIdExist(memberId)) {
             throw new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfile");
+        }
+    }
+
+    public void validateIfMemberWrotePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
+        if (!activitySubjectPostRepository.isWrittenByMember(memberId, activitySubjectPostId)) {
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "activitySubjectPostId", activitySubjectPostId.getValue());
         }
     }
 

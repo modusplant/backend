@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.outbound.jpa.adapter;
 import kr.modusplant.domains.comment.framework.outbound.jpa.entity.CommentEntity;
 import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;
+import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentLikeJpaRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.mockito.Mockito;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST_COMMENT_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
@@ -87,6 +89,116 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
     }
 
     @Test
+    @DisplayName("isDeleted로 true 반환")
+    void testIsDeleted_givenDeletedComment_willReturnTrue() {
+        // given
+        CommentEntity mockComment = mock(CommentEntity.class);
+        given(mockComment.getIsDeleted()).willReturn(true);
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(mockComment));
+
+        // when & then
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isDeleted(testActivitySubjectCommentId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isDeleted로 false 반환")
+    void testIsDeleted_givenNotDeletedComment_willReturnFalse() {
+        // given
+        CommentEntity mockComment = mock(CommentEntity.class);
+        given(mockComment.getIsDeleted()).willReturn(false);
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(mockComment));
+
+        // when & then
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isDeleted(testActivitySubjectCommentId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 댓글로 인해 isDeleted 실행 실패")
+    void testIsDeleted_givenNotFoundComment_willThrowException() {
+        // given
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isDeleted(testActivitySubjectCommentId));
+    }
+
+    @Test
+    @DisplayName("isWrittenByMember로 true 반환")
+    void testIsWrittenByMember_givenCommentWrittenByMember_willReturnTrue() {
+        // given
+        CommentEntity mockComment = mock(CommentEntity.class);
+        MemberEntity mockAuthMember = mock(MemberEntity.class);
+        given(mockAuthMember.getUuid()).willReturn(testMemberId.getValue());
+        given(mockComment.getAuthMember()).willReturn(mockAuthMember);
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(mockComment));
+
+        // when & then
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectCommentId)).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("isWrittenByMember로 false 반환")
+    void testIsWrittenByMember_givenCommentWrittenByOtherMember_willReturnFalse() {
+        // given
+        CommentEntity mockComment = mock(CommentEntity.class);
+        MemberEntity mockAuthMember = mock(MemberEntity.class);
+        given(mockAuthMember.getUuid()).willReturn(UUID.randomUUID());
+        given(mockComment.getAuthMember()).willReturn(mockAuthMember);
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(mockComment));
+
+        // when & then
+        assertThat(activitySubjectCommentRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectCommentId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 댓글로 인해 isWrittenByMember 실행 실패")
+    void testIsWrittenByMember_givenNotFoundComment_willThrowException() {
+        // given
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectCommentId));
+    }
+
+    @Test
+    @DisplayName("존재하는 댓글에 대해 choose 실행 시 채택 처리")
+    void testChoose_givenExistedComment_willMarkAsChosen() {
+        // given
+        CommentEntity mockComment = mock(CommentEntity.class);
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(mockComment));
+
+        // when
+        activitySubjectCommentRepositoryJpaAdapter.choose(testActivitySubjectCommentId);
+
+        // then
+        verify(mockComment, times(1)).markAsChosen();
+    }
+
+    @Test
+    @DisplayName("이미 채택된 같은 댓글에 대해 choose 재실행 시 활동 수행")
+    void testChoose_givenAlreadyChosenComment_willProcessAction() {
+        // given
+        CommentEntity chosenComment = CommentEntity.builder().isChosen(true).build();
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.of(chosenComment));
+
+        // when
+        activitySubjectCommentRepositoryJpaAdapter.choose(testActivitySubjectCommentId);
+
+        // then
+        assertThat(chosenComment.getIsChosen()).isTrue();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 댓글로 인해 choose 실행 실패")
+    void testChoose_givenNotFoundComment_willThrowException() {
+        // given
+        given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.choose(testActivitySubjectCommentId));
+    }
+
+    @Test
     @DisplayName("존재하는 댓글에 대해 like 실행 시 좋아요 저장 및 카운트 증가")
     void testLike_givenExistedComment_willIncreaseLikeCount() {
         // given
@@ -141,4 +253,4 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         // then
         verify(commentLikeJpaRepository, times(1)).delete(any(CommentLikeEntity.class));
     }
-}
+}

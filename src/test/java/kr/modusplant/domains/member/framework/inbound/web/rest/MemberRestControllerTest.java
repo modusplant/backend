@@ -37,6 +37,7 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.constant.ReportConstant.*;
 import static kr.modusplant.domains.member.common.util.usecase.record.CommentAbuseReportRecordTestUtils.testCommentAbuseReportRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCancelPostBookmarkRecordTestUtils.testMemberPostBookmarkCancelRecord;
+import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentChooseRecordTestUtils.testMemberCommentChooseRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentLikeRecordTestUtils.testMemberCommentLikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberCommentUnlikeRecordTestUtils.testMemberCommentUnlikeRecord;
 import static kr.modusplant.domains.member.common.util.usecase.record.MemberNicknameCheckRecordTestUtils.testMemberNicknameCheckRecord;
@@ -290,6 +291,21 @@ class MemberRestControllerTest implements MemberTestUtils {
         // then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+    }
+
+    @Test
+    @DisplayName("chooseCommunicationComment로 응답 반환")
+    void testChooseCommunicationComment_givenValidRequest_willReturnResponse() {
+        // given
+        willDoNothing().given(memberController).chooseComment(testMemberCommentChooseRecord);
+
+        // when
+        ResponseEntity<DataResponse<Void>> responseEntity = memberRestController.chooseCommunicationComment(TEST_POST_ULID, TEST_COMMENT_PATH, MEMBER_BASIC_USER_UUID);
+
+        // then
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).toString()).isEqualTo(DataResponse.ok().toString());
+        verify(memberController, times(1)).chooseComment(testMemberCommentChooseRecord);
     }
 
     @Test

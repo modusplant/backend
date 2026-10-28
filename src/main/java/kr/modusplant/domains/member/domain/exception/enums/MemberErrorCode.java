@@ -8,10 +8,11 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum MemberErrorCode implements ErrorCode {
-    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다"),
+    EXISTS_CHOSEN_COMMENT(HttpStatus.CONFLICT.value(), "exists_chosen_comment", "채택된 댓글이 이미 존재합니다. "),
+    EXISTS_COMMENT_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report", "댓글 신고가 이미 존재합니다. "),
     EXISTS_COMMENT_ABUSE_REPORT_BLINDED(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report_blinded", "댓글 신고가 이미 수리되었습니다. "),
     EXISTS_COMMENT_ABUSE_REPORT_DISMISSED(HttpStatus.CONFLICT.value(), "exists_comment_abuse_report_dismissed", "댓글 신고가 이미 반려되었습니다. "),
-    EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다"),
+    EXISTS_POST_ABUSE_REPORT(HttpStatus.CONFLICT.value(), "exists_post_abuse_report", "게시글 신고가 이미 존재합니다. "),
     EXISTS_POST_ABUSE_REPORT_BLINDED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_blinded", "게시글 신고가 이미 수리되었습니다. "),
     EXISTS_POST_ABUSE_REPORT_DISMISSED(HttpStatus.CONFLICT.value(), "exists_post_abuse_report_dismissed", "게시글 신고가 이미 반려되었습니다. "),
     EXISTS_PROPOSAL_OR_BUG_REPORT_CHECKED(HttpStatus.CONFLICT.value(), "exists_proposal_or_bug_report_checked", "건의 및 버그 제보가 이미 확인되었습니다. "),
@@ -53,6 +54,7 @@ public enum MemberErrorCode implements ErrorCode {
     MISMATCHED_AUTH_INFO(HttpStatus.BAD_REQUEST.value(), "mismatched_auth_info", "인증 정보가 올바르지 않습니다. "),
     MISMATCHED_REPORT_IMAGE_SIZE(HttpStatus.BAD_REQUEST.value(), "mismatched_report_image_size", "보고서 이미지 개수가 올바르지 않습니다. "),
 
+    NOT_ACCESSIBLE_COMMENT_CHOICE(HttpStatus.BAD_REQUEST.value(), "not_accessible_comment_choice", "대상 게시글에 대한 댓글 채택 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_BOOKMARK(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_bookmark", "대상 게시글에 대한 북마크 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_LIKE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_like", "대상 게시글에 대한 좋아요 기능을 이용할 수 없습니다. "),
     NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE(HttpStatus.BAD_REQUEST.value(), "not_accessible_post_report_for_abuse", "대상 게시글에 대한 신고 기능을 이용할 수 없습니다. "),
@@ -72,11 +74,10 @@ public enum MemberErrorCode implements ErrorCode {
 
     NOT_FOUND_PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER(HttpStatus.INTERNAL_SERVER_ERROR.value(), "not_found_proposal_or_bug_image_number", "건의 및 버그 제보 이미지 개수를 찾을 수 없습니다. "),
 
+    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
     REPORT_PAGE_SIZE_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "report_page_size_out_of_range", "보고서 페이지 크기가 올바른 값의 범위를 벗어났습니다. "),
 
     DUPLICATED_REPORT_IMAGE_FILE_NAME(HttpStatus.BAD_REQUEST.value(), "duplicated_report_image_file_name", "보고서 이미지 파일명이 중복되어 있습니다. "),
-
-    PROPOSAL_OR_BUG_REPORT_IMAGE_NUMBER_OUT_OF_RANGE(HttpStatus.BAD_REQUEST.value(), "proposal_or_bug_report_image_number_out_of_range", "건의 및 버그 제보 이미지 개수가 올바른 값의 범위를 벗어났습니다. "),
 
     REPORT_TIME_ON_FUTURE(HttpStatus.BAD_REQUEST.value(), "report_time_on_future", "보고 시각이 미래입니다. "),
     ;

@@ -111,3 +111,4 @@ middle_category_name	plant_variety	중분류명
 reply_to_path	comm_comment	답글 대상 경로
 path_1_depth_value	comm_comment	경로 1깊이 값
 path_2_depth_value	comm_comment	경로 2깊이 값
+is_chosen		채택 여부

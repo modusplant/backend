@@ -193,7 +193,8 @@ Boot's Flyway auto-configuration:
 - Null replies and data-access errors are rethrown as a shared connection-failure exception
 
 **JPA Entity** (`framework/outbound/jpa/entity/`):
-- Mutation methods include incrementing/decrementing a counter floored at zero and marking the comment as deleted
+- Mutation methods include incrementing/decrementing a counter floored at zero and marking the comment as deleted or
+  chosen
 - `@PrePersist` callback defaults nullable numeric/boolean columns before insert
 
 **JPA Mapper** (`framework/outbound/jpa/mapper/`) — `*Impl` class implementing an interface in `mapper/supers/`: domain

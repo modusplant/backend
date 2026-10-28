@@ -364,7 +364,7 @@ public class MemberRestController {
 
             @Parameter(
                     description = "좋아요를 누를 댓글의 경로",
-                    example = "1.0.4",
+                    example = "1.2",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
             @PathVariable(required = false)
@@ -397,7 +397,7 @@ public class MemberRestController {
 
             @Parameter(
                     description = "좋아요를 취소할 댓글의 경로",
-                    example = "1.0.4",
+                    example = "1.2",
                     schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
             )
             @PathVariable(required = false)
@@ -409,6 +409,39 @@ public class MemberRestController {
             @AuthenticationPrincipal(expression = "uuid")
             UUID memberId) {
         memberController.unlikeComment(new MemberCommentUnlikeRecord(memberId, postUlid, path));
+        return ResponseEntity.ok().body(DataResponse.ok());
+    }
+
+    @Operation(
+            summary = "댓글 채택 API",
+            description = "댓글을 채택합니다.",
+            security = @SecurityRequirement(name = HttpHeaders.AUTHORIZATION)
+    )
+    @PutMapping("/v1/members/choose/communication/post/{postUlid}/path/{path}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<DataResponse<Void>> chooseCommunicationComment(
+            @Parameter(
+                    description = "채택할 댓글의 게시글 식별자",
+                    schema = @Schema(type = "string", format = "ulid", pattern = REGEX_ULID)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "게시글 식별자가 비어 있습니다.")
+            String postUlid,
+
+            @Parameter(
+                    description = "채택할 댓글의 경로",
+                    example = "1.2",
+                    schema = @Schema(type = "string", pattern = REGEX_MATERIALIZED_PATH)
+            )
+            @PathVariable(required = false)
+            @NotBlank(message = "댓글 경로가 비어 있습니다.")
+            String path,
+
+            @Parameter(hidden = true)
+            @NotNull(message = "회원 ID를 찾을 수 없습니다. ")
+            @AuthenticationPrincipal(expression = "uuid")
+            UUID memberId) {
+        memberController.chooseComment(new MemberCommentChooseRecord(memberId, postUlid, path));
         return ResponseEntity.ok().body(DataResponse.ok());
     }
 

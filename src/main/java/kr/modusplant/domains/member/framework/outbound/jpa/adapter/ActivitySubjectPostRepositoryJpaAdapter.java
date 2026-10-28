@@ -7,7 +7,9 @@ import kr.modusplant.domains.member.framework.outbound.jpa.entity.PostLikeEntity
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostRepository;
+import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.enums.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -29,6 +31,12 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
     }
 
     @Override
+    public boolean isInQnaPrimaryCategory(ActivitySubjectPostId activitySubjectPostId) {
+        PrimaryCategoryEntity primaryCategory = postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow().getPrimaryCategory();
+        return primaryCategory != null && PostType.QNA.getValue().equals(primaryCategory.getCategory());
+    }
+
+    @Override
     public boolean isLiked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         return postLikeJpaRepository.existsByPostIdAndMemberId(activitySubjectPostId.getValue(), memberId.getValue());
     }
@@ -46,6 +54,12 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
     @Override
     public boolean isNotBookmarked(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         return !postBookmarkJpaRepository.existsByPostIdAndMemberId(activitySubjectPostId.getValue(), memberId.getValue());
+    }
+
+    @Override
+    public boolean isWrittenByMember(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
+        return postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow()
+                .getAuthMember().getUuid().equals(memberId.getValue());
     }
 
     @Override

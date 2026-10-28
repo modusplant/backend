@@ -81,7 +81,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   Never edit manually.
 - **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or
   `@Mapping(target=..., ignore=true)` must be set.
-- **Redis**: Used for response caching and JWT access-token blacklisting.
+- **Redis**: Used for multi-purpose caching (e.g. concurrency control) and JWT access-token blacklisting.
 
 ### Project Conventions
 - **IDs**: Entity identifiers use UUID v4, ULID (via `ulid-creator`), or a DB-managed identity (serial) depending on the

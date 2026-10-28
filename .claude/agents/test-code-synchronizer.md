@@ -91,6 +91,9 @@ Only look up a target path if actually needed for the test at hand.
 
 - After processing every bucket, or right after a Termination ends bucket processing, run all tests and confirm that
   they pass.
+- Run the full test suite in the foreground — no `run_in_background`, with `timeout: 600000`, since the default
+  2-minute timeout moves the run to the background — and never end the turn with `Monitor` or a waiting message,
+  because ending the turn ends this subagent's run and stops its background commands.
 - Resolve every failing test, regardless of what `# Loading the Area Test Rule` specifies, except a test that fails
   because of a reported @src/main/ defect.
 

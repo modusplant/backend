@@ -3,6 +3,7 @@ package kr.modusplant.domains.member.framework.outbound;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
+import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
 import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
 import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
 import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -135,6 +137,11 @@ public class MemberRepositoryAdapter implements MemberRepository {
         }
         eventPublisher.publishEvent(RecentlyViewMemberRemoveEvent.create(memberId));
         eventPublisher.publishEvent(MemberSearchHistoryRemoveEvent.create(memberId));
+        Map<String, String> chosenPostUlidCommentPathMap =
+                activitySubjectCommentJooqRepository.getChosenCommentPathsByMemberId(memberId);
+        if (!chosenPostUlidCommentPathMap.isEmpty()) {
+            eventPublisher.publishEvent(CommentChooseCachesRemoveEvent.create(chosenPostUlidCommentPathMap));
+        }
 
         // 게시글·댓글 삭제 전에 수행되어야 하는 작업(하위 쿼리로 게시글·댓글 참조)
         memberJooqRepository.deleteNotificationsByMemberIdAndPostUlids(memberId, publishedPostUlids);

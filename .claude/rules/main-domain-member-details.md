@@ -49,6 +49,7 @@ member/
  ├ outbound/jpa/adapter/ # *RepositoryJpaAdapter — mediates between the outbound port
  │ # implementation and the raw Spring Data JPA repository
  ├ outbound/jpa/compositekey/ # Composite PK classes for join/report tables
+ ├ outbound/redis/ # Redis-backed cache port implementations
  └ outbound/jooq/repository/
 ```
 
@@ -149,7 +150,10 @@ to present a narrower, domain-shaped interface to the outbound repository implem
 
 **Composite Key** (`framework/outbound/jpa/compositekey/`) — used by join/report tables (e.g. like, abuse report)
 
-**Repository Adapter** (`framework/outbound/`) — implements usecase port by combining JPA + jOOQ:
-- Use jOOQ for cascade deletes that JPA's cascade cannot express; otherwise use JPA
+**Repository Adapter** (`framework/outbound/`) — implements usecase port by combining JPA + jOOQ
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — serves bulk cascades, complex joins, paginated read models
+**jOOQ Repository** (`framework/outbound/jooq/repository/`) — serves bulk cascade deletes that JPA's cascade cannot
+express, complex joins, paginated read models
+
+**Redis Repository** (`framework/outbound/redis/`) — implements a cache port over a `StringRedisTemplate`, falling back
+to a JPA lookup and populating the cache on a miss
