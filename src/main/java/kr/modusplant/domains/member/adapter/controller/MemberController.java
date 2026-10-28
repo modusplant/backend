@@ -355,7 +355,8 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postLike", activitySubjectPostId.getValue());
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_POST_LIKE, "activitySubjectPostId", activitySubjectPostId.getValue());
         }
     }
 
@@ -363,7 +364,8 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_LIKE, "postUnlike", activitySubjectPostId.getValue());
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_POST_LIKE, "activitySubjectPostId", activitySubjectPostId.getValue());
         }
     }
 
@@ -375,13 +377,14 @@ public class MemberController {
         memberValidationHelper.validateIfActivitySubjectCommentExists(activitySubjectCommentId);
         memberValidationHelper.validateIfMemberWrotePost(memberId, activitySubjectPostId);
         if (!activitySubjectPostRepository.isInQnaPrimaryCategory(activitySubjectPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", activitySubjectPostId.getValue());
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_COMMENT_CHOICE, "activitySubjectPostId", activitySubjectPostId.getValue());
         }
         if (activitySubjectCommentRepository.isWrittenByMember(memberId, activitySubjectCommentId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", commentPath);
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "activitySubjectCommentPath", commentPath);
         }
         if (activitySubjectCommentRepository.isDeleted(activitySubjectCommentId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "commentChoice", commentPath);
+            throw new NotAccessibleException(NOT_ACCESSIBLE_COMMENT_CHOICE, "activitySubjectCommentPath", commentPath);
         }
         if (activitySubjectPostCacheRepository.hasChosenCommentWithDifferentPath(activitySubjectCommentId)) {
             throw new ExistsValueException(EXISTS_CHOSEN_COMMENT,
@@ -393,7 +396,8 @@ public class MemberController {
         memberValidationHelper.validateIfMemberExists(memberId);
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
-            throw new NotAccessibleException(NOT_ACCESSIBLE_POST_BOOKMARK, "postBookmark", activitySubjectPostId.getValue());
+            throw new NotAccessibleException(
+                    NOT_ACCESSIBLE_POST_BOOKMARK, "activitySubjectPostId", activitySubjectPostId.getValue());
         }
     }
 
@@ -418,7 +422,7 @@ public class MemberController {
         memberValidationHelper.validateIfActivitySubjectPostExists(activitySubjectPostId);
         if (!activitySubjectPostRepository.isPublished(activitySubjectPostId)) {
             throw new NotAccessibleException(
-                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "postReportForAbuse", activitySubjectPostId.getValue());
+                    NOT_ACCESSIBLE_POST_REPORT_FOR_ABUSE, "activitySubjectPostId", activitySubjectPostId.getValue());
         } else if (reportRepository.isMemberAbusePost(memberId, activitySubjectPostId)) {
             throw new ExistsEntityException(
                     EXISTS_POST_ABUSE_REPORT, "postAbuseReport");
