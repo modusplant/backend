@@ -25,6 +25,7 @@ import java.util.Set;
 
 import static kr.modusplant.jooq.Tables.PLANT;
 import static kr.modusplant.jooq.Tables.PLANT_VARIETY;
+import static kr.modusplant.jooq.Tables.PLANT_VARIETY_ADDITION;
 
 @Configuration
 @EnableCaching
@@ -54,7 +55,7 @@ public class CacheConfig {
         cacheManager.setCacheNames(List.of("transliteratedPlantNamesCache"));
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
-                        .maximumWeight(40000)
+                        .maximumWeight(50000)
                         .weigher((Object key, Object value) -> switch (value) {
                             case List<?> list -> list.size();
                             case Map<?, ?> map -> map.size();
@@ -70,11 +71,12 @@ public class CacheConfig {
     }
 
     private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
-        log.info("[PostgreSQL] Loading all the plant names from the plant and plant_variety tables");
+        log.info("[PostgreSQL] Loading all the plant names from the plant, plant_variety, and plant_variety_addition tables");
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
                 .where(PLANT.KOREAN_NAME.isNotNull())
                 .union(dslContext.select(PLANT_VARIETY.VARIETY_NAME).from(PLANT_VARIETY))
+                .union(dslContext.select(PLANT_VARIETY_ADDITION.VARIETY_NAME).from(PLANT_VARIETY_ADDITION))
                 .fetchInto(String.class)
                 .stream()
                 .map(plantName -> Normalizer.normalize(plantName, Normalizer.Form.NFD))
