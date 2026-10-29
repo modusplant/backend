@@ -2,8 +2,8 @@ column	table	label
 id		식별자
 uuid		식별자
 ulid		식별자
-post_ulid	comm_notification	연관 게시글 식별자
 post_ulid		게시글 식별자
+post_ulid	comm_notification	연관 게시글 식별자
 memb_uuid		회원 식별자
 member_uuid		회원 식별자
 auth_memb_uuid		인가 회원 식별자
@@ -105,10 +105,17 @@ watering_cycle_days		물주기 일수
 grown_since		식물 키우기 일자
 variety_code	plant_variety	품종코드
 variety_name	plant_variety	품종명
-major_category_name	plant_variety	대분류명
 middle_category_code	plant_variety	중분류코드
-middle_category_name	plant_variety	중분류명
+major_category_code	plant_variety	대분류코드
 reply_to_path	comm_comment	답글 대상 경로
 path_1_depth_value	comm_comment	경로 1깊이 값
 path_2_depth_value	comm_comment	경로 2깊이 값
 is_chosen		채택 여부
+category_code	plant_variety_middle_category	분류코드
+category_name	plant_variety_middle_category	분류명
+category_code	plant_variety_major_category	분류코드
+category_name	plant_variety_major_category	분류명
+variety_code	plant_variety_addition	품종코드
+variety_name	plant_variety_addition	품종명
+middle_category_code	plant_variety_addition	중분류코드
+major_category_code	plant_variety_addition	대분류코드

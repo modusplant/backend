@@ -9,3 +9,5 @@
 2026-10-28T00:11:01+09:00	V6.0.0__Add_is_chosen_column_to_comment.sql	user-activity
 2026-10-28T00:11:01+09:00	V7.0.0__Add_is_chosen_column_to_comment_archive.sql	user-activity
 2026-10-28T00:11:01+09:00	CommentEntity.java	user-activity
+2026-10-29T01:26:43+09:00	V7.1.0__Create_plant_variety_category_tables.sql	environment-and-plant
+2026-10-29T19:38:31+09:00	V7.2.0__Create_plant_variety_addition_table.sql	environment-and-plant
