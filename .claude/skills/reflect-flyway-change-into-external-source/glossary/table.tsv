@@ -32,3 +32,5 @@ common_code	공통 코드
 pending_file	지연 중 파일
 plant_variety	식물 품종
 comm_comment_archive	소통 댓글 아카이브
+plant_variety_middle_category	식물 품종 중분류
+plant_variety_major_category	식물 품종 대분류
