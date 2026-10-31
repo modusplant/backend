@@ -1,12 +1,13 @@
 ---
 paths:
-  - ".claude/agents/**"
-  - ".claude/skills/**"
+  - ".claude/skills/reflect-api-change-into-notion/**"
+  - ".claude/skills/reflect-flyway-change-into-external-source/**"
 ---
 
 # Subagent Call Details
 
-Applies to every skill that sends a prompt to a subagent under @.claude/agents/.
+Applies only when a skill sends a prompt to a subagent under @.claude/agents/ in a format defined in a file other than
+its `SKILL.md`.
 
 ---
 
