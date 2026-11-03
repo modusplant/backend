@@ -116,8 +116,6 @@ Detailed working rules live under `.claude/`:
     `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
   - `guide/performance-test-guide.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
 - `.claude/skills/*/SKILL.md` — task workflows.
-- `.claude/skills/<skill>/workflow-diagram.html` — human-only visual view of that skill's `SKILL.md`. Never read it —
-  `SKILL.md` is canonical. Reading it is permitted only to update it to match `SKILL.md`.
 
 ## Precaution
 
