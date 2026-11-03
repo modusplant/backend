@@ -125,11 +125,3 @@ same change as the endpoint:
 
 `EndpointAuthorizationCoverageTest` catches only an endpoint with neither an annotation nor a matching public-endpoint
 entry; no test enforces the other conditions.
-
----
-
-## 5. Data-Deletion Consistency
-
-A class that hard-deletes, soft-deletes, or archives persisted data, or deletes the S3 objects or Redis keys tied to it,
-is checked against @.claude/documents/policy/data-deletion-policy.md, read in full; any divergence from the document is
-a policy violation.

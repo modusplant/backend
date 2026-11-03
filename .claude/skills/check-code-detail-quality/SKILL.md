@@ -1,12 +1,12 @@
 ---
 name: check-code-detail-quality
-description: Checks the unpushed changes under src/main/ against .claude/rules/main-architecture-details.md with one Haiku subagent, then returns either a pass or a rejection with the aggregated reasons.
+description: Checks the unpushed changes under src/main/ against .claude/rules/main-architecture-details.md and each document under .claude/documents/policy/, with one Haiku subagent per document, then returns either a pass or a rejection with the aggregated reasons.
 ---
 
 # Preconditions
 
-- This skill is read-only: it reads source under `src/main/java/`, `.claude/rules/main-architecture-details.md`, and git
-  metadata, and writes nothing.
+- This skill is read-only: it reads source under `src/main/java/`, the Standard Documents, and git metadata, and writes
+  nothing.
 
 # Target Classes
 
@@ -16,19 +16,26 @@ description: Checks the unpushed changes under src/main/ against .claude/rules/m
     `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- 'src/main/java/*.java'`
 - Termination: if the union is empty, terminate the skill immediately with an empty target set.
 
+# Standard Documents
+
+- `.claude/rules/main-architecture-details.md`
+- Every `.md` file directly under `.claude/documents/policy/`
+
 # Workflow
 
 1. Resolve the Target Classes.
-2. Launch one subagent with the Agent tool (`subagent_type: Explore`, `model: haiku`; no `fork`, no `isolation`). Its
-   prompt carries:
+2. Resolve the Standard Documents.
+3. Launch one subagent per Standard Document with the Agent tool, all in a single message so they run in parallel
+   (`subagent_type: Explore`, `model: haiku`; no `fork`, no `isolation`). Each prompt carries:
    - the Target Class list and the two git commands above, so the subagent reads the actual diff
-   - the instruction to read `.claude/rules/main-architecture-details.md` in full, and every document it requires, then
-     judge the changes against each rule the changes fall under, treating a rule no change falls under as satisfied
-   - the reply format of step 3
-3. The subagent replies with exactly one of:
+   - the instruction to read its one Standard Document in full, then judge the changes against each rule in it that the
+     changes fall under, treating a rule no change falls under as satisfied
+   - the reply format of step 4
+4. Each subagent replies with exactly one of:
    - `PASS` — the changes satisfy every rule. Nothing else is sent.
-   - `REJECT` — followed by every violation grouped under the name of the rule section it fails, each with its
+   - `REJECT` — followed by every violation grouped under the name of the section it fails, each with its
      `file_path:line`, the requirement it fails, and what is missing or wrong, as specifically as possible.
-4. Return:
-   - `QUALITY CHECK PASSED` alone, if the reply is `PASS`.
-   - `QUALITY CHECK REJECTED`, followed by the grouped violations, if the reply is `REJECT`.
+5. Return:
+   - `QUALITY CHECK PASSED` alone, if every reply is `PASS`.
+   - `QUALITY CHECK REJECTED`, followed by the violations of every `REJECT` reply grouped by Standard Document, then by
+     section, otherwise.
