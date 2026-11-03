@@ -19,7 +19,7 @@ One value per concept, identical across every signal.
 | environment | `deployment.environment.name` | `deployment_environment` | `local`, `dev`, or `prod` |
 | instance | `service.instance.id` | `instance` (Prometheus target host, port stripped) | `modusplant-be` |
 
-`job` (Prometheus scrape job, Promtail stream label) carries the value `modusplant` for the backend, matching the
+`job` (Prometheus scrape job, Promtail stream label) carries the value `spring-boot` for the backend, distinct from the
 service name.
 
 ---
