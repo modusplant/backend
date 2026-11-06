@@ -15,6 +15,7 @@ import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
+import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class SocialIdentityController {
     private final SocialAuthClientFactory clientFactory;
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
+    private final SwearHolder swearHolder;
 
     @Transactional
     public SocialLoginResult handleSocialLogin(SocialProvider provider, String code, boolean isLocal) {
@@ -92,7 +94,7 @@ public class SocialIdentityController {
                 Role.USER
         );
         AgreedTerms agreedTerms = AgreedTerms.create(AgreedTermVersion.create(signUpRequest.agreedTermsOfUseVersion()),AgreedTermVersion.create(signUpRequest.agreedPrivacyPolicyVersion()),AgreedTermVersion.create(signUpRequest.agreedCommunityPolicyVersion()));
-        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, signUpRequest.introduction(), agreedTerms));
+        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, swearHolder.filterSwear(signUpRequest.introduction()), agreedTerms));
     }
 
     // 기존 일반 계정과 연동
