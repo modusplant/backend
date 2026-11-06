@@ -103,11 +103,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 Detailed working rules live under `.claude/`:
 
-- `.claude/rules/*.md` — convention specs, auto-attached by path glob:
-  - `main-architecture-details.md` / `test-architecture-details.md` (baselines for all main / test code)
-  - `main-<kind>-<area>-details.md` / `test-<kind>-<area>-details.md` (per-area main / test conventions, `<kind>` being
-    `domain` or `infra`)
-  - `claude-document-format-details.md` (whitespace-lean formatting of the handwritten docs under `.claude/`)
+- `.claude/rules/*.md` — convention specs, auto-attached by path glob.
 - `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by directory. Before reading one, decide whether
   it is needed from its document name (`<type>/<file-name>`, e.g. `policy/soft-and-hard-data-deletion-policy.md`):
   - `architecture/` — explanations of specific concerns that span the backend architecture
