@@ -108,13 +108,12 @@ Detailed working rules live under `.claude/`:
   - `main-<kind>-<area>-details.md` / `test-<kind>-<area>-details.md` (per-area main / test conventions, `<kind>` being
     `domain` or `infra`)
   - `claude-document-format-details.md` (whitespace-lean formatting of the handwritten docs under `.claude/`)
-- `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by type:
-  - `policy/soft-and-hard-data-deletion-policy.md` (hard-delete/soft-delete policy, archiving, per-flow related-data
-    handling, and cascade rules)
-  - `architecture/observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `tech-stack/open-authentication-implementation.md` (OAuth 2.0 authorization-code flow across
-    `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
-  - `guide/performance-test-guide.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
+- `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by directory. Before reading one, decide whether
+  it is needed from its document name (`<type>/<file-name>`, e.g. `policy/soft-and-hard-data-deletion-policy.md`):
+  - `architecture/` — explanations of specific concerns that span the backend architecture
+  - `guide/` — guides addressed to AI for carrying out specific purposes
+  - `policy/` — policies currently applied to this project
+  - `tech-stack/` — how this project implements specific technologies
 - `.claude/skills/*/SKILL.md` — task workflows.
 
 ## Precaution
