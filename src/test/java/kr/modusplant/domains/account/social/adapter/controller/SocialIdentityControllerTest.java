@@ -42,25 +42,23 @@ import static org.mockito.Mockito.*;
 
 class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
         AgreedTermsTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils {
-    @SuppressWarnings("unused")
     private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
 
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
-    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper);
+    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,swearHolder);
 
     @Test
     @DisplayName("최초 회원 로그인시 NeedSignupResult 반환하기")
     void testHandleSocialLogin_givenSocialProviderAndSocialAccessToken_willReturnSocialLoginResult() {
         // given
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code,false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail())).willReturn(Optional.empty());
 
@@ -82,12 +80,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
     void testHandleSocialLogin_givenNewSocialMemberSocialProfile_willReturnNeedLinkResult() {
         // given
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail()))
                 .willReturn(Optional.of(testBasicSocialMemberProfile));
@@ -111,12 +108,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         // given
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
 
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfileWithBasicEmail));
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);

@@ -2,11 +2,11 @@ package kr.modusplant.shared.framework.jdbc.holder;
 
 import jakarta.annotation.PostConstruct;
 import kr.modusplant.shared.exception.NotInitializedException;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -21,21 +21,20 @@ import static kr.modusplant.shared.persistence.constant.TableName.SWEAR;
 public class SwearHolder {
     private final JdbcTemplate jdbcTemplate;
 
-    @Getter
-    private Set<String> swearWords;
-
-    private static Set<String> staticSwearWords;
+    private List<String> swearWords;
+    private static List<String> staticSwearWords;
 
     @PostConstruct
     public void init() {
-        Set<String> swears = new HashSet<>(
-                jdbcTemplate.queryForList("SELECT " + WORD + " FROM " + SWEAR, String.class));
-        this.swearWords = Set.copyOf(addModifiedSwears(swears));
-        SwearHolder.staticSwearWords = this.swearWords;
+        List<String> swearWords = Set.copyOf(setModifiedSwears()).stream()
+                .sorted(Comparator.comparingInt(String::length).reversed().thenComparing(Comparator.naturalOrder()))
+                .toList();
+        this.swearWords = swearWords;
+        SwearHolder.staticSwearWords = swearWords;
     }
 
     // 주의: 최소한으로만 사용할 것.
-    public static Set<String> getStaticSwearWords() {
+    public static List<String> getStaticSwearWords() {
         if (staticSwearWords == null) {
             throw new NotInitializedException(HOLDER_NOT_INITIALIZED, "staticSwearWords");
         }
@@ -55,9 +54,11 @@ public class SwearHolder {
         return text;
     }
 
-    private Set<String> addModifiedSwears(Set<String> swears) {
-        Set<String> swearsWithWhiteSpaceAndNumber = new HashSet<>();
+    private Set<String> setModifiedSwears() {
+        Set<String> swears = new HashSet<>(
+                jdbcTemplate.queryForList("SELECT " + WORD + " FROM " + SWEAR, String.class));
 
+        Set<String> swearsWithWhiteSpaceAndNumber = new HashSet<>();
         for (String version : List.of(" ", "1", "2")) {
             Set<String> modifiedSwears = swears.stream()
                     .filter(swear -> swear.length() == 2)
