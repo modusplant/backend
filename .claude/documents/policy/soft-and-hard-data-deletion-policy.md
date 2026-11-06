@@ -1,4 +1,4 @@
-# Data Deletion Policy
+# Soft and Hard Data Deletion Policy
 
 Policy that defines which delete type each kind of persisted data receives, what is archived, and which related data
 each deletion flow removes.

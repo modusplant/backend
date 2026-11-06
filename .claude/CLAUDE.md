@@ -109,8 +109,8 @@ Detailed working rules live under `.claude/`:
     `domain` or `infra`)
   - `claude-document-format-details.md` (whitespace-lean formatting of the handwritten docs under `.claude/`)
 - `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by type:
-  - `policy/data-deletion-policy.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and
-    cascade rules)
+  - `policy/soft-and-hard-data-deletion-policy.md` (hard-delete/soft-delete policy, archiving, per-flow related-data
+    handling, and cascade rules)
   - `architecture/observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
   - `tech-stack/open-authentication-implementation.md` (OAuth 2.0 authorization-code flow across
     `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
