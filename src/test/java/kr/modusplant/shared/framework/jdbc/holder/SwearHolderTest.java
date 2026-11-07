@@ -11,9 +11,9 @@ public class SwearHolderTest {
 
     @Test
     @DisplayName("욕설 포함 문자열로 문자열 반환")
-    public void testFilterSwear_givenStringWithSwear_willReturnString() {
+    public void testMaskSwear_givenStringWithSwear_willReturnString() {
         // given & when
-        String result = swearHolder.filterSwear("애1미야");
+        String result = swearHolder.maskSwear("애1미야");
 
         // then
         assertThat(result).isEqualTo("***야");
@@ -21,9 +21,9 @@ public class SwearHolderTest {
 
     @Test
     @DisplayName("빈 문자열로 문자열 반환")
-    public void testFilterSwear_givenBlankString_willReturnString() {
+    public void testMaskSwear_givenBlankString_willReturnString() {
         // given & when
-        String result = swearHolder.filterSwear(" ");
+        String result = swearHolder.maskSwear(" ");
 
         // then
         assertThat(result).isEqualTo(" ");
@@ -31,9 +31,9 @@ public class SwearHolderTest {
 
     @Test
     @DisplayName("null로 null 반환")
-    public void testFilterSwear_givenNull_willReturnNull() {
+    public void testMaskSwear_givenNull_willReturnNull() {
         // given & when
-        String result = swearHolder.filterSwear(null);
+        String result = swearHolder.maskSwear(null);
 
         // then
         assertThat(result).isEqualTo(null);

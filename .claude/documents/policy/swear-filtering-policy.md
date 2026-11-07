@@ -4,7 +4,7 @@ Policy that defines which user input is checked against the swear dictionary, ho
 of each flow the check runs.
 
 Applies to every flow that reaches `SwearHolder` (`shared/framework/jdbc/holder/SwearHolder`), either through its
-`filterSwear` method or through the `Nickname` kernel VO (`shared/kernel/Nickname`).
+`maskSwear` method or through the `Nickname` kernel VO (`shared/kernel/Nickname`).
 
 ---
 
@@ -33,7 +33,7 @@ Every other user input is stored as submitted, including post titles and content
 - Code outside Spring beans reads the same list through the static `getStaticSwearWords()`, which throws
   `NotInitializedException` (`HOLDER_NOT_INITIALIZED`) before the holder is initialized; only `Nickname` uses it.
 
-### 2.2 Masking (`filterSwear`)
+### 2.2 Masking (`maskSwear`)
 
 - Null or blank text is returned unchanged.
 - For each dictionary word the text contains, every occurrence is replaced with as many `*` as the word has characters,

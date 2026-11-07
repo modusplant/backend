@@ -41,7 +41,7 @@ public class SwearHolder {
         return staticSwearWords;
     }
 
-    public String filterSwear(String text) {
+    public String maskSwear(String text) {
         if(text == null || text.isBlank()) {
             return text;
         }

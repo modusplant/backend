@@ -405,7 +405,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.3")));
-        given(swearHolder.filterSwear(content)).willReturn(content);
+        given(swearHolder.maskSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -447,7 +447,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.filterSwear(content)).willReturn(content);
+        given(swearHolder.maskSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -473,7 +473,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
-        given(swearHolder.filterSwear(content)).willReturn(content);
+        given(swearHolder.maskSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -494,7 +494,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
-        given(swearHolder.filterSwear(content)).willReturn(content);
+        given(swearHolder.maskSwear(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -524,27 +524,27 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
     }
 
     @Test
-    @DisplayName("비속어가 포함된 내용은 필터링된 내용으로 저장하는 활동 수행")
+    @DisplayName("비속어가 포함된 내용은 마스킹된 내용으로 저장하는 활동 수행")
     void testRegister_givenContentContainingProfanity_willProcessAction() {
         // given
         String rawContent = "욕설 포함 내용";
-        String filteredContent = "*** 포함 내용";
+        String maskedContent = "*** 포함 내용";
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", rawContent);
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.filterSwear(rawContent)).willReturn(filteredContent);
+        given(swearHolder.maskSwear(rawContent)).willReturn(maskedContent);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(swearHolder).should(times(1)).filterSwear(rawContent);
+        then(swearHolder).should(times(1)).maskSwear(rawContent);
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
-        assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(filteredContent));
+        assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(maskedContent));
         ArgumentCaptor<CommentRegisterEvent> eventCaptor = ArgumentCaptor.forClass(CommentRegisterEvent.class);
         then(publisher).should(times(1)).publishEvent(eventCaptor.capture());
-        assertThat(eventCaptor.getValue().getContentPreview()).isEqualTo(filteredContent);
+        assertThat(eventCaptor.getValue().getContentPreview()).isEqualTo(maskedContent);
     }
 
     @Test
@@ -554,7 +554,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", "content");
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.filterSwear("content")).willReturn("content");
+        given(swearHolder.maskSwear("content")).willReturn("content");
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -572,7 +572,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         // given
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1.2", updatedContent);
-        given(swearHolder.filterSwear(updatedContent)).willReturn(updatedContent);
+        given(swearHolder.maskSwear(updatedContent)).willReturn(updatedContent);
 
         // when
         controller.updateContent(request, MEMBER_BASIC_USER_UUID);
@@ -585,21 +585,21 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
     }
 
     @Test
-    @DisplayName("비속어가 포함된 수정 내용은 필터링된 내용으로 갱신하는 활동 수행")
+    @DisplayName("비속어가 포함된 수정 내용은 마스킹된 내용으로 갱신하는 활동 수행")
     void testUpdateContent_givenContentContainingProfanity_willProcessAction() {
         // given
         String rawContent = "욕설 포함 내용";
-        String filteredContent = "*** 포함 내용";
+        String maskedContent = "*** 포함 내용";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1.2", rawContent);
-        given(swearHolder.filterSwear(rawContent)).willReturn(filteredContent);
+        given(swearHolder.maskSwear(rawContent)).willReturn(maskedContent);
 
         // when
         controller.updateContent(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(swearHolder).should(times(1)).filterSwear(rawContent);
+        then(swearHolder).should(times(1)).maskSwear(rawContent);
         then(commandRepository).should(times(1)).updateContent(
-                ParentPostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentContent.create(filteredContent));
+                ParentPostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentContent.create(maskedContent));
     }
 
     @Test
