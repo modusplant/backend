@@ -124,7 +124,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(swearHolder.maskSwear(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
@@ -146,7 +146,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(swearHolder.maskSwear(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 

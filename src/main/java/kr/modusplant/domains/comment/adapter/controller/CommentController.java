@@ -105,7 +105,7 @@ public class CommentController {
         if (!(replyToPath instanceof EmptyReplyToCommentPath)) {
             validateIfReplyToCommentPathIsValid(parentPostId, path, replyToPath);
         }
-        String filteredContent = swearHolder.filterSwear(request.content());
+        String maskedContent = swearHolder.maskSwear(request.content());
 
         // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
         // DB 하한값 조회(findMaximumSiblingPathOrder)는 Redis 예약 키가 전혀 없을 때만 실행되도록 지연 전달한다.
@@ -118,11 +118,11 @@ public class CommentController {
         CommentPath reservedPath = optionalReservedPath.get();
 
         Comment comment = Comment.create(
-                parentPostId, reservedPath, replyToPath, commentAuthorId, CommentContent.create(filteredContent));
+                parentPostId, reservedPath, replyToPath, commentAuthorId, CommentContent.create(maskedContent));
         commandRepository.save(comment);
 
         applicationEventPublisher.publishEvent(
-                CommentRegisterEvent.create(authorId, request.postId(), reservedPath.getValue(), filteredContent)
+                CommentRegisterEvent.create(authorId, request.postId(), reservedPath.getValue(), maskedContent)
         );
     }
 
@@ -131,9 +131,9 @@ public class CommentController {
         CommentPath path = CommentPath.create(request.path());
         CommentAuthorId commentAuthorId = CommentAuthorId.fromUuid(authorId);
         commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(parentPostId, path, commentAuthorId);
-        String filteredContent = swearHolder.filterSwear(request.content());
+        String maskedContent = swearHolder.maskSwear(request.content());
 
-        commandRepository.updateContent(parentPostId, path, CommentContent.create(filteredContent));
+        commandRepository.updateContent(parentPostId, path, CommentContent.create(maskedContent));
     }
 
     public void delete(String postUlid, String commentPath, UUID authorId) {

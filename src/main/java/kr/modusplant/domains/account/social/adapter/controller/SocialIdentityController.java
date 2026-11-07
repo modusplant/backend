@@ -94,7 +94,7 @@ public class SocialIdentityController {
                 Role.USER
         );
         AgreedTerms agreedTerms = AgreedTerms.create(AgreedTermVersion.create(signUpRequest.agreedTermsOfUseVersion()),AgreedTermVersion.create(signUpRequest.agreedPrivacyPolicyVersion()),AgreedTermVersion.create(signUpRequest.agreedCommunityPolicyVersion()));
-        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, swearHolder.filterSwear(signUpRequest.introduction()), agreedTerms));
+        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, swearHolder.maskSwear(signUpRequest.introduction()), agreedTerms));
     }
 
     // 기존 일반 계정과 연동
