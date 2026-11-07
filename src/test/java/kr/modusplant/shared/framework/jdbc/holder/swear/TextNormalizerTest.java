@@ -1,14 +1,20 @@
 package kr.modusplant.shared.framework.jdbc.holder.swear;
 
+import kr.modusplant.infrastructure.config.icu4j.Icu4jConfig;
+import kr.modusplant.infrastructure.normalization.NormalizedText;
+import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TextNormalizerTest {
+    private static final Icu4jConfig icu4jConfig = new Icu4jConfig();
+    private static final TextNormalizer textNormalizer =
+            new TextNormalizer(icu4jConfig.nfkdNormalizer(), icu4jConfig.nfkcNormalizer());
 
     private static String lightlyNormalizedText(String original) {
-        return TextNormalizer.lightlyNormalize(original).getText();
+        return textNormalizer.lightlyNormalize(original).getText();
     }
 
     private static void assertSpans(NormalizedText normalizedText, int index,
@@ -138,7 +144,7 @@ class TextNormalizerTest {
     @DisplayName("보이지 않는 문자만 있는 문자열로 정규화 뷰 반환")
     void testLightlyNormalize_givenOnlyInvisibleCharacters_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("​ㅤ﻿󠁡");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("​ㅤ﻿󠁡");
 
         // then
         assertThat(normalizedText.getText()).isEmpty();
@@ -149,7 +155,7 @@ class TextNormalizerTest {
     @DisplayName("빈 문자열로 정규화 뷰 반환")
     void testLightlyNormalize_givenEmptyString_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("");
 
         // then
         assertThat(normalizedText.length()).isZero();
@@ -159,7 +165,7 @@ class TextNormalizerTest {
     @DisplayName("서로게이트 쌍으로 정규화 뷰 반환")
     void testLightlyNormalize_givenSurrogatePair_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("𝐬i");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("𝐬i");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("si");
@@ -171,7 +177,7 @@ class TextNormalizerTest {
     @DisplayName("조합형 자모 군집으로 정규화 뷰 반환")
     void testLightlyNormalize_givenConjoiningJamoCluster_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("시발!");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("시발!");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("시발!");
@@ -184,7 +190,7 @@ class TextNormalizerTest {
     @DisplayName("지역 표시 기호 쌍으로 정규화 뷰 반환")
     void testLightlyNormalize_givenRegionalIndicatorPair_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("🇸🇮🇧");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("🇸🇮🇧");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("sib");
@@ -197,7 +203,7 @@ class TextNormalizerTest {
     @DisplayName("결합 문자와 보이지 않는 문자가 붙은 군집으로 정규화 뷰 반환")
     void testLightlyNormalize_givenClusterWithMarkAndInvisibleCharacter_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("s̈i시‍발");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("s̈i시‍발");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("si시발");
@@ -211,7 +217,7 @@ class TextNormalizerTest {
     @DisplayName("여러 단위로 펼쳐지는 문자로 정규화 뷰 반환")
     void testLightlyNormalize_givenCharacterExpandingToSeveralUnits_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("ﬁ시");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("ﬁ시");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("fi시");
@@ -224,7 +230,7 @@ class TextNormalizerTest {
     @DisplayName("보이지 않는 문자 사이의 단위로 정규화 뷰 반환")
     void testLightlyNormalize_givenUnitsAroundRemovedCharacter_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = TextNormalizer.lightlyNormalize("시​발");
+        NormalizedText normalizedText = textNormalizer.lightlyNormalize("시​발");
 
         // then
         assertThat(normalizedText.getText()).isEqualTo("시발");

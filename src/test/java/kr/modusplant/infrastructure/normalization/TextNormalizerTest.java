@@ -1,13 +1,13 @@
-package kr.modusplant.infrastructure.transliterate;
+package kr.modusplant.infrastructure.normalization;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UnicodeTransliteratorTest {
+class TextNormalizerTest {
 
-    private final UnicodeTransliterator transliterator = new UnicodeTransliterator();
+    private final TextNormalizer textNormalizer = new TextNormalizer();
 
     @Test
     @DisplayName("한국어 문자열로 문자열 반환")
@@ -16,7 +16,7 @@ class UnicodeTransliteratorTest {
         String korean = "장미";
 
         // when
-        String result = transliterator.separateKoreanIntoConsonantAndVowel(korean);
+        String result = textNormalizer.nfdNormalize(korean);
 
         // then
         assertThat(result).isNotBlank();
@@ -26,13 +26,13 @@ class UnicodeTransliteratorTest {
 
     @Test
     @DisplayName("NFD 문자열로 문자열 반환")
-    void testCombineKoreanIntoConsonantAndVowel_givenNFDString_willReturnString() {
+    void testNfcNormalize_givenNFDString_willReturnString() {
         // given
         String korean = "장미";
-        String transliteratedKorean = transliterator.separateKoreanIntoConsonantAndVowel(korean);
+        String transliteratedKorean = textNormalizer.nfdNormalize(korean);
 
         // when
-        String combinedKorean = transliterator.combineKoreanIntoConsonantAndVowel(transliteratedKorean);
+        String combinedKorean = textNormalizer.nfcNormalize(transliteratedKorean);
 
         // then
         assertThat(combinedKorean).isEqualTo(korean);
@@ -45,7 +45,7 @@ class UnicodeTransliteratorTest {
         String nonKorean = "rose";
 
         // when
-        String result = transliterator.separateKoreanIntoConsonantAndVowel(nonKorean);
+        String result = textNormalizer.nfdNormalize(nonKorean);
 
         // then
         assertThat(result).isEqualTo(nonKorean);
@@ -53,12 +53,12 @@ class UnicodeTransliteratorTest {
 
     @Test
     @DisplayName("혼합 문자열로 문자열 반환")
-    void testSeparateKoreanIntoConsonantAndVowel_givenMixedString_willReturnString() {
+    void testNfdNormalize_givenMixedString_willReturnString() {
         // given
         String mixed = "장미rose";
 
         // when
-        String result = transliterator.separateKoreanIntoConsonantAndVowel(mixed);
+        String result = textNormalizer.nfdNormalize(mixed);
 
         // then
         assertThat(result).contains("rose");
