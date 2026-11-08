@@ -9,10 +9,21 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class Icu4jConfig {
+    public static final String NFD_NORMALIZER_BEAN_NAME = "nfdNormalizer";
+    public static final String NFC_NORMALIZER_BEAN_NAME = "nfcNormalizer";
     public static final String NFKD_NORMALIZER_BEAN_NAME = "nfkdNormalizer";
     public static final String NFKC_NORMALIZER_BEAN_NAME = "nfkcNormalizer";
 
-    // Normalizer2 인스턴스는 불변이며 스레드 안전함
+    @Bean(NFD_NORMALIZER_BEAN_NAME)
+    public Normalizer2 nfdNormalizer() {
+        return Normalizer2.getNFDInstance();
+    }
+
+    @Bean(NFC_NORMALIZER_BEAN_NAME)
+    public Normalizer2 nfcNormalizer() {
+        return Normalizer2.getNFCInstance();
+    }
+
     @Bean(NFKD_NORMALIZER_BEAN_NAME)
     public Normalizer2 nfkdNormalizer() {
         return Normalizer2.getNFKDInstance();
