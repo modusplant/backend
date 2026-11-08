@@ -1,4 +1,4 @@
-package kr.modusplant.shared.framework.jdbc.holder.swear;
+package kr.modusplant.infrastructure.normalization;
 
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.lang.UProperty;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class SwearCharacterMap {
+public final class NormalizationCharacterMap {
     private static final List<String> CONJOINING_JAMO_NAME_PREFIXES =
             List.of("HANGUL CHOSEONG ", "HANGUL JUNGSEONG ", "HANGUL JONGSEONG ");
 
