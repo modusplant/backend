@@ -239,7 +239,7 @@ class TextNormalizerTest {
 
     @Test
     @DisplayName("한국어 문자열로 문자열 반환")
-    void testSeparateKoreanIntoConsonantAndVowel_givenKoreanString_willReturnString() {
+    void testNfdNormalize_givenKoreanString_willReturnString() {
         // given
         String korean = "장미";
 
@@ -268,7 +268,7 @@ class TextNormalizerTest {
 
     @Test
     @DisplayName("비한국어 문자열로 문자열 반환")
-    void testSeparateKoreanIntoConsonantAndVowel_givenNonKoreanString_willReturnString() {
+    void testNfdNormalize_givenNonKoreanString_willReturnString() {
         // given
         String nonKorean = "rose";
 
