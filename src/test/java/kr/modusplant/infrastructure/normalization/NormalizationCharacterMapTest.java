@@ -4,10 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -46,77 +46,77 @@ class NormalizationCharacterMapTest {
 
     @Test
     @DisplayName("문자형 기호로 라틴 소문자 반환")
-    void testLetterLikeSymbolToLowerCaseLatinMap_givenLetterLikeSymbols_willReturnInteger() {
+    void testLetterLikeSymbolLowerCaseLatinMap_givenLetterLikeSymbols_willReturnInteger() {
         // given & when & then
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP).hasSize(78);
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F1E6)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F1FF)).isEqualTo('z');
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F150)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F169)).isEqualTo('z');
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F170)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.get(0x1F189)).isEqualTo('z');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP).hasSize(78);
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F1E6)).isEqualTo('a');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F1FF)).isEqualTo('z');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F150)).isEqualTo('a');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F169)).isEqualTo('z');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F170)).isEqualTo('a');
+        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F189)).isEqualTo('z');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testLetterLikeSymbolToLowerCaseLatinMap_givenModification_willThrowException() {
+    void testLetterLikeSymbolLowerCaseLatinMap_givenModification_willThrowException() {
         // given & when & then
-        assertThatThrownBy(() -> LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP.put(0, 0))
+        assertThatThrownBy(() -> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
     @DisplayName("키릴 및 그리스 동형 문자로 라틴 소문자 반환")
-    void testCrossScriptHomoglyphToLatinMap_givenHomoglyphs_willReturnInteger() {
+    void testCrossScriptHomoglyphLatinMap_givenHomoglyphs_willReturnInteger() {
         // given & when & then
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP.get(0x0455)).isEqualTo('s');
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP.get(0x0456)).isEqualTo('i');
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP.get(0x03BF)).isEqualTo('o');
+        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x0455)).isEqualTo('s');
+        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x0456)).isEqualTo('i');
+        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x03BF)).isEqualTo('o');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testCrossScriptHomoglyphToLatinMap_givenModification_willThrowException() {
+    void testCrossScriptHomoglyphLatinMap_givenModification_willThrowException() {
         // given & when & then
-        assertThatThrownBy(() -> CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP.put(0, 0))
+        assertThatThrownBy(() -> CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
     @DisplayName("한글 문맥의 유사 문자로 호환 자모 반환")
-    void testHangulContextLookAlikeToJamoMap_givenLookAlikes_willReturnInteger() {
+    void testHangulContextLookAlikeJamoMap_givenLookAlikes_willReturnInteger() {
         // given & when & then
-        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.get((int) '1')).isEqualTo('ㅣ');
-        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.get((int) 'l')).isEqualTo('ㅣ');
-        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.get((int) '0')).isEqualTo('ㅇ');
-        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.get((int) '^')).isEqualTo('ㅅ');
-        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.get((int) '人')).isEqualTo('ㅅ');
+        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.get((int) '1')).isEqualTo('ㅣ');
+        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.get((int) 'l')).isEqualTo('ㅣ');
+        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.get((int) '0')).isEqualTo('ㅇ');
+        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.get((int) '^')).isEqualTo('ㅅ');
+        assertThat(HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.get((int) '人')).isEqualTo('ㅅ');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testHangulContextLookAlikeToJamoMap_givenModification_willThrowException() {
+    void testHangulContextLookAlikeJamoMap_givenModification_willThrowException() {
         // given & when & then
-        assertThatThrownBy(() -> HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP.put(0, 0))
+        assertThatThrownBy(() -> HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
     @DisplayName("라틴 문맥의 유사 문자로 라틴 소문자 반환")
-    void testLatinContextLookAlikeToLeetLetterMap_givenLookAlikes_willReturnInteger() {
+    void testLatinContextLookAlikeLeetLetterMap_givenLookAlikes_willReturnInteger() {
         // given & when & then
-        assertThat(LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP.get((int) '1')).isEqualTo('i');
-        assertThat(LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP.get((int) '5')).isEqualTo('s');
-        assertThat(LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP.get((int) '$')).isEqualTo('s');
+        assertThat(LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP.get((int) '1')).isEqualTo('i');
+        assertThat(LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP.get((int) '5')).isEqualTo('s');
+        assertThat(LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP.get((int) '$')).isEqualTo('s');
         // 문자인 유사 문자와 문장 끝에 흔한 느낌표는 제외
-        assertThat(LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP).doesNotContainKeys((int) 'l', (int) 'o', (int) '!');
+        assertThat(LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP).doesNotContainKeys((int) 'l', (int) 'o', (int) '!');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testLatinContextLookAlikeToLeetLetterMap_givenModification_willThrowException() {
+    void testLatinContextLookAlikeLeetLetterMap_givenModification_willThrowException() {
         // given & when & then
-        assertThatThrownBy(() -> LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP.put(0, 0))
+        assertThatThrownBy(() -> LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }
