@@ -71,7 +71,7 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `email-identity` → `domains/account/email/`
   - `normal-identity` → `domains/account/normal/`
   - `social-identity` → `domains/account/social/`
-- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `normalization`, `security` (all under
   `infrastructure/<area>/`).
 
 ### Technical Design Decisions
