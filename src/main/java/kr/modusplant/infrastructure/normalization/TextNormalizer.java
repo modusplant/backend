@@ -60,12 +60,12 @@ public class TextNormalizer {
     }
 
     private String canonicalize(String originalCluster) {
-        String visibleText = removeDICPCodePoint(originalCluster, isInDICP());
+        String visibleText = removeCodePointIf(originalCluster, isInDICP());
         if (visibleText.isEmpty()) {
             return visibleText;
         }
         String decomposedText = nfkdNormalizer.normalize(visibleText);
-        String unmarkedText = removeDICPCodePoint(decomposedText, TextNormalizer::isInCombiningMark);
+        String unmarkedText = removeCodePointIf(decomposedText, TextNormalizer::isInCombiningMark);
         String composedText = nfkcNormalizer.normalize(unmarkedText);
 
         StringBuilder canonicalText = new StringBuilder(composedText.length());
@@ -77,9 +77,9 @@ public class TextNormalizer {
         return canonicalText.toString();
     }
 
-    private static String removeDICPCodePoint(String originalCluster, IntPredicate removeDICPFunction) {
-        StringBuilder keptText = new StringBuilder(originalCluster.length());
-        originalCluster.codePoints().filter(removeDICPFunction.negate()).forEach(keptText::appendCodePoint);
+    private static String removeCodePointIf(String text, IntPredicate removalPredicate) {
+        StringBuilder keptText = new StringBuilder(text.length());
+        text.codePoints().filter(removalPredicate.negate()).forEach(keptText::appendCodePoint);
         return keptText.toString();
     }
 
