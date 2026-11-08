@@ -1,6 +1,7 @@
 package kr.modusplant.infrastructure.config.cache;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import lombok.extern.slf4j.Slf4j;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -17,7 +18,6 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.text.Normalizer;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class CacheConfig {
 
     @Bean
     @Qualifier("plantNameCaffeineCacheManager")
-    public CacheManager caffeineCacheManager(DSLContext dslContext) {
+    public CacheManager caffeineCacheManager(DSLContext dslContext, TextNormalizer textNormalizer) {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCacheNames(List.of("transliteratedPlantNamesCache"));
         cacheManager.setCaffeine(
@@ -65,12 +65,12 @@ public class CacheConfig {
                         .softValues()
                         .recordStats());
         cacheManager.setCacheLoader(
-                key -> loadAllTransliteratedPlantNamesFromDb(dslContext));
+                key -> loadAllTransliteratedPlantNamesFromDb(dslContext, textNormalizer));
 
         return cacheManager;
     }
 
-    private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext) {
+    private List<String> loadAllTransliteratedPlantNamesFromDb(DSLContext dslContext, TextNormalizer textNormalizer) {
         log.info("[PostgreSQL] Loading all the plant names from the plant, plant_variety, and plant_variety_addition tables");
         return dslContext.select(PLANT.KOREAN_NAME)
                 .from(PLANT)
@@ -79,7 +79,7 @@ public class CacheConfig {
                 .union(dslContext.select(PLANT_VARIETY_ADDITION.VARIETY_NAME).from(PLANT_VARIETY_ADDITION))
                 .fetchInto(String.class)
                 .stream()
-                .map(plantName -> Normalizer.normalize(plantName, Normalizer.Form.NFD))
+                .map(textNormalizer::nfdNormalize)
                 .toList();
     }
 }

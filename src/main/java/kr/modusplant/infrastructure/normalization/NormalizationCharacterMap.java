@@ -2,11 +2,11 @@ package kr.modusplant.infrastructure.normalization;
 
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.lang.UProperty;
+import com.ibm.icu.text.Normalizer2;
 import com.ibm.icu.text.UnicodeSet;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.text.Normalizer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +27,8 @@ public final class NormalizationCharacterMap {
     private static final int NEGATIVE_CIRCLED_LATIN_CAPITAL_A = 0x1F150; // 검은 원 안의 라틴 대문자 🅐~🅩 26자의 시작 코드 포인트
     private static final int NEGATIVE_SQUARED_LATIN_CAPITAL_A = 0x1F170; // 검은 사각형 안의 라틴 대문자 🅰~🆉 26자의 시작 코드 포인트
 
+    private static final Normalizer2 nfkdInstance = Normalizer2.getNFKDInstance();
+
     // 키: Hangul_Syllable_Type이 첫소리(L)·가운뎃소리(V)·끝소리(T)인 조합형 자모의 코드 포인트
     // 값: 접두어(HANGUL CHOSEONG/JUNGSEONG/JONGSEONG)를 뗀 자모 이름에 매칭되는 한글 호환 자모의 코드 포인트
     // 이름이 같은 호환 자모가 없는 조합형 자모(호환 자모가 없는 옛한글 자모, 채움 문자)는 포함하지 않음
@@ -45,7 +47,7 @@ public final class NormalizationCharacterMap {
                 if (UCharacter.hasBinaryProperty(compatibilityJamo, UProperty.DEFAULT_IGNORABLE_CODE_POINT)) {
                     continue;
                 }
-                String conjoiningJamo = Normalizer.normalize(Character.toString(compatibilityJamo), Normalizer.Form.NFKD);
+                String conjoiningJamo = nfkdInstance.normalize(Character.toString(compatibilityJamo));
                 String conjoiningJamoName = getConjoiningJamoName(conjoiningJamo.codePointAt(0));
                 if (conjoiningJamoName != null) {
                     conjoiningJamoNameCompatibilityJamoMap.put(conjoiningJamoName, compatibilityJamo);

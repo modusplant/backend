@@ -8,9 +8,10 @@ import com.ibm.icu.text.Normalizer2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
 import java.util.function.IntPredicate;
 
+import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFC_NORMALIZER_BEAN_NAME;
+import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFD_NORMALIZER_BEAN_NAME;
 import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFKC_NORMALIZER_BEAN_NAME;
 import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFKD_NORMALIZER_BEAN_NAME;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
@@ -18,21 +19,27 @@ import static kr.modusplant.infrastructure.normalization.NormalizationCharacterM
 
 @Component
 public class TextNormalizer {
+    private final Normalizer2 nfdNormalizer;
+    private final Normalizer2 nfcNormalizer;
     private final Normalizer2 nfkdNormalizer;
     private final Normalizer2 nfkcNormalizer;
 
-    public TextNormalizer(@Qualifier(NFKD_NORMALIZER_BEAN_NAME) Normalizer2 nfkdNormalizer,
+    public TextNormalizer(@Qualifier(NFD_NORMALIZER_BEAN_NAME) Normalizer2 nfdNormalizer,
+                          @Qualifier(NFC_NORMALIZER_BEAN_NAME) Normalizer2 nfcNormalizer,
+                          @Qualifier(NFKD_NORMALIZER_BEAN_NAME) Normalizer2 nfkdNormalizer,
                           @Qualifier(NFKC_NORMALIZER_BEAN_NAME) Normalizer2 nfkcNormalizer) {
+        this.nfdNormalizer = nfdNormalizer;
+        this.nfcNormalizer = nfcNormalizer;
         this.nfkdNormalizer = nfkdNormalizer;
         this.nfkcNormalizer = nfkcNormalizer;
     }
 
     public String nfdNormalize(String stringIncludingKorean) {
-        return Normalizer.normalize(stringIncludingKorean, Normalizer.Form.NFD);
+        return nfdNormalizer.normalize(stringIncludingKorean);
     }
 
     public String nfcNormalize(String stringIncludingKorean) {
-        return Normalizer.normalize(stringIncludingKorean, Normalizer.Form.NFC);
+        return nfcNormalizer.normalize(stringIncludingKorean);
     }
 
     // 경량 정규화: 문자 체계를 바꾸지 않고 인코딩 수준의 변형만 제거하며, 각 코드 유닛은 그 유닛을 생성한 원본 문자소 군집의 전체 구간에 대응함
