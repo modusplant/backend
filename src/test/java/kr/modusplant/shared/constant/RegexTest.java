@@ -39,6 +39,27 @@ class RegexTest {
     }
 
     @Test
+    @DisplayName("채움 자모로 참 반환")
+    void testPatternFillerJamo_givenFillerJamo_willReturnTrue() {
+        // given & when & then
+        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅋ").matches());
+        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅎ").matches());
+        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅠ").matches());
+        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅜ").matches());
+    }
+
+    @Test
+    @DisplayName("채움 자모가 아닌 문자열로 거짓 반환")
+    void testPatternFillerJamo_givenNonFillerJamo_willReturnFalse() {
+        // given & when & then
+        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅅ").matches());
+        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅏ").matches());
+        assertFalse(PATTERN_FILLER_JAMO.matcher("크").matches());
+        // 두 글자 이상
+        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅋㅋ").matches());
+    }
+
+    @Test
     @DisplayName("유효한 구체화 경로 문자열로 참 반환")
     void testPatternMaterializedPath_givenValidPathString_willReturnTrue() {
         // given & when & then
