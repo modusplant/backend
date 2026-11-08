@@ -47,13 +47,13 @@ normalization/
 - `CONJOINING_COMPATIBILITY_JAMO_MAP`: every conjoining jamo whose `Hangul_Syllable_Type` is L, V, or T → the Hangul
   Compatibility Jamo code point of the same name without its `HANGUL CHOSEONG/JUNGSEONG/JONGSEONG` prefix; a jamo
   without a same-named compatibility jamo (an archaic jamo, a filler) is left out.
-- `LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP`: the regional indicator symbols `🇦`–`🇿` and the negative circled and
+- `LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP`: the regional indicator symbols `🇦`–`🇿` and the negative circled and
   negative squared Latin capital letters, which have no compatibility decomposition → Latin lowercase letters.
-- `CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP`: lowercase Cyrillic and Greek letters confusable with Latin letters (`ѕ`, `і`)
+- `CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP`: lowercase Cyrillic and Greek letters confusable with Latin letters (`ѕ`, `і`)
   → Latin lowercase letters.
-- `HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP`: digits, symbols, and letters that stand for a jamo next to Hangul (`1`, `l`,
+- `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP`: digits, symbols, and letters that stand for a jamo next to Hangul (`1`, `l`,
   `|`, `0`, `o`, `^`, `人`) → Hangul Compatibility Jamo.
-- `LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP`: digits and symbols that stand for a letter next to Latin letters (`1`,
+- `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP`: digits and symbols that stand for a letter next to Latin letters (`1`,
   `0`, `$`, and others) → Latin lowercase letters; `!` is left out, because a sentence can end with it.
 
 **`Regex.PATTERN_FILLER_JAMO`** in `shared/constant/Regex` matches one of `ㅋ`, `ㅎ`, `ㅠ`, `ㅜ`.
@@ -70,7 +70,7 @@ cluster passes these steps in order:
 | 1 | Remove code points with the `Default_Ignorable_Code_Point` property (including the Hangul fillers) |
 | 2 | NFKD, remove combining marks (general categories `Mn`, `Mc`, `Me`), NFKC |
 | 3 | Map conjoining jamo through `CONJOINING_COMPATIBILITY_JAMO_MAP` |
-| 4 | Map code points through `LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP` |
+| 4 | Map code points through `LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP` |
 | 5 | Lowercase per code point with `UCharacter.toLowerCase` |
 
 - Every UTF-16 code unit a cluster produces gets the whole output range of the cluster as its lightly normalized range
@@ -94,9 +94,9 @@ The lightly normalized text passes these steps in order, each building a new `No
 
 | Order | Step |
 |---|---|
-| 1 | Map code points through `CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP` |
-| 2 | Decide each key of `HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP` and `LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP` by its nearest neighbors (table below) |
-| 3 | Remove code points of the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*` (whitespace, line breaks, punctuation, symbols, digits) |
+| 1 | Map code points through `CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP` |
+| 2 | Decide each key of `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP` and `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP` by its nearest neighbors (table below) |
+| 3 | Remove code points of the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*` (separators, control characters, punctuation, symbols, numbers) |
 | 4 | Remove each consecutive run of `PATTERN_FILLER_JAMO` code points that has a Hangul syllable on both sides |
 | 5 | Collapse consecutive identical code points into one |
 | 6 | Merge an elongated vowel into its syllable (rules below) |
@@ -107,8 +107,8 @@ map, so a chain of keys is decided together (`人l발` → `ㅅㅣ발`):
 | Neighbors | Result |
 |---|---|
 | A Hangul syllable on both sides | Removed |
-| Hangul on one or both sides, no Latin | `HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP` value; unchanged without an entry |
-| Latin on one or both sides, no Hangul | `LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP` value; unchanged without an entry |
+| Hangul on one or both sides, no Latin | `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP` value; unchanged without an entry |
+| Latin on one or both sides, no Hangul | `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP` value; unchanged without an entry |
 | Hangul and Latin, or neither | Unchanged, so `tl발` keeps its Latin letters |
 
 - Step 2 runs before step 3, because step 3 removes the digits and symbols that step 2 reads.

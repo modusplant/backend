@@ -34,9 +34,9 @@ public final class NormalizationCharacterMap {
     // 이름이 같은 호환 자모가 없는 조합형 자모(호환 자모가 없는 옛한글 자모, 채움 문자)는 포함하지 않음
     public static final Map<Integer, Integer> CONJOINING_COMPATIBILITY_JAMO_MAP = createConjoiningCompatibilityJamoMap();
     // 호환 분해가 없는 문자 유사 기호 → 라틴 소문자
-    public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
+    public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
     // 라틴 소문자와 형태가 혼동되는 키릴 · 그리스 소문자 → 라틴 소문자
-    public static final Map<Integer, Integer> CROSS_SCRIPT_HOMOGLYPH_TO_LATIN_MAP = Map.ofEntries(
+    public static final Map<Integer, Integer> CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP = Map.ofEntries(
             Map.entry(0x0430, (int) 'a'), // 키릴 а
             Map.entry(0x0435, (int) 'e'), // 키릴 е
             Map.entry(0x043E, (int) 'o'), // 키릴 о
@@ -63,7 +63,7 @@ public final class NormalizationCharacterMap {
             Map.entry(0x03C5, (int) 'u'), // 그리스 υ
             Map.entry(0x03C7, (int) 'x')); // 그리스 χ
     // 한글 주변에서 한글 자모를 흉내 내는 문자 → 호환 자모
-    public static final Map<Integer, Integer> HANGUL_CONTEXT_LOOK_ALIKE_TO_JAMO_MAP = Map.ofEntries(
+    public static final Map<Integer, Integer> HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP = Map.ofEntries(
             Map.entry((int) '1', (int) 'ㅣ'),
             Map.entry((int) 'l', (int) 'ㅣ'),
             Map.entry((int) '|', (int) 'ㅣ'),
@@ -72,17 +72,19 @@ public final class NormalizationCharacterMap {
             Map.entry((int) '^', (int) 'ㅅ'),
             Map.entry((int) '人', (int) 'ㅅ'));
     // 라틴 문자 주변에서 라틴 문자를 흉내 내는 숫자·기호 → 라틴 소문자
-    public static final Map<Integer, Integer> LATIN_CONTEXT_LOOK_ALIKE_TO_LEET_LETTER_MAP = Map.ofEntries(
+    public static final Map<Integer, Integer> LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP = Map.ofEntries(
             Map.entry((int) '0', (int) 'o'),
             Map.entry((int) '1', (int) 'i'),
+            Map.entry((int) '2', (int) 'z'),
             Map.entry((int) '3', (int) 'e'),
             Map.entry((int) '4', (int) 'a'),
             Map.entry((int) '5', (int) 's'),
-            Map.entry((int) '7', (int) 't'),
+            Map.entry((int) '6', (int) 'g'),
             Map.entry((int) '8', (int) 'b'),
+            Map.entry((int) '9', (int) 'g'),
             Map.entry((int) '$', (int) 's'),
             Map.entry((int) '@', (int) 'a'),
-            Map.entry((int) '+', (int) 't'));
+            Map.entry((int) '€', (int) 'e'));
 
     private static Map<Integer, Integer> createConjoiningCompatibilityJamoMap() {
         // 1. 한글 호환 자모의 각 문자를 NFKD로 분해한 조합형 자모의 이름에서 접두어를 떼어, 조합형 자모 이름 → 호환 자모 맵을 만듦
