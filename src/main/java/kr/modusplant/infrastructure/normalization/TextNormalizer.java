@@ -13,8 +13,8 @@ import java.util.function.IntPredicate;
 
 import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFKC_NORMALIZER_BEAN_NAME;
 import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFKD_NORMALIZER_BEAN_NAME;
-import static kr.modusplant.shared.framework.jdbc.holder.swear.SwearCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.shared.framework.jdbc.holder.swear.SwearCharacterMap.LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_TO_LOWER_CASE_LATIN_MAP;
 
 @Component
 public class TextNormalizer {
