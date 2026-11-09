@@ -4,11 +4,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isFillerJamo;
+import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNoiseJamo;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllableWithoutFinal;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isInCombiningMark;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isInDICP;
+import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isLineTerminator;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNonLetterNoiseCategory;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -68,21 +69,43 @@ class NormalizationHelperTest {
     }
 
     @Test
-    @DisplayName("채움 자모로 true 반환")
-    void testIsFillerJamo_givenFillerJamo_willReturnTrue() {
+    @DisplayName("잡음 자모로 true 반환")
+    void testIsNoiseJamo_givenNoiseJamo_willReturnTrue() {
         // given & when & then
-        assertThat(isFillerJamo('ㅋ')).isTrue();
-        assertThat(isFillerJamo('ㅎ')).isTrue();
-        assertThat(isFillerJamo('ㅠ')).isTrue();
-        assertThat(isFillerJamo('ㅜ')).isTrue();
+        assertThat(isNoiseJamo('ㅋ')).isTrue();
+        assertThat(isNoiseJamo('ㅎ')).isTrue();
+        assertThat(isNoiseJamo('ㅠ')).isTrue();
+        assertThat(isNoiseJamo('ㅜ')).isTrue();
     }
 
     @Test
-    @DisplayName("채움 자모가 아닌 문자로 false 반환")
-    void testIsFillerJamo_givenOtherCharacter_willReturnFalse() {
+    @DisplayName("잡음 자모가 아닌 문자로 false 반환")
+    void testIsNoiseJamo_givenOtherCharacter_willReturnFalse() {
         // given & when & then
-        assertThat(isFillerJamo('ㅅ')).isFalse();
-        assertThat(isFillerJamo('가')).isFalse();
+        assertThat(isNoiseJamo('ㅅ')).isFalse();
+        assertThat(isNoiseJamo('가')).isFalse();
+    }
+
+    @Test
+    @DisplayName("줄 종결 문자로 true 반환")
+    void testIsLineTerminator_givenLineTerminator_willReturnTrue() {
+        // given & when & then
+        assertThat(isLineTerminator('\n')).isTrue();
+        assertThat(isLineTerminator('\r')).isTrue();
+        assertThat(isLineTerminator(0x000B)).isTrue();
+        assertThat(isLineTerminator(0x000C)).isTrue();
+        assertThat(isLineTerminator(0x0085)).isTrue();
+        assertThat(isLineTerminator(0x2028)).isTrue();
+        assertThat(isLineTerminator(0x2029)).isTrue();
+    }
+
+    @Test
+    @DisplayName("줄 종결 문자가 아닌 문자로 false 반환")
+    void testIsLineTerminator_givenOtherCharacter_willReturnFalse() {
+        // given & when & then
+        assertThat(isLineTerminator(' ')).isFalse();
+        assertThat(isLineTerminator('\t')).isFalse();
+        assertThat(isLineTerminator('가')).isFalse();
     }
 
     @Test

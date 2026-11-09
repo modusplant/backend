@@ -39,24 +39,23 @@ class RegexTest {
     }
 
     @Test
-    @DisplayName("채움 자모로 참 반환")
-    void testPatternFillerJamo_givenFillerJamo_willReturnTrue() {
+    @DisplayName("줄 종결 문자로 참 반환")
+    void testPatternLineTerminator_givenLineTerminator_willReturnTrue() {
         // given & when & then
-        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅋ").matches());
-        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅎ").matches());
-        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅠ").matches());
-        assertTrue(PATTERN_FILLER_JAMO.matcher("ㅜ").matches());
+        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\n").matches());
+        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\r").matches());
+        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\r\n").matches());
+        assertTrue(PATTERN_LINE_TERMINATOR.matcher(" ").matches());
     }
 
     @Test
-    @DisplayName("채움 자모가 아닌 문자열로 거짓 반환")
-    void testPatternFillerJamo_givenNonFillerJamo_willReturnFalse() {
+    @DisplayName("줄 종결 문자가 아닌 문자열로 거짓 반환")
+    void testPatternLineTerminator_givenNonLineTerminator_willReturnFalse() {
         // given & when & then
-        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅅ").matches());
-        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅏ").matches());
-        assertFalse(PATTERN_FILLER_JAMO.matcher("크").matches());
-        // 두 글자 이상
-        assertFalse(PATTERN_FILLER_JAMO.matcher("ㅋㅋ").matches());
+        assertFalse(PATTERN_LINE_TERMINATOR.matcher(" ").matches());
+        assertFalse(PATTERN_LINE_TERMINATOR.matcher("가").matches());
+        // 줄 종결 문자 두 개
+        assertFalse(PATTERN_LINE_TERMINATOR.matcher("\n\n").matches());
     }
 
     @Test
@@ -103,6 +102,27 @@ class RegexTest {
         // 한글, 영문, 숫자 이외에 다른 문자 사용
         assertFalse(PATTERN_NICKNAME.matcher("비!").matches());
         assertFalse(PATTERN_NICKNAME.matcher("눈?").matches());
+    }
+
+    @Test
+    @DisplayName("잡음 자모로 참 반환")
+    void testPatternNoiseJamo_givenNoiseJamo_willReturnTrue() {
+        // given & when & then
+        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅋ").matches());
+        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅎ").matches());
+        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅠ").matches());
+        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅜ").matches());
+    }
+
+    @Test
+    @DisplayName("잡음 자모가 아닌 문자열로 거짓 반환")
+    void testPatternNoiseJamo_givenNonNoiseJamo_willReturnFalse() {
+        // given & when & then
+        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅅ").matches());
+        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅏ").matches());
+        assertFalse(PATTERN_NOISE_JAMO.matcher("크").matches());
+        // 두 글자 이상
+        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅋㅋ").matches());
     }
 
     @Test

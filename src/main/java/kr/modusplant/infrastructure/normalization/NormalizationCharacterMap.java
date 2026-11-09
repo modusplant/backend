@@ -49,7 +49,7 @@ public final class NormalizationCharacterMap {
     // 호환 분해가 없는 문자 유사 기호 → 라틴 소문자
     public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
     // 라틴 소문자와 형태가 혼동되는 키릴 · 그리스 소문자 → 라틴 소문자
-    public static final Map<Integer, Integer> CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP = Map.ofEntries(
+    public static final Map<Integer, Integer> CROSS_SCRIPT_CONFUSABLE_LATIN_MAP = Map.ofEntries(
             Map.entry(0x0430, (int) 'a'), // 키릴 а
             Map.entry(0x0435, (int) 'e'), // 키릴 е
             Map.entry(0x043E, (int) 'o'), // 키릴 о
@@ -75,6 +75,54 @@ public final class NormalizationCharacterMap {
             Map.entry(0x03C4, (int) 't'), // 그리스 τ
             Map.entry(0x03C5, (int) 'u'), // 그리스 υ
             Map.entry(0x03C7, (int) 'x')); // 그리스 χ
+    // 라틴 소문자 → 두벌식(KS X 5002) 자판의 같은 키에 있는 호환 자모
+    public static final Map<Integer, Integer> LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP = Map.ofEntries(
+            Map.entry((int) 'q', (int) 'ㅂ'),
+            Map.entry((int) 'w', (int) 'ㅈ'),
+            Map.entry((int) 'e', (int) 'ㄷ'),
+            Map.entry((int) 'r', (int) 'ㄱ'),
+            Map.entry((int) 't', (int) 'ㅅ'),
+            Map.entry((int) 'y', (int) 'ㅛ'),
+            Map.entry((int) 'u', (int) 'ㅕ'),
+            Map.entry((int) 'i', (int) 'ㅑ'),
+            Map.entry((int) 'o', (int) 'ㅐ'),
+            Map.entry((int) 'p', (int) 'ㅔ'),
+            Map.entry((int) 'a', (int) 'ㅁ'),
+            Map.entry((int) 's', (int) 'ㄴ'),
+            Map.entry((int) 'd', (int) 'ㅇ'),
+            Map.entry((int) 'f', (int) 'ㄹ'),
+            Map.entry((int) 'g', (int) 'ㅎ'),
+            Map.entry((int) 'h', (int) 'ㅗ'),
+            Map.entry((int) 'j', (int) 'ㅓ'),
+            Map.entry((int) 'k', (int) 'ㅏ'),
+            Map.entry((int) 'l', (int) 'ㅣ'),
+            Map.entry((int) 'z', (int) 'ㅋ'),
+            Map.entry((int) 'x', (int) 'ㅌ'),
+            Map.entry((int) 'c', (int) 'ㅊ'),
+            Map.entry((int) 'v', (int) 'ㅍ'),
+            Map.entry((int) 'b', (int) 'ㅠ'),
+            Map.entry((int) 'n', (int) 'ㅜ'),
+            Map.entry((int) 'm', (int) 'ㅡ'));
+    // 두벌식 자판에서 두 번 입력하는 겹모음·겹받침 호환 자모 → 입력 순서대로 나열한 호환 자모
+    public static final Map<Integer, String> COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP = Map.ofEntries(
+            Map.entry((int) 'ㅘ', "ㅗㅏ"),
+            Map.entry((int) 'ㅙ', "ㅗㅐ"),
+            Map.entry((int) 'ㅚ', "ㅗㅣ"),
+            Map.entry((int) 'ㅝ', "ㅜㅓ"),
+            Map.entry((int) 'ㅞ', "ㅜㅔ"),
+            Map.entry((int) 'ㅟ', "ㅜㅣ"),
+            Map.entry((int) 'ㅢ', "ㅡㅣ"),
+            Map.entry((int) 'ㄳ', "ㄱㅅ"),
+            Map.entry((int) 'ㄵ', "ㄴㅈ"),
+            Map.entry((int) 'ㄶ', "ㄴㅎ"),
+            Map.entry((int) 'ㄺ', "ㄹㄱ"),
+            Map.entry((int) 'ㄻ', "ㄹㅁ"),
+            Map.entry((int) 'ㄼ', "ㄹㅂ"),
+            Map.entry((int) 'ㄽ', "ㄹㅅ"),
+            Map.entry((int) 'ㄾ', "ㄹㅌ"),
+            Map.entry((int) 'ㄿ', "ㄹㅍ"),
+            Map.entry((int) 'ㅀ', "ㄹㅎ"),
+            Map.entry((int) 'ㅄ', "ㅂㅅ"));
 
     private static Map<Integer, Integer> createConjoiningCompatibilityJamoMap() {
         // 1. 한글 호환 자모의 각 문자를 NFKD로 분해한 조합형 자모의 이름에서 접두어를 떼어, 조합형 자모 이름 → 호환 자모 맵을 만듦
