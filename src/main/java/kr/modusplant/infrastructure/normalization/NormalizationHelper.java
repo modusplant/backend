@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.function.IntPredicate;
 
-import static kr.modusplant.shared.constant.Regex.PATTERN_FILLER_JAMO;
+import static kr.modusplant.shared.constant.Regex.PATTERN_NOISE_JAMO;
+import static kr.modusplant.shared.constant.Regex.PATTERN_LINE_TERMINATOR;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 final class NormalizationHelper {
@@ -53,8 +54,12 @@ final class NormalizationHelper {
         };
     }
 
-    static boolean isFillerJamo(int codePoint) {
-        return PATTERN_FILLER_JAMO.matcher(Character.toString(codePoint)).matches();
+    static boolean isNoiseJamo(int codePoint) {
+        return PATTERN_NOISE_JAMO.matcher(Character.toString(codePoint)).matches();
+    }
+
+    static boolean isLineTerminator(int codePoint) {
+        return PATTERN_LINE_TERMINATOR.matcher(Character.toString(codePoint)).matches();
     }
 
     static boolean isHangulSyllable(int codePoint) {

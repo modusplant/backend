@@ -17,20 +17,33 @@ import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.NFKD_NORMALI
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_CHOSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_JONGSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_JUNGSEONG_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isFillerJamo;
+import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNoiseJamo;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllableWithoutFinal;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isInDICP;
+import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isLineTerminator;
 import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNonLetterNoiseCategory;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.FINAL;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.INITIAL;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.MEDIAL;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.STANDALONE;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.HANGUL_SYLLABLE;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.LATIN_LETTER;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.OTHER;
+import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.STANDALONE_JAMO;
 
 @Component
 public class TextNormalizer {
     private static final int NOT_MERGED_CODE_POINT = -1;
+    private static final int MINIMUM_CONTRIBUTING_LINE_COUNT = 2;
     private static final char CHOSEONG_IEUNG = 'ᄋ';
+    private static final List<NormalizedView.JamoPosition> SYLLABLE_JAMO_POSITIONS = List.of(INITIAL, MEDIAL, FINAL);
 
     private final Normalizer2 nfdNormalizer;
     private final Normalizer2 nfcNormalizer;
@@ -56,8 +69,8 @@ public class TextNormalizer {
     }
 
     // 경량 정규화: 문자 체계를 바꾸지 않고 인코딩 수준의 변형만 제거하며, 각 코드 유닛은 그 유닛을 생성한 원본 문자소 군집의 전체 구간에 대응함
-    public NormalizedText lightlyNormalize(String originalText) {
-        NormalizedText.Builder builder = new NormalizedText.Builder(originalText.length());
+    public NormalizedView lightlyNormalize(String originalText) {
+        NormalizedView.Builder builder = new NormalizedView.Builder(originalText.length());
         BreakIterator originalClusters = BreakIterator.getCharacterInstance();
         originalClusters.setText(originalText);
         int start = originalClusters.first();
@@ -74,13 +87,40 @@ public class TextNormalizer {
 
     // 강화 정규화: 단어 사이에 끼워 넣은 문자는 제거하고, 치환한 문자는 대응 문자로 변환하고, 반복한 문자는 병합하며,
     // 병합된 코드 유닛은 그 유닛을 만든 코드 유닛들의 구간 합에 대응함
-    public NormalizedText aggressivelyNormalize(NormalizedText lightlyNormalizedText) {
-        NormalizedText homoglyphMappedText = mapCrossScriptHomoglyphsToLatin(lightlyNormalizedText);
-        NormalizedText nonLetterNoiseRemovedText = removeNonLetterNoise(homoglyphMappedText);
-        NormalizedText fillerJamoRemovedText = removeFillerJamoBetweenSyllables(nonLetterNoiseRemovedText);
-        NormalizedText repeatCollapsedText = collapseRepeats(fillerJamoRemovedText);
-        NormalizedText jamoComposedText = composeCompatibilityRunIntoSyllables(repeatCollapsedText);
-        return mergeElongatedVowels(jamoComposedText);
+    public NormalizedView aggressivelyNormalize(NormalizedView lightlyNormalizedView) {
+        NormalizedView confusableMappedView = mapCrossScriptConfusablesToLatin(lightlyNormalizedView);
+        NormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(confusableMappedView);
+        NormalizedView noiseJamoRemovedView = removeNoiseJamoBetweenSyllables(nonLetterNoiseRemovedView);
+        NormalizedView repeatCollapsedView = collapseRepeats(noiseJamoRemovedView);
+        NormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(repeatCollapsedView);
+        return mergeElongatedVowels(jamoComposedView);
+    }
+
+    // 키 입력 정규화: 음절, 낱자, 라틴 문자를 두벌식 키 입력 자모로 통일하고 연속한 같은 자모를 병합하며, 각 코드 유닛에 유닛 태그를 기록함
+    public NormalizedView decomposeIntoKeystrokes(NormalizedView aggressivelyNormalizedView,
+                                                  NormalizedView lightlyNormalizedView) {
+        NormalizedView keystrokeMappedView = mapToKeystrokeJamo(aggressivelyNormalizedView, lightlyNormalizedView);
+        return collapseIdenticalJamoRuns(keystrokeMappedView);
+    }
+
+    // 행 머리 추출: 비문자 잡음을 건너뛴 각 행의 첫 문자를 이어 붙이며, 기여한 행이 2개 미만이면 빈 뷰를 반환함
+    public NormalizedView extractLineInitials(NormalizedView lightlyNormalizedView) {
+        NormalizedView.Builder builder = new NormalizedView.Builder(lightlyNormalizedView.length());
+        int contributingLineCount = 0;
+        boolean isLineInitialFound = false;
+        int sourceCodeUnitStart = 0;
+        for (int codePoint : lightlyNormalizedView.getText().codePoints().toArray()) {
+            int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoint);
+            if (isLineTerminator(codePoint)) {
+                isLineInitialFound = false;
+            } else if (!isLineInitialFound && !isNonLetterNoiseCategory(codePoint)) {
+                appendCodePoint(builder, codePoint, lightlyNormalizedView, sourceCodeUnitStart, sourceCodeUnitEnd);
+                isLineInitialFound = true;
+                contributingLineCount++;
+            }
+            sourceCodeUnitStart = sourceCodeUnitEnd;
+        }
+        return contributingLineCount >= MINIMUM_CONTRIBUTING_LINE_COUNT ? builder.build() : new NormalizedView.Builder(0).build();
     }
 
     private String canonicalize(String originalCluster) {
@@ -107,39 +147,39 @@ public class TextNormalizer {
         return keptText.toString();
     }
 
-    private NormalizedText mapCrossScriptHomoglyphsToLatin(NormalizedText sourceText) {
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView mapCrossScriptConfusablesToLatin(NormalizedView sourceView) {
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
-        for (int codePoint : sourceText.getText().codePoints().toArray()) {
+        for (int codePoint : sourceView.getText().codePoints().toArray()) {
             int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoint);
-            appendCodePoint(builder, CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.getOrDefault(codePoint, codePoint),
-                    sourceText, sourceCodeUnitStart, sourceCodeUnitEnd);
+            appendCodePoint(builder, CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.getOrDefault(codePoint, codePoint),
+                    sourceView, sourceCodeUnitStart, sourceCodeUnitEnd);
             sourceCodeUnitStart = sourceCodeUnitEnd;
         }
         return builder.build();
     }
 
-    private NormalizedText removeNonLetterNoise(NormalizedText sourceText) {
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView removeNonLetterNoise(NormalizedView sourceView) {
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
-        for (int codePoint : sourceText.getText().codePoints().toArray()) {
+        for (int codePoint : sourceView.getText().codePoints().toArray()) {
             int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoint);
             if (!isNonLetterNoiseCategory(codePoint)) {
-                appendCodePoint(builder, codePoint, sourceText, sourceCodeUnitStart, sourceCodeUnitEnd);
+                appendCodePoint(builder, codePoint, sourceView, sourceCodeUnitStart, sourceCodeUnitEnd);
             }
             sourceCodeUnitStart = sourceCodeUnitEnd;
         }
         return builder.build();
     }
 
-    private NormalizedText removeFillerJamoBetweenSyllables(NormalizedText sourceText) {
-        int[] codePoints = sourceText.getText().codePoints().toArray();
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView removeNoiseJamoBetweenSyllables(NormalizedView sourceView) {
+        int[] codePoints = sourceView.getText().codePoints().toArray();
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
             int runEndArrayIndex = codePointArrayIndex;
-            while (runEndArrayIndex < codePoints.length && isFillerJamo(codePoints[runEndArrayIndex])) {
+            while (runEndArrayIndex < codePoints.length && isNoiseJamo(codePoints[runEndArrayIndex])) {
                 runEndArrayIndex++;
             }
             boolean isRunBetweenSyllables = runEndArrayIndex > codePointArrayIndex
@@ -147,7 +187,7 @@ public class TextNormalizer {
                     && isHangulSyllable(codePoints[codePointArrayIndex - 1])
                     && isHangulSyllable(codePoints[runEndArrayIndex]);
             if (isRunBetweenSyllables) {
-                // 채움 자모는 모두 BMP 문자이므로 코드 포인트 수와 코드 유닛 수가 같음
+                // 잡음 자모는 모두 BMP 문자이므로 코드 포인트 수와 코드 유닛 수가 같음
                 sourceCodeUnitStart += runEndArrayIndex - codePointArrayIndex;
                 codePointArrayIndex = runEndArrayIndex;
                 continue;
@@ -155,7 +195,7 @@ public class TextNormalizer {
             int keptEndArrayIndex = Math.max(runEndArrayIndex, codePointArrayIndex + 1);
             for (; codePointArrayIndex < keptEndArrayIndex; codePointArrayIndex++) {
                 int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoints[codePointArrayIndex]);
-                appendCodePoint(builder, codePoints[codePointArrayIndex], sourceText,
+                appendCodePoint(builder, codePoints[codePointArrayIndex], sourceView,
                         sourceCodeUnitStart, sourceCodeUnitEnd);
                 sourceCodeUnitStart = sourceCodeUnitEnd;
             }
@@ -164,9 +204,9 @@ public class TextNormalizer {
     }
 
     // 서로게이트 절반이 합쳐지지 않도록 코드 포인트 단위로 비교
-    private NormalizedText collapseRepeats(NormalizedText sourceText) {
-        int[] codePoints = sourceText.getText().codePoints().toArray();
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView collapseRepeats(NormalizedView sourceView) {
+        int[] codePoints = sourceView.getText().codePoints().toArray();
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -176,16 +216,16 @@ public class TextNormalizer {
                 sourceCodeUnitEnd += Character.charCount(codePoint);
                 codePointArrayIndex++;
             }
-            appendCodePoint(builder, codePoint, sourceText, sourceCodeUnitStart, sourceCodeUnitEnd);
+            appendCodePoint(builder, codePoint, sourceView, sourceCodeUnitStart, sourceCodeUnitEnd);
             sourceCodeUnitStart = sourceCodeUnitEnd;
         }
         return builder.build();
     }
 
     // 호환 자모 연속 전체가 음절로 나뉠 때만 결합함
-    private NormalizedText composeCompatibilityRunIntoSyllables(NormalizedText sourceText) {
-        int[] codePoints = sourceText.getText().codePoints().toArray();
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView composeCompatibilityRunIntoSyllables(NormalizedView sourceView) {
+        int[] codePoints = sourceView.getText().codePoints().toArray();
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -196,7 +236,7 @@ public class TextNormalizer {
             List<Integer> syllableJamoCounts = segmentCompatibilityJamoRunIntoSyllables(codePoints, codePointArrayIndex, runEndArrayIndex);
             // 호환 자모는 모두 BMP 문자이므로 코드 포인트 수와 코드 유닛 수가 같음
             for (int jamoCount : syllableJamoCounts) {
-                appendCodePoint(builder, composeSyllable(codePoints, codePointArrayIndex, jamoCount), sourceText,
+                appendCodePoint(builder, composeSyllable(codePoints, codePointArrayIndex, jamoCount), sourceView,
                         sourceCodeUnitStart, sourceCodeUnitStart + jamoCount);
                 sourceCodeUnitStart += jamoCount;
                 codePointArrayIndex += jamoCount;
@@ -205,7 +245,7 @@ public class TextNormalizer {
                 int keptEndArrayIndex = Math.max(runEndArrayIndex, codePointArrayIndex + 1);
                 for (; codePointArrayIndex < keptEndArrayIndex; codePointArrayIndex++) {
                     int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoints[codePointArrayIndex]);
-                    appendCodePoint(builder, codePoints[codePointArrayIndex], sourceText,
+                    appendCodePoint(builder, codePoints[codePointArrayIndex], sourceView,
                             sourceCodeUnitStart, sourceCodeUnitEnd);
                     sourceCodeUnitStart = sourceCodeUnitEnd;
                 }
@@ -245,9 +285,9 @@ public class TextNormalizer {
         return nfcNormalizer.normalize(conjoiningJamo).codePointAt(0);
     }
 
-    private NormalizedText mergeElongatedVowels(NormalizedText sourceText) {
-        int[] codePoints = sourceText.getText().codePoints().toArray();
-        NormalizedText.Builder builder = new NormalizedText.Builder(sourceText.length());
+    private NormalizedView mergeElongatedVowels(NormalizedView sourceView) {
+        int[] codePoints = sourceView.getText().codePoints().toArray();
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
         int codePointArrayIndex = 0;
         int sourceCodeUnitStart = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -263,7 +303,7 @@ public class TextNormalizer {
                 sourceCodeUnitEnd += Character.charCount(codePoints[codePointArrayIndex]);
                 codePointArrayIndex++;
             }
-            appendCodePoint(builder, mergedCodePoint, sourceText, sourceCodeUnitStart, sourceCodeUnitEnd);
+            appendCodePoint(builder, mergedCodePoint, sourceView, sourceCodeUnitStart, sourceCodeUnitEnd);
             sourceCodeUnitStart = sourceCodeUnitEnd;
         }
         return builder.build();
@@ -289,13 +329,99 @@ public class TextNormalizer {
         return nfcNormalizer.normalize(precedingJamo + followingJamo.substring(2)).codePointAt(0);
     }
 
+    private NormalizedView mapToKeystrokeJamo(NormalizedView sourceView, NormalizedView lightlyNormalizedView) {
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        int sourceCodeUnitStart = 0;
+        for (int codePoint : sourceView.getText().codePoints().toArray()) {
+            if (isHangulSyllable(codePoint)) {
+                appendSyllableKeystrokes(builder, codePoint, sourceView, sourceCodeUnitStart, lightlyNormalizedView);
+            } else if (isCompatibilityJamo(codePoint)) {
+                appendKeystrokes(builder,
+                        convertToKeystrokeJamo(codePoint), STANDALONE_JAMO,
+                        STANDALONE, false, sourceView, sourceCodeUnitStart);
+            } else if (LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.containsKey(codePoint)) {
+                appendKeystrokes(builder,
+                        Character.toString(LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.get(codePoint)),
+                        LATIN_LETTER, STANDALONE, false, sourceView, sourceCodeUnitStart);
+            } else {
+                appendKeystrokes(builder,
+                        Character.toString(codePoint),
+                        OTHER, STANDALONE, false, sourceView, sourceCodeUnitStart);
+            }
+            sourceCodeUnitStart += Character.charCount(codePoint);
+        }
+        return builder.build();
+    }
+
+    // 낱자로 입력해 강화 정규화에서 합성된 음절도 낱자 입력으로 기록하되, 자모 위치는 합성된 음절의 위치를 따름
+    private void appendSyllableKeystrokes(NormalizedView.Builder builder, int syllable, NormalizedView sourceView,
+                                          int sourceCodeUnitIndex, NormalizedView lightlyNormalizedView) {
+        int lightlyNormalizedStart = sourceView.getLightlyNormalizedStart(sourceCodeUnitIndex);
+        NormalizedView.SourceCharacterKind sourceCharacterKind =
+                isCompatibilityJamo(lightlyNormalizedView.getText().codePointAt(lightlyNormalizedStart))
+                        ? STANDALONE_JAMO : HANGUL_SYLLABLE;
+        String conjoiningJamo = nfdNormalizer.normalize(Character.toString(syllable));
+        for (int jamoIndex = 0; jamoIndex < conjoiningJamo.length(); jamoIndex++) {
+            int compatibilityJamo = CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) conjoiningJamo.charAt(jamoIndex));
+            boolean isLastJamo = jamoIndex == conjoiningJamo.length() - 1;
+            appendKeystrokes(builder, convertToKeystrokeJamo(compatibilityJamo), sourceCharacterKind,
+                    SYLLABLE_JAMO_POSITIONS.get(jamoIndex), isLastJamo, sourceView, sourceCodeUnitIndex);
+        }
+    }
+
+    private String convertToKeystrokeJamo(int compatibilityJamo) {
+        return COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP
+                .getOrDefault(compatibilityJamo, Character.toString(compatibilityJamo));
+    }
+
+    // 음절의 끝은 마지막 키 입력 자모에만 기록함
+    private void appendKeystrokes(NormalizedView.Builder builder, String keystrokes,
+                                  NormalizedView.SourceCharacterKind sourceCharacterKind,
+                                  NormalizedView.JamoPosition jamoPosition, boolean endsSyllableAtLastKeystroke,
+                                  NormalizedView sourceView, int sourceCodeUnitIndex) {
+        for (int keystrokeIndex = 0; keystrokeIndex < keystrokes.length(); keystrokeIndex++) {
+            boolean endsSyllable = endsSyllableAtLastKeystroke && keystrokeIndex == keystrokes.length() - 1;
+            builder.append(keystrokes.charAt(keystrokeIndex),
+                    sourceView.getLightlyNormalizedStart(sourceCodeUnitIndex),
+                    sourceView.getLightlyNormalizedEnd(sourceCodeUnitIndex),
+                    sourceView.getOriginalStart(sourceCodeUnitIndex),
+                    sourceView.getOriginalEnd(sourceCodeUnitIndex),
+                    sourceCharacterKind, jamoPosition, jamoPosition, endsSyllable);
+        }
+    }
+
+    // 병합된 코드 유닛의 자모 위치는 매치 시작 검사에 첫 유닛의 값을, 매치 끝 검사에 마지막 유닛의 값을 사용함
+    private NormalizedView collapseIdenticalJamoRuns(NormalizedView sourceView) {
+        String text = sourceView.getText();
+        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        int runStart = 0;
+        while (runStart < text.length()) {
+            char unit = text.charAt(runStart);
+            int lastUnitOfRun = runStart;
+            while (isCompatibilityJamo(unit) && lastUnitOfRun + 1 < text.length() && text.charAt(lastUnitOfRun + 1) == unit) {
+                lastUnitOfRun++;
+            }
+            builder.append(unit,
+                    sourceView.getLightlyNormalizedStart(runStart),
+                    sourceView.getLightlyNormalizedEnd(lastUnitOfRun),
+                    sourceView.getOriginalStart(runStart),
+                    sourceView.getOriginalEnd(lastUnitOfRun),
+                    sourceView.getSourceCharacterKind(runStart),
+                    sourceView.getFirstSourceJamoPosition(runStart),
+                    sourceView.getLastSourceJamoPosition(lastUnitOfRun),
+                    sourceView.getSyllableEnds(lastUnitOfRun));
+            runStart = lastUnitOfRun + 1;
+        }
+        return builder.build();
+    }
+
     // 합쳐진 코드 유닛도 원본 순서를 유지하므로 구간 합은 첫 유닛의 시작과 마지막 유닛의 끝으로 결정됨
-    private void appendCodePoint(NormalizedText.Builder builder, int codePoint, NormalizedText sourceText,
+    private void appendCodePoint(NormalizedView.Builder builder, int codePoint, NormalizedView sourceView,
                                  int sourceCodeUnitStart, int sourceCodeUnitEnd) {
-        int lightlyNormalizedStart = sourceText.getLightlyNormalizedStart(sourceCodeUnitStart);
-        int lightlyNormalizedEnd = sourceText.getLightlyNormalizedEnd(sourceCodeUnitEnd - 1);
-        int originalStart = sourceText.getOriginalStart(sourceCodeUnitStart);
-        int originalEnd = sourceText.getOriginalEnd(sourceCodeUnitEnd - 1);
+        int lightlyNormalizedStart = sourceView.getLightlyNormalizedStart(sourceCodeUnitStart);
+        int lightlyNormalizedEnd = sourceView.getLightlyNormalizedEnd(sourceCodeUnitEnd - 1);
+        int originalStart = sourceView.getOriginalStart(sourceCodeUnitStart);
+        int originalEnd = sourceView.getOriginalEnd(sourceCodeUnitEnd - 1);
         for (char unit : Character.toChars(codePoint)) {
             builder.append(unit, lightlyNormalizedStart, lightlyNormalizedEnd, originalStart, originalEnd);
         }

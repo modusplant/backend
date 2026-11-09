@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_CHOSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_JONGSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPATIBILITY_CONJOINING_JUNGSEONG_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -41,6 +43,7 @@ class NormalizationCharacterMapTest {
     @DisplayName("변경 시도로 예외 반환")
     void testConjoiningCompatibilityJamoMap_givenModification_willThrowException() {
         // given & when & then
+        //noinspection DataFlowIssue
         assertThatThrownBy(() -> CONJOINING_COMPATIBILITY_JAMO_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
@@ -62,24 +65,26 @@ class NormalizationCharacterMapTest {
     @DisplayName("변경 시도로 예외 반환")
     void testLetterLikeSymbolLowerCaseLatinMap_givenModification_willThrowException() {
         // given & when & then
+        //noinspection DataFlowIssue
         assertThatThrownBy(() -> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
     @Test
-    @DisplayName("키릴 및 그리스 동형 문자로 라틴 소문자 반환")
-    void testCrossScriptHomoglyphLatinMap_givenHomoglyphs_willReturnInteger() {
+    @DisplayName("라틴 문자와 혼동하기 쉬운 키릴 및 그리스 문자로 라틴 소문자 반환")
+    void testCrossScriptConfusableLatinMap_givenConfusables_willReturnInteger() {
         // given & when & then
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x0455)).isEqualTo('s');
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x0456)).isEqualTo('i');
-        assertThat(CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.get(0x03BF)).isEqualTo('o');
+        assertThat(CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.get(0x0455)).isEqualTo('s');
+        assertThat(CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.get(0x0456)).isEqualTo('i');
+        assertThat(CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.get(0x03BF)).isEqualTo('o');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testCrossScriptHomoglyphLatinMap_givenModification_willThrowException() {
+    void testCrossScriptConfusableLatinMap_givenModification_willThrowException() {
         // given & when & then
-        assertThatThrownBy(() -> CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP.put(0, 0))
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -102,6 +107,33 @@ class NormalizationCharacterMapTest {
     }
 
     @Test
+    @DisplayName("라틴 소문자로 같은 키의 호환 자모 반환")
+    void testLatinLowerCaseTwoBeolsikJamoMap_givenLatinLetter_willReturnInteger() {
+        // given & when & then
+        assertThat(LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP).hasSize(26);
+        assertThat(LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.get((int) 'q')).isEqualTo(0x3142); // ㅂ
+        assertThat(LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.get((int) 'l')).isEqualTo(0x3163); // ㅣ
+        assertThat(LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.get((int) 'm')).isEqualTo(0x3161); // ㅡ
+    }
+
+    @Test
+    @DisplayName("겹모음과 겹받침으로 키 입력 순서의 문자열 반환")
+    void testCompoundJamoKeystrokeJamoMap_givenCompoundJamo_willReturnString() {
+        // given & when & then
+        assertThat(COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP).hasSize(18);
+        assertThat(COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.get((int) 'ㅟ')).isEqualTo("ㅜㅣ");
+        assertThat(COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.get((int) 'ㅄ')).isEqualTo("ㅂㅅ");
+    }
+
+    @Test
+    @DisplayName("한 번에 입력하는 자모로 null 반환")
+    void testCompoundJamoKeystrokeJamoMap_givenSingleKeystrokeJamo_willReturnNull() {
+        // given & when & then
+        assertThat(COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.get((int) 'ㅐ')).isNull();
+        assertThat(COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.get((int) 'ㅆ')).isNull();
+    }
+
+    @Test
     @DisplayName("해당 위치에 올 수 없는 자모로 null 반환")
     void testCompatibilityJamoMaps_givenJamoInvalidForPosition_willReturnNull() {
         // given & when & then
@@ -114,11 +146,20 @@ class NormalizationCharacterMapTest {
     @DisplayName("변경 시도로 예외 반환")
     void testCompatibilityJamoMaps_givenModification_willThrowException() {
         // given & when & then
+        //noinspection DataFlowIssue
         assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_CHOSEONG_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
+        //noinspection DataFlowIssue
         assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
+        //noinspection DataFlowIssue
         assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_JONGSEONG_MAP.put(0, 0))
+                .isInstanceOf(UnsupportedOperationException.class);
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.put(0, 0))
+                .isInstanceOf(UnsupportedOperationException.class);
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.put(0, ""))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }
