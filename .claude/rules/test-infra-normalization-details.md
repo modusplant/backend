@@ -25,5 +25,5 @@ the ICU4J normalization result itself.
 
 ## 3. TestUtils
 
-`NormalizedText` is built in each test through the package-private `NormalizedText.Builder`, because a TestUtils under
-`common/util/` sits in another package and cannot reach it.
+When built directly, `NormalizedText` is built in each test through the package-private `NormalizedText.Builder`,
+because a TestUtils under `common/util/` sits in another package and cannot reach it.
