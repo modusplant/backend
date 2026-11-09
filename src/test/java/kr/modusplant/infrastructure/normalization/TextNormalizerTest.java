@@ -289,27 +289,40 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("한글 문맥의 유사 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenHangulContextLookAlikes_willReturnNormalizedText() {
+    @DisplayName("음절로 나뉘는 자모 연속으로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenComposableCompatibilityJamoRun_willReturnNormalizedText() {
         // given & when & then
-        assertThat(aggressivelyNormalizedText("ㅅl발")).isEqualTo("ㅅㅣ발");
-        assertThat(aggressivelyNormalizedText("ㅅ|발")).isEqualTo("ㅅㅣ발");
-        assertThat(aggressivelyNormalizedText("^ㅣ발")).isEqualTo("ㅅㅣ발");
-        assertThat(aggressivelyNormalizedText("ㅂㅕo신")).isEqualTo("ㅂㅕㅇ신");
+        assertThat(aggressivelyNormalizedText("ㅂㅕㅇ신")).isEqualTo("병신");
+        assertThat(aggressivelyNormalizedText("ㅅㅣ발")).isEqualTo("시발");
+        assertThat(aggressivelyNormalizedText("ㅅㅣㅂㅏㄹ")).isEqualTo("시발");
     }
 
     @Test
-    @DisplayName("연속된 유사 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenChainedLookAlikes_willReturnNormalizedText() {
+    @DisplayName("음절로 나뉘지 않는 자모 연속으로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenNonComposableCompatibilityJamoRun_willReturnNormalizedText() {
         // given & when & then
-        assertThat(aggressivelyNormalizedText("人l발")).isEqualTo("ㅅㅣ발");
+        assertThat(aggressivelyNormalizedText("ㅅㅂ")).isEqualTo("ㅅㅂ");
+        assertThat(aggressivelyNormalizedText("ㅋㅋ")).isEqualTo("ㅋ");
+        assertThat(aggressivelyNormalizedText("시바ㄹ")).isEqualTo("시바ㄹ");
+        assertThat(aggressivelyNormalizedText("ㅅㅂㅠㅠ")).isEqualTo("ㅅㅂㅠ");
+        assertThat(aggressivelyNormalizedText("ㄷㅜㅣㅈㅕ")).isEqualTo("ㄷㅜㅣㅈㅕ");
     }
 
     @Test
-    @DisplayName("두 음절 사이의 유사 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenLookAlikeBetweenSyllables_willReturnNormalizedText() {
+    @DisplayName("결합 후 모음 늘이기가 있는 자모 연속으로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenComposedJamoWithElongation_willReturnNormalizedText() {
         // given & when & then
-        assertThat(aggressivelyNormalizedText("시l발")).isEqualTo("시발");
+        assertThat(aggressivelyNormalizedText("ㅅㅣ이발")).isEqualTo("시발");
+    }
+
+    @Test
+    @DisplayName("한글 사이의 문자와 숫자 및 기호로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenLettersAndNoiseNextToHangul_willReturnNormalizedText() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("ㅅl발")).isEqualTo("ㅅl발");
+        assertThat(aggressivelyNormalizedText("시l발")).isEqualTo("시l발");
+        assertThat(aggressivelyNormalizedText("人l발")).isEqualTo("人l발");
+        assertThat(aggressivelyNormalizedText("ㅅ|발")).isEqualTo("ㅅ발");
         assertThat(aggressivelyNormalizedText("시 1 발")).isEqualTo("시발");
     }
 
@@ -321,21 +334,20 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("라틴 문맥의 유사 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenLatinContextLookAlikes_willReturnNormalizedText() {
+    @DisplayName("라틴 문자 사이의 숫자와 기호로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenNoiseInLatinWord_willReturnNormalizedText() {
         // given & when & then
-        assertThat(aggressivelyNormalizedText("s1bal")).isEqualTo("sibal");
-        assertThat(aggressivelyNormalizedText("$ibal")).isEqualTo("sibal");
-        assertThat(aggressivelyNormalizedText("5hit")).isEqualTo("shit");
+        assertThat(aggressivelyNormalizedText("s1bal")).isEqualTo("sbal");
+        assertThat(aggressivelyNormalizedText("$ibal")).isEqualTo("ibal");
+        assertThat(aggressivelyNormalizedText("5hit")).isEqualTo("hit");
     }
 
     @Test
-    @DisplayName("문맥이 모호하거나 라틴 대응이 없는 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenUnresolvedLookAlikes_willReturnNormalizedText() {
+    @DisplayName("라틴 문자와 숫자 및 기호만으로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenLatinLettersOrOnlyNoise_willReturnNormalizedText() {
         // given & when & then
         assertThat(aggressivelyNormalizedText("tl발")).isEqualTo("tl발");
         assertThat(aggressivelyNormalizedText("helo")).isEqualTo("helo");
-        // 문맥 없는 숫자와 기호는 구분 문자로 제거
         assertThat(aggressivelyNormalizedText("1^0")).isEmpty();
     }
 
@@ -384,14 +396,15 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("치환된 유사 문자로 정규화 뷰 반환")
-    void testAggressivelyNormalize_givenMappedLookAlike_willReturnNormalizedText() {
+    @DisplayName("결합된 자모로 정규화 뷰 반환")
+    void testAggressivelyNormalize_givenComposedJamo_willReturnNormalizedText() {
         // given & when
-        NormalizedText normalizedText = textNormalizer.aggressivelyNormalize(textNormalizer.lightlyNormalize("ㅅl발"));
+        NormalizedText normalizedText = textNormalizer.aggressivelyNormalize(textNormalizer.lightlyNormalize("ㅂㅕㅇ신"));
 
         // then
-        assertThat(normalizedText.getText()).isEqualTo("ㅅㅣ발");
-        assertSpans(normalizedText, 1, 1, 2, 1, 2);
+        assertThat(normalizedText.getText()).isEqualTo("병신");
+        assertSpans(normalizedText, 0, 0, 3, 0, 3);
+        assertSpans(normalizedText, 1, 3, 4, 3, 4);
     }
 
     @Test

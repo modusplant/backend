@@ -27,12 +27,25 @@ public final class NormalizationCharacterMap {
     private static final int NEGATIVE_CIRCLED_LATIN_CAPITAL_A = 0x1F150; // 검은 원 안의 라틴 대문자 🅐~🅩 26자의 시작 코드 포인트
     private static final int NEGATIVE_SQUARED_LATIN_CAPITAL_A = 0x1F170; // 검은 사각형 안의 라틴 대문자 🅰~🆉 26자의 시작 코드 포인트
 
+    // 음절 결합 가능 여부를 확인하는 문맥으로 쓰는 자모
+    // 현대 자모의 결합은 자모 종류와 무관하게 성립하여 어떤 현대 자모를 써도 결과가 같으므로, 첫소리·가운뎃소리 각각의 첫 현대 자모를 사용
+    private static final int CHOSEONG_KIYEOK = 0x1100; // 첫소리 ᄀ
+    private static final int JUNGSEONG_A = 0x1161; // 가운뎃소리 ᅡ
+
     private static final Normalizer2 nfkdInstance = Normalizer2.getNFKDInstance();
+    private static final Normalizer2 nfcInstance = Normalizer2.getNFCInstance();
 
     // 키: Hangul_Syllable_Type이 첫소리(L)·가운뎃소리(V)·끝소리(T)인 조합형 자모의 코드 포인트
     // 값: 접두어(HANGUL CHOSEONG/JUNGSEONG/JONGSEONG)를 뗀 자모 이름에 매칭되는 한글 호환 자모의 코드 포인트
     // 이름이 같은 호환 자모가 없는 조합형 자모(호환 자모가 없는 옛한글 자모, 채움 문자)는 포함하지 않음
     public static final Map<Integer, Integer> CONJOINING_COMPATIBILITY_JAMO_MAP = createConjoiningCompatibilityJamoMap();
+    // 호환 자모 → 완성형 음절의 첫소리·가운뎃소리·끝소리가 될 수 있는 조합형 자모
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_CHOSEONG_MAP = createCompatibilityConjoiningJamoMap(
+            "", Character.toString(JUNGSEONG_A));
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP = createCompatibilityConjoiningJamoMap(
+            Character.toString(CHOSEONG_KIYEOK), "");
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JONGSEONG_MAP = createCompatibilityConjoiningJamoMap(
+            Character.toString(CHOSEONG_KIYEOK) + Character.toString(JUNGSEONG_A), "");
     // 호환 분해가 없는 문자 유사 기호 → 라틴 소문자
     public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
     // 라틴 소문자와 형태가 혼동되는 키릴 · 그리스 소문자 → 라틴 소문자
@@ -62,29 +75,6 @@ public final class NormalizationCharacterMap {
             Map.entry(0x03C4, (int) 't'), // 그리스 τ
             Map.entry(0x03C5, (int) 'u'), // 그리스 υ
             Map.entry(0x03C7, (int) 'x')); // 그리스 χ
-    // 한글 주변에서 한글 자모를 흉내 내는 문자 → 호환 자모
-    public static final Map<Integer, Integer> HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP = Map.ofEntries(
-            Map.entry((int) '1', (int) 'ㅣ'),
-            Map.entry((int) 'l', (int) 'ㅣ'),
-            Map.entry((int) '|', (int) 'ㅣ'),
-            Map.entry((int) '0', (int) 'ㅇ'),
-            Map.entry((int) 'o', (int) 'ㅇ'),
-            Map.entry((int) '^', (int) 'ㅅ'),
-            Map.entry((int) '人', (int) 'ㅅ'));
-    // 라틴 문자 주변에서 라틴 문자를 흉내 내는 숫자·기호 → 라틴 소문자
-    public static final Map<Integer, Integer> LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP = Map.ofEntries(
-            Map.entry((int) '0', (int) 'o'),
-            Map.entry((int) '1', (int) 'i'),
-            Map.entry((int) '2', (int) 'z'),
-            Map.entry((int) '3', (int) 'e'),
-            Map.entry((int) '4', (int) 'a'),
-            Map.entry((int) '5', (int) 's'),
-            Map.entry((int) '6', (int) 'g'),
-            Map.entry((int) '8', (int) 'b'),
-            Map.entry((int) '9', (int) 'g'),
-            Map.entry((int) '$', (int) 's'),
-            Map.entry((int) '@', (int) 'a'),
-            Map.entry((int) '€', (int) 'e'));
 
     private static Map<Integer, Integer> createConjoiningCompatibilityJamoMap() {
         // 1. 한글 호환 자모의 각 문자를 NFKD로 분해한 조합형 자모의 이름에서 접두어를 떼어, 조합형 자모 이름 → 호환 자모 맵을 만듦
@@ -124,6 +114,21 @@ public final class NormalizationCharacterMap {
             }
         }
         return Map.copyOf(conjoiningCompatibilityJamoMap);
+    }
+
+    // 앞뒤 자모와 NFC로 결합해 하나의 완성형 음절이 되는 조합형 자모만 대상으로 하므로, 옛한글 자모는 포함하지 않음
+    // 위치별 최소 문맥을 강제함: 첫소리는 뒤따르는 가운뎃소리, 가운뎃소리는 앞선 첫소리, 끝소리는 앞선 첫소리·가운뎃소리
+    private static Map<Integer, Integer> createCompatibilityConjoiningJamoMap(
+            String enforcedPrecedingJamo, String enforcedFollowingJamo) {
+        Map<Integer, Integer> map = new HashMap<>();
+        CONJOINING_COMPATIBILITY_JAMO_MAP.forEach((conjoiningJamo, compatibilityJamo) -> {
+            String composedText = nfcInstance.normalize(
+                    enforcedPrecedingJamo + Character.toString(conjoiningJamo) + enforcedFollowingJamo);
+            if (composedText.codePointCount(0, composedText.length()) == 1) {
+                map.put(compatibilityJamo, conjoiningJamo);
+            }
+        });
+        return Map.copyOf(map);
     }
 
     private static String getConjoiningJamoName(int codePoint) {

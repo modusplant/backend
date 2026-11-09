@@ -11,13 +11,14 @@ Applies to `kr.modusplant.infrastructure.normalization`.
 
 ## 1. Package Structure
 
-The package is flat: three classes, no sub-packages.
+The package is flat: four classes, no sub-packages.
 
 ```
 normalization/
 ├ TextNormalizer # Spring bean; Unicode normalization forms and lightly and aggressively normalized text
 ├ NormalizedText # A normalized text and, per UTF-16 code unit, its source ranges
-└ NormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
+├ NormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
+└ NormalizationHelper # Stateless code-point predicates that TextNormalizer calls
 ```
 
 ---
@@ -51,10 +52,19 @@ normalization/
   negative squared Latin capital letters, which have no compatibility decomposition → Latin lowercase letters.
 - `CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP`: lowercase Cyrillic and Greek letters confusable with Latin letters (`ѕ`, `і`)
   → Latin lowercase letters.
-- `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP`: digits, symbols, and letters that stand for a jamo next to Hangul (`1`, `l`,
-  `|`, `0`, `o`, `^`, `人`) → Hangul Compatibility Jamo.
-- `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP`: digits and symbols that stand for a letter next to Latin letters (`1`,
-  `0`, `$`, and others) → Latin lowercase letters; `!` is left out, because a sentence can end with it.
+- `COMPATIBILITY_CONJOINING_CHOSEONG_MAP`, `COMPATIBILITY_CONJOINING_JUNGSEONG_MAP`,
+  `COMPATIBILITY_CONJOINING_JONGSEONG_MAP`: Hangul Compatibility Jamo → the conjoining jamo of that syllable position;
+  only a jamo that composes into a precomposed syllable is included, so an archaic jamo is left out.
+
+**`NormalizationHelper`** — package-private, `final`, `@NoArgsConstructor(access = PRIVATE)`:
+- Holds the package-private `static` code-point predicates of `lightlyNormalize` and `aggressivelyNormalize`, which read
+  no `Normalizer2`.
+- `isInDICP`: an `IntPredicate` for the `Default_Ignorable_Code_Point` property.
+- `isInCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
+- `isNonLetterNoiseCategory`: the general categories that step 2 of §4 removes.
+- `isFillerJamo`: a code point that `Regex.PATTERN_FILLER_JAMO` matches.
+- `isHangulSyllable`: the `Hangul_Syllable_Type` LV or LVT; `isHangulSyllableWithoutFinal`: LV only.
+- `isCompatibilityJamo`: a code point in the Hangul Compatibility Jamo block.
 
 **`Regex.PATTERN_FILLER_JAMO`** in `shared/constant/Regex` matches one of `ㅋ`, `ㅎ`, `ㅠ`, `ㅜ`.
 
@@ -95,27 +105,19 @@ The lightly normalized text passes these steps in order, each building a new `No
 | Order | Step |
 |---|---|
 | 1 | Map code points through `CROSS_SCRIPT_HOMOGLYPH_LATIN_MAP` |
-| 2 | Decide each key of `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP` and `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP` by its nearest neighbors (table below) |
-| 3 | Remove code points of the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*` (separators, control characters, punctuation, symbols, numbers) |
-| 4 | Remove each consecutive run of `PATTERN_FILLER_JAMO` code points that has a Hangul syllable on both sides |
-| 5 | Collapse consecutive identical code points into one |
+| 2 | Remove code points of the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*` (separators, control characters, punctuation, symbols, numbers) |
+| 3 | Remove each run of `PATTERN_FILLER_JAMO` code points that has a Hangul syllable on both sides |
+| 4 | Collapse consecutive identical code points into one |
+| 5 | Compose each run of Hangul Compatibility Jamo into syllables |
 | 6 | Merge an elongated vowel into its syllable (rules below) |
 
-Step 2 reads the nearest code point on each side that is neither in the step 3 general categories nor a key of either
-map, so a chain of keys is decided together (`人l발` → `ㅅㅣ발`):
-
-| Neighbors | Result |
-|---|---|
-| A Hangul syllable on both sides | Removed |
-| Hangul on one or both sides, no Latin | `HANGUL_CONTEXT_LOOK_ALIKE_JAMO_MAP` value; unchanged without an entry |
-| Latin on one or both sides, no Hangul | `LATIN_CONTEXT_LOOK_ALIKE_LEET_LETTER_MAP` value; unchanged without an entry |
-| Hangul and Latin, or neither | Unchanged, so `tl발` keeps its Latin letters |
-
-- Step 2 runs before step 3, because step 3 removes the digits and symbols that step 2 reads.
-- Script and syllable checks are ICU4J property queries (`UScript.getScript`, `UProperty.HANGUL_SYLLABLE_TYPE`,
-  `UProperty.BLOCK`).
-- Step 5 compares code points, because comparing UTF-16 code units would join two different supplementary characters
+- Syllable checks are ICU4J property queries (`UProperty.HANGUL_SYLLABLE_TYPE`, `UProperty.BLOCK`).
+- Step 4 compares code points, because comparing UTF-16 code units would join two different supplementary characters
   that share a high surrogate.
+- Step 5: a run (maximally successive Hangul Compatibility Jamo) is read left to right as an initial, a vowel, and an
+  optional final, and a consonant followed by a vowel starts the next syllable (`ㅂㅕㅇ신` → `병신`). A run that does not
+  divide entirely into syllables is kept, because composing part of it would turn `ㅅㅂㅠ` into `ㅅ뷰` and lose `ㅅㅂ`. Step 5
+  runs before step 6, so a composed syllable can absorb an elongated vowel (`ㅅㅣ이발` → `시발`).
 - Step 6: a Hangul syllable without a final absorbs a following Hangul Compatibility Jamo of the same vowel, or a
   following syllable with the initial `ㅇ` and the same vowel, taking that syllable's final (`바알` → `발`). The merged
   syllable keeps absorbing while it has no final.
