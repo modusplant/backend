@@ -63,7 +63,8 @@ normalization/
 - `isInCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
 - `isNonLetterNoiseCategory`: the general categories that step 2 of §4 removes.
 - `isFillerJamo`: a code point that `Regex.PATTERN_FILLER_JAMO` matches.
-- `isHangulSyllable`: the `Hangul_Syllable_Type` LV or LVT; `isHangulSyllableWithoutFinal`: LV only.
+- `isHangulSyllable`: the `Hangul_Syllable_Type` LV or LVT; `isHangulSyllableWithoutFinal`: LV only;
+  `isHangulSyllableWithFinal`: LVT only.
 - `isCompatibilityJamo`: a code point in the Hangul Compatibility Jamo block.
 
 **`Regex.PATTERN_FILLER_JAMO`** in `shared/constant/Regex` matches one of `ㅋ`, `ㅎ`, `ㅠ`, `ㅜ`.
