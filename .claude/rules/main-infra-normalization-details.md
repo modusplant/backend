@@ -47,7 +47,7 @@ normalization/
     `LATIN_LETTER`, `OTHER`.
   - `getFirstSourceJamoPosition` / `getLastSourceJamoPosition` → the nested enum `JamoPosition` of the code unit's first
     and last source: `INITIAL`, `MEDIAL`, `FINAL`, `STANDALONE`.
-  - `endsSyllable` → whether the code unit ends its syllable.
+  - `getSyllableEnds` → whether the code unit ends its syllable.
 - Built only inside the package through the package-private `NormalizedView.Builder` (`append` one code unit with its
   four range bounds, then `build`), which copies its arrays to the final size. The `append` overload that also takes the
   keystroke tags serves the keystroke view; a code unit appended without them has `OTHER`, `STANDALONE`, and `false`.
@@ -71,6 +71,8 @@ normalization/
 - `COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP`: a compound vowel or compound final Hangul
   Compatibility Jamo → a `String` of its 2-beolsik keystroke jamo in typing order; handwritten, because no Unicode
   property gives this split.
+- `KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP`: the inverse of the map above, a `String` key of two
+  keystroke jamo → their compound Hangul Compatibility Jamo; derived from that map, so the two cannot drift apart.
 
 **`NormalizationHelper`** — package-private, `final`, `@NoArgsConstructor(access = PRIVATE)`:
 - Holds the package-private `static` code-point predicates of `TextNormalizer`, which read no `Normalizer2`.
@@ -128,7 +130,7 @@ The lightly normalized view passes these steps in order, each building a new `No
 | 3 | Remove each run of `PATTERN_NOISE_JAMO` code points that has a Hangul syllable on both sides |
 | 4 | Collapse consecutive identical code points into one |
 | 5 | Compose each run of Hangul Compatibility Jamo into syllables |
-| 6 | Merge an elongated vowel into its syllable (rules below) |
+| 6 | Merge an elongated vowel or consonant into its syllable (rules below) |
 
 - Syllable checks are ICU4J property queries (`UProperty.HANGUL_SYLLABLE_TYPE`, `UProperty.BLOCK`).
 - Step 4 compares code points, because comparing UTF-16 code units would join two different supplementary characters
@@ -137,9 +139,11 @@ The lightly normalized view passes these steps in order, each building a new `No
   optional final, and a consonant followed by a vowel starts the next syllable (`ㅂㅕㅇ신` → `병신`). A run that does not
   divide entirely into syllables is kept, because composing part of it would turn `ㅅㅂㅠ` into `ㅅ뷰` and lose `ㅅㅂ`. Step 5
   runs before step 6, so a composed syllable can absorb an elongated vowel (`ㅅㅣ이발` → `시발`).
-- Step 6: a Hangul syllable without a final absorbs a following Hangul Compatibility Jamo of the same vowel, or a
+- Step 6, vowel: a Hangul syllable without a final absorbs a following Hangul Compatibility Jamo of the same vowel, or a
   following syllable with the initial `ㅇ` and the same vowel, taking that syllable's final (`바알` → `발`). The merged
   syllable keeps absorbing while it has no final.
+- Step 6, consonant: a Hangul Compatibility Jamo between two Hangul syllables is absorbed into the preceding syllable
+  when it equals that syllable's final or the following syllable's initial (`존ㄴ나` → `존나`, `시ㅂ발` → `시발`).
 - A merged or collapsed code unit takes the union of its source code units' ranges, and every kept code unit keeps its
   own lightly normalized range (`시 발`: `[0, 1)` and `[2, 3)`).
 
@@ -147,24 +151,49 @@ The lightly normalized view passes these steps in order, each building a new `No
 
 ## 5. `decomposeIntoKeystrokes`
 
-Each code point of the aggressively normalized view becomes keystroke code units that keep its ranges:
+The aggressively normalized view passes these steps in order, each building a new `NormalizedView`:
 
-| Source code point | `SourceCharacterKind` | Becomes | `JamoPosition` | `endsSyllable` |
+| Order | Step |
+|---|---|
+| 1 | Expand each key of `LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP` back into the Latin letters of its lightly normalized range (rules below) |
+| 2 | Convert Latin letters to 2-beolsik Hangul (rules below) |
+| 3 | Step 5 of §4 |
+| 4 | Step 6 of §4 |
+| 5 | Decompose each code point into keystroke code units that keep its ranges (table below) |
+
+- Step 1 undoes step 4 of §4 for Latin letters, so a doubled key stays both a final and an initial (`whssk` → `존나`,
+  not `조나`).
+  - Each letter of the range is mapped through `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP`, the categories of step 2 of §4 are
+    skipped (`s s`), and each letter keeps its own ranges.
+  - A code point whose lightly normalized range was already expanded is skipped, because the code units of one cluster
+    share that range (`ﬁ`).
+- Step 2: each key of `LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP` becomes its jamo, and the jamo of adjacent Latin letters
+  compose as a 2-beolsik input method composes them: an initial, a vowel, and an optional final (`tlqkf` → `시발`).
+  - Two adjacent keys that `KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP` joins form a compound vowel or
+    compound final (`dnjs` → `원`), which step 5 of §4 never builds.
+  - A consonant followed by a vowel, converted or typed, stays an initial instead of becoming a final (`rkqtk` → `갑사`,
+    `tlqㅏㄹ` → `시ㅂㅏㄹ`).
+  - A converted jamo never composes with a typed jamo or syllable in this step; steps 3 and 4 join them (`ㅅl발`,
+    `시l발`, and `tlllqkf` → `시발`).
+- Steps 3 and 4 change only code points next to converted jamo, because §4 already applied them to the rest. Step 4 can
+  also absorb a converted jamo into an adjacent Hangul syllable (`나k` → `나`).
+
+| Source code point | `SourceCharacterKind` | Becomes | `JamoPosition` | `syllableEnds` |
 |---|---|---|---|---|
-| Hangul syllable | `HANGUL_SYLLABLE`, or `STANDALONE_JAMO` when composed from jamo | Its keystroke jamo | `INITIAL`, `MEDIAL`, or `FINAL` of the syllable | `true` on its last code unit only |
-| Hangul Compatibility Jamo | `STANDALONE_JAMO` | Its keystroke jamo | `STANDALONE` | `false` |
-| Key of `LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP` | `LATIN_LETTER` | The jamo on that key | `STANDALONE` | `false` |
+| Hangul syllable | By its lightly normalized source (below) | Its keystroke jamo | `INITIAL`, `MEDIAL`, or `FINAL` of the syllable | `true` on its last code unit only |
+| Hangul Compatibility Jamo | By its lightly normalized source (below) | Its keystroke jamo | `STANDALONE` | `false` |
 | Any other | `OTHER` | Kept | `STANDALONE` | `false` |
 
-- `COMPOUND_JAMO_KEYSTROKE_JAMO_MAP` splits compound vowels and compound finals into their 2-beolsik keystrokes (`ㅟ` →
-  `ㅜㅣ`, `ㅄ` → `ㅂㅅ`). A tense consonant stays one code unit, because it is one shifted keystroke.
-- A Hangul syllable that `aggressivelyNormalize` composed from a Hangul Compatibility Jamo run takes `STANDALONE_JAMO`,
-  decided by whether the lightly normalized view has a Hangul Compatibility Jamo at the start of the syllable's lightly
-  normalized range. Its jamo positions stay those of the syllable (`ㅁㅏㅅㅂㅗㄷㅏ` has the positions of `맛보다`).
-- Runs of identical Hangul Compatibility Jamo then collapse into one code unit (`존나` → `ㅈㅗㄴㅏ`), which takes the union
-  of the run's ranges. It keeps the `SourceCharacterKind` and the first-source `JamoPosition` of the run's first code
-  unit, for the match-start check of `SwearEngine`, and the last-source `JamoPosition` and `endsSyllable` of the run's
-  last code unit, for the match-end check.
+- `COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP` splits compound vowels and compound finals into their
+  2-beolsik keystrokes (`ㅟ` → `ㅜㅣ`, `ㅄ` → `ㅂㅅ`). A tense consonant stays one code unit, because it is one shifted
+  keystroke.
+- The `SourceCharacterKind` of a Hangul code point is read from the lightly normalized view at the start of its lightly
+  normalized range: a Latin letter, or a letter that `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP` maps to one, gives
+  `LATIN_LETTER`; a Hangul Compatibility Jamo gives `STANDALONE_JAMO`; anything else gives `HANGUL_SYLLABLE`.
+- A composed syllable keeps the jamo positions of the syllable (`ㅁㅏㅅㅂㅗㄷㅏ` and `tlqkf` have the positions of `맛보다`
+  and `시발`).
+- Identical keystroke jamo are not merged, so a final and the next initial stay apart (`존나` → `ㅈㅗㄴㄴㅏ`) and `존나`
+  does not match `구조나`.
 
 ---
 

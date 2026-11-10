@@ -9,6 +9,7 @@ import static kr.modusplant.infrastructure.normalization.NormalizationCharacterM
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -134,6 +135,23 @@ class NormalizationCharacterMapTest {
     }
 
     @Test
+    @DisplayName("키 입력 순서의 두 자모로 겹모음과 겹받침 반환")
+    void testKeystrokeJamoCompoundJamoMap_givenKeystrokeJamoPair_willReturnInteger() {
+        // given & when & then
+        assertThat(KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP).hasSize(18);
+        assertThat(KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅜㅓ")).isEqualTo('ㅝ');
+        assertThat(KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅂㅅ")).isEqualTo('ㅄ');
+    }
+
+    @Test
+    @DisplayName("겹자모를 이루지 않는 두 자모로 null 반환")
+    void testKeystrokeJamoCompoundJamoMap_givenNonCompoundPair_willReturnNull() {
+        // given & when & then
+        assertThat(KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅓㅜ")).isNull();
+        assertThat(KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㄴㄴ")).isNull();
+    }
+
+    @Test
     @DisplayName("해당 위치에 올 수 없는 자모로 null 반환")
     void testCompatibilityJamoMaps_givenJamoInvalidForPosition_willReturnNull() {
         // given & when & then
@@ -160,6 +178,9 @@ class NormalizationCharacterMapTest {
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
         assertThatThrownBy(() -> COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.put(0, ""))
+                .isInstanceOf(UnsupportedOperationException.class);
+        //noinspection DataFlowIssue
+        assertThatThrownBy(() -> KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.put("", 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }
