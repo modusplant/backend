@@ -16,9 +16,9 @@ The package is flat: four classes, no sub-packages.
 ```
 normalization/
 ├ TextNormalizer # Spring bean; Unicode normalization forms and the light, aggressive, keystroke, and line-initial views
-├ NormalizedView # A normalized text and, per UTF-16 code unit, its source ranges and keystroke tags
-├ NormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
-└ NormalizationHelper # Stateless code-point predicates that TextNormalizer calls
+├ TextNormalizedView # A normalized text and, per UTF-16 code unit, its source ranges and keystroke tags
+├ TextNormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
+└ TextNormalizationHelper # Stateless code-point predicates that TextNormalizer calls
 ```
 
 ---
@@ -29,14 +29,15 @@ normalization/
 - Receives the NFD, NFC, NFKD, and NFKC `Normalizer2` instances as `Icu4jConfig` beans, selected with
   `@Qualifier(*_NORMALIZER_BEAN_NAME)`, so every normalization form follows the one Unicode version of ICU4J.
 - `nfdNormalize(String)` / `nfcNormalize(String)` → the NFD/NFC form of plant-name search.
-- `lightlyNormalize(String)` → the lightly normalized view as a `NormalizedView` (§3).
-- `aggressivelyNormalize(NormalizedView)` → the aggressively normalized view of a lightly normalized view as a
-  `NormalizedView` (§4).
-- `decomposeIntoKeystrokes(NormalizedView, NormalizedView)` → the keystroke view of an aggressively normalized view and
-  its lightly normalized view as a `NormalizedView` (§5).
-- `extractLineInitials(NormalizedView)` → the line-initial view of a lightly normalized view as a `NormalizedView` (§6).
+- `lightlyNormalize(String)` → the lightly normalized view as a `TextNormalizedView` (§3).
+- `aggressivelyNormalize(TextNormalizedView)` → the aggressively normalized view of a lightly normalized view as a
+  `TextNormalizedView` (§4).
+- `decomposeIntoKeystrokes(TextNormalizedView, TextNormalizedView)` → the keystroke view of an aggressively normalized
+  view and its lightly normalized view as a `TextNormalizedView` (§5).
+- `extractLineInitials(TextNormalizedView)` → the line-initial view of a lightly normalized view as a
+  `TextNormalizedView` (§6).
 
-**`NormalizedView`** — `final`, immutable:
+**`TextNormalizedView`** — `final`, immutable:
 - Holds the normalized text and four parallel `int[]` arrays indexed by its UTF-16 code units: for each code unit, the
   half-open range `[start, end)` of UTF-16 indexes it derives from in the lightly normalized view and in the original
   text.
@@ -48,11 +49,12 @@ normalization/
   - `getFirstSourceJamoPosition` / `getLastSourceJamoPosition` → the nested enum `JamoPosition` of the code unit's first
     and last source: `INITIAL`, `MEDIAL`, `FINAL`, `STANDALONE`.
   - `getSyllableEnds` → whether the code unit ends its syllable.
-- Built only inside the package through the package-private `NormalizedView.Builder` (`append` one code unit with its
-  four range bounds, then `build`), which copies its arrays to the final size. The `append` overload that also takes the
-  keystroke tags serves the keystroke view; a code unit appended without them has `OTHER`, `STANDALONE`, and `false`.
+- Built only inside the package through the package-private `TextNormalizedView.Builder` (`append` one code unit with
+  its four range bounds, then `build`), which copies its arrays to the final size. The `append` overload that also takes
+  the keystroke tags serves the keystroke view; a code unit appended without them has `OTHER`, `STANDALONE`, and
+  `false`.
 
-**`NormalizationCharacterMap`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
+**`TextNormalizationCharacterMap`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
 - Holds the maps as immutable `public static final Map` constants keyed by code point, with code-point values unless
   stated otherwise.
 - Is static, so it takes its `Normalizer2` from `Normalizer2` directly instead of an `Icu4jConfig` bean.
@@ -74,7 +76,7 @@ normalization/
 - `KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP`: the inverse of the map above, a `String` key of two
   keystroke jamo → their compound Hangul Compatibility Jamo; derived from that map, so the two cannot drift apart.
 
-**`NormalizationHelper`** — package-private, `final`, `@NoArgsConstructor(access = PRIVATE)`:
+**`TextNormalizationHelper`** — package-private, `final`, `@NoArgsConstructor(access = PRIVATE)`:
 - Holds the package-private `static` code-point predicates of `TextNormalizer`, which read no `Normalizer2`.
 - `isInDICP`: an `IntPredicate` for the `Default_Ignorable_Code_Point` property.
 - `isInCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
@@ -115,13 +117,13 @@ cluster passes these steps in order:
 - Whitespace and punctuation are kept (`시 발.` stays `시 발.`).
 - An archaic jamo without a compatibility form is kept, so no letter is lost.
 - A cluster made up only of default-ignorable code points and combining marks produces no code unit, so a text of such
-  clusters yields an empty `NormalizedView`.
+  clusters yields an empty `TextNormalizedView`.
 
 ---
 
 ## 4. `aggressivelyNormalize`
 
-The lightly normalized view passes these steps in order, each building a new `NormalizedView`:
+The lightly normalized view passes these steps in order, each building a new `TextNormalizedView`:
 
 | Order | Step |
 |---|---|
@@ -151,7 +153,7 @@ The lightly normalized view passes these steps in order, each building a new `No
 
 ## 5. `decomposeIntoKeystrokes`
 
-The aggressively normalized view passes these steps in order, each building a new `NormalizedView`:
+The aggressively normalized view passes these steps in order, each building a new `TextNormalizedView`:
 
 | Order | Step |
 |---|---|
@@ -204,4 +206,4 @@ The aggressively normalized view passes these steps in order, each building a ne
 - A supplementary-plane first letter keeps both its code units, so a surrogate pair is never split.
 - Each code unit keeps its lightly normalized and original ranges.
 - Lines are split at the code points that `isLineTerminator` accepts.
-- Fewer than 2 contributing lines yield an empty `NormalizedView`.
+- Fewer than 2 contributing lines yield an empty `TextNormalizedView`.

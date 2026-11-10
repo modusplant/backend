@@ -12,7 +12,7 @@ import static kr.modusplant.shared.constant.Regex.PATTERN_NOISE_JAMO;
 import static kr.modusplant.shared.constant.Regex.PATTERN_LINE_TERMINATOR;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-final class NormalizationHelper {
+final class TextNormalizationHelper {
     static IntPredicate isInDICP() {
         return codePoint -> UCharacter.hasBinaryProperty(codePoint, UProperty.DEFAULT_IGNORABLE_CODE_POINT);
     }

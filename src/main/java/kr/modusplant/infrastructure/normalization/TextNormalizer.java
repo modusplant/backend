@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.function.IntPredicate;
 
 import static kr.modusplant.infrastructure.config.icu4j.Icu4jConfig.*;
-import static kr.modusplant.infrastructure.normalization.NormalizationCharacterMap.*;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.*;
-import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.*;
-import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.*;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.*;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.*;
+import static kr.modusplant.infrastructure.normalization.TextNormalizedView.JamoPosition.*;
+import static kr.modusplant.infrastructure.normalization.TextNormalizedView.SourceCharacterKind.*;
 
 @Component
 public class TextNormalizer {
@@ -23,7 +23,7 @@ public class TextNormalizer {
     private static final int NOT_MERGED_CODE_POINT = -1;
     private static final int MINIMUM_CONTRIBUTING_LINE_COUNT = 2;
     private static final char CHOSEONG_IEUNG = 'ᄋ';
-    private static final List<NormalizedView.JamoPosition> SYLLABLE_JAMO_POSITIONS = List.of(INITIAL, MEDIAL, FINAL);
+    private static final List<TextNormalizedView.JamoPosition> SYLLABLE_JAMO_POSITIONS = List.of(INITIAL, MEDIAL, FINAL);
 
     private final Normalizer2 nfdNormalizer;
     private final Normalizer2 nfcNormalizer;
@@ -49,8 +49,8 @@ public class TextNormalizer {
     }
 
     // 경량 정규화: 문자 체계를 바꾸지 않고 인코딩 수준의 변형만 제거하며, 각 코드 유닛은 그 유닛을 생성한 원본 문자소 군집의 전체 구간에 대응함
-    public NormalizedView lightlyNormalize(String originalText) {
-        NormalizedView.Builder builder = new NormalizedView.Builder(originalText.length());
+    public TextNormalizedView lightlyNormalize(String originalText) {
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(originalText.length());
         BreakIterator originalClusters = BreakIterator.getCharacterInstance();
         originalClusters.setText(originalText);
         int start = originalClusters.first();
@@ -67,29 +67,29 @@ public class TextNormalizer {
 
     // 강화 정규화: 단어 사이에 끼워 넣은 문자는 제거하고, 치환한 문자는 대응 문자로 변환하고, 반복한 문자는 병합하며,
     // 병합된 코드 유닛은 그 유닛을 만든 코드 유닛들의 구간 합에 대응함
-    public NormalizedView aggressivelyNormalize(NormalizedView lightlyNormalizedView) {
-        NormalizedView confusableMappedView = mapCrossScriptConfusablesToLatin(lightlyNormalizedView);
-        NormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(confusableMappedView);
-        NormalizedView noiseJamoRemovedView = removeNoiseJamoBetweenSyllables(nonLetterNoiseRemovedView);
-        NormalizedView repeatCollapsedView = collapseRepeats(noiseJamoRemovedView);
-        NormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(repeatCollapsedView);
+    public TextNormalizedView aggressivelyNormalize(TextNormalizedView lightlyNormalizedView) {
+        TextNormalizedView confusableMappedView = mapCrossScriptConfusablesToLatin(lightlyNormalizedView);
+        TextNormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(confusableMappedView);
+        TextNormalizedView noiseJamoRemovedView = removeNoiseJamoBetweenSyllables(nonLetterNoiseRemovedView);
+        TextNormalizedView repeatCollapsedView = collapseRepeats(noiseJamoRemovedView);
+        TextNormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(repeatCollapsedView);
         return mergeElongatedJamo(jamoComposedView);
     }
 
     // 키 입력 정규화: 라틴 문자를 두벌식 한글로 바꾼 뒤 음절과 낱자를 두벌식 키 입력 자모로 통일하며, 각 코드 유닛에 유닛 태그를 기록함
     // 강화 정규화가 병합한 라틴 문자는 경량 정규화 뷰에서 되살려, 두 번 누른 키가 받침과 다음 첫소리로 나뉘게 함 (whssk → 존나)
-    public NormalizedView decomposeIntoKeystrokes(NormalizedView aggressivelyNormalizedView,
-                                                  NormalizedView lightlyNormalizedView) {
-        NormalizedView latinExpandedView = expandLatinLettersFromLightView(aggressivelyNormalizedView, lightlyNormalizedView);
-        NormalizedView latinConvertedView = convertLatinLettersToTwoBeolsikHangul(latinExpandedView);
-        NormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(latinConvertedView);
-        NormalizedView elongationMergedView = mergeElongatedJamo(jamoComposedView);
+    public TextNormalizedView decomposeIntoKeystrokes(TextNormalizedView aggressivelyNormalizedView,
+                                                      TextNormalizedView lightlyNormalizedView) {
+        TextNormalizedView latinExpandedView = expandLatinLettersFromLightView(aggressivelyNormalizedView, lightlyNormalizedView);
+        TextNormalizedView latinConvertedView = convertLatinLettersToTwoBeolsikHangul(latinExpandedView);
+        TextNormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(latinConvertedView);
+        TextNormalizedView elongationMergedView = mergeElongatedJamo(jamoComposedView);
         return mapToKeystrokeJamo(elongationMergedView, lightlyNormalizedView);
     }
 
     // 행 머리 추출: 비문자 잡음을 건너뛴 각 행의 첫 문자를 이어 붙이며, 기여한 행이 2개 미만이면 빈 뷰를 반환함
-    public NormalizedView extractLineInitials(NormalizedView lightlyNormalizedView) {
-        NormalizedView.Builder builder = new NormalizedView.Builder(lightlyNormalizedView.length());
+    public TextNormalizedView extractLineInitials(TextNormalizedView lightlyNormalizedView) {
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(lightlyNormalizedView.length());
         int contributingLineCount = 0;
         boolean isLineInitialFound = false;
         int sourceCodeUnitStart = 0;
@@ -104,7 +104,7 @@ public class TextNormalizer {
             }
             sourceCodeUnitStart = sourceCodeUnitEnd;
         }
-        return contributingLineCount >= MINIMUM_CONTRIBUTING_LINE_COUNT ? builder.build() : new NormalizedView.Builder(0).build();
+        return contributingLineCount >= MINIMUM_CONTRIBUTING_LINE_COUNT ? builder.build() : new TextNormalizedView.Builder(0).build();
     }
 
     private String canonicalize(String originalCluster) {
@@ -113,7 +113,7 @@ public class TextNormalizer {
             return visibleText;
         }
         String decomposedText = nfkdNormalizer.normalize(visibleText);
-        String unmarkedText = removeCodePointIf(decomposedText, NormalizationHelper::isInCombiningMark);
+        String unmarkedText = removeCodePointIf(decomposedText, TextNormalizationHelper::isInCombiningMark);
         String composedText = nfkcNormalizer.normalize(unmarkedText);
 
         StringBuilder canonicalText = new StringBuilder(composedText.length());
@@ -131,8 +131,8 @@ public class TextNormalizer {
         return keptText.toString();
     }
 
-    private NormalizedView mapCrossScriptConfusablesToLatin(NormalizedView sourceView) {
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+    private TextNormalizedView mapCrossScriptConfusablesToLatin(TextNormalizedView sourceView) {
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         for (int codePoint : sourceView.getText().codePoints().toArray()) {
             int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoint);
@@ -145,10 +145,10 @@ public class TextNormalizer {
 
     // 라틴 문자 코드 유닛을 그 경량 정규화 구간의 라틴 문자들로 되돌리며, 비문자 잡음은 건너뛰고 각 문자는 자신의 구간을 유지함
     // 한 문자 묶음이 만든 코드 유닛들은 같은 경량 정규화 구간을 공유하므로, 이미 되돌린 구간에 속한 코드 유닛은 건너뜀 (ﬁ → fi)
-    private NormalizedView expandLatinLettersFromLightView(NormalizedView aggressivelyView,
-                                                           NormalizedView lightlyView) {
+    private TextNormalizedView expandLatinLettersFromLightView(TextNormalizedView aggressivelyView,
+                                                               TextNormalizedView lightlyView) {
         String lightlyText = lightlyView.getText();
-        NormalizedView.Builder builder = new NormalizedView.Builder(lightlyView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(lightlyView.length());
         int expandedLightlyEnd = 0;
         int aggressivelyCodeUnitStart = 0;
         for (int codePoint : aggressivelyView.getText().codePoints().toArray()) {
@@ -176,9 +176,9 @@ public class TextNormalizer {
     }
 
     // 라틴 문자만 두벌식 자모로 바꾸며, 바꾼 자모끼리만 두벌식 입력기처럼 초성, 중성, 선택적 종성 순으로 음절을 조합함
-    private NormalizedView convertLatinLettersToTwoBeolsikHangul(NormalizedView sourceView) {
+    private TextNormalizedView convertLatinLettersToTwoBeolsikHangul(TextNormalizedView sourceView) {
         int[] codePoints = sourceView.getText().codePoints().toArray();
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -262,8 +262,8 @@ public class TextNormalizer {
                 LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.getOrDefault(nextCodePoint, nextCodePoint));
     }
 
-    private NormalizedView removeNonLetterNoise(NormalizedView sourceView) {
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+    private TextNormalizedView removeNonLetterNoise(TextNormalizedView sourceView) {
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         for (int codePoint : sourceView.getText().codePoints().toArray()) {
             int sourceCodeUnitEnd = sourceCodeUnitStart + Character.charCount(codePoint);
@@ -275,9 +275,9 @@ public class TextNormalizer {
         return builder.build();
     }
 
-    private NormalizedView removeNoiseJamoBetweenSyllables(NormalizedView sourceView) {
+    private TextNormalizedView removeNoiseJamoBetweenSyllables(TextNormalizedView sourceView) {
         int[] codePoints = sourceView.getText().codePoints().toArray();
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -307,9 +307,9 @@ public class TextNormalizer {
     }
 
     // 서로게이트 절반이 합쳐지지 않도록 코드 포인트 단위로 비교
-    private NormalizedView collapseRepeats(NormalizedView sourceView) {
+    private TextNormalizedView collapseRepeats(TextNormalizedView sourceView) {
         int[] codePoints = sourceView.getText().codePoints().toArray();
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -326,9 +326,9 @@ public class TextNormalizer {
     }
 
     // 호환 자모 연속 전체가 음절로 나뉠 때만 결합함
-    private NormalizedView composeCompatibilityRunIntoSyllables(NormalizedView sourceView) {
+    private TextNormalizedView composeCompatibilityRunIntoSyllables(TextNormalizedView sourceView) {
         int[] codePoints = sourceView.getText().codePoints().toArray();
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         int codePointArrayIndex = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -392,9 +392,9 @@ public class TextNormalizer {
 
     // 각 코드 포인트가 뒤따르는 늘여 쓴 모음·자음을 더 흡수할 수 없을 때까지 연달아 흡수하며 (바아알 → 발, 존ㄴ나 → 존나),
     // 병합된 코드 유닛은 흡수한 코드 유닛들의 구간 합에 대응함
-    private NormalizedView mergeElongatedJamo(NormalizedView sourceView) {
+    private TextNormalizedView mergeElongatedJamo(TextNormalizedView sourceView) {
         int[] codePoints = sourceView.getText().codePoints().toArray();
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int codePointArrayIndex = 0;
         int sourceCodeUnitStart = 0;
         while (codePointArrayIndex < codePoints.length) {
@@ -463,8 +463,8 @@ public class TextNormalizer {
 
     // 음절과 호환 자모를 두벌식 키 입력 자모로 분해해 입력 종류·자모 위치·음절 끝 태그를 기록하고, 그 밖의 문자는 OTHER 태그로 그대로 둠
     // 분해된 키 입력 자모는 모두 원래 코드 포인트의 구간을 그대로 물려받음
-    private NormalizedView mapToKeystrokeJamo(NormalizedView sourceView, NormalizedView lightlyNormalizedView) {
-        NormalizedView.Builder builder = new NormalizedView.Builder(sourceView.length());
+    private TextNormalizedView mapToKeystrokeJamo(TextNormalizedView sourceView, TextNormalizedView lightlyNormalizedView) {
+        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int sourceCodeUnitStart = 0;
         for (int codePoint : sourceView.getText().codePoints().toArray()) {
             if (isHangulSyllable(codePoint)) {
@@ -485,9 +485,9 @@ public class TextNormalizer {
     }
 
     // 낱자나 라틴 문자로 입력해 강화 정규화에서 합성된 음절도 그 입력으로 기록하되, 자모 위치는 합성된 음절의 위치를 따름
-    private void appendSyllableKeystrokes(NormalizedView.Builder builder, int syllable, NormalizedView sourceView,
-                                          int sourceCodeUnitIndex, NormalizedView lightlyNormalizedView) {
-        NormalizedView.SourceCharacterKind sourceCharacterKind =
+    private void appendSyllableKeystrokes(TextNormalizedView.Builder builder, int syllable, TextNormalizedView sourceView,
+                                          int sourceCodeUnitIndex, TextNormalizedView lightlyNormalizedView) {
+        TextNormalizedView.SourceCharacterKind sourceCharacterKind =
                 determineSourceCharacterKind(sourceView, sourceCodeUnitIndex, lightlyNormalizedView);
         String conjoiningJamo = nfdNormalizer.normalize(Character.toString(syllable));
         for (int jamoIndex = 0; jamoIndex < conjoiningJamo.length(); jamoIndex++) {
@@ -499,9 +499,9 @@ public class TextNormalizer {
     }
 
     // 강화 정규화의 한글 코드 유닛이 시작하는 경량 정규화 문자로 입력 종류를 판단하며, 라틴 문자로 치환되는 혼동 문자도 라틴 문자로 봄
-    private NormalizedView.SourceCharacterKind determineSourceCharacterKind(NormalizedView sourceView,
-                                                                           int sourceCodeUnitIndex,
-                                                                           NormalizedView lightlyNormalizedView) {
+    private TextNormalizedView.SourceCharacterKind determineSourceCharacterKind(TextNormalizedView sourceView,
+                                                                                int sourceCodeUnitIndex,
+                                                                                TextNormalizedView lightlyNormalizedView) {
         int lightlyNormalizedCodePoint = lightlyNormalizedView.getText()
                 .codePointAt(sourceView.getLightlyNormalizedStart(sourceCodeUnitIndex));
         if (LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP.containsKey(
@@ -517,10 +517,10 @@ public class TextNormalizer {
     }
 
     // 음절의 끝은 마지막 키 입력 자모에만 기록함
-    private void appendKeystrokes(NormalizedView.Builder builder, String keystrokes,
-                                  NormalizedView.SourceCharacterKind sourceCharacterKind,
-                                  NormalizedView.JamoPosition jamoPosition, boolean syllableEndsAtLastKeystroke,
-                                  NormalizedView sourceView, int sourceCodeUnitIndex) {
+    private void appendKeystrokes(TextNormalizedView.Builder builder, String keystrokes,
+                                  TextNormalizedView.SourceCharacterKind sourceCharacterKind,
+                                  TextNormalizedView.JamoPosition jamoPosition, boolean syllableEndsAtLastKeystroke,
+                                  TextNormalizedView sourceView, int sourceCodeUnitIndex) {
         for (int keystrokeIndex = 0; keystrokeIndex < keystrokes.length(); keystrokeIndex++) {
             boolean syllableEnds = syllableEndsAtLastKeystroke && keystrokeIndex == keystrokes.length() - 1;
             builder.append(keystrokes.charAt(keystrokeIndex),
@@ -533,7 +533,7 @@ public class TextNormalizer {
     }
 
     // 합쳐진 코드 유닛도 원본 순서를 유지하므로 구간 합은 첫 유닛의 시작과 마지막 유닛의 끝으로 결정됨
-    private void appendCodePoint(NormalizedView.Builder builder, int codePoint, NormalizedView sourceView,
+    private void appendCodePoint(TextNormalizedView.Builder builder, int codePoint, TextNormalizedView sourceView,
                                  int sourceCodeUnitStart, int sourceCodeUnitEnd) {
         int lightlyNormalizedStart = sourceView.getLightlyNormalizedStart(sourceCodeUnitStart);
         int lightlyNormalizedEnd = sourceView.getLightlyNormalizedEnd(sourceCodeUnitEnd - 1);
