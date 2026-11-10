@@ -3,17 +3,17 @@ package kr.modusplant.infrastructure.normalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNoiseJamo;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllable;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isHangulSyllableWithoutFinal;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isInCombiningMark;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isInDICP;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isLineTerminator;
-import static kr.modusplant.infrastructure.normalization.NormalizationHelper.isNonLetterNoiseCategory;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isNoiseJamo;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutFinal;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isInCombiningMark;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isInDICP;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isNonLetterNoiseCategory;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class NormalizationHelperTest {
+class TextNormalizationHelperTest {
     @Test
     @DisplayName("기본 무시 코드 포인트로 true 반환")
     void testIsInDICP_givenDefaultIgnorableCodePoint_willReturnTrue() {

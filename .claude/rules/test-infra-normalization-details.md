@@ -29,5 +29,5 @@ ranges.
 
 ## 3. TestUtils
 
-When built directly, `NormalizedView` is built in each test through the package-private `NormalizedView.Builder`,
-because a TestUtils under `common/util/` sits in another package and cannot reach it.
+When built directly, `TextNormalizedView` is built in each test through the package-private
+`TextNormalizedView.Builder`, because a TestUtils under `common/util/` sits in another package and cannot reach it.

@@ -4,11 +4,11 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-import static kr.modusplant.infrastructure.normalization.NormalizedView.JamoPosition.STANDALONE;
-import static kr.modusplant.infrastructure.normalization.NormalizedView.SourceCharacterKind.OTHER;
+import static kr.modusplant.infrastructure.normalization.TextNormalizedView.JamoPosition.STANDALONE;
+import static kr.modusplant.infrastructure.normalization.TextNormalizedView.SourceCharacterKind.OTHER;
 
 // 정규화 뷰와, 각 UTF-16 코드 유닛이 경량 정규화 뷰와 원본 텍스트에서 차지하는 반열린 구간 및 키 입력 뷰의 유닛 태그
-public final class NormalizedView {
+public final class TextNormalizedView {
     public enum SourceCharacterKind {
         HANGUL_SYLLABLE, STANDALONE_JAMO, LATIN_LETTER, OTHER
     }
@@ -28,10 +28,10 @@ public final class NormalizedView {
     private final JamoPosition[] lastSourceJamoPositions;
     private final boolean[] syllableEnds;
 
-    private NormalizedView(String text, int[] lightlyNormalizedStarts, int[] lightlyNormalizedEnds,
-                           int[] originalStarts, int[] originalEnds, SourceCharacterKind[] sourceCharacterKinds,
-                           JamoPosition[] firstSourceJamoPositions, JamoPosition[] lastSourceJamoPositions,
-                           boolean[] syllableEnds) {
+    private TextNormalizedView(String text, int[] lightlyNormalizedStarts, int[] lightlyNormalizedEnds,
+                               int[] originalStarts, int[] originalEnds, SourceCharacterKind[] sourceCharacterKinds,
+                               JamoPosition[] firstSourceJamoPositions, JamoPosition[] lastSourceJamoPositions,
+                               boolean[] syllableEnds) {
         this.text = text;
         this.lightlyNormalizedStarts = lightlyNormalizedStarts;
         this.lightlyNormalizedEnds = lightlyNormalizedEnds;
@@ -139,9 +139,9 @@ public final class NormalizedView {
             this.syllableEnds[index] = syllableEnds;
         }
 
-        NormalizedView build() {
+        TextNormalizedView build() {
             int size = text.length();
-            return new NormalizedView(
+            return new TextNormalizedView(
                     text.toString(),
                     Arrays.copyOf(lightlyNormalizedStarts, size),
                     Arrays.copyOf(lightlyNormalizedEnds, size),

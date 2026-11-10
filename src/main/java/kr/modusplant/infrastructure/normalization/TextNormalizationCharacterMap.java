@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NormalizationCharacterMap {
+public final class TextNormalizationCharacterMap {
     private static final List<String> CONJOINING_JAMO_NAME_PREFIXES =
             List.of("HANGUL CHOSEONG ", "HANGUL JUNGSEONG ", "HANGUL JONGSEONG ");
 
