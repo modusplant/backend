@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class NormalizationCharacterMap {
@@ -123,6 +124,10 @@ public final class NormalizationCharacterMap {
             Map.entry((int) 'ㄿ', "ㄹㅍ"),
             Map.entry((int) 'ㅀ', "ㄹㅎ"),
             Map.entry((int) 'ㅄ', "ㅂㅅ"));
+    // 입력 순서대로 나열한 두 호환 자모 → 겹모음·겹받침 호환 자모 (위 맵을 뒤집어 만듦)
+    public static final Map<String, Integer> KEYSTROKE_COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP =
+            COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_COMPATIBILITY_JAMO_MAP.entrySet().stream()
+                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
 
     private static Map<Integer, Integer> createConjoiningCompatibilityJamoMap() {
         // 1. 한글 호환 자모의 각 문자를 NFKD로 분해한 조합형 자모의 이름에서 접두어를 떼어, 조합형 자모 이름 → 호환 자모 맵을 만듦

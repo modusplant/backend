@@ -115,7 +115,7 @@ public final class NormalizedView {
 
         void append(char unit, int lightlyNormalizedStart, int lightlyNormalizedEnd,
                     int originalStart, int originalEnd, SourceCharacterKind sourceCharacterKind,
-                    JamoPosition firstSourceJamoPosition, JamoPosition lastSourceJamoPosition, boolean endsSyllable) {
+                    JamoPosition firstSourceJamoPosition, JamoPosition lastSourceJamoPosition, boolean syllableEnds) {
             int index = text.length();
             if (index == lightlyNormalizedStarts.length) {
                 int grownCapacity = lightlyNormalizedStarts.length * 2;
@@ -126,7 +126,7 @@ public final class NormalizedView {
                 sourceCharacterKinds = Arrays.copyOf(sourceCharacterKinds, grownCapacity);
                 firstSourceJamoPositions = Arrays.copyOf(firstSourceJamoPositions, grownCapacity);
                 lastSourceJamoPositions = Arrays.copyOf(lastSourceJamoPositions, grownCapacity);
-                syllableEnds = Arrays.copyOf(syllableEnds, grownCapacity);
+                this.syllableEnds = Arrays.copyOf(this.syllableEnds, grownCapacity);
             }
             text.append(unit);
             lightlyNormalizedStarts[index] = lightlyNormalizedStart;
@@ -136,7 +136,7 @@ public final class NormalizedView {
             sourceCharacterKinds[index] = sourceCharacterKind;
             firstSourceJamoPositions[index] = firstSourceJamoPosition;
             lastSourceJamoPositions[index] = lastSourceJamoPosition;
-            syllableEnds[index] = endsSyllable;
+            this.syllableEnds[index] = syllableEnds;
         }
 
         NormalizedView build() {
