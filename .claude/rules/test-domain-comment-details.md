@@ -38,8 +38,7 @@ Exception assertions check `getErrorCode()` against `CommentErrorCode`.
 
 ## 4. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/domains/comment/` and mirrored 1:1 under
-`src/test/java/kr/modusplant/domains/comment/common/util/`.
+Paths below are relative to `src/main/java/kr/modusplant/domains/comment/`.
 
 - **Shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`,
   `domains/member/common/constant`, `domains/notification/common/constant`

@@ -41,8 +41,7 @@ Exception assertions check `getErrorCode()` against `MemberErrorCode`.
 
 ## 5. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/domains/member/` and mirrored 1:1 under
-`src/test/java/kr/modusplant/domains/member/common/util/`.
+Paths below are relative to `src/main/java/kr/modusplant/domains/member/`.
 
 - **Shared constant paths:** `domains/member/common/constant`, `domains/post/common/constant`,
   `domains/comment/common/constant`
