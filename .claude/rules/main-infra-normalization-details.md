@@ -11,12 +11,13 @@ Applies to `kr.modusplant.infrastructure.normalization`.
 
 ## 1. Package Structure
 
-The package is flat: four classes, no sub-packages.
+The package is flat: five classes, no sub-packages.
 
 ```
 normalization/
 ├ TextNormalizer # Spring bean; Unicode normalization forms and the light, aggressive, keystroke, and line-initial views
 ├ TextNormalizedView # A normalized text and, per UTF-16 code unit, its source ranges and keystroke tags
+├ TextNormalizationType # The normalization method that produced a TextNormalizedView
 ├ TextNormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
 └ TextNormalizationHelper # Stateless code-point predicates that TextNormalizer calls
 ```
@@ -53,6 +54,10 @@ normalization/
   its four range bounds, then `build`), which copies its arrays to the final size. The `append` overload that also takes
   the keystroke tags serves the keystroke view; a code unit appended without them has `OTHER`, `STANDALONE`, and
   `false`.
+
+**`TextNormalizationType`** — enum of the normalization method that produced a `TextNormalizedView`: `LIGHT`
+(`lightlyNormalize`), `AGGRESSIVE` (`aggressivelyNormalize`), `KEYSTROKE` (`decomposeIntoKeystrokes`), `LINE_INITIAL`
+(`extractLineInitials`); declared in that order. `TextNormalizedView` does not hold it.
 
 **`TextNormalizationCharacterMap`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
 - Holds the maps as immutable `public static final Map` constants keyed by code point, with code-point values unless
