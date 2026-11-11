@@ -1,6 +1,7 @@
 package kr.modusplant.infrastructure.swear;
 
 import kr.modusplant.infrastructure.config.exception.ConfigurationException;
+import kr.modusplant.infrastructure.config.exception.enums.ConfigurationErrorCode;
 import kr.modusplant.infrastructure.config.icu4j.Icu4jConfig;
 import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import kr.modusplant.infrastructure.swear.common.util.SwearMatchTestUtils;
@@ -38,6 +39,8 @@ class SwearEngineTest implements SwearMatchTestUtils {
         // when & then
         assertThatThrownBy(() -> engineOf(swearWords, List.of()))
                 .isInstanceOf(ConfigurationException.class)
+                .satisfies(exception -> assertThat(((ConfigurationException) exception).getErrorCode())
+                        .isEqualTo(ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT))
                 .hasMessageContainingAll("sibal(HANGUL → LATIN)", "🖕(LATIN → OTHER)")
                 .hasMessageNotContaining("시발");
     }
