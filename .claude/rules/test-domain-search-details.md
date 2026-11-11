@@ -30,8 +30,7 @@ Exception assertions check `getErrorCode()` against `SearchErrorCode`.
 
 ## 4. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/domains/search/` and mirrored 1:1 under
-`src/test/java/kr/modusplant/domains/search/common/util/`.
+Paths below are relative to `src/main/java/kr/modusplant/domains/search/`.
 
 - **Shared constant paths:** `domains/search/common/constant`, `domains/post/common/constant`,
   `domains/comment/common/constant`
