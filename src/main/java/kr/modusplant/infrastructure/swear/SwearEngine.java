@@ -115,8 +115,9 @@ public final class SwearEngine {
         views.put(KEYSTROKE,
                 textNormalizer.decomposeIntoKeystrokes(aggressivelyNormalizedView, lightlyNormalizedView));
         views.put(LINE_INITIAL, textNormalizer.extractLineInitials(lightlyNormalizedView));
+        KeyboardRuns keyboardRuns = KeyboardRuns.of(lightlyNormalizedView.getText());
 
-        List<SwearMatch> matches = new ArrayList<>();
+        List<SwearMatch> keptMatches = new ArrayList<>();
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
             TextNormalizedView view = views.get(textNormalizationType);
             List<KeywordMatch> allowedKeywordMatches = allowedKeywordTries.containsKey(textNormalizationType)
@@ -130,18 +131,19 @@ public final class SwearEngine {
                 }
                 for (CompiledSwearWord compiledSwearWord :
                         keywordCompiledSwearWords.get(textNormalizationType).get(keywordMatch.keyword())) {
-                    if (!isValidMatch(textNormalizationType, compiledSwearWord, view, lightlyNormalizedView, start, end)) {
+                    if (!isValidMatch(textNormalizationType, compiledSwearWord, view, lightlyNormalizedView,
+                            keyboardRuns, start, end)) {
                         continue;
                     }
                     SwearMatch swearMatch = new SwearMatch(compiledSwearWord.swearWord(), textNormalizationType,
                             calculateOriginalStart(view, start, end), calculateOriginalEnd(view, start, end));
-                    if (!overlapsKeptMatchOfSameWord(matches, swearMatch)) {
-                        matches.add(swearMatch);
+                    if (!overlapsSameWordWithKeptMatch(keptMatches, swearMatch)) {
+                        keptMatches.add(swearMatch);
                     }
                 }
             }
         }
-        return List.copyOf(matches);
+        return List.copyOf(keptMatches);
     }
 
     // 경량 정규화 형태와, 공격적 정규화가 바꾸지 않는 단어에 한해 공격적 정규화 및 키 입력 형태를 뷰별로 반환
@@ -177,22 +179,21 @@ public final class SwearEngine {
 
     private static boolean isValidMatch(TextNormalizationType textNormalizationType, CompiledSwearWord compiledSwearWord,
                                         TextNormalizedView view, TextNormalizedView lightlyNormalizedView,
-                                        int start, int end) {
+                                        KeyboardRuns keyboardRuns, int start, int end) {
         return switch (textNormalizationType) {
             case LIGHT -> true;
             case AGGRESSIVE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end);
             case KEYSTROKE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end)
-                    && isValidKeystrokeMatch(compiledSwearWord.swearWord().script(), view, lightlyNormalizedView,
-                    start, end);
+                    && isValidKeystrokeMatch(compiledSwearWord.swearWord().script(), view, keyboardRuns, start, end);
             case LINE_INITIAL -> compiledSwearWord.codePointCount() >= MINIMUM_LINE_INITIAL_WORD_CODE_POINT_COUNT;
         };
     }
 
     private static boolean isValidKeystrokeMatch(SwearScript swearScript, TextNormalizedView keystrokeView,
-                                                 TextNormalizedView lightlyNormalizedView, int start, int end) {
+                                                 KeyboardRuns keyboardRuns, int start, int end) {
         return switch (swearScript) {
             case HANGUL -> hasValidJamoRoles(keystrokeView, start, end)
-                    && coversWholeKeyboardRuns(keystrokeView, lightlyNormalizedView, start, end);
+                    && coversWholeKeyboardRuns(keystrokeView, keyboardRuns, start, end);
             case LATIN -> isTypedAsStandaloneJamo(keystrokeView, start, end);
             case OTHER -> true;
         };
@@ -226,25 +227,14 @@ public final class SwearEngine {
     }
 
     // 라틴 문자에서 변환된 유닛이 있으면, 그 유닛이 닿는 경량 정규화 뷰의 라틴 문자 연속 구간을 모두 덮어야 유효
-    private static boolean coversWholeKeyboardRuns(TextNormalizedView keystrokeView,
-                                                   TextNormalizedView lightlyNormalizedView, int start, int end) {
+    private static boolean coversWholeKeyboardRuns(TextNormalizedView keystrokeView, KeyboardRuns keyboardRuns,
+                                                   int start, int end) {
         int lightlyNormalizedStart = calculateLightlyNormalizedStart(keystrokeView, start, end);
         int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(keystrokeView, start, end);
-        String lightlyNormalizedText = lightlyNormalizedView.getText();
         for (int index = start; index < end; index++) {
-            if (keystrokeView.getSourceCharacterKind(index) != LATIN_LETTER) {
-                continue;
-            }
-            int runStart = keystrokeView.getLightlyNormalizedStart(index);
-            while (runStart > 0 && isKeyboardLetter(lightlyNormalizedText.codePointBefore(runStart))) {
-                runStart -= Character.charCount(lightlyNormalizedText.codePointBefore(runStart));
-            }
-            int runEnd = keystrokeView.getLightlyNormalizedStart(index);
-            while (runEnd < lightlyNormalizedText.length()
-                    && isKeyboardLetter(lightlyNormalizedText.codePointAt(runEnd))) {
-                runEnd += Character.charCount(lightlyNormalizedText.codePointAt(runEnd));
-            }
-            if (runStart < lightlyNormalizedStart || lightlyNormalizedEnd < runEnd) {
+            if (keystrokeView.getSourceCharacterKind(index) == LATIN_LETTER
+                    && !keyboardRuns.isCoveredBy(keystrokeView.getLightlyNormalizedStart(index),
+                    lightlyNormalizedStart, lightlyNormalizedEnd)) {
                 return false;
             }
         }
@@ -278,7 +268,7 @@ public final class SwearEngine {
         return false;
     }
 
-    private static boolean overlapsKeptMatchOfSameWord(List<SwearMatch> keptMatches, SwearMatch swearMatch) {
+    private static boolean overlapsSameWordWithKeptMatch(List<SwearMatch> keptMatches, SwearMatch swearMatch) {
         for (SwearMatch keptMatch : keptMatches) {
             if (keptMatch.swearWord().equals(swearMatch.swearWord())
                     && keptMatch.originalStart() < swearMatch.originalEnd()
@@ -325,7 +315,7 @@ public final class SwearEngine {
     // CharsTrie는 탐색 상태를 가지므로 매칭마다 직렬화된 문자열로 새로 만듦
     private record KeywordTrie(CharSequence trieChars, List<String> keywords) {
         private static KeywordTrie of(Collection<String> keywords) {
-            List<String> distinctKeywords = List.copyOf(new LinkedHashSet<>(keywords));
+            List<String> distinctKeywords = List.copyOf(new HashSet<>(keywords));
             if (distinctKeywords.isEmpty()) {
                 return new KeywordTrie("", distinctKeywords);
             }
@@ -356,6 +346,41 @@ public final class SwearEngine {
                 }
             }
             return List.copyOf(keywordMatches);
+        }
+    }
+
+    // 경량 정규화 텍스트의 각 UTF-16 위치가 속한 두벌식 키보드 문자 연속 구간 [runStart, runEnd)를 한 번의 순회로 계산함
+    // 두벌식 키보드 문자가 아닌 위치는 빈 구간 [index, index)를 가짐
+    private record KeyboardRuns(int[] runStarts, int[] runEnds) {
+        private static KeyboardRuns of(String lightlyNormalizedText) {
+            int[] runStarts = new int[lightlyNormalizedText.length()];
+            int[] runEnds = new int[lightlyNormalizedText.length()];
+            int runStart = 0;
+            int index = 0;
+            while (index < lightlyNormalizedText.length()) {
+                int codePoint = lightlyNormalizedText.codePointAt(index);
+                int nextIndex = index + Character.charCount(codePoint);
+                if (!isKeyboardLetter(codePoint)) {
+                    fillRun(runStarts, runEnds, runStart, index);
+                    Arrays.fill(runStarts, index, nextIndex, index);
+                    Arrays.fill(runEnds, index, nextIndex, index);
+                    runStart = nextIndex;
+                }
+                index = nextIndex;
+            }
+            fillRun(runStarts, runEnds, runStart, lightlyNormalizedText.length());
+            return new KeyboardRuns(runStarts, runEnds);
+        }
+
+        // 구간 [runStart, runEnd)의 모든 위치에 그 구간을 기록함
+        private static void fillRun(int[] runStarts, int[] runEnds, int runStart, int runEnd) {
+            Arrays.fill(runStarts, runStart, runEnd, runStart);
+            Arrays.fill(runEnds, runStart, runEnd, runEnd);
+        }
+
+        private boolean isCoveredBy(int lightlyNormalizedIndex, int lightlyNormalizedStart, int lightlyNormalizedEnd) {
+            return lightlyNormalizedStart <= runStarts[lightlyNormalizedIndex]
+                    && runEnds[lightlyNormalizedIndex] <= lightlyNormalizedEnd;
         }
     }
 

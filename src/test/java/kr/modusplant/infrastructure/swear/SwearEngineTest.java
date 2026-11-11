@@ -138,11 +138,13 @@ class SwearEngineTest implements SwearMatchTestUtils {
         // when
         List<SwearMatch> wholeRunMatches = swearEngine.match("tlqkf");
         List<SwearMatch> leadingLetterMatches = swearEngine.match("atlqkf");
+        List<SwearMatch> trailingLetterMatches = swearEngine.match("tlqkfb");
         List<SwearMatch> surroundingLetterMatches = swearEngine.match("atlqkfb");
 
         // then
         assertThat(wholeRunMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 5));
         assertThat(leadingLetterMatches).isEmpty();
+        assertThat(trailingLetterMatches).isEmpty();
         assertThat(surroundingLetterMatches).isEmpty();
     }
 
