@@ -11,7 +11,7 @@ Applies to `kr.modusplant.infrastructure.swear`.
 
 ## 1. Package Structure
 
-The package is flat: five classes, no sub-packages.
+The package is flat: four classes, no sub-packages.
 
 ```
 swear/
@@ -26,10 +26,11 @@ swear/
 ## 2. Class Responsibilities
 
 **`SwearEngine`** — `final`, immutable, private constructor; not a Spring bean:
-- `static create(TextNormalizer, List<SwearWord> swearWords, List<String> allowlist)` compiles the lists once (§3).
-  It takes the `TextNormalizer` as an argument, so its caller passes the Spring bean and a test passes one built from
-  `new Icu4jConfig()`. It throws one `IllegalArgumentException` that lists every word whose `script` differs from
-  `SwearScript.of` its light form, so a wrong dictionary row fails the startup once with all mismatches.
+- `static create(TextNormalizer, List<SwearWord> swearWords, List<String> allowedWords)` compiles the lists once
+  (§3). It takes the `TextNormalizer` as an argument, so its caller passes the Spring bean and a test passes one built
+  from `new Icu4jConfig()`. It throws one `ConfigurationException` with `ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT`
+  that lists every word whose `script` differs from `SwearScript.of` its light form, so a wrong dictionary row fails
+  the startup once with all mismatches.
 - `match(String text)` → a `List<SwearMatch>`. It builds the four `TextNormalizer` views of the text, runs each view
   against its tries, and keeps the matches that pass §4 and §5, in view order. A `null` or empty text returns an
   empty list.
