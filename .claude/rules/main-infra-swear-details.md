@@ -15,7 +15,7 @@ The package is flat: four classes, no sub-packages.
 
 ```
 swear/
-├ SwearEngine # Per-view tries over dictionary and allowlist; returns valid, deduplicated matches
+├ SwearEngine # Per-view tries over dictionary and not-swear words; returns valid, deduplicated matches
 ├ SwearWord # One dictionary word with its type, severity, and script
 ├ SwearScript # The script a dictionary word is written in: HANGUL, LATIN, OTHER
 └ SwearMatch # One match: word, view, and original span
@@ -26,7 +26,7 @@ swear/
 ## 2. Class Responsibilities
 
 **`SwearEngine`** — `final`, immutable, private constructor; not a Spring bean:
-- `static create(TextNormalizer, List<SwearWord> swearWords, List<String> allowedWords)` compiles the lists once
+- `static create(TextNormalizer, List<SwearWord> swearWords, List<String> notSwearWords)` compiles the lists once
   (§3). It takes the `TextNormalizer` as an argument, so its caller passes the Spring bean and a test passes one built
   from `new Icu4jConfig()`. It throws one `ConfigurationException` with `ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT`
   that lists every word whose `script` differs from `SwearScript.of` its light form, so a wrong dictionary row fails
@@ -56,15 +56,17 @@ evading characters (`시.발` → `[0, 3)`).
 
 ## 3. Compilation
 
-| View | Word and allowlist keywords |
+| View | Word and not-swear word keywords |
 |---|---|
-| `LIGHT` | `lightlyNormalize` text of every entry |
-| `AGGRESSIVE` | The same text, only for an entry whose `aggressivelyNormalize` text equals it |
-| `KEYSTROKE` | `decomposeIntoKeystrokes` text, only for the entries of `AGGRESSIVE` |
-| `LINE_INITIAL` | `lightlyNormalize` text of every word; no allowlist |
+| `LIGHT` | `normalizeLightly` text of every entry |
+| `AGGRESSIVE` | The same text, only for an entry whose `normalizeAggressively` text equals it |
+| `KEYSTROKE` | `normalizeWithKeystroke` text, only for the entries of `AGGRESSIVE` whose keystroke view's lightly normalized ranges cover the whole light form |
+| `LINE_INITIAL` | `normalizeLightly` text of every word; no not-swear word |
 
 - An entry that the aggressive view changes stays in `LIGHT` (and `LINE_INITIAL`) only, because a shortened form
   matches more text than the word (`씨8` → `씨`, `ass` → `as`). `🖕` stays in `LIGHT` only for the same reason.
+- An entry of `AGGRESSIVE` whose keystroke view leaves part of its light form uncovered gets no `KEYSTROKE` keyword,
+  for the same reason: the keystroke view removed one of its code points (`개ㅅ끼` → `ㄱㅐㄲㅣ`).
 - An entry whose form is empty is skipped. Several words sharing a keyword are all kept, and each is validated on its
   own.
 - A word's stored `script` decides its keystroke rules (§4); a word whose `script` is `OTHER` has none.
@@ -77,11 +79,11 @@ A match is kept only when every rule for its view holds:
 
 | Rule | Applies to | Keeps the match when |
 |---|---|---|
-| Allowlist | Light, aggressive, keystroke | It is not inside an allowlist match of the same view (`시발점`) |
+| Not-swear word | Light, aggressive, keystroke | It is not inside a not-swear word match of the same view (`시발점`) |
 | Token alignment | Aggressive, keystroke | A span whose lightly normalized range contains whitespace (ICU4J `isUWhiteSpace`) starts and ends at token boundaries of the light view (`검사 시 발생` rejected, `시 발 놈` kept) |
-| Jamo role | Keystroke, `HANGUL` word | It starts at an `INITIAL` or `STANDALONE` jamo and ends at a syllable end or `STANDALONE` jamo (`맛보다` rejected for `ㅅㅂ`) |
-| Keyboard run | Keystroke, `HANGUL` word, with any `LATIN_LETTER` unit | Its lightly normalized range covers the whole run of keyboard letters (keys of `LATIN_LOWER_CASE_TWO_BEOLSIK_JAMO_MAP` or `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP`) in the light view around each such unit, because English text also converts to Hangul (`atlqkfb` rejected) |
-| Latin word | Keystroke, `LATIN` word | Every unit has the source kind `STANDALONE_JAMO` (`려차` rejected for `fuck`, `ㄹㅕㅊㅏ` kept) |
+| Jamo role | Keystroke, `HANGUL` word | It starts at a `CHOSEONG` or `STANDALONE` jamo and ends at a syllable end or `STANDALONE` jamo (`맛보다` rejected for `ㅅㅂ`) |
+| Keyboard run | Keystroke, `HANGUL` word, with any `ASCII_LOWER_CASE_LETTER` unit | Its lightly normalized range covers the whole run of keyboard letters (ASCII lowercase letters or keys of `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP`) in the light view around each such unit, because English text also converts to Hangul (`atlqkfb` rejected) |
+| Latin word | Keystroke, `LATIN` word | Every unit has the keystroke source kind `STANDALONE_JAMO` (`려차` rejected for `fuck`, `ㄹㅕㅊㅏ` kept) |
 | Line-initial | Line-initial | The word's light form has 2 or more code points |
 
 ---

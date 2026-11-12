@@ -105,27 +105,6 @@ class RegexTest {
     }
 
     @Test
-    @DisplayName("잡음 자모로 참 반환")
-    void testPatternNoiseJamo_givenNoiseJamo_willReturnTrue() {
-        // given & when & then
-        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅋ").matches());
-        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅎ").matches());
-        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅠ").matches());
-        assertTrue(PATTERN_NOISE_JAMO.matcher("ㅜ").matches());
-    }
-
-    @Test
-    @DisplayName("잡음 자모가 아닌 문자열로 거짓 반환")
-    void testPatternNoiseJamo_givenNonNoiseJamo_willReturnFalse() {
-        // given & when & then
-        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅅ").matches());
-        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅏ").matches());
-        assertFalse(PATTERN_NOISE_JAMO.matcher("크").matches());
-        // 두 글자 이상
-        assertFalse(PATTERN_NOISE_JAMO.matcher("ㅋㅋ").matches());
-    }
-
-    @Test
     @DisplayName("유효한 비밀번호 문자열로 참 반환")
     void testPatternPassword_givenValidPasswordString_willReturnTrue() {
         // given & when & then

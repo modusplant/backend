@@ -21,8 +21,8 @@ class SwearEngineTest implements SwearMatchTestUtils {
             new TextNormalizer(icu4jConfig.nfdNormalizer(), icu4jConfig.nfcNormalizer(),
                     icu4jConfig.nfkdNormalizer(), icu4jConfig.nfkcNormalizer());
 
-    private static SwearEngine engineOf(List<SwearWord> swearWords, List<String> allowlist) {
-        return SwearEngine.create(textNormalizer, swearWords, allowlist);
+    private static SwearEngine engineOf(List<SwearWord> swearWords, List<String> notSwearWords) {
+        return SwearEngine.create(textNormalizer, swearWords, notSwearWords);
     }
 
     private static SwearWord swearWordOf(String word, SwearScript swearScript) {
@@ -87,17 +87,17 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("허용 목록 단어로 List 반환")
-    void testMatch_givenAllowlistWord_willReturnList() {
+    @DisplayName("비속어가 아닌 단어로 List 반환")
+    void testMatch_givenNotSwearWord_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of("시발점"));
 
         // when
-        List<SwearMatch> allowedWordMatches = swearEngine.match("시발점");
+        List<SwearMatch> notSwearWordMatches = swearEngine.match("시발점");
         List<SwearMatch> separatedWordMatches = swearEngine.match("시발 점");
 
         // then
-        assertThat(allowedWordMatches).isEmpty();
+        assertThat(notSwearWordMatches).isEmpty();
         assertThat(separatedWordMatches).containsExactly(testSwearMatch);
     }
 
@@ -133,8 +133,8 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("한글 자판으로 친 라틴 문자로 List 반환")
-    void testMatch_givenKeyboardTypedLatinLetters_willReturnList() {
+    @DisplayName("한글 자판으로 친 ASCII 소문자로 List 반환")
+    void testMatch_givenKeyboardTypedAsciiLowerCaseLetters_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of());
 
@@ -164,6 +164,39 @@ class SwearEngineTest implements SwearMatchTestUtils {
         // then
         assertThat(syllableMatches).isEmpty();
         assertThat(standaloneJamoMatches).containsExactly(new SwearMatch(testEnglishSwearWord, KEYSTROKE, 0, 4));
+    }
+
+    @Test
+    @DisplayName("두 음절 사이 한 글자 잡음의 키 입력 매칭으로 List 반환")
+    void testMatch_givenSingleNoiseBetweenSyllables_willReturnList() {
+        // given
+        SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of());
+
+        // when
+        List<SwearMatch> asciiNoiseMatches = swearEngine.match("시X발");
+        List<SwearMatch> jamoNoiseMatches = swearEngine.match("시ㅈ발");
+        List<SwearMatch> doubleNoiseMatches = swearEngine.match("시xx발");
+
+        // then
+        assertThat(asciiNoiseMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
+        assertThat(jamoNoiseMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
+        assertThat(doubleNoiseMatches).isEmpty();
+    }
+
+    @Test
+    @DisplayName("키 입력 뷰가 경량 형태를 덮지 못하는 단어로 키 입력 키워드 제외한 List 반환")
+    void testMatch_givenWordNotCoveredByKeystrokeView_willReturnList() {
+        // given
+        SwearWord incompletelyCoveredSwearWord = swearWordOf("개ㅅ끼", SwearScript.HANGUL);
+        SwearEngine swearEngine = engineOf(List.of(incompletelyCoveredSwearWord), List.of());
+
+        // when
+        List<SwearMatch> sameWordMatches = swearEngine.match("개ㅅ끼");
+        List<SwearMatch> keystrokeShortenedMatches = swearEngine.match("개끼");
+
+        // then
+        assertThat(sameWordMatches).containsExactly(new SwearMatch(incompletelyCoveredSwearWord, LIGHT, 0, 3));
+        assertThat(keystrokeShortenedMatches).isEmpty();
     }
 
     @Test

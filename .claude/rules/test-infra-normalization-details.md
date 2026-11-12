@@ -21,7 +21,7 @@ the ICU4J normalization result itself.
 `TextNormalizerTest` asserts a code unit's lightly normalized and original ranges together through its private
 `assertSpans` helper.
 
-`TextNormalizerTest` asserts a code unit's source character kind, first-source and last-source jamo positions, and
+`TextNormalizerTest` asserts a keystroke-view code unit's source kind, first-source and last-source jamo positions, and
 syllable end together through its private `assertUnitTags` helper, because these fields are read per code unit like the
 ranges.
 
@@ -29,5 +29,5 @@ ranges.
 
 ## 3. TestUtils
 
-When built directly, `TextNormalizedView` is built in each test through the package-private
-`TextNormalizedView.Builder`, because a TestUtils under `common/util/` sits in another package and cannot reach it.
+When built directly, `TextNormalizedView` and `TextNormalizedKeystrokeView` are built in each test through their
+package-private `Builder`, because a TestUtils under `common/util/` sits in another package and cannot reach it.

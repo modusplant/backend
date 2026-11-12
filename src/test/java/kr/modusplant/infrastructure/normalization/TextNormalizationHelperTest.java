@@ -3,8 +3,8 @@ package kr.modusplant.infrastructure.normalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isNoiseJamo;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutFinal;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isInCombiningMark;
@@ -69,24 +69,6 @@ class TextNormalizationHelperTest {
     }
 
     @Test
-    @DisplayName("잡음 자모로 true 반환")
-    void testIsNoiseJamo_givenNoiseJamo_willReturnTrue() {
-        // given & when & then
-        assertThat(isNoiseJamo('ㅋ')).isTrue();
-        assertThat(isNoiseJamo('ㅎ')).isTrue();
-        assertThat(isNoiseJamo('ㅠ')).isTrue();
-        assertThat(isNoiseJamo('ㅜ')).isTrue();
-    }
-
-    @Test
-    @DisplayName("잡음 자모가 아닌 문자로 false 반환")
-    void testIsNoiseJamo_givenOtherCharacter_willReturnFalse() {
-        // given & when & then
-        assertThat(isNoiseJamo('ㅅ')).isFalse();
-        assertThat(isNoiseJamo('가')).isFalse();
-    }
-
-    @Test
     @DisplayName("줄 종결 문자로 true 반환")
     void testIsLineTerminator_givenLineTerminator_willReturnTrue() {
         // given & when & then
@@ -106,6 +88,24 @@ class TextNormalizationHelperTest {
         assertThat(isLineTerminator(' ')).isFalse();
         assertThat(isLineTerminator('\t')).isFalse();
         assertThat(isLineTerminator('가')).isFalse();
+    }
+
+    @Test
+    @DisplayName("ASCII 소문자로 true 반환")
+    void testIsAsciiLowerCaseLetter_givenAsciiLowerCaseLetter_willReturnTrue() {
+        // given & when & then
+        assertThat(isAsciiLowerCaseLetter('a')).isTrue();
+        assertThat(isAsciiLowerCaseLetter('z')).isTrue();
+    }
+
+    @Test
+    @DisplayName("ASCII 소문자가 아닌 문자로 false 반환")
+    void testIsAsciiLowerCaseLetter_givenOtherCharacter_willReturnFalse() {
+        // given & when & then
+        assertThat(isAsciiLowerCaseLetter('A')).isFalse();
+        assertThat(isAsciiLowerCaseLetter(0x00DF)).isFalse(); // ß
+        assertThat(isAsciiLowerCaseLetter(0x0455)).isFalse(); // 키릴 ѕ
+        assertThat(isAsciiLowerCaseLetter('시')).isFalse();
     }
 
     @Test
