@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// 키 입력 뷰: 텍스트와 구간을 담은 정규화 뷰와, 각 UTF-16 코드 유닛의 원천 문자 종류, 첫·마지막 원천 자모 위치, 음절 끝 여부
+// 키 입력 뷰: 텍스트와 구간을 담은 정규화 뷰와, 각 코드 유닛의 원천 문자 종류, 첫·마지막 원천 자모 위치, 음절 끝 여부
 public final class TextNormalizedKeystrokeView {
     public enum SourceKind {
         HANGUL_SYLLABLE, STANDALONE_JAMO, ASCII_LOWER_CASE_LETTER, OTHER

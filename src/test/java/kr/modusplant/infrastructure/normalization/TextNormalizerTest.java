@@ -118,7 +118,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("겹받침으로 키 입력 뷰 반환")
+    @DisplayName("겹종성으로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenCompoundFinal_willReturnNormalizedView() {
         // given & when
         TextNormalizedKeystrokeView view = keystrokeView("값");
@@ -179,7 +179,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("두 키로 이루는 겹모음과 겹받침의 영문 자판 입력으로 키 입력 뷰 반환")
+    @DisplayName("두 키로 이루는 겹모음과 겹종성의 영문 자판 입력으로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenAsciiLowerCaseLettersOfCompoundJamo_willReturnNormalizedView() {
         // given & when & then
         assertThat(keystrokeText("dnjs")).isEqualTo("ㅇㅜㅓㄴ");
@@ -187,7 +187,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("뒤에 모음이 오는 영문 자판 자음으로 첫소리로 남은 키 입력 뷰 반환")
+    @DisplayName("뒤에 모음이 오는 영문 자판 자음으로 초성으로 남은 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenAsciiLowerCaseConsonantBeforeVowel_willReturnNormalizedView() {
         // given & when
         TextNormalizedKeystrokeView view = keystrokeView("rkqtk");
@@ -227,7 +227,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("끝소리 자모가 있는 단어와 낱자로 입력한 같은 단어로 같은 자모 위치의 키 입력 뷰 반환")
+    @DisplayName("종성 자모가 있는 단어와 낱자로 입력한 같은 단어로 같은 자모 위치의 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenWordWithFinal_willReturnNormalizedView() {
         // given & when
         TextNormalizedKeystrokeView syllableTypedView = keystrokeView("맛보다");
@@ -241,7 +241,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("받침과 다음 첫소리가 같은 자모로 병합되지 않은 키 입력 뷰 반환")
+    @DisplayName("종성과 다음 초성이 같은 자모로 병합되지 않은 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenFinalFollowedByIdenticalInitial_willReturnNormalizedView() {
         // given & when
         TextNormalizedKeystrokeView syllableTypedView = keystrokeView("존나");
@@ -446,9 +446,9 @@ class TextNormalizerTest {
     void testNormalizeLightly_givenConjoiningJamo_willReturnNormalizedView() {
         // given & when & then
         assertThat(lightlyNormalizedText("시발")).isEqualTo("시발");
-        // 짝이 없는 첫소리
+        // 짝이 없는 초성
         assertThat(lightlyNormalizedText("ᄉᄇ")).isEqualTo("ㅅㅂ");
-        // 짝이 없는 가운뎃소리와 끝소리
+        // 짝이 없는 중성과 종성
         assertThat(lightlyNormalizedText("ᅵ ᆯ")).isEqualTo("ㅣ ㄹ");
         // 확장 블록의 옛한글 자모 중 호환 자모가 있는 경우
         assertThat(lightlyNormalizedText("ᅀ")).isEqualTo("ㅿ");
@@ -724,7 +724,7 @@ class TextNormalizerTest {
         assertThat(aggressivelyNormalizedText("시이발")).isEqualTo("시발");
         assertThat(aggressivelyNormalizedText("시이이발")).isEqualTo("시발");
         assertThat(aggressivelyNormalizedText("씨ㅣ발")).isEqualTo("씨발");
-        // 뒤 음절의 받침을 앞 음절로 옮김
+        // 뒤 음절의 종성을 앞 음절로 옮김
         assertThat(aggressivelyNormalizedText("씨이바알")).isEqualTo("씨발");
     }
 
@@ -734,11 +734,11 @@ class TextNormalizerTest {
         // given & when & then
         // 모음이 다름
         assertThat(aggressivelyNormalizedText("시아")).isEqualTo("시아");
-        // 앞 음절에 받침이 있음
+        // 앞 음절에 종성이 있음
         assertThat(aggressivelyNormalizedText("발아")).isEqualTo("발아");
         // 뒤 음절의 초성이 ㅇ이 아님
         assertThat(aggressivelyNormalizedText("시미")).isEqualTo("시미");
-        // 자음 낱자가 앞 음절의 받침과도 뒤 음절의 첫소리와도 다름
+        // 자음 낱자가 앞 음절의 종성과도 뒤 음절의 초성과도 다름
         assertThat(aggressivelyNormalizedText("시ㄱ발")).isEqualTo("시ㄱ발");
         // 자음 낱자 뒤에 음절이 없음
         assertThat(aggressivelyNormalizedText("발ㄹ")).isEqualTo("발ㄹ");
@@ -755,7 +755,7 @@ class TextNormalizerTest {
         assertSpans(textNormalizedView, 0, 0, 2, 0, 2);
         assertSpans(textNormalizedView, 1, 2, 3, 2, 3);
         assertThat(aggressivelyNormalizedText("시ㅂ발")).isEqualTo("시발");
-        // 자음 낱자가 앞 음절의 받침과만 같고 뒤 음절의 첫소리와는 다름
+        // 자음 낱자가 앞 음절의 종성과만 같고 뒤 음절의 초성과는 다름
         assertThat(aggressivelyNormalizedText("존ㄴ맛")).isEqualTo("존맛");
     }
 

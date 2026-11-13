@@ -46,7 +46,7 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("사전 단어로 List 반환")
+    @DisplayName("비속어로 List 반환")
     void testMatch_givenSwearWord_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of());
@@ -117,7 +117,7 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("받침에서 시작하는 키 입력 매칭으로 List 반환")
+    @DisplayName("종성에서 시작하는 키 입력 매칭으로 List 반환")
     void testMatch_givenKeystrokeMatchStartingAtFinal_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testInitialConsonantSwearWord), List.of());
@@ -158,8 +158,8 @@ class SwearEngineTest implements SwearMatchTestUtils {
         SwearEngine swearEngine = engineOf(List.of(testEnglishSwearWord), List.of());
 
         // when
-        List<SwearMatch> syllableMatches = swearEngine.match("려차");
-        List<SwearMatch> standaloneJamoMatches = swearEngine.match("ㄹㅕㅊㅏ");
+        List<SwearMatch> syllableMatches = swearEngine.match("야차");
+        List<SwearMatch> standaloneJamoMatches = swearEngine.match("ㅇㅑㅊㅏ");
 
         // then
         assertThat(syllableMatches).isEmpty();

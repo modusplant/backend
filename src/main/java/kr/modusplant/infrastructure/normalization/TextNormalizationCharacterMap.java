@@ -17,7 +17,7 @@ public final class TextNormalizationCharacterMap {
     private static final List<String> CONJOINING_JAMO_NAME_PREFIXES =
             List.of("HANGUL CHOSEONG ", "HANGUL JUNGSEONG ", "HANGUL JONGSEONG ");
 
-    // 유니코드 Hangul_Syllable_Type 속성값: 첫소리(L)·가운뎃소리(V)·끝소리(T)
+    // 유니코드 Hangul_Syllable_Type 속성값: 초성(L)·중성(V)·종성(T)
     private static final List<Integer> CONJOINING_JAMO_SYLLABLE_TYPES = List.of(
             UCharacter.HangulSyllableType.LEADING_JAMO,
             UCharacter.HangulSyllableType.VOWEL_JAMO,
@@ -29,18 +29,18 @@ public final class TextNormalizationCharacterMap {
     private static final int NEGATIVE_SQUARED_LATIN_CAPITAL_A = 0x1F170; // 검은 사각형 안의 라틴 대문자 🅰~🆉 26자의 시작 코드 포인트
 
     // 음절 결합 가능 여부를 확인하는 문맥으로 쓰는 자모
-    // 현대 자모의 결합은 자모 종류와 무관하게 성립하여 어떤 현대 자모를 써도 결과가 같으므로, 첫소리·가운뎃소리 각각의 첫 현대 자모를 사용
-    private static final int CHOSEONG_KIYEOK = 0x1100; // 첫소리 ᄀ
-    private static final int JUNGSEONG_A = 0x1161; // 가운뎃소리 ᅡ
+    // 현대 자모의 결합은 자모 종류와 무관하게 성립하여 어떤 현대 자모를 써도 결과가 같으므로, 초성·중성 각각의 첫 현대 자모를 사용
+    private static final int CHOSEONG_KIYEOK = 0x1100; // 초성 ᄀ
+    private static final int JUNGSEONG_A = 0x1161; // 중성 ᅡ
 
     private static final Normalizer2 nfkdInstance = Normalizer2.getNFKDInstance();
     private static final Normalizer2 nfcInstance = Normalizer2.getNFCInstance();
 
-    // 키: Hangul_Syllable_Type이 첫소리(L)·가운뎃소리(V)·끝소리(T)인 조합형 자모의 코드 포인트
+    // 키: Hangul_Syllable_Type이 초성(L)·중성(V)·종성(T)인 조합형 자모의 코드 포인트
     // 값: NFKD로 분해한 조합형 자모와 키의 이름이 접두어(HANGUL CHOSEONG/JUNGSEONG/JONGSEONG)를 떼었을 때 같은 한글 호환 자모의 코드 포인트
     // 이름이 같은 호환 자모가 없는 조합형 자모(호환 자모가 없는 옛한글 자모, 채움 문자)는 포함하지 않음
     public static final Map<Integer, Integer> CONJOINING_COMPATIBILITY_JAMO_MAP = createConjoiningCompatibilityJamoMap();
-    // 호환 자모 → 완성형 음절의 첫소리·가운뎃소리·끝소리가 될 수 있는 조합형 자모
+    // 호환 자모 → 완성형 음절의 초성·중성·종성이 될 수 있는 조합형 자모
     public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_CHOSEONG_MAP = createCompatibilityConjoiningJamoMap(
             "", Character.toString(JUNGSEONG_A));
     public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP = createCompatibilityConjoiningJamoMap(
@@ -104,7 +104,7 @@ public final class TextNormalizationCharacterMap {
             Map.entry((int) 'b', (int) 'ㅠ'),
             Map.entry((int) 'n', (int) 'ㅜ'),
             Map.entry((int) 'm', (int) 'ㅡ'));
-    // 두벌식 자판에서 두 번 입력하는 겹모음·겹받침 호환 자모 → 입력 순서대로 나열한 두벌식 키 입력 자모
+    // 두벌식 자판에서 두 번 입력하는 겹모음·겹종성 호환 자모 → 입력 순서대로 나열한 두벌식 키 입력 자모
     public static final Map<Integer, String> COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP = Map.ofEntries(
             Map.entry((int) 'ㅘ', "ㅗㅏ"),
             Map.entry((int) 'ㅙ', "ㅗㅐ"),
@@ -124,7 +124,7 @@ public final class TextNormalizationCharacterMap {
             Map.entry((int) 'ㄿ', "ㄹㅍ"),
             Map.entry((int) 'ㅀ', "ㄹㅎ"),
             Map.entry((int) 'ㅄ', "ㅂㅅ"));
-    // 입력 순서대로 나열한 두 호환 자모 → 겹모음·겹받침 호환 자모 (위 맵을 뒤집어 만듦)
+    // 입력 순서대로 나열한 두 호환 자모 → 겹모음·겹종성 호환 자모 (위 맵을 뒤집어 만듦)
     public static final Map<String, Integer> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP =
             COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
@@ -149,7 +149,7 @@ public final class TextNormalizationCharacterMap {
         }
 
         // 2. Hangul_Syllable_Type이 L·V·T인 조합형 자모를 모두 순회하며, 접두어를 뗀 이름이 1단계 맵에 있으면 그 호환 자모에 대응시킴
-        // (예: 첫소리 ᄀ과 끝소리 ᆨ이 모두 호환 자모 ㄱ에 대응)
+        // (예: 초성 ᄀ과 종성 ᆨ이 모두 호환 자모 ㄱ에 대응)
         UnicodeSet conjoiningJamoSet = new UnicodeSet();
         for (int syllableType : CONJOINING_JAMO_SYLLABLE_TYPES) {
             conjoiningJamoSet.addAll(
@@ -170,7 +170,7 @@ public final class TextNormalizationCharacterMap {
     }
 
     // 앞뒤 자모와 NFC로 결합해 하나의 완성형 음절이 되는 조합형 자모만 대상으로 하므로, 옛한글 자모는 포함하지 않음
-    // 위치별 최소 문맥을 강제함: 첫소리는 뒤따르는 가운뎃소리, 가운뎃소리는 앞선 첫소리, 끝소리는 앞선 첫소리·가운뎃소리
+    // 위치별 최소 문맥을 강제함: 초성은 뒤따르는 중성, 중성은 앞선 초성, 종성은 앞선 초성·중성
     private static Map<Integer, Integer> createCompatibilityConjoiningJamoMap(
             String enforcedPrecedingJamo, String enforcedFollowingJamo) {
         Map<Integer, Integer> map = new HashMap<>();

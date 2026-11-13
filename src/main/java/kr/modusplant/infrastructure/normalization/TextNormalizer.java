@@ -78,7 +78,7 @@ public class TextNormalizer {
     }
 
     // 키 입력 정규화: ASCII 소문자를 두벌식 한글로 바꾼 뒤 음절과 낱자를 두벌식 키 입력 자모로 통일하며, 각 코드 유닛에 유닛 태그를 기록함
-    // 강화 정규화가 병합한 ASCII 소문자는 경량 정규화 뷰에서 되살려, 두 번 누른 키가 받침과 다음 첫소리로 나뉘게 함 (whssk → 존나)
+    // 강화 정규화가 병합한 ASCII 소문자는 경량 정규화 뷰에서 되살려, 두 번 누른 키가 종성과 다음 초성으로 나뉘게 함 (whssk → 존나)
     // 두 음절 사이에 끼워 넣은 한 글자는 키 입력 자모로 분해하기 전에 제거함 (시x발, 시ㅈ발 → 시발)
     public TextNormalizedKeystrokeView normalizeWithKeystroke(TextNormalizedView aggressivelyNormalizedView,
                                                               TextNormalizedView lightlyNormalizedView) {
@@ -204,7 +204,7 @@ public class TextNormalizer {
         return builder.build();
     }
 
-    // 뒤에 모음이 오는 자음은 받침이 되지 않고 다음 음절의 첫소리로 남으며, 이웃한 두 키가 겹모음·겹받침을 이루면 하나로 합침
+    // 뒤에 모음이 오는 자음은 종성이 되지 않고 다음 음절의 초성으로 남으며, 이웃한 두 키가 겹모음·겹종성을 이루면 하나로 합침
     private ConvertedAsciiLowerCaseLetters convertAsciiLowerCaseLetters(int[] codePoints, int letterStartIndex) {
         int firstJamo = convertAsciiLowerCaseLetterAt(codePoints, letterStartIndex);
         boolean startsWithInitial = COMPATIBILITY_CONJOINING_CHOSEONG_MAP.containsKey(firstJamo)
@@ -227,7 +227,7 @@ public class TextNormalizer {
         }
         int finalJamo = NOT_FINAL_JAMO;
         int firstFinalJamo = convertAsciiLowerCaseLetterAt(codePoints, vowelLetterIndex);
-        // 받침이 될 수 있는 자음이고 뒤에 모음이 없을 때만 받침으로 붙임
+        // 종성이 될 수 있는 자음이고 뒤에 모음이 없을 때만 종성으로 붙임
         if (COMPATIBILITY_CONJOINING_JONGSEONG_MAP.containsKey(firstFinalJamo) && isNotFollowedByVowel(codePoints, vowelLetterIndex)) {
             Integer compoundFinalJamo = composeCompoundJamo(firstFinalJamo, convertAsciiLowerCaseLetterAt(codePoints, vowelLetterIndex + 1));
             if (compoundFinalJamo != null && isNotFollowedByVowel(codePoints, vowelLetterIndex + 1)) {
@@ -332,7 +332,7 @@ public class TextNormalizer {
         return builder.build();
     }
 
-    // 뒤에 모음이 오는 자음은 다음 음절의 첫소리로 읽으며, 연속 전체가 음절로 나뉘지 않으면 빈 목록을 반환함
+    // 뒤에 모음이 오는 자음은 다음 음절의 초성으로 읽으며, 연속 전체가 음절로 나뉘지 않으면 빈 목록을 반환함
     private List<Integer> segmentCompatibilityJamoRunIntoSyllables(int[] codePoints, int runStart, int runEnd) {
         List<Integer> syllableJamoCounts = new ArrayList<>();
         int cursor = runStart;
@@ -398,7 +398,7 @@ public class TextNormalizer {
                 ? precedingCodePoint : NOT_MERGED_CODE_POINT;
     }
 
-    // 두 음절 사이의 자음 낱자가 앞 음절의 받침이나 뒤 음절의 첫소리와 같으면 늘여 쓴 자음으로 봄 (존ㄴ맛, 시ㅂ발)
+    // 두 음절 사이의 자음 낱자가 앞 음절의 종성이나 뒤 음절의 초성과 같으면 늘여 쓴 자음으로 봄 (존ㄴ맛, 시ㅂ발)
     private boolean isElongatedConsonant(int precedingCodePoint, int[] codePoints, int followingArrayIndex) {
         int followingCodePoint = codePoints[followingArrayIndex];
         int nextArrayIndex = followingArrayIndex + 1;
@@ -414,7 +414,7 @@ public class TextNormalizer {
         return equalsPrecedingFinal || equalsNextInitial;
     }
 
-    // 받침 없는 음절이 같은 모음의 낱자 또는 같은 모음의 ㅇ 초성 음절을 흡수하며, 뒤 음절의 받침은 앞 음절로 옮김 (바 + 알 → 발)
+    // 종성 없는 음절이 같은 모음의 낱자 또는 같은 모음의 ㅇ 초성 음절을 흡수하며, 뒤 음절의 종성은 앞 음절로 옮김 (바 + 알 → 발)
     private int absorbElongatedVowel(int precedingCodePoint, int followingCodePoint) {
         if (!isHangulSyllableWithoutFinal(precedingCodePoint)) {
             return NOT_MERGED_CODE_POINT;

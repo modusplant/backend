@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TextNormalizationCharacterMapTest {
     @Test
-    @DisplayName("첫소리와 끝소리로 같은 호환 자모 반환")
+    @DisplayName("초성과 종성으로 같은 호환 자모 반환")
     void testConjoiningCompatibilityJamoMap_givenLeadingAndTrailingJamo_willReturnInteger() {
         // given & when & then
         assertThat(CONJOINING_COMPATIBILITY_JAMO_MAP.get(0x1100)).isEqualTo(0x3131);
@@ -25,7 +25,7 @@ class TextNormalizationCharacterMapTest {
     }
 
     @Test
-    @DisplayName("가운뎃소리로 호환 자모 반환")
+    @DisplayName("중성으로 호환 자모 반환")
     void testConjoiningCompatibilityJamoMap_givenVowelJamo_willReturnInteger() {
         // given & when & then
         assertThat(CONJOINING_COMPATIBILITY_JAMO_MAP.get(0x1175)).isEqualTo(0x3163);
@@ -118,7 +118,7 @@ class TextNormalizationCharacterMapTest {
     }
 
     @Test
-    @DisplayName("겹모음과 겹받침으로 입력 순서의 두벌식 키 입력 자모 문자열 반환")
+    @DisplayName("겹모음과 겹종성으로 입력 순서의 두벌식 키 입력 자모 문자열 반환")
     void testCompoundCompatibilityJamoCompatibilityJamoKeystrokeMap_givenCompoundJamo_willReturnString() {
         // given & when & then
         assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP).hasSize(18);
@@ -135,7 +135,7 @@ class TextNormalizationCharacterMapTest {
     }
 
     @Test
-    @DisplayName("입력 순서의 두 두벌식 키 입력 자모로 겹모음과 겹받침 반환")
+    @DisplayName("입력 순서의 두 두벌식 키 입력 자모로 겹모음과 겹종성 반환")
     void testCompatibilityJamoCompoundCompatibilityJamoKeystrokeMap_givenKeystrokeJamoPair_willReturnInteger() {
         // given & when & then
         assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP).hasSize(18);

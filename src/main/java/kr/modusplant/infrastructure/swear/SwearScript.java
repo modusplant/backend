@@ -2,7 +2,7 @@ package kr.modusplant.infrastructure.swear;
 
 import com.ibm.icu.lang.UScript;
 
-// 비속어 사전 단어가 쓰인 문자 체계
+// 비속어가 쓰인 문자 체계
 public enum SwearScript {
     HANGUL, LATIN, OTHER;
 

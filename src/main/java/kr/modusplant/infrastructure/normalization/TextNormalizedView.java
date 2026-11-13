@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-// 정규화 뷰와, 각 UTF-16 코드 유닛이 경량 정규화 뷰와 원본 텍스트에서 차지하는 반열린 구간
+// 정규화 뷰와, 각 코드 유닛이 경량 정규화 뷰와 원본 텍스트에서 차지하는 구간
 public final class TextNormalizedView {
     @Getter
     private final String text;

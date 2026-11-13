@@ -125,14 +125,14 @@ class TextNormalizationHelperTest {
     }
 
     @Test
-    @DisplayName("받침 없는 음절로 true 반환")
+    @DisplayName("종성 없는 음절로 true 반환")
     void testIsHangulSyllableWithoutFinal_givenSyllableWithoutFinal_willReturnTrue() {
         // given & when & then
         assertThat(isHangulSyllableWithoutFinal('가')).isTrue();
     }
 
     @Test
-    @DisplayName("받침 있는 음절로 false 반환")
+    @DisplayName("종성 있는 음절로 false 반환")
     void testIsHangulSyllableWithoutFinal_givenSyllableWithFinal_willReturnFalse() {
         // given & when & then
         assertThat(isHangulSyllableWithoutFinal('각')).isFalse();
@@ -147,7 +147,7 @@ class TextNormalizationHelperTest {
     }
 
     @Test
-    @DisplayName("첫소리 자모와 음절로 false 반환")
+    @DisplayName("초성 자모와 음절로 false 반환")
     void testIsCompatibilityJamo_givenConjoiningJamoOrSyllable_willReturnFalse() {
         // given & when & then
         assertThat(isCompatibilityJamo(0x1100)).isFalse();
