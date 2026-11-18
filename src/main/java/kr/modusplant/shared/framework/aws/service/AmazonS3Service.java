@@ -101,7 +101,7 @@ public class AmazonS3Service {
 
     public String generateGetPresignedUrl(String fileKey) {
         if (profile.equals("dev")){
-            return String.format("%s/%s/%s", devPublicEndpoint, bucket, fileKey);
+            return String.format("%s/%s/%s", devPublicEndpoint, bucket, getPresignedUrl(fileKey));
         }
         return getPresignedUrl(fileKey);
     }
