@@ -19,6 +19,7 @@ import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper
 
 @Component
 public class TextNormalizer {
+    private static final int NOT_CODE_POINT = -1;
     private static final int NOT_CONVERTED_JAMO = -1;
     private static final int NOT_FINAL_JAMO = -1;
     private static final int NOT_MERGED_CODE_POINT = -1;
@@ -452,7 +453,8 @@ public class TextNormalizer {
             int codeUnitEnd = codeUnitStart + Character.charCount(mergedCodePoint);
             codePointIndex++;
             while (codePointIndex < codePoints.length) {
-                int absorbedCodePoint = absorbElongatedJamo(mergedCodePoint, codePoints, codePointIndex);
+                int afterNextCodePoint = codePointIndex + 1 < codePoints.length ? codePoints[codePointIndex + 1] : NOT_CODE_POINT;
+                int absorbedCodePoint = absorbElongatedJamo(mergedCodePoint, codePoints[codePointIndex], afterNextCodePoint);
                 if (absorbedCodePoint == NOT_MERGED_CODE_POINT) {
                     break;
                 }
@@ -466,49 +468,51 @@ public class TextNormalizer {
         return builder.build();
     }
 
-    private int absorbElongatedJamo(int precedingCodePoint, int[] codePoints, int followingIndex) {
-        int absorbedCodePoint = absorbElongatedVowel(precedingCodePoint, codePoints[followingIndex]);
+    private int absorbElongatedJamo(int mergedCodePoint, int nextCodePoint, int afterNextCodePoint) {
+        int absorbedCodePoint = absorbElongatedVowel(mergedCodePoint, nextCodePoint);
         if (absorbedCodePoint != NOT_MERGED_CODE_POINT) {
             return absorbedCodePoint;
         }
-        return isElongatedConsonant(precedingCodePoint, codePoints, followingIndex)
-                ? precedingCodePoint : NOT_MERGED_CODE_POINT;
-    }
-
-    // 두 음절 사이의 자음 낱자가 앞 음절의 종성이나 뒤 음절의 초성과 같으면 늘여 쓴 자음으로 봄 (존ㄴ맛, 시ㅂ발)
-    private boolean isElongatedConsonant(int precedingCodePoint, int[] codePoints, int followingIndex) {
-        int followingCodePoint = codePoints[followingIndex];
-        int nextIndex = followingIndex + 1;
-        if (!isHangulSyllable(precedingCodePoint) || !isCompatibilityJamo(followingCodePoint)
-                || nextIndex >= codePoints.length || !isHangulSyllable(codePoints[nextIndex])) {
-            return false;
-        }
-        String precedingJamo = nfdNormalizer.normalize(Character.toString(precedingCodePoint));
-        String nextJamo = nfdNormalizer.normalize(Character.toString(codePoints[nextIndex]));
-        boolean equalsPrecedingFinal = precedingJamo.length() == 3
-                && CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) precedingJamo.charAt(2)) == followingCodePoint;
-        boolean equalsNextInitial = CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) nextJamo.charAt(0)) == followingCodePoint;
-        return equalsPrecedingFinal || equalsNextInitial;
+        return isElongatedConsonant(mergedCodePoint, nextCodePoint, afterNextCodePoint)
+                ? mergedCodePoint : NOT_MERGED_CODE_POINT;
     }
 
     // 종성 없는 음절이 같은 모음의 낱자 또는 같은 모음의 ㅇ 초성 음절을 흡수하며, 뒤 음절의 종성은 앞 음절로 옮김 (바 + 알 → 발)
-    private int absorbElongatedVowel(int precedingCodePoint, int followingCodePoint) {
-        if (!isHangulSyllableWithoutFinal(precedingCodePoint)) {
+    private int absorbElongatedVowel(int mergedCodePoint, int nextCodePoint) {
+        if (!isHangulSyllableWithoutFinal(mergedCodePoint)) {
             return NOT_MERGED_CODE_POINT;
         }
-        String precedingJamo = nfdNormalizer.normalize(Character.toString(precedingCodePoint));
-        int vowel = precedingJamo.charAt(1);
-        if (isCompatibilityJamo(followingCodePoint)) {
-            return CONJOINING_COMPATIBILITY_JAMO_MAP.get(vowel) == followingCodePoint ? precedingCodePoint : NOT_MERGED_CODE_POINT;
+        String mergedJamo = nfdNormalizer.normalize(Character.toString(mergedCodePoint));
+        int vowel = mergedJamo.charAt(1);
+        if (isCompatibilityJamo(nextCodePoint)) {
+            return CONJOINING_COMPATIBILITY_JAMO_MAP.get(vowel) == nextCodePoint ? mergedCodePoint : NOT_MERGED_CODE_POINT;
         }
-        if (!isHangulSyllable(followingCodePoint)) {
+        if (!isHangulSyllable(nextCodePoint)) {
             return NOT_MERGED_CODE_POINT;
         }
-        String followingJamo = nfdNormalizer.normalize(Character.toString(followingCodePoint));
-        if (followingJamo.charAt(0) != CONJOINING_CHOSEONG_IEUNG || followingJamo.charAt(1) != vowel) {
+        String nextJamo = nfdNormalizer.normalize(Character.toString(nextCodePoint));
+        if (nextJamo.charAt(0) != CONJOINING_CHOSEONG_IEUNG || nextJamo.charAt(1) != vowel) {
             return NOT_MERGED_CODE_POINT;
         }
-        return nfcNormalizer.normalize(precedingJamo + followingJamo.substring(2)).codePointAt(0);
+        if (nextJamo.length() == 2) {
+            return mergedCodePoint;
+        }
+        return nfcNormalizer.normalize(mergedJamo + nextJamo.charAt(2)).codePointAt(0);
+    }
+
+    // 두 음절 사이의 자음 낱자가 앞 음절의 종성이나 뒤 음절의 초성과 같으면 늘여 쓴 자음으로 봄 (존ㄴ맛, 시ㅂ발)
+    private boolean isElongatedConsonant(int mergedCodePoint, int nextCodePoint, int afterNextCodePoint) {
+        if (afterNextCodePoint == NOT_CODE_POINT || !isHangulSyllable(mergedCodePoint)
+                || !isCompatibilityJamo(nextCodePoint) || !isHangulSyllable(afterNextCodePoint)) {
+            return false;
+        }
+        String mergedJamo = nfdNormalizer.normalize(Character.toString(mergedCodePoint));
+        String afterNextJamo = nfdNormalizer.normalize(Character.toString(afterNextCodePoint));
+        boolean isNextEqualToMergedFinal = mergedJamo.length() == 3
+                && CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) mergedJamo.charAt(2)) == nextCodePoint;
+        boolean isNextEqualToAfterNextInitial =
+                CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) afterNextJamo.charAt(0)) == nextCodePoint;
+        return isNextEqualToMergedFinal || isNextEqualToAfterNextInitial;
     }
 
     // 합쳐진 코드 유닛도 원본 순서를 유지하므로 구간 합은 첫 유닛의 시작과 마지막 유닛의 끝으로 결정됨
