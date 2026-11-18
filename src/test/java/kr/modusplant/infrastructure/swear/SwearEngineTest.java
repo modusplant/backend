@@ -117,17 +117,17 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("종성에서 시작하는 키 입력 매칭으로 List 반환")
-    void testMatch_givenKeystrokeMatchStartingAtFinal_willReturnList() {
+    @DisplayName("음절 안 자모의 키 입력 매칭으로 List 반환")
+    void testMatch_givenKeystrokeKeywordInsideSyllables_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testInitialConsonantSwearWord), List.of());
 
         // when
-        List<SwearMatch> finalStartMatches = swearEngine.match("맛보다");
+        List<SwearMatch> insideSyllableMatches = swearEngine.match("맛보다");
         List<SwearMatch> standaloneJamoMatches = swearEngine.match("ㅅ ㅂ");
 
         // then
-        assertThat(finalStartMatches).isEmpty();
+        assertThat(insideSyllableMatches).isEmpty();
         assertThat(standaloneJamoMatches)
                 .containsExactly(new SwearMatch(testInitialConsonantSwearWord, AGGRESSIVE, 0, 3));
     }
@@ -143,60 +143,62 @@ class SwearEngineTest implements SwearMatchTestUtils {
         List<SwearMatch> leadingLetterMatches = swearEngine.match("atlqkf");
         List<SwearMatch> trailingLetterMatches = swearEngine.match("tlqkfb");
         List<SwearMatch> surroundingLetterMatches = swearEngine.match("atlqkfb");
+        List<SwearMatch> elongatedMatches = swearEngine.match("tlllqkf");
+        List<SwearMatch> mixedMatches = swearEngine.match("ㅅl발");
 
         // then
         assertThat(wholeRunMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 5));
+        assertThat(elongatedMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 7));
+        assertThat(mixedMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
         assertThat(leadingLetterMatches).isEmpty();
         assertThat(trailingLetterMatches).isEmpty();
         assertThat(surroundingLetterMatches).isEmpty();
     }
 
     @Test
-    @DisplayName("라틴 단어의 키 입력 매칭으로 List 반환")
-    void testMatch_givenLatinWordKeystrokeMatch_willReturnList() {
+    @DisplayName("라틴 단어의 키 입력 키워드 제외한 List 반환")
+    void testMatch_givenLatinWord_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testEnglishSwearWord), List.of());
 
         // when
-        List<SwearMatch> syllableMatches = swearEngine.match("야차");
+        List<SwearMatch> syllableTypedMatches = swearEngine.match("야차");
         List<SwearMatch> standaloneJamoMatches = swearEngine.match("ㅇㅑㅊㅏ");
 
         // then
-        assertThat(syllableMatches).isEmpty();
-        assertThat(standaloneJamoMatches).containsExactly(new SwearMatch(testEnglishSwearWord, KEYSTROKE, 0, 4));
+        assertThat(syllableTypedMatches).isEmpty();
+        assertThat(standaloneJamoMatches).isEmpty();
     }
 
     @Test
-    @DisplayName("두 음절 사이 한 글자 잡음의 키 입력 매칭으로 List 반환")
-    void testMatch_givenSingleNoiseBetweenSyllables_willReturnList() {
+    @DisplayName("두 음절 사이 잡음의 음절 매칭으로 List 반환")
+    void testMatch_givenNoiseBetweenSyllables_willReturnList() {
         // given
         SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of());
 
         // when
         List<SwearMatch> asciiNoiseMatches = swearEngine.match("시X발");
-        List<SwearMatch> jamoNoiseMatches = swearEngine.match("시ㅈ발");
-        List<SwearMatch> doubleNoiseMatches = swearEngine.match("시xx발");
+        List<SwearMatch> finalJamoMatches = swearEngine.match("시바ㄹ놈");
 
         // then
-        assertThat(asciiNoiseMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
-        assertThat(jamoNoiseMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
-        assertThat(doubleNoiseMatches).isEmpty();
+        assertThat(asciiNoiseMatches).containsExactly(new SwearMatch(testSwearWord, SYLLABLE, 0, 3));
+        assertThat(finalJamoMatches).containsExactly(new SwearMatch(testSwearWord, SYLLABLE, 0, 3));
     }
 
     @Test
-    @DisplayName("키 입력 뷰가 경량 형태를 덮지 못하는 단어로 키 입력 키워드 제외한 List 반환")
-    void testMatch_givenWordNotCoveredByKeystrokeView_willReturnList() {
+    @DisplayName("음절 정규화가 바꾸는 단어로 음절 키워드 제외한 List 반환")
+    void testMatch_givenWordChangedBySyllableNormalization_willReturnList() {
         // given
-        SwearWord incompletelyCoveredSwearWord = swearWordOf("개ㅅ끼", SwearScript.HANGUL);
-        SwearEngine swearEngine = engineOf(List.of(incompletelyCoveredSwearWord), List.of());
+        SwearWord initialConsonantSwearWord = swearWordOf("ㅅㅂ", SwearScript.HANGUL);
+        SwearEngine swearEngine = engineOf(List.of(initialConsonantSwearWord), List.of());
 
         // when
-        List<SwearMatch> sameWordMatches = swearEngine.match("개ㅅ끼");
-        List<SwearMatch> keystrokeShortenedMatches = swearEngine.match("개끼");
+        List<SwearMatch> sameWordMatches = swearEngine.match("ㅅㅂ");
+        List<SwearMatch> noisedMatches = swearEngine.match("ㅅㅈㅂ");
 
         // then
-        assertThat(sameWordMatches).containsExactly(new SwearMatch(incompletelyCoveredSwearWord, LIGHT, 0, 3));
-        assertThat(keystrokeShortenedMatches).isEmpty();
+        assertThat(sameWordMatches).extracting(SwearMatch::textNormalizationType).doesNotContain(SYLLABLE);
+        assertThat(noisedMatches).extracting(SwearMatch::textNormalizationType).doesNotContain(SYLLABLE);
     }
 
     @Test

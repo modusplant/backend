@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_CHOSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_JONGSEONG_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_JUNGSEONG_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP;
@@ -118,23 +117,6 @@ class TextNormalizationCharacterMapTest {
     }
 
     @Test
-    @DisplayName("겹모음과 겹종성으로 입력 순서의 두벌식 키 입력 자모 문자열 반환")
-    void testCompoundCompatibilityJamoCompatibilityJamoKeystrokeMap_givenCompoundJamo_willReturnString() {
-        // given & when & then
-        assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP).hasSize(18);
-        assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get((int) 'ㅟ')).isEqualTo("ㅜㅣ");
-        assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get((int) 'ㅄ')).isEqualTo("ㅂㅅ");
-    }
-
-    @Test
-    @DisplayName("한 번에 입력하는 자모로 null 반환")
-    void testCompoundCompatibilityJamoCompatibilityJamoKeystrokeMap_givenSingleKeystrokeJamo_willReturnNull() {
-        // given & when & then
-        assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get((int) 'ㅐ')).isNull();
-        assertThat(COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get((int) 'ㅆ')).isNull();
-    }
-
-    @Test
     @DisplayName("입력 순서의 두 두벌식 키 입력 자모로 겹모음과 겹종성 반환")
     void testCompatibilityJamoCompoundCompatibilityJamoKeystrokeMap_givenKeystrokeJamoPair_willReturnInteger() {
         // given & when & then
@@ -175,9 +157,6 @@ class TextNormalizationCharacterMapTest {
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
         assertThatThrownBy(() -> ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put(0, 0))
-                .isInstanceOf(UnsupportedOperationException.class);
-        //noinspection DataFlowIssue
-        assertThatThrownBy(() -> COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put(0, ""))
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
         assertThatThrownBy(() -> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put("", 0))

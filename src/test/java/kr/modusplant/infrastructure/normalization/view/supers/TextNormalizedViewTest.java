@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.normalization;
+package kr.modusplant.infrastructure.normalization.view.supers;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

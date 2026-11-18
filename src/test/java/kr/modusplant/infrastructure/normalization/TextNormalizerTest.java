@@ -1,17 +1,11 @@
 package kr.modusplant.infrastructure.normalization;
 
 import kr.modusplant.infrastructure.config.icu4j.Icu4jConfig;
+import kr.modusplant.infrastructure.normalization.view.LightlyNormalizedView;
+import kr.modusplant.infrastructure.normalization.view.supers.TextNormalizedView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.JONGSEONG;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.CHOSEONG;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.JUNGSEONG;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.STANDALONE;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.HANGUL_SYLLABLE;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.ASCII_LOWER_CASE_LETTER;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.OTHER;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.STANDALONE_JAMO;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TextNormalizerTest {
@@ -28,29 +22,27 @@ class TextNormalizerTest {
         return textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly(original)).getText();
     }
 
-    private static TextNormalizedKeystrokeView keystrokeView(String original) {
-        TextNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(original);
+    private static TextNormalizedView keystrokeView(String original) {
         return textNormalizer.normalizeWithKeystroke(
-                textNormalizer.normalizeAggressively(lightlyNormalizedView), lightlyNormalizedView);
+                textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly(original)));
     }
 
     private static String keystrokeText(String original) {
-        return keystrokeView(original).getTextNormalizedView().getText();
+        return keystrokeView(original).getText();
+    }
+
+    private static TextNormalizedView syllableView(String original) {
+        LightlyNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(original);
+        return textNormalizer.normalizeWithSyllable(
+                textNormalizer.normalizeAggressively(lightlyNormalizedView), lightlyNormalizedView);
+    }
+
+    private static String syllableText(String original) {
+        return syllableView(original).getText();
     }
 
     private static TextNormalizedView lineInitialView(String original) {
         return textNormalizer.normalizeWithLineInitial(textNormalizer.normalizeLightly(original));
-    }
-
-    private static void assertUnitTags(TextNormalizedKeystrokeView keystrokeView, int index,
-                                       TextNormalizedKeystrokeView.SourceKind sourceKind,
-                                       TextNormalizedKeystrokeView.JamoPosition firstSourceJamoPosition,
-                                       TextNormalizedKeystrokeView.JamoPosition lastSourceJamoPosition,
-                                       boolean syllableEnd) {
-        assertThat(keystrokeView.getSourceKind(index)).isEqualTo(sourceKind);
-        assertThat(keystrokeView.getFirstSourceJamoPosition(index)).isEqualTo(firstSourceJamoPosition);
-        assertThat(keystrokeView.getLastSourceJamoPosition(index)).isEqualTo(lastSourceJamoPosition);
-        assertThat(keystrokeView.isSyllableEnd(index)).isEqualTo(syllableEnd);
     }
 
     private static void assertSpans(TextNormalizedView textNormalizedView, int index,
@@ -66,275 +58,219 @@ class TextNormalizerTest {
     @DisplayName("음절로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenSyllables_willReturnNormalizedView() {
         // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("시발");
+        TextNormalizedView view = keystrokeView("시발");
 
         // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertUnitTags(view, 0, HANGUL_SYLLABLE, CHOSEONG, CHOSEONG, false);
-        assertUnitTags(view, 1, HANGUL_SYLLABLE, JUNGSEONG, JUNGSEONG, true);
-        assertUnitTags(view, 2, HANGUL_SYLLABLE, CHOSEONG, CHOSEONG, false);
-        assertUnitTags(view, 3, HANGUL_SYLLABLE, JUNGSEONG, JUNGSEONG, false);
-        assertUnitTags(view, 4, HANGUL_SYLLABLE, JONGSEONG, JONGSEONG, true);
-        assertSpans(view.getTextNormalizedView(), 4, 1, 2, 1, 2);
+        assertThat(view.getText()).isEqualTo("시발");
+        assertSpans(view, 0, 0, 1, 0, 1);
+        assertSpans(view, 1, 1, 2, 1, 2);
     }
 
     @Test
-    @DisplayName("완전 분해된 자모로 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenFullyDecomposedJamo_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("ㅅㅣㅂㅏㄹ");
-
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertUnitTags(view, 0, STANDALONE_JAMO, CHOSEONG, CHOSEONG, false);
-        assertUnitTags(view, 4, STANDALONE_JAMO, JONGSEONG, JONGSEONG, true);
-        assertSpans(view.getTextNormalizedView(), 0, 0, 2, 0, 2);
-        assertSpans(view.getTextNormalizedView(), 4, 2, 5, 2, 5);
-    }
-
-    @Test
-    @DisplayName("음절과 자모가 섞인 문자열로 키 입력 뷰 반환")
+    @DisplayName("낱자와 음절이 섞인 문자열로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenMixedSyllablesAndJamo_willReturnNormalizedView() {
-        // given & when & then
-        assertThat(keystrokeText("시바ㄹ")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("씨ㅂㅏㄹ")).isEqualTo("ㅆㅣㅂㅏㄹ");
-        assertThat(keystrokeText("ㅂㅕㅇ신")).isEqualTo("ㅂㅕㅇㅅㅣㄴ");
-        assertThat(keystrokeText("ㅅㅣ발")).isEqualTo("ㅅㅣㅂㅏㄹ");
-    }
+        // given
+        TextNormalizedView jamoView = keystrokeView("ㅅㅣㅂㅏㄹ");
 
-    @Test
-    @DisplayName("겹모음으로 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenCompoundVowel_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("뒤져");
-
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㄷㅜㅣㅈㅕ");
+        // when & then
+        assertThat(jamoView.getText()).isEqualTo("시발");
+        assertSpans(jamoView, 0, 0, 2, 0, 2);
+        assertSpans(jamoView, 1, 2, 5, 2, 5);
+        assertThat(keystrokeText("씨ㅂㅏㄹ")).isEqualTo("씨발");
+        assertThat(keystrokeText("ㅂㅕㅇ신")).isEqualTo("병신");
+        assertThat(keystrokeText("ㅅㅣ발")).isEqualTo("시발");
         assertThat(keystrokeText("ㄷㅜㅣㅈㅕ")).isEqualTo("ㄷㅜㅣㅈㅕ");
-        assertUnitTags(view, 1, HANGUL_SYLLABLE, JUNGSEONG, JUNGSEONG, false);
-        assertUnitTags(view, 2, HANGUL_SYLLABLE, JUNGSEONG, JUNGSEONG, true);
-        assertSpans(view.getTextNormalizedView(), 1, 0, 1, 0, 1);
-        assertSpans(view.getTextNormalizedView(), 2, 0, 1, 0, 1);
-    }
-
-    @Test
-    @DisplayName("겹종성으로 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenCompoundFinal_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("값");
-
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㄱㅏㅂㅅ");
-        assertUnitTags(view, 2, HANGUL_SYLLABLE, JONGSEONG, JONGSEONG, false);
-        assertUnitTags(view, 3, HANGUL_SYLLABLE, JONGSEONG, JONGSEONG, true);
-    }
-
-    @Test
-    @DisplayName("겹자모 낱자로 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenStandaloneCompoundJamo_willReturnNormalizedView() {
-        // given & when & then
-        assertThat(keystrokeText("ㄳ")).isEqualTo("ㄱㅅ");
-        assertThat(keystrokeText("ㅟ")).isEqualTo("ㅜㅣ");
-    }
-
-    @Test
-    @DisplayName("된소리로 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenTenseConsonant_willReturnNormalizedView() {
-        // given & when & then
-        assertThat(keystrokeText("까")).isEqualTo("ㄲㅏ");
-        assertThat(keystrokeText("ㅆㅂ")).isEqualTo("ㅆㅂ");
+        assertThat(keystrokeText("뒤져")).isEqualTo("뒤져");
+        assertThat(keystrokeText("값")).isEqualTo("값");
+        assertThat(keystrokeText("까")).isEqualTo("까");
     }
 
     @Test
     @DisplayName("결합되지 않은 낱자로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenUncomposedJamo_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("ㅅㅂ");
-
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㅅㅂ");
-        assertUnitTags(view, 0, STANDALONE_JAMO, STANDALONE, STANDALONE, false);
-        assertUnitTags(view, 1, STANDALONE_JAMO, STANDALONE, STANDALONE, false);
+        // given & when & then
+        assertThat(keystrokeText("ㅅㅂ")).isEqualTo("ㅅㅂ");
+        assertThat(keystrokeText("ㅆㅂ")).isEqualTo("ㅆㅂ");
+        assertThat(keystrokeText("ㄳ")).isEqualTo("ㄳ");
+        assertThat(keystrokeText("ㅟ")).isEqualTo("ㅟ");
+        assertThat(keystrokeText("tq")).isEqualTo("ㅅㅂ");
+        assertThat(keystrokeText("시ㅈ발")).isEqualTo("시ㅈ발");
+        assertThat(keystrokeText("시바ㄹ")).isEqualTo("시바ㄹ");
     }
 
     @Test
     @DisplayName("영문 자판 입력으로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenAsciiLowerCaseLetters_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("tlqkf");
+        // given
+        TextNormalizedView view = keystrokeView("tlqkf");
 
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertUnitTags(view, 0, ASCII_LOWER_CASE_LETTER, CHOSEONG, CHOSEONG, false);
-        assertUnitTags(view, 1, ASCII_LOWER_CASE_LETTER, JUNGSEONG, JUNGSEONG, true);
-        assertUnitTags(view, 4, ASCII_LOWER_CASE_LETTER, JONGSEONG, JONGSEONG, true);
-        assertSpans(view.getTextNormalizedView(), 4, 2, 5, 2, 5);
-        assertThat(keystrokeText("qudtls")).isEqualTo("ㅂㅕㅇㅅㅣㄴ");
-        assertThat(keystrokeText("시qkf")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("tl발")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("tlllqkf")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("ㅅl발")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertUnitTags(keystrokeView("ㅅl발"), 0, STANDALONE_JAMO, CHOSEONG, CHOSEONG, false);
-        assertThat(keystrokeText("시l발")).isEqualTo("ㅅㅣㅂㅏㄹ");
+        // when & then
+        assertThat(view.getText()).isEqualTo("시발");
+        assertSpans(view, 0, 0, 2, 0, 2);
+        assertSpans(view, 1, 2, 5, 2, 5);
+        assertThat(keystrokeText("qudtls")).isEqualTo("병신");
+        assertThat(keystrokeText("시qkf")).isEqualTo("시발");
+        assertThat(keystrokeText("tl발")).isEqualTo("시발");
+        assertThat(keystrokeText("ㅅl발")).isEqualTo("시발");
+        assertThat(keystrokeText("tlllqkf")).isEqualTo("시발");
+        assertThat(keystrokeText("시l발")).isEqualTo("시발");
     }
 
     @Test
     @DisplayName("두 키로 이루는 겹모음과 겹종성의 영문 자판 입력으로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenAsciiLowerCaseLettersOfCompoundJamo_willReturnNormalizedView() {
         // given & when & then
-        assertThat(keystrokeText("dnjs")).isEqualTo("ㅇㅜㅓㄴ");
-        assertThat(keystrokeText("rkqt")).isEqualTo("ㄱㅏㅂㅅ");
+        assertThat(keystrokeText("dnjs")).isEqualTo("원");
+        assertThat(keystrokeText("rkqt")).isEqualTo("값");
     }
 
     @Test
     @DisplayName("뒤에 모음이 오는 영문 자판 자음으로 초성으로 남은 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenAsciiLowerCaseConsonantBeforeVowel_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("rkqtk");
-
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㄱㅏㅂㅅㅏ");
-        assertUnitTags(view, 3, ASCII_LOWER_CASE_LETTER, CHOSEONG, CHOSEONG, false);
-        assertThat(keystrokeText("tlqㅏㄹ")).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("tlq kf")).isEqualTo("ㅅㅣㅂㅏㄹ");
+        // given & when & then
+        assertThat(keystrokeText("rkqtk")).isEqualTo("갑사");
+        assertThat(keystrokeText("tlqㅏㄹ")).isEqualTo("시발");
+        assertThat(keystrokeText("tlq kf")).isEqualTo("시발");
     }
 
     @Test
     @DisplayName("뒤 문자와 일부만 합쳐진 합자의 영문 자판 입력으로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenLigaturePartlyJoinedWithNextLetter_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView view = keystrokeView("ﬁi");
+        // given
+        TextNormalizedView partlyJoinedView = keystrokeView("ﬁi");
+        TextNormalizedView separateView = keystrokeView("ﬁo");
 
-        // then
-        assertThat(view.getTextNormalizedView().getText()).isEqualTo("ㄹㅑ");
-        assertSpans(view.getTextNormalizedView(), 1, 0, 3, 0, 2);
+        // when & then
+        assertThat(partlyJoinedView.getText()).isEqualTo("랴");
+        assertSpans(partlyJoinedView, 0, 0, 3, 0, 2);
+        assertThat(separateView.getText()).isEqualTo("랴ㅐ");
+        assertSpans(separateView, 0, 0, 2, 0, 1);
+        assertSpans(separateView, 1, 2, 3, 1, 2);
     }
 
     @Test
-    @DisplayName("낱자로 입력한 음절과 음절 입력으로 서로 다른 출처 종류의 키 입력 뷰 반환")
+    @DisplayName("낱자로 입력한 음절과 음절 입력으로 같은 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenJamoTypedAndSyllableTypedWord_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView jamoTypedView = keystrokeView("ㄹㅕㅊㅏ");
-        TextNormalizedKeystrokeView syllableTypedView = keystrokeView("려차");
-
-        // then
-        assertThat(jamoTypedView.getTextNormalizedView().getText()).isEqualTo("ㄹㅕㅊㅏ");
-        assertThat(syllableTypedView.getTextNormalizedView().getText()).isEqualTo("ㄹㅕㅊㅏ");
-        for (int index = 0; index < 4; index++) {
-            assertThat(jamoTypedView.getSourceKind(index)).isEqualTo(STANDALONE_JAMO);
-            assertThat(syllableTypedView.getSourceKind(index)).isEqualTo(HANGUL_SYLLABLE);
-        }
-    }
-
-    @Test
-    @DisplayName("종성 자모가 있는 단어와 낱자로 입력한 같은 단어로 같은 자모 위치의 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenWordWithFinal_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView syllableTypedView = keystrokeView("맛보다");
-        TextNormalizedKeystrokeView jamoTypedView = keystrokeView("ㅁㅏㅅㅂㅗㄷㅏ");
-
-        // then
-        assertThat(syllableTypedView.getTextNormalizedView().getText()).isEqualTo("ㅁㅏㅅㅂㅗㄷㅏ");
-        assertThat(jamoTypedView.getTextNormalizedView().getText()).isEqualTo("ㅁㅏㅅㅂㅗㄷㅏ");
-        assertUnitTags(syllableTypedView, 2, HANGUL_SYLLABLE, JONGSEONG, JONGSEONG, true);
-        assertUnitTags(jamoTypedView, 2, STANDALONE_JAMO, JONGSEONG, JONGSEONG, true);
+        // given & when & then
+        assertThat(keystrokeText("ㄹㅕㅊㅏ")).isEqualTo("려차");
+        assertThat(keystrokeText("려차")).isEqualTo("려차");
+        assertThat(keystrokeText("ㅁㅏㅅㅂㅗㄷㅏ")).isEqualTo("맛보다");
+        assertThat(keystrokeText("맛보다")).isEqualTo("맛보다");
     }
 
     @Test
     @DisplayName("종성과 다음 초성이 같은 자모로 병합되지 않은 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenFinalFollowedByIdenticalInitial_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView syllableTypedView = keystrokeView("존나");
-        TextNormalizedKeystrokeView asciiLowerCaseTypedView = keystrokeView("whssk");
+        // given
+        TextNormalizedView syllableTypedView = keystrokeView("존나");
+        TextNormalizedView asciiLowerCaseTypedView = keystrokeView("whssk");
 
-        // then
-        assertThat(syllableTypedView.getTextNormalizedView().getText()).isEqualTo("ㅈㅗㄴㄴㅏ");
-        assertThat(asciiLowerCaseTypedView.getTextNormalizedView().getText()).isEqualTo("ㅈㅗㄴㄴㅏ");
-        assertThat(keystrokeText("whsssk")).isEqualTo("ㅈㅗㄴㄴㅏ");
-        assertUnitTags(syllableTypedView, 2, HANGUL_SYLLABLE, JONGSEONG, JONGSEONG, true);
-        assertUnitTags(syllableTypedView, 3, HANGUL_SYLLABLE, CHOSEONG, CHOSEONG, false);
-        assertUnitTags(asciiLowerCaseTypedView, 2, ASCII_LOWER_CASE_LETTER, JONGSEONG, JONGSEONG, true);
-        assertSpans(syllableTypedView.getTextNormalizedView(), 2, 0, 1, 0, 1);
-        assertThat(keystrokeText("구조나")).isEqualTo("ㄱㅜㅈㅗㄴㅏ");
+        // when & then
+        assertThat(syllableTypedView.getText()).isEqualTo("존나");
+        assertThat(asciiLowerCaseTypedView.getText()).isEqualTo("존나");
+        assertSpans(syllableTypedView, 0, 0, 1, 0, 1);
+        assertSpans(asciiLowerCaseTypedView, 0, 0, 3, 0, 3);
+        assertSpans(asciiLowerCaseTypedView, 1, 3, 5, 3, 5);
+        assertThat(keystrokeText("구조나")).isEqualTo("구조나");
     }
 
     @Test
-    @DisplayName("ASCII 소문자에서 바꾼 낱자로 ASCII 소문자 출처 종류의 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenJamoConvertedFromAsciiLowerCaseLetters_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView asciiLowerCaseTypedView = keystrokeView("tq");
-        TextNormalizedKeystrokeView confusableTypedView = keystrokeView("ѕk");
+    @DisplayName("교차 문자 혼동 문자에서 바꾼 영문 자판 입력으로 키 입력 뷰 반환")
+    void testNormalizeWithKeystroke_givenJamoConvertedFromConfusableLetters_willReturnNormalizedView() {
+        // given
+        TextNormalizedView confusableTypedView = keystrokeView("ѕk");
 
-        // then
-        assertThat(asciiLowerCaseTypedView.getTextNormalizedView().getText()).isEqualTo("ㅅㅂ");
-        assertUnitTags(asciiLowerCaseTypedView, 0, ASCII_LOWER_CASE_LETTER, STANDALONE, STANDALONE, false);
-        assertUnitTags(asciiLowerCaseTypedView, 1, ASCII_LOWER_CASE_LETTER, STANDALONE, STANDALONE, false);
-        assertThat(confusableTypedView.getTextNormalizedView().getText()).isEqualTo("ㄴㅏ");
-        assertUnitTags(confusableTypedView, 0, ASCII_LOWER_CASE_LETTER, CHOSEONG, CHOSEONG, false);
+        // when & then
+        assertThat(confusableTypedView.getText()).isEqualTo("나");
+        assertSpans(confusableTypedView, 0, 0, 2, 0, 2);
     }
 
     @Test
-    @DisplayName("합성 또는 흡수된 음절로 시작 문자에 따른 출처 종류의 키 입력 뷰 반환")
+    @DisplayName("비문자 잡음으로 떨어진 낱자와 흡수된 낱자로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenComposedOrAbsorbedSyllable_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView noiseSeparatedJamoView = keystrokeView("ㄹ.ㅕ");
-        TextNormalizedKeystrokeView absorbedJamoView = keystrokeView("시ㅣ발");
+        // given
+        TextNormalizedView noiseSeparatedJamoView = keystrokeView("ㄹ.ㅕ");
 
-        // then
-        assertThat(noiseSeparatedJamoView.getTextNormalizedView().getText()).isEqualTo("ㄹㅕ");
-        assertUnitTags(noiseSeparatedJamoView, 0, STANDALONE_JAMO, CHOSEONG, CHOSEONG, false);
-        assertSpans(noiseSeparatedJamoView.getTextNormalizedView(), 0, 0, 3, 0, 3);
-        assertThat(absorbedJamoView.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertUnitTags(absorbedJamoView, 0, HANGUL_SYLLABLE, CHOSEONG, CHOSEONG, false);
+        // when & then
+        assertThat(noiseSeparatedJamoView.getText()).isEqualTo("려");
+        assertSpans(noiseSeparatedJamoView, 0, 0, 3, 0, 3);
+        assertThat(keystrokeText("시ㅣ발")).isEqualTo("시발");
     }
 
     @Test
-    @DisplayName("두 음절 사이 비음절 한 글자로 제거된 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenSingleNoiseBetweenSyllables_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView asciiNoiseView = keystrokeView("시x발");
-        TextNormalizedKeystrokeView jamoNoiseView = keystrokeView("시ㅈ발");
+    @DisplayName("두 음절 사이 호환 자모와 ASCII 소문자로 제거된 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenNoiseBetweenSyllables_willReturnNormalizedView() {
+        // given
+        TextNormalizedView asciiNoiseView = syllableView("시x발");
 
-        // then
-        assertThat(asciiNoiseView.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(jamoNoiseView.getTextNormalizedView().getText()).isEqualTo("ㅅㅣㅂㅏㄹ");
-        assertSpans(asciiNoiseView.getTextNormalizedView(), 0, 0, 1, 0, 1);
-        assertSpans(asciiNoiseView.getTextNormalizedView(), 2, 2, 3, 2, 3);
-        assertSpans(jamoNoiseView.getTextNormalizedView(), 4, 2, 3, 2, 3);
-        assertThat(keystrokeText("아h아")).isEqualTo("ㅇㅏㅇㅏ");
+        // when & then
+        assertThat(asciiNoiseView.getText()).isEqualTo("시발");
+        assertSpans(asciiNoiseView, 0, 0, 1, 0, 1);
+        assertSpans(asciiNoiseView, 1, 2, 3, 2, 3);
+        assertThat(syllableText("시l발")).isEqualTo("시발");
+        assertThat(syllableText("시xx발")).isEqualTo("시발");
+        assertThat(syllableText("시 ㅋ 발")).isEqualTo("시발");
     }
 
     @Test
-    @DisplayName("두 음절 사이 비음절 두 글자 이상으로 유지된 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenMultipleNoiseBetweenSyllables_willReturnNormalizedView() {
+    @DisplayName("종성 없는 음절 뒤 같은 토큰의 자음 낱자를 종성으로 붙인 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenConsonantJamoAfterSyllableWithoutFinal_willReturnNormalizedView() {
+        // given
+        TextNormalizedView finalAttachedView = syllableView("시바ㄹ놈");
+        TextNormalizedView compoundFinalView = syllableView("바ㄹㄱ");
+
+        // when & then
+        assertThat(finalAttachedView.getText()).isEqualTo("시발놈");
+        assertSpans(finalAttachedView, 1, 1, 3, 1, 3);
+        assertThat(syllableText("시ㅈ발")).isEqualTo("싲발");
+        assertThat(compoundFinalView.getText()).isEqualTo("밝");
+        assertSpans(compoundFinalView, 0, 0, 3, 0, 3);
+    }
+
+    @Test
+    @DisplayName("모음 낱자가 뒤따르거나 다른 토큰의 자음 낱자를 붙이지 않은 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenConsonantJamoNotAttachable_willReturnNormalizedView() {
         // given & when & then
-        assertThat(keystrokeText("시ㅈㅊ발")).isEqualTo("ㅅㅣㅈㅊㅂㅏㄹ");
-        assertSpans(keystrokeView("시ㅈㅊ발").getTextNormalizedView(), 2, 1, 2, 1, 2);
-        assertSpans(keystrokeView("시ㅈㅊ발").getTextNormalizedView(), 3, 2, 3, 2, 3);
+        assertThat(syllableText("시바ㄹㅏ")).isEqualTo("시바라");
+        assertThat(syllableText("시바 ㄹ")).isEqualTo("시바");
     }
 
     @Test
-    @DisplayName("음절 사이가 아닌 비음절로 유지된 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenNoiseNotBetweenSyllables_willReturnNormalizedView() {
+    @DisplayName("같은 토큰의 호환 자모 연속으로 조합된 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenCompatibilityJamoRun_willReturnNormalizedView() {
         // given & when & then
-        assertThat(keystrokeText("tlxqkf")).isNotEqualTo("ㅅㅣㅂㅏㄹ");
-        assertThat(keystrokeText("x발")).isEqualTo(keystrokeText("ㅌ발"));
-        assertThat(keystrokeText("시x")).isEqualTo(keystrokeText("시ㅌ"));
+        assertThat(syllableText("ㅅㅣㅂㅏㄹ")).isEqualTo("시발");
+        assertThat(syllableText("ㅅㅣ발")).isEqualTo("시발");
+        assertThat(syllableText("ㅅㅂ")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("ASCII 소문자와 한글 음절 외 문자로 유지된 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenOtherCharacters_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(syllableText("fuck")).isEmpty();
+        assertThat(syllableText("漢字")).isEqualTo("漢字");
+        assertThat(syllableText("시발")).isEqualTo("시발");
+    }
+
+    @Test
+    @DisplayName("빈 문자열로 빈 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenEmptyView_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(syllableText("")).isEmpty();
     }
 
     @Test
     @DisplayName("한자와 옛한글로 그대로 유지된 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenOtherCharacters_willReturnNormalizedView() {
-        // given & when
-        TextNormalizedKeystrokeView hanjaView = keystrokeView("漢");
-        TextNormalizedKeystrokeView supplementaryHanjaView = keystrokeView("𠀀");
+        // given
+        TextNormalizedView supplementaryHanjaView = keystrokeView("𠀀");
 
-        // then
-        assertThat(hanjaView.getTextNormalizedView().getText()).isEqualTo("漢");
-        assertUnitTags(hanjaView, 0, OTHER, STANDALONE, STANDALONE, false);
+        // when & then
+        assertThat(keystrokeText("漢")).isEqualTo("漢");
         assertThat(keystrokeText("ᄓ")).isEqualTo("ᄓ");
-        assertThat(supplementaryHanjaView.getTextNormalizedView().getText()).isEqualTo("𠀀");
-        assertSpans(supplementaryHanjaView.getTextNormalizedView(), 1, 0, 2, 0, 2);
+        assertThat(supplementaryHanjaView.getText()).isEqualTo("𠀀");
+        assertSpans(supplementaryHanjaView, 1, 0, 2, 0, 2);
     }
 
     @Test
@@ -553,7 +489,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("조합형 자모 군집으로 정규화 뷰 반환")
+    @DisplayName("조합형 자모 클러스터로 정규화 뷰 반환")
     void testNormalizeLightly_givenConjoiningJamoCluster_willReturnNormalizedView() {
         // given & when
         TextNormalizedView textNormalizedView = textNormalizer.normalizeLightly("시발!");
@@ -579,7 +515,7 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("결합 문자와 보이지 않는 문자가 붙은 군집으로 정규화 뷰 반환")
+    @DisplayName("결합 문자와 보이지 않는 문자가 붙은 클러스터로 정규화 뷰 반환")
     void testNormalizeLightly_givenClusterWithMarkAndInvisibleCharacter_willReturnNormalizedView() {
         // given & when
         TextNormalizedView textNormalizedView = textNormalizer.normalizeLightly("s̈i시‍발");
@@ -667,6 +603,22 @@ class TextNormalizerTest {
     }
 
     @Test
+    @DisplayName("낱자 하나로 된 겹모음과 겹종성이 있는 자모 연속으로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenSingleCompoundJamoRun_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("ㅂㅏㄺ")).isEqualTo("밝");
+        assertThat(aggressivelyNormalizedText("ㅂㅘㄹ")).isEqualTo("봘");
+    }
+
+    @Test
+    @DisplayName("두 낱자로 된 겹종성이나 모음 앞 겹종성이 있는 자모 연속으로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenUnjoinedOrUnsplitCompoundFinalRun_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("ㅂㅏㄹㄱ")).isEqualTo("ㅂㅏㄹㄱ");
+        assertThat(aggressivelyNormalizedText("ㄱㅏㄳㅣ")).isEqualTo("ㄱㅏㄳㅣ");
+    }
+
+    @Test
     @DisplayName("결합 후 모음 늘이기가 있는 자모 연속으로 정규화 뷰 반환")
     void testNormalizeAggressively_givenComposedJamoWithElongation_willReturnNormalizedView() {
         // given & when & then
@@ -710,12 +662,22 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("문자 반복으로 정규화 뷰 반환")
-    void testNormalizeAggressively_givenRepeatedCharacters_willReturnNormalizedView() {
+    @DisplayName("낱자 자모 반복으로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenRepeatedJamo_willReturnNormalizedView() {
         // given & when & then
-        assertThat(aggressivelyNormalizedText("시발발발")).isEqualTo("시발");
-        assertThat(aggressivelyNormalizedText("ssiiibal")).isEqualTo("sibal");
-        assertThat(aggressivelyNormalizedText("fuuuck")).isEqualTo("fuck");
+        assertThat(aggressivelyNormalizedText("ㅋㅋㅋ")).isEqualTo("ㅋ");
+        assertThat(aggressivelyNormalizedText("ㅅㅣㅂㅂㅏㄹ")).isEqualTo("시발");
+        // 호환 자모가 없는 조합형 자모
+        assertThat(aggressivelyNormalizedText("ᄓᄓᄓ")).isEqualTo("ᄓ");
+    }
+
+    @Test
+    @DisplayName("음절과 라틴 문자 반복으로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenRepeatedSyllablesOrLatinLetters_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("시발발발")).isEqualTo("시발발발");
+        assertThat(aggressivelyNormalizedText("ssiiibal")).isEqualTo("ssiiibal");
+        assertThat(aggressivelyNormalizedText("fuuuck")).isEqualTo("fuuuck");
     }
     @Test
     @DisplayName("모음 늘이기로 정규화 뷰 반환")
@@ -784,13 +746,13 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("접힌 반복 문자로 정규화 뷰 반환")
+    @DisplayName("접힌 반복 자모로 정규화 뷰 반환")
     void testNormalizeAggressively_givenCollapsedRepeats_willReturnNormalizedView() {
         // given & when
-        TextNormalizedView textNormalizedView = textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly("시발발발"));
+        TextNormalizedView textNormalizedView = textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly("시ㅋㅋㅋ"));
 
         // then
-        assertThat(textNormalizedView.getText()).isEqualTo("시발");
+        assertThat(textNormalizedView.getText()).isEqualTo("시ㅋ");
         assertSpans(textNormalizedView, 0, 0, 1, 0, 1);
         assertSpans(textNormalizedView, 1, 1, 4, 1, 4);
     }
@@ -815,13 +777,15 @@ class TextNormalizerTest {
         String differentSupplementaryCharacters = "𠀀𠀁";
 
         // when
-        TextNormalizedView collapsedView =
+        TextNormalizedView repeatedView =
                 textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly(repeatedSupplementaryCharacter));
 
         // then
-        assertThat(collapsedView.getText()).isEqualTo("𠀀");
-        assertSpans(collapsedView, 0, 0, 4, 0, 4);
-        assertSpans(collapsedView, 1, 0, 4, 0, 4);
+        assertThat(repeatedView.getText()).isEqualTo(repeatedSupplementaryCharacter);
+        assertSpans(repeatedView, 0, 0, 2, 0, 2);
+        assertSpans(repeatedView, 1, 0, 2, 0, 2);
+        assertSpans(repeatedView, 2, 2, 4, 2, 4);
+        assertSpans(repeatedView, 3, 2, 4, 2, 4);
         assertThat(aggressivelyNormalizedText(differentSupplementaryCharacters))
                 .isEqualTo(differentSupplementaryCharacters);
     }
