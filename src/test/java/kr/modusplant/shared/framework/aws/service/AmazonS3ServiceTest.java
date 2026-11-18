@@ -44,6 +44,7 @@ class AmazonS3ServiceTest {
         uploadS3Presigner = mock(S3Presigner.class);
         amazonS3Service = new AmazonS3Service(s3Client, s3Presigner, uploadS3Presigner);
         ReflectionTestUtils.setField(amazonS3Service, "bucket", BUCKET_NAME);
+        ReflectionTestUtils.setField(amazonS3Service, "profile", "prod");
     }
 
     @Test
@@ -143,6 +144,23 @@ class AmazonS3ServiceTest {
         // then
         assertThat(result).isEqualTo(expected);
         verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
+    }
+
+    @Test
+    @DisplayName("개발 환경에서 파일 키로 서명되지 않은 문자열 반환")
+    void testGenerateGetPresignedUrl_givenFileKeyOnDevProfile_willReturnUnsignedString() {
+        // given
+        String fileKey = "test-file-key";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
+        ReflectionTestUtils.setField(amazonS3Service, "profile", "dev");
+        ReflectionTestUtils.setField(amazonS3Service, "devPublicEndpoint", ENDPOINT);
+
+        // when
+        String result = amazonS3Service.generateGetPresignedUrl(fileKey);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+        verify(s3Presigner, never()).presignGetObject(any(GetObjectPresignRequest.class));
     }
 
     @Test
