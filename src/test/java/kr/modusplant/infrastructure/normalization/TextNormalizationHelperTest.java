@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isConjoiningJamo;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutFinal;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isInCombiningMark;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isInDICP;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCombiningMark;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDICP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isNonLetterNoiseCategory;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,35 +17,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TextNormalizationHelperTest {
     @Test
     @DisplayName("기본 무시 코드 포인트로 true 반환")
-    void testIsInDICP_givenDefaultIgnorableCodePoint_willReturnTrue() {
+    void testIsDICP_givenDefaultIgnorableCodePoint_willReturnTrue() {
         // given & when & then
-        assertThat(isInDICP().test(0x200B)).isTrue();
-        assertThat(isInDICP().test(0x3164)).isTrue();
+        assertThat(isDICP(0x200B)).isTrue();
+        assertThat(isDICP(0x3164)).isTrue();
     }
 
     @Test
     @DisplayName("기본 무시 코드 포인트가 아닌 문자로 false 반환")
-    void testIsInDICP_givenOtherCharacter_willReturnFalse() {
+    void testIsDICP_givenOtherCharacter_willReturnFalse() {
         // given & when & then
-        assertThat(isInDICP().test('a')).isFalse();
-        assertThat(isInDICP().test('시')).isFalse();
+        assertThat(isDICP('a')).isFalse();
+        assertThat(isDICP('시')).isFalse();
     }
 
     @Test
     @DisplayName("결합 문자로 true 반환")
-    void testIsInCombiningMark_givenCombiningMark_willReturnTrue() {
+    void testIsCombiningMark_givenCombiningMark_willReturnTrue() {
         // given & when & then
-        assertThat(isInCombiningMark(0x0301)).isTrue();
-        assertThat(isInCombiningMark(0x0903)).isTrue();
-        assertThat(isInCombiningMark(0x20DD)).isTrue();
+        assertThat(isCombiningMark(0x0301)).isTrue();
+        assertThat(isCombiningMark(0x0903)).isTrue();
+        assertThat(isCombiningMark(0x20DD)).isTrue();
     }
 
     @Test
     @DisplayName("결합 문자가 아닌 문자로 false 반환")
-    void testIsInCombiningMark_givenOtherCharacter_willReturnFalse() {
+    void testIsCombiningMark_givenOtherCharacter_willReturnFalse() {
         // given & when & then
-        assertThat(isInCombiningMark('a')).isFalse();
-        assertThat(isInCombiningMark('시')).isFalse();
+        assertThat(isCombiningMark('a')).isFalse();
+        assertThat(isCombiningMark('시')).isFalse();
     }
 
     @Test
@@ -152,5 +153,22 @@ class TextNormalizationHelperTest {
         // given & when & then
         assertThat(isCompatibilityJamo(0x1100)).isFalse();
         assertThat(isCompatibilityJamo('가')).isFalse();
+    }
+
+    @Test
+    @DisplayName("초성, 중성, 종성 자모로 true 반환")
+    void testIsConjoiningJamo_givenConjoiningJamo_willReturnTrue() {
+        // given & when & then
+        assertThat(isConjoiningJamo(0x1100)).isTrue();
+        assertThat(isConjoiningJamo(0x1161)).isTrue();
+        assertThat(isConjoiningJamo(0x11A8)).isTrue();
+    }
+
+    @Test
+    @DisplayName("호환 자모와 음절로 false 반환")
+    void testIsConjoiningJamo_givenCompatibilityJamoOrSyllable_willReturnFalse() {
+        // given & when & then
+        assertThat(isConjoiningJamo(0x3131)).isFalse();
+        assertThat(isConjoiningJamo('가')).isFalse();
     }
 }

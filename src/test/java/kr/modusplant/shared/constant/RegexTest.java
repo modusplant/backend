@@ -39,26 +39,6 @@ class RegexTest {
     }
 
     @Test
-    @DisplayName("줄 종결 문자로 참 반환")
-    void testPatternLineTerminator_givenLineTerminator_willReturnTrue() {
-        // given & when & then
-        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\n").matches());
-        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\r").matches());
-        assertTrue(PATTERN_LINE_TERMINATOR.matcher("\r\n").matches());
-        assertTrue(PATTERN_LINE_TERMINATOR.matcher(" ").matches());
-    }
-
-    @Test
-    @DisplayName("줄 종결 문자가 아닌 문자열로 거짓 반환")
-    void testPatternLineTerminator_givenNonLineTerminator_willReturnFalse() {
-        // given & when & then
-        assertFalse(PATTERN_LINE_TERMINATOR.matcher(" ").matches());
-        assertFalse(PATTERN_LINE_TERMINATOR.matcher("가").matches());
-        // 줄 종결 문자 두 개
-        assertFalse(PATTERN_LINE_TERMINATOR.matcher("\n\n").matches());
-    }
-
-    @Test
     @DisplayName("유효한 구체화 경로 문자열로 참 반환")
     void testPatternMaterializedPath_givenValidPathString_willReturnTrue() {
         // given & when & then

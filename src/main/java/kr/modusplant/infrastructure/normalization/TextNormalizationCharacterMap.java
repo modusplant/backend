@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TextNormalizationCharacterMap {
@@ -28,10 +27,10 @@ public final class TextNormalizationCharacterMap {
     private static final int NEGATIVE_CIRCLED_LATIN_CAPITAL_A = 0x1F150; // 검은 원 안의 라틴 대문자 🅐~🅩 26자의 시작 코드 포인트
     private static final int NEGATIVE_SQUARED_LATIN_CAPITAL_A = 0x1F170; // 검은 사각형 안의 라틴 대문자 🅰~🆉 26자의 시작 코드 포인트
 
-    // 음절 결합 가능 여부를 확인하는 문맥으로 쓰는 자모
-    // 현대 자모의 결합은 자모 종류와 무관하게 성립하여 어떤 현대 자모를 써도 결과가 같으므로, 초성·중성 각각의 첫 현대 자모를 사용
-    private static final int CHOSEONG_KIYEOK = 0x1100; // 초성 ᄀ
-    private static final int JUNGSEONG_A = 0x1161; // 중성 ᅡ
+    // 음절 결합 가능 여부를 확인하는 문맥으로 쓰는 조합형 자모
+    // 현대 자모의 결합은 자모 종류와 무관하게 성립하여 어떤 현대 자모를 써도 결과가 같으므로, 초성·중성 각각의 첫 현대 조합형 자모를 사용
+    private static final int CONJOINING_CHOSEONG_KIYEOK = 0x1100; // 조합형 초성 ᄀ
+    private static final int CONJOINING_JUNGSEONG_A = 0x1161; // 조합형 중성 ᅡ
 
     private static final Normalizer2 nfkdInstance = Normalizer2.getNFKDInstance();
     private static final Normalizer2 nfcInstance = Normalizer2.getNFCInstance();
@@ -42,11 +41,11 @@ public final class TextNormalizationCharacterMap {
     public static final Map<Integer, Integer> CONJOINING_COMPATIBILITY_JAMO_MAP = createConjoiningCompatibilityJamoMap();
     // 호환 자모 → 완성형 음절의 초성·중성·종성이 될 수 있는 조합형 자모
     public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_CHOSEONG_MAP = createCompatibilityConjoiningJamoMap(
-            "", Character.toString(JUNGSEONG_A));
+            "", Character.toString(CONJOINING_JUNGSEONG_A));
     public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP = createCompatibilityConjoiningJamoMap(
-            Character.toString(CHOSEONG_KIYEOK), "");
+            Character.toString(CONJOINING_CHOSEONG_KIYEOK), "");
     public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JONGSEONG_MAP = createCompatibilityConjoiningJamoMap(
-            Character.toString(CHOSEONG_KIYEOK) + Character.toString(JUNGSEONG_A), "");
+            Character.toString(CONJOINING_CHOSEONG_KIYEOK) + Character.toString(CONJOINING_JUNGSEONG_A), "");
     // 호환 분해가 없는 문자 유사 기호 → ASCII 소문자
     public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
     // ASCII 소문자와 형태가 혼동되는 키릴 · 그리스 소문자 → ASCII 소문자
@@ -104,30 +103,26 @@ public final class TextNormalizationCharacterMap {
             Map.entry((int) 'b', (int) 'ㅠ'),
             Map.entry((int) 'n', (int) 'ㅜ'),
             Map.entry((int) 'm', (int) 'ㅡ'));
-    // 두벌식 자판에서 두 번 입력하는 겹모음·겹종성 호환 자모 → 입력 순서대로 나열한 두벌식 키 입력 자모
-    public static final Map<Integer, String> COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP = Map.ofEntries(
-            Map.entry((int) 'ㅘ', "ㅗㅏ"),
-            Map.entry((int) 'ㅙ', "ㅗㅐ"),
-            Map.entry((int) 'ㅚ', "ㅗㅣ"),
-            Map.entry((int) 'ㅝ', "ㅜㅓ"),
-            Map.entry((int) 'ㅞ', "ㅜㅔ"),
-            Map.entry((int) 'ㅟ', "ㅜㅣ"),
-            Map.entry((int) 'ㅢ', "ㅡㅣ"),
-            Map.entry((int) 'ㄳ', "ㄱㅅ"),
-            Map.entry((int) 'ㄵ', "ㄴㅈ"),
-            Map.entry((int) 'ㄶ', "ㄴㅎ"),
-            Map.entry((int) 'ㄺ', "ㄹㄱ"),
-            Map.entry((int) 'ㄻ', "ㄹㅁ"),
-            Map.entry((int) 'ㄼ', "ㄹㅂ"),
-            Map.entry((int) 'ㄽ', "ㄹㅅ"),
-            Map.entry((int) 'ㄾ', "ㄹㅌ"),
-            Map.entry((int) 'ㄿ', "ㄹㅍ"),
-            Map.entry((int) 'ㅀ', "ㄹㅎ"),
-            Map.entry((int) 'ㅄ', "ㅂㅅ"));
-    // 입력 순서대로 나열한 두 호환 자모 → 겹모음·겹종성 호환 자모 (위 맵을 뒤집어 만듦)
-    public static final Map<String, Integer> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP =
-            COMPOUND_COMPATIBILITY_JAMO_COMPATIBILITY_JAMO_KEYSTROKE_MAP.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getValue, Map.Entry::getKey));
+    // 두벌식 자판에서 입력 순서대로 나열한 두 호환 자모 → 두 번 입력하는 겹모음·겹종성 호환 자모
+    public static final Map<String, Integer> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP = Map.ofEntries(
+            Map.entry("ㅗㅏ", (int) 'ㅘ'),
+            Map.entry("ㅗㅐ", (int) 'ㅙ'),
+            Map.entry("ㅗㅣ", (int) 'ㅚ'),
+            Map.entry("ㅜㅓ", (int) 'ㅝ'),
+            Map.entry("ㅜㅔ", (int) 'ㅞ'),
+            Map.entry("ㅜㅣ", (int) 'ㅟ'),
+            Map.entry("ㅡㅣ", (int) 'ㅢ'),
+            Map.entry("ㄱㅅ", (int) 'ㄳ'),
+            Map.entry("ㄴㅈ", (int) 'ㄵ'),
+            Map.entry("ㄴㅎ", (int) 'ㄶ'),
+            Map.entry("ㄹㄱ", (int) 'ㄺ'),
+            Map.entry("ㄹㅁ", (int) 'ㄻ'),
+            Map.entry("ㄹㅂ", (int) 'ㄼ'),
+            Map.entry("ㄹㅅ", (int) 'ㄽ'),
+            Map.entry("ㄹㅌ", (int) 'ㄾ'),
+            Map.entry("ㄹㅍ", (int) 'ㄿ'),
+            Map.entry("ㄹㅎ", (int) 'ㅀ'),
+            Map.entry("ㅂㅅ", (int) 'ㅄ'));
 
     private static Map<Integer, Integer> createConjoiningCompatibilityJamoMap() {
         // 1. 한글 호환 자모의 각 문자를 NFKD로 분해한 조합형 자모의 이름에서 접두어를 떼어, 조합형 자모 이름 → 호환 자모 맵을 만듦

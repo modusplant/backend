@@ -8,8 +8,10 @@ import com.ibm.icu.util.StringTrieBuilder;
 import kr.modusplant.infrastructure.config.exception.ConfigurationException;
 import kr.modusplant.infrastructure.config.exception.enums.ConfigurationErrorCode;
 import kr.modusplant.infrastructure.normalization.TextNormalizationType;
-import kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView;
-import kr.modusplant.infrastructure.normalization.TextNormalizedView;
+import kr.modusplant.infrastructure.normalization.view.AggressivelyNormalizedView;
+import kr.modusplant.infrastructure.normalization.view.LightlyNormalizedView;
+import kr.modusplant.infrastructure.normalization.view.SyllableNormalizedView;
+import kr.modusplant.infrastructure.normalization.view.supers.TextNormalizedView;
 import kr.modusplant.infrastructure.normalization.TextNormalizer;
 
 import java.util.*;
@@ -17,15 +19,11 @@ import java.util.*;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationType.*;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.CHOSEONG;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.JamoPosition.STANDALONE;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.ASCII_LOWER_CASE_LETTER;
-import static kr.modusplant.infrastructure.normalization.TextNormalizedKeystrokeView.SourceKind.STANDALONE_JAMO;
 
 // 비속어와 비속어가 아닌 단어를 정규화 뷰별 키워드로 정규화해 ICU4J 트라이를 만들고, 텍스트의 유효하고 중복 제거된 매칭을 반환
 public final class SwearEngine {
     private static final int MINIMUM_LINE_INITIAL_WORD_CODE_POINT_COUNT = 2;
-    private static final List<TextNormalizationType> NOT_SWEAR_NORMALIZATION_TYPES = List.of(LIGHT, AGGRESSIVE, KEYSTROKE);
+    private static final List<TextNormalizationType> NOT_SWEAR_NORMALIZATION_TYPES = List.of(LIGHT, AGGRESSIVE, SYLLABLE, KEYSTROKE);
 
     private final TextNormalizer textNormalizer;
     private final Map<TextNormalizationType, KeywordTrie> swearKeywordTries;
@@ -58,6 +56,10 @@ public final class SwearEngine {
             if (swearWord.script() != derivedScript) {
                 scriptMismatches.add(swearWord.word() + "(" + swearWord.script() + " → " + derivedScript + ")");
                 continue;
+            }
+            // 키 입력 뷰는 두벌식 자판으로 입력한 한국어만 다루므로, 한글 비속어에만 키 입력 키워드를 줌
+            if (swearWord.script() != SwearScript.HANGUL) {
+                keywords.remove(KEYSTROKE);
             }
             keywords.forEach((textNormalizationType, keyword) -> keywordSwearWords.get(textNormalizationType)
                     .computeIfAbsent(keyword, ignored -> new ArrayList<>())
@@ -106,14 +108,15 @@ public final class SwearEngine {
         if (text == null || text.isEmpty()) {
             return List.of();
         }
-        TextNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(text);
-        TextNormalizedView aggressivelyNormalizedView = textNormalizer.normalizeAggressively(lightlyNormalizedView);
-        TextNormalizedKeystrokeView keystrokeView =
-                textNormalizer.normalizeWithKeystroke(aggressivelyNormalizedView, lightlyNormalizedView);
+        LightlyNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(text);
+        AggressivelyNormalizedView aggressivelyNormalizedView = textNormalizer.normalizeAggressively(lightlyNormalizedView);
+        SyllableNormalizedView syllableView =
+                textNormalizer.normalizeWithSyllable(aggressivelyNormalizedView, lightlyNormalizedView);
         Map<TextNormalizationType, TextNormalizedView> views = new EnumMap<>(TextNormalizationType.class);
         views.put(LIGHT, lightlyNormalizedView);
         views.put(AGGRESSIVE, aggressivelyNormalizedView);
-        views.put(KEYSTROKE, keystrokeView.getTextNormalizedView());
+        views.put(SYLLABLE, syllableView);
+        views.put(KEYSTROKE, textNormalizer.normalizeWithKeystroke(aggressivelyNormalizedView));
         views.put(LINE_INITIAL, textNormalizer.normalizeWithLineInitial(lightlyNormalizedView));
         KeyboardRuns keyboardRuns = KeyboardRuns.of(lightlyNormalizedView.getText());
 
@@ -131,8 +134,8 @@ public final class SwearEngine {
                 }
                 for (SwearWord swearWord :
                         keywordSwearWords.get(textNormalizationType).get(keywordMatch.keyword())) {
-                    if (!isValidMatch(textNormalizationType, swearWord, keywordMatch.keyword(), view,
-                            lightlyNormalizedView, keystrokeView, keyboardRuns, start, end)) {
+                    if (!isValidMatch(textNormalizationType, keywordMatch.keyword(), view,
+                            lightlyNormalizedView, keyboardRuns, start, end)) {
                         continue;
                     }
                     SwearMatch swearMatch = new SwearMatch(swearWord, textNormalizationType,
@@ -146,42 +149,28 @@ public final class SwearEngine {
         return List.copyOf(keptMatches);
     }
 
-    // 경량 정규화 형태와, 공격적 정규화가 바꾸지 않는 단어에 한해 공격적 정규화 및 키 입력 형태를 뷰별로 반환
+    // 경량 정규화 형태와, 공격적 정규화가 바꾸지 않는 단어에 한해 공격적 정규화·음절·키 입력 형태를 뷰별로 반환
     private static Map<TextNormalizationType, String> normalizeWord(TextNormalizer textNormalizer, String word) {
         Map<TextNormalizationType, String> keywords = new EnumMap<>(TextNormalizationType.class);
-        TextNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(word);
+        LightlyNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(word);
         String lightlyNormalizedWord = lightlyNormalizedView.getText();
         if (lightlyNormalizedWord.isEmpty()) {
             return keywords;
         }
         keywords.put(LIGHT, lightlyNormalizedWord);
         keywords.put(LINE_INITIAL, lightlyNormalizedWord);
-        TextNormalizedView aggressivelyNormalizedView = textNormalizer.normalizeAggressively(lightlyNormalizedView);
+        AggressivelyNormalizedView aggressivelyNormalizedView = textNormalizer.normalizeAggressively(lightlyNormalizedView);
         if (aggressivelyNormalizedView.getText().equals(lightlyNormalizedWord)) {
             keywords.put(AGGRESSIVE, lightlyNormalizedWord);
-            TextNormalizedView keystrokeTextNormalizedView = textNormalizer
-                    .normalizeWithKeystroke(aggressivelyNormalizedView, lightlyNormalizedView)
-                    .getTextNormalizedView();
-            // 키 입력 정규화가 단어 자체의 글자를 지우면(개ㅅ끼 → ㄱㅐㄲㅣ) 단어보다 짧은 형태가 더 많은 텍스트와 매칭되므로 제외
-            if (keystrokeTextNormalizedView.length() > 0
-                    && coversWholeLightlyNormalizedText(keystrokeTextNormalizedView, lightlyNormalizedWord.length())) {
-                keywords.put(KEYSTROKE, keystrokeTextNormalizedView.getText());
+            // 음절 정규화가 단어의 자모나 ASCII 소문자를 바꾸거나 지우면(ㅅㅂ, fuck) 그 형태가 단어를 대표하지 못하므로 제외
+            if (textNormalizer.normalizeWithSyllable(aggressivelyNormalizedView, lightlyNormalizedView)
+                    .getText().equals(lightlyNormalizedWord)) {
+                keywords.put(SYLLABLE, lightlyNormalizedWord);
             }
+            keywords.put(KEYSTROKE, textNormalizer
+                    .normalizeWithKeystroke(aggressivelyNormalizedView).getText());
         }
         return keywords;
-    }
-
-    private static boolean coversWholeLightlyNormalizedText(TextNormalizedView view, int lightlyNormalizedLength) {
-        boolean[] covered = new boolean[lightlyNormalizedLength];
-        for (int index = 0; index < view.length(); index++) {
-            Arrays.fill(covered, view.getLightlyNormalizedStart(index), view.getLightlyNormalizedEnd(index), true);
-        }
-        for (boolean isCovered : covered) {
-            if (!isCovered) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private static boolean isInsideNotSwearKeywordMatch(List<KeywordMatch> notSwearKeywordMatches, int start, int end) {
@@ -194,34 +183,23 @@ public final class SwearEngine {
     }
 
     // 줄 첫 글자 뷰의 키워드는 비속어의 경량 정규화 텍스트이므로, 그 코드 포인트 수로 줄 첫 글자 규칙을 판정
-    private static boolean isValidMatch(TextNormalizationType textNormalizationType, SwearWord swearWord,
+    private static boolean isValidMatch(TextNormalizationType textNormalizationType,
                                         String keyword, TextNormalizedView view,
-                                        TextNormalizedView lightlyNormalizedView,
-                                        TextNormalizedKeystrokeView keystrokeView, KeyboardRuns keyboardRuns,
+                                        LightlyNormalizedView lightlyNormalizedView, KeyboardRuns keyboardRuns,
                                         int start, int end) {
         return switch (textNormalizationType) {
             case LIGHT -> true;
-            case AGGRESSIVE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end);
+            case AGGRESSIVE, SYLLABLE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end);
             case KEYSTROKE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end)
-                    && isValidKeystrokeMatch(swearWord.script(), keystrokeView, keyboardRuns, start, end);
+                    && coversWholeKeyboardRuns(view, keyboardRuns, start, end);
             case LINE_INITIAL -> keyword.codePointCount(0, keyword.length())
                     >= MINIMUM_LINE_INITIAL_WORD_CODE_POINT_COUNT;
         };
     }
 
-    private static boolean isValidKeystrokeMatch(SwearScript swearScript, TextNormalizedKeystrokeView keystrokeView,
-                                                 KeyboardRuns keyboardRuns, int start, int end) {
-        return switch (swearScript) {
-            case HANGUL -> hasValidJamoRoles(keystrokeView, start, end)
-                    && coversWholeKeyboardRuns(keystrokeView, keyboardRuns, start, end);
-            case LATIN -> isTypedAsStandaloneJamo(keystrokeView, start, end);
-            case OTHER -> true;
-        };
-    }
-
     // 공백을 넘는 매칭은 경량 정규화 뷰의 토큰 전체를 덮어야 유효
     private static boolean isTokenAlignedAcrossWhitespace(TextNormalizedView view,
-                                                          TextNormalizedView lightlyNormalizedView,
+                                                          LightlyNormalizedView lightlyNormalizedView,
                                                           int start, int end) {
         int lightlyNormalizedStart = calculateLightlyNormalizedStart(view, start, end);
         int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(view, start, end);
@@ -236,36 +214,14 @@ public final class SwearEngine {
         return startsAtTokenStart && endsAtTokenEnd;
     }
 
-    // 초성 또는 낱자 자모에서 시작해 음절 끝 또는 낱자 자모에서 끝나야 유효
-    private static boolean hasValidJamoRoles(TextNormalizedKeystrokeView keystrokeView, int start, int end) {
-        TextNormalizedKeystrokeView.JamoPosition firstJamoPosition = keystrokeView.getFirstSourceJamoPosition(start);
-        int lastIndex = end - 1;
-        boolean startsAtChoseongOrStandaloneJamo = firstJamoPosition == CHOSEONG || firstJamoPosition == STANDALONE;
-        boolean endsAtSyllableEndOrStandaloneJamo = keystrokeView.isSyllableEnd(lastIndex)
-                || keystrokeView.getLastSourceJamoPosition(lastIndex) == STANDALONE;
-        return startsAtChoseongOrStandaloneJamo && endsAtSyllableEndOrStandaloneJamo;
-    }
-
-    // ASCII 소문자에서 변환된 유닛이 있으면, 그 유닛이 닿는 경량 정규화 뷰의 자판 문자 연속 구간을 모두 덮어야 유효
-    private static boolean coversWholeKeyboardRuns(TextNormalizedKeystrokeView keystrokeView, KeyboardRuns keyboardRuns,
+    // 매칭의 경량 정규화 구간에 자판 문자가 있으면, 그 문자가 속한 경량 정규화 뷰의 자판 문자 연속 구간을 모두 덮어야 유효
+    // 자판 문자가 아닌 위치는 빈 구간을 가지므로 항상 덮인 것으로 판정됨
+    private static boolean coversWholeKeyboardRuns(TextNormalizedView view, KeyboardRuns keyboardRuns,
                                                    int start, int end) {
-        TextNormalizedView textNormalizedView = keystrokeView.getTextNormalizedView();
-        int lightlyNormalizedStart = calculateLightlyNormalizedStart(textNormalizedView, start, end);
-        int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(textNormalizedView, start, end);
-        for (int index = start; index < end; index++) {
-            if (keystrokeView.getSourceKind(index) == ASCII_LOWER_CASE_LETTER
-                    && !keyboardRuns.isCoveredBy(textNormalizedView.getLightlyNormalizedStart(index),
-                    lightlyNormalizedStart, lightlyNormalizedEnd)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    // 라틴 단어의 키 입력 매칭은 모든 유닛이 낱자 자모로 입력되어야 유효
-    private static boolean isTypedAsStandaloneJamo(TextNormalizedKeystrokeView keystrokeView, int start, int end) {
-        for (int index = start; index < end; index++) {
-            if (keystrokeView.getSourceKind(index) != STANDALONE_JAMO) {
+        int lightlyNormalizedStart = calculateLightlyNormalizedStart(view, start, end);
+        int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(view, start, end);
+        for (int index = lightlyNormalizedStart; index < lightlyNormalizedEnd; index++) {
+            if (!keyboardRuns.isCoveredBy(index, lightlyNormalizedStart, lightlyNormalizedEnd)) {
                 return false;
             }
         }
@@ -334,22 +290,21 @@ public final class SwearEngine {
 
     // 키워드를 ICU4J CharsTrie로 직렬화하고, 텍스트의 모든 시작 위치에서 겹치는 매칭까지 모두 찾음
     // CharsTrie는 탐색 상태를 가지므로 매칭마다 직렬화된 문자열로 새로 만듦
-    private record KeywordTrie(CharSequence trieChars, List<String> keywords) {
+    // 매칭된 키워드는 텍스트의 매칭 구간 자체이므로 트라이 값은 쓰지 않음
+    private record KeywordTrie(CharSequence trieChars) {
         private static KeywordTrie of(Collection<String> keywords) {
-            List<String> distinctKeywords = List.copyOf(new HashSet<>(keywords));
-            if (distinctKeywords.isEmpty()) {
-                return new KeywordTrie("", distinctKeywords);
+            if (keywords.isEmpty()) {
+                return new KeywordTrie("");
             }
             CharsTrieBuilder charsTrieBuilder = new CharsTrieBuilder();
-            for (int index = 0; index < distinctKeywords.size(); index++) {
-                charsTrieBuilder.add(distinctKeywords.get(index), index);
+            for (String keyword : new HashSet<>(keywords)) {
+                charsTrieBuilder.add(keyword, 0);
             }
-            String trieChars = charsTrieBuilder.buildCharSequence(StringTrieBuilder.Option.FAST).toString();
-            return new KeywordTrie(trieChars, distinctKeywords);
+            return new KeywordTrie(charsTrieBuilder.buildCharSequence(StringTrieBuilder.Option.FAST).toString());
         }
 
         private List<KeywordMatch> findAll(String text) {
-            if (keywords.isEmpty()) {
+            if (trieChars.isEmpty()) {
                 return List.of();
             }
             List<KeywordMatch> keywordMatches = new ArrayList<>();
@@ -359,7 +314,7 @@ public final class SwearEngine {
                 for (int index = start; index < text.length(); index++) {
                     BytesTrie.Result result = charsTrie.next(text.charAt(index));
                     if (result.hasValue()) {
-                        keywordMatches.add(new KeywordMatch(keywords.get(charsTrie.getValue()), start, index + 1));
+                        keywordMatches.add(new KeywordMatch(text.substring(start, index + 1), start, index + 1));
                     }
                     if (!result.hasNext()) {
                         break;
