@@ -41,12 +41,6 @@ public class AmazonS3Service {
     @Value("${cloud.wasabi.s3.bucket}")
     private String bucket;
 
-    @Value("${spring.profiles.active:local}")
-    private String profile;
-
-    @Value("${minio.public-endpoint:#{null}}")
-    private String devPublicEndpoint;
-
     public void uploadFile(MultipartFile file, String fileKey) throws IOException {
         PutObjectRequest request = PutObjectRequest.builder()
                 .bucket(bucket)
@@ -100,13 +94,6 @@ public class AmazonS3Service {
     }
 
     public String generateGetPresignedUrl(String fileKey) {
-        if (profile.equals("dev")){
-            return String.format("%s/%s/%s", devPublicEndpoint, bucket, getPresignedUrl(fileKey));
-        }
-        return getPresignedUrl(fileKey);
-    }
-
-    private String getPresignedUrl(String fileKey) {
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 .signatureDuration(Duration.ofHours(168))
                 .getObjectRequest(req -> req
