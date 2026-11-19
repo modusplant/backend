@@ -245,6 +245,18 @@ class TextNormalizerTest {
     }
 
     @Test
+    @DisplayName("토큰 경계에서 끊긴 호환 자모 연속으로 조합된 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenCompatibilityJamoRunAcrossTokens_willReturnNormalizedView() {
+        // given
+        TextNormalizedView tokenBoundedView = syllableView("ㅂㅠ ㅅㅂ");
+
+        // when & then
+        assertThat(tokenBoundedView.getText()).isEqualTo("뷰");
+        assertSpans(tokenBoundedView, 0, 0, 2, 0, 2);
+        assertThat(syllableText("ㅂ ㅠㅅㅂ")).isEmpty();
+    }
+
+    @Test
     @DisplayName("ASCII 소문자와 한글 음절 외 문자로 유지된 음절 뷰 반환")
     void testNormalizeWithSyllable_givenOtherCharacters_willReturnNormalizedView() {
         // given & when & then

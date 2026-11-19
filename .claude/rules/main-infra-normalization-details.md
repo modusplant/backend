@@ -86,7 +86,7 @@ accepts only the view it needs:
   only a jamo that composes into a precomposed syllable is included, so an archaic jamo is left out.
 - `ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP`: ASCII lowercase letters (`a`–`z`) → the Hangul Compatibility
   Jamo on the same Dubeolsik (KS X 5002) key.
-- `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP`: a `String` of two Dubeolsik keystroke jamo in typing
+- `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP`: a `String` of two Dubeolsik keystroke jamo in typing
   order → the compound vowel or compound final Hangul Compatibility Jamo they form.
 
 **`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
@@ -183,7 +183,7 @@ The aggressively normalized view passes these steps in order, each building a ne
 - Step 1 reads a run left to right as an initial, a vowel, and an optional final, and a consonant followed by a vowel
   starts the next syllable, like step 4 of §4, but composes the part that forms syllables and keeps the rest as jamo
   (`ㅅㅂㅠ` → `ㅅ뷰`).
-  - Two adjacent jamo that `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP` joins form a compound vowel
+  - Two adjacent jamo that `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP` joins form a compound vowel
     or compound final (`ㄷㅜㅔ져` → `뒈져`).
   - A consonant jamo directly after a Hangul syllable without a final becomes that syllable's final, because a final
     typed apart from its syllable only hides the word (`시바ㄹ놈` → `시발놈`); an inserted consonant becomes a final
@@ -212,7 +212,7 @@ The aggressively normalized view passes these steps in order, each building a ne
   `ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP`, and the Hangul Compatibility Jamo converted from adjacent ASCII
   lowercase letters compose into Hangul syllables, each read left to right as an initial, a vowel, and an optional
   final; a converted jamo that joins no syllable stays a Hangul Compatibility Jamo (`tlqkf` → `시발`).
-  - Two adjacent ASCII lowercase letters whose jamo `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP` joins
+  - Two adjacent ASCII lowercase letters whose jamo `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP` joins
     form a compound vowel or compound final (`dnjs` → `원`).
   - A consonant followed by a vowel, converted or typed, stays an initial instead of becoming a final (`rkqtk` → `갑사`;
     `tlqㅏㄹ` → `시ㅂㅏㄹ`).
