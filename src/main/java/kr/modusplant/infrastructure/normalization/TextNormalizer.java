@@ -226,30 +226,34 @@ public class TextNormalizer {
     // 종성 없는 음절 뒤의 자음 낱자는 그 음절의 종성으로 붙이며 (시바ㄹ놈 → 시발놈), 합성된 음절은 조합한 자모들의 구간 합에 대응함
     private TextNormalizedView composeCompatibilityJamoWithinTokens(TextNormalizedView sourceView,
                                                                     LightlyNormalizedView lightlyNormalizedView) {
-        int[] tokenIndexes = indexTokens(lightlyNormalizedView.getText());
+        int[] tokenIndexes = getTokenIndexes(lightlyNormalizedView.getText());
         int[] codePoints = sourceView.getText().codePoints().toArray();
         TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int codeUnitStart = 0;
         int codePointIndex = 0;
         while (codePointIndex < codePoints.length) {
-            if (isHangulSyllableWithoutFinal(codePoints[codePointIndex])) {
-                int syllableIndex = codePointIndex;
+            int codePoint = codePoints[codePointIndex];
+            if (isHangulSyllableWithoutFinal(codePoint)) {
+                int syllableCodePointIndex = codePointIndex;
                 int syllableCodeUnitStart = codeUnitStart;
                 int syllableTokenIndex = tokenIndexes[sourceView.getLightlyNormalizedStart(syllableCodeUnitStart)];
                 // 음절과 호환 자모는 모두 BMP 문자이므로, 음절부터 이어지는 호환 자모까지는 배열 인덱스 차이가 코드 유닛 차이와 같음
-                ComposedJamo composedJamo = attachFollowingFinalJamo(codePoints, syllableIndex,
-                        arrayIndex -> arrayIndex < codePoints.length && isCompatibilityJamo(codePoints[arrayIndex])
-                                && tokenIndexes[sourceView.getLightlyNormalizedStart(
-                                        syllableCodeUnitStart + arrayIndex - syllableIndex)] == syllableTokenIndex);
+                ComposedJamo composedJamo = attachFollowingFinalJamo(codePoints, syllableCodePointIndex,
+                        tempCodePointIndex ->
+                                tempCodePointIndex < codePoints.length &&
+                                        isCompatibilityJamo(codePoints[tempCodePointIndex]) &&
+                                        tokenIndexes[sourceView.getLightlyNormalizedStart(
+                                                syllableCodeUnitStart + tempCodePointIndex - syllableCodePointIndex)
+                                                ] == syllableTokenIndex);
                 appendCodePoint(builder, composedJamo.codePoint(), sourceView,
                         codeUnitStart, codeUnitStart + composedJamo.jamoCount());
                 codeUnitStart += composedJamo.jamoCount();
                 codePointIndex += composedJamo.jamoCount();
                 continue;
             }
-            if (!isCompatibilityJamo(codePoints[codePointIndex])) {
-                int codeUnitEnd = codeUnitStart + Character.charCount(codePoints[codePointIndex]);
-                appendCodePoint(builder, codePoints[codePointIndex], sourceView, codeUnitStart, codeUnitEnd);
+            if (!isCompatibilityJamo(codePoint)) {
+                int codeUnitEnd = codeUnitStart + Character.charCount(codePoint);
+                appendCodePoint(builder, codePoint, sourceView, codeUnitStart, codeUnitEnd);
                 codeUnitStart = codeUnitEnd;
                 codePointIndex++;
                 continue;
@@ -281,10 +285,10 @@ public class TextNormalizer {
     // 종성 없는 음절 뒤에 같은 토큰의 종성이 될 수 있는 자음 낱자가 오고 그 뒤에 모음 낱자가 없으면, 그 자음 낱자를 종성으로 붙이며
     // 이웃한 두 자음 낱자가 겹종성을 이루면 하나로 합침 (바ㄹ → 발, 바ㄹㄱ → 밝, 바ㄹㅏ는 붙이지 않음)
     // 모든 위치의 자모 여부는 그 앞 위치가 같은 토큰의 자모일 때만 판정하므로, 판정 위치까지는 모두 BMP 문자임
-    private ComposedJamo attachFollowingFinalJamo(int[] codePoints, int syllableIndex,
+    private ComposedJamo attachFollowingFinalJamo(int[] codePoints, int syllableCodePointIndex,
                                                   IntPredicate isJamoInSyllableTokenAt) {
-        int syllable = codePoints[syllableIndex];
-        int firstFinalIndex = syllableIndex + 1;
+        int syllable = codePoints[syllableCodePointIndex];
+        int firstFinalIndex = syllableCodePointIndex + 1;
         if (!isJamoInSyllableTokenAt.test(firstFinalIndex)
                 || !COMPATIBILITY_CONJOINING_JONGSEONG_MAP.containsKey(codePoints[firstFinalIndex])
                 || isVowelJamoInSyllableTokenAt(codePoints, firstFinalIndex + 1, isJamoInSyllableTokenAt)) {
@@ -310,19 +314,23 @@ public class TextNormalizer {
                 && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(codePoints[arrayIndex]);
     }
 
-    // 경량 정규화 텍스트의 각 코드 유닛에, 공백으로 나뉜 토큰의 번호를 기록함
-    private int[] indexTokens(String lightlyNormalizedText) {
+    // 경량 정규화 텍스트의 각 코드 유닛에 대하여 공백으로 나뉜 토큰의 인덱스를 기록함
+    private int[] getTokenIndexes(String lightlyNormalizedText) {
         int[] tokenIndexes = new int[lightlyNormalizedText.length()];
         int tokenIndex = 0;
-        int index = 0;
-        while (index < lightlyNormalizedText.length()) {
-            int codePoint = lightlyNormalizedText.codePointAt(index);
-            int nextIndex = index + Character.charCount(codePoint);
+        boolean pointsTokenBoundary = true;
+        int codeUnitIndex = 0;
+        while (codeUnitIndex < lightlyNormalizedText.length()) {
+            int codePoint = lightlyNormalizedText.codePointAt(codeUnitIndex);
+            int nextCodeUnitIndex = codeUnitIndex + Character.charCount(codePoint);
             if (UCharacter.isUWhiteSpace(codePoint)) {
+                pointsTokenBoundary = true;
+            } else if (pointsTokenBoundary) {
                 tokenIndex++;
+                pointsTokenBoundary = false;
             }
-            Arrays.fill(tokenIndexes, index, nextIndex, tokenIndex);
-            index = nextIndex;
+            Arrays.fill(tokenIndexes, codeUnitIndex, nextCodeUnitIndex, tokenIndex);
+            codeUnitIndex = nextCodeUnitIndex;
         }
         return tokenIndexes;
     }
