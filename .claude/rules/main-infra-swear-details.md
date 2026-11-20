@@ -40,10 +40,10 @@ word normalized for that view:
 | `AGGRESSIVE` | The same text, only for a word whose `normalizeAggressively` text equals it |
 | `SYLLABLE` | The same text, only for the words of `AGGRESSIVE` whose `normalizeWithSyllable` text equals it |
 | `KEYSTROKE` | `normalizeWithKeystroke` text, only for the not-swear words and `HANGUL` swear words of `AGGRESSIVE` |
-| `LINE_INITIAL` | `normalizeLightly` text of every swear word |
+| `LINE_INITIAL` | `normalizeLightly` text of every word |
 
-- Each view has a swear-word trie and, except `LINE_INITIAL`, a not-swear-word trie. Both are ICU4J `CharsTrie`s whose
-  keys are the view's keywords of their words. A keyword match takes its keyword from the matched range of the view's
+- Each view has a swear-word trie and a not-swear-word trie. Both are ICU4J `CharsTrie`s whose keys are the view's
+  keywords of their words. A keyword match takes its keyword from the matched range of the view's
   text, which equals the keyword, so the trie values are unused.
 - A keyword match of the swear-word trie is a match of every swear word with that keyword, so swear words that share a
   keyword all match the same span of the original text.
@@ -94,7 +94,7 @@ characters (`시.발` → `[0, 3)`).
 
 | Rule | Applies to | Keeps the match when |
 |---|---|---|
-| Not-swear word | Light, aggressive, syllable, keystroke | It is not inside a keyword match of a not-swear word in the same view (`시발점`) |
+| Not-swear word | All views | It is not inside a keyword match of a not-swear word in the same view (`시발점`) |
 | Token alignment | Aggressive, syllable, keystroke | A span whose lightly normalized range contains whitespace (ICU4J `isUWhiteSpace`) starts and ends at token boundaries of the light view (`시발` matches in `시 발 놈`, not in `검사 시 발생`) |
 | Keyboard run | Keystroke | For each keyboard letter (an ASCII lowercase letter, or a letter that `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP` maps to one) in its lightly normalized range, that range covers the whole maximal run of keyboard letters in the light view containing it, because English text also converts to Hangul (no `시발` match in `atlqkfb`) |
 | Line-initial | Line-initial | The swear word's lightly normalized text has 2 or more code points |

@@ -71,15 +71,15 @@ public final class SwearEngine {
                     ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT, scriptMismatches.toArray(String[]::new));
         }
 
-        Map<TextNormalizationType, List<String>> notSwearKeywords = new EnumMap<>(TextNormalizationType.class);
+        Map<TextNormalizationType, List<String>> keywordNotSwearWords = new EnumMap<>(TextNormalizationType.class);
         for (TextNormalizationType textNormalizationType : NOT_SWEAR_NORMALIZATION_TYPES) {
-            notSwearKeywords.put(textNormalizationType, new ArrayList<>());
+            keywordNotSwearWords.put(textNormalizationType, new ArrayList<>());
         }
         for (String notSwearWord : notSwearWords) {
             normalizeWord(textNormalizer, notSwearWord)
                     .forEach((textNormalizationType, keyword) -> {
-                        if (notSwearKeywords.containsKey(textNormalizationType)) {
-                            notSwearKeywords.get(textNormalizationType).add(keyword);
+                        if (keywordNotSwearWords.containsKey(textNormalizationType)) {
+                            keywordNotSwearWords.get(textNormalizationType).add(keyword);
                         }
                     });
         }
@@ -98,7 +98,7 @@ public final class SwearEngine {
                             textNormalizationType, Map.copyOf(immutableKeywordSwearWordsAsValue));
                 });
         Map<TextNormalizationType, KeywordTrie> notSwearKeywordTries = new EnumMap<>(TextNormalizationType.class);
-        notSwearKeywords.forEach((textNormalizationType, notSwearKeywordsAsValue) ->
+        keywordNotSwearWords.forEach((textNormalizationType, notSwearKeywordsAsValue) ->
                 notSwearKeywordTries.put(textNormalizationType, KeywordTrie.of(notSwearKeywordsAsValue)));
 
         return new SwearEngine(

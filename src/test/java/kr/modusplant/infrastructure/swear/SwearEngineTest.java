@@ -215,6 +215,19 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
+    @DisplayName("행 첫 글자의 비속어가 아닌 단어로 List 반환")
+    void testMatch_givenNotSwearWordInLineInitials_willReturnList() {
+        // given
+        SwearEngine swearEngine = engineOf(List.of(testSwearWord), List.of("시발점"));
+
+        // when
+        List<SwearMatch> swearMatches = swearEngine.match("- 시원\n- 발코니\n- 점심");
+
+        // then
+        assertThat(swearMatches).isEmpty();
+    }
+
+    @Test
     @DisplayName("행 첫 글자의 한 코드 포인트 단어로 List 반환")
     void testMatch_givenSingleCodePointWordInLineInitials_willReturnList() {
         // given
