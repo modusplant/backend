@@ -46,7 +46,7 @@ public class TextNormalizer {
         return nfcNormalizer.normalize(stringIncludingKorean);
     }
 
-    // 문자 체계를 바꾸지 않고 인코딩 수준의 변형만 제거함
+    // 인코딩 수준의 변형을 제거하고, 라틴 문자와 닮은 기호, 그리고 다른 문자 체계의 문자를 라틴 문자로 바꿈
     public LightlyNormalizedView normalizeLightly(String originalText) {
         TextNormalizedView.Builder builder = new TextNormalizedView.Builder(originalText.length());
         BreakIterator originalClusters = BreakIterator.getCharacterInstance();
@@ -66,10 +66,9 @@ public class TextNormalizer {
         return new LightlyNormalizedView(builder.build());
     }
 
-    // 단어를 숨기려고 의도적으로 가한 변형(문자 끼워 넣기, 닮은 문자로 치환, 자모를 풀어 쓰거나 반복하거나 늘여 쓰기)을 되돌림
+    // 단어를 숨기려고 의도적으로 가한 변형(문자 끼워 넣기, 자모를 풀어 쓰거나 반복하거나 늘여 쓰기)을 되돌림
     public AggressivelyNormalizedView normalizeAggressively(LightlyNormalizedView lightlyNormalizedView) {
-        TextNormalizedView confusableMappedView = mapCrossScriptConfusablesToLatin(lightlyNormalizedView);
-        TextNormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(confusableMappedView);
+        TextNormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(lightlyNormalizedView);
         TextNormalizedView repeatCollapsedView = collapseRepeatedJamo(nonLetterNoiseRemovedView);
         TextNormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(repeatCollapsedView);
         return new AggressivelyNormalizedView(mergeElongatedJamo(jamoComposedView));
@@ -119,20 +118,9 @@ public class TextNormalizer {
                 .map(codePoint -> CONJOINING_COMPATIBILITY_JAMO_MAP.getOrDefault(codePoint, codePoint))
                 .map(codePoint -> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.getOrDefault(codePoint, codePoint))
                 .map(UCharacter::toLowerCase)
+                .map(codePoint -> CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.getOrDefault(codePoint, codePoint))
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
-    }
-
-    private TextNormalizedView mapCrossScriptConfusablesToLatin(TextNormalizedView sourceView) {
-        TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
-        int codeUnitStart = 0;
-        for (int codePoint : sourceView.getText().codePoints().toArray()) {
-            int codeUnitEnd = codeUnitStart + Character.charCount(codePoint);
-            appendCodePoint(builder, CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.getOrDefault(codePoint, codePoint),
-                    sourceView, codeUnitStart, codeUnitEnd);
-            codeUnitStart = codeUnitEnd;
-        }
-        return builder.build();
     }
 
     private TextNormalizedView convertAsciiLowerCaseLettersToDubeolsikHangul(TextNormalizedView sourceView) {

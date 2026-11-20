@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationType.*;
 
@@ -222,11 +221,6 @@ public final class SwearEngine {
         return true;
     }
 
-    private static boolean isKeyboardLetter(int codePoint) {
-        return isAsciiLowerCaseLetter(codePoint)
-                || CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.containsKey(codePoint);
-    }
-
     private static boolean containsWhitespace(String text, int start, int end) {
         int index = start;
         while (index < end) {
@@ -329,7 +323,7 @@ public final class SwearEngine {
             while (index < lightlyNormalizedText.length()) {
                 int codePoint = lightlyNormalizedText.codePointAt(index);
                 int nextIndex = index + Character.charCount(codePoint);
-                if (!isKeyboardLetter(codePoint)) {
+                if (!isAsciiLowerCaseLetter(codePoint)) {
                     fillRun(runStarts, runEnds, runStart, index);
                     Arrays.fill(runStarts, index, nextIndex, index);
                     Arrays.fill(runEnds, index, nextIndex, index);

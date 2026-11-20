@@ -379,6 +379,15 @@ class TextNormalizerTest {
     }
 
     @Test
+    @DisplayName("라틴 문자와 혼동하기 쉬운 키릴 및 그리스 문자로 정규화 뷰 반환")
+    void testNormalizeLightly_givenCrossScriptConfusables_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(lightlyNormalizedText("ѕіbаl")).isEqualTo("sibal");
+        assertThat(lightlyNormalizedText("ЅІbАl")).isEqualTo("sibal");
+        assertThat(lightlyNormalizedText("ѕіβаl")).isEqualTo("sibal");
+    }
+
+    @Test
     @DisplayName("반각 및 원문자 한글로 정규화 뷰 반환")
     void testNormalizeLightly_givenHalfWidthAndEnclosedHangul_willReturnNormalizedView() {
         // given & when & then
@@ -646,13 +655,6 @@ class TextNormalizerTest {
         assertThat(aggressivelyNormalizedText("人l발")).isEqualTo("人l발");
         assertThat(aggressivelyNormalizedText("ㅅ|발")).isEqualTo("ㅅ발");
         assertThat(aggressivelyNormalizedText("시 1 발")).isEqualTo("시발");
-    }
-
-    @Test
-    @DisplayName("라틴 문자와 혼동하기 쉬운 키릴 문자로 정규화 뷰 반환")
-    void testNormalizeAggressively_givenCrossScriptConfusables_willReturnNormalizedView() {
-        // given & when & then
-        assertThat(aggressivelyNormalizedText("ѕіbаl")).isEqualTo("sibal");
     }
 
     @Test
