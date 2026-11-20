@@ -54,6 +54,87 @@ class TextNormalizerTest {
         assertThat(textNormalizedView.getOriginalEnd(index)).isEqualTo(originalEnd);
     }
 
+    // 모든 정규화 단계를 거치는 난독화 문자열
+    private static final String[] OBFUSCATED_TEXTS = {
+            "시 발 놈", "ㅅㅣㅂㅂㅏㄹ", "ㅂㅕㅇ신", "바알", "존ㄴ맛", "시ㅂ발", "ㅅㅣ이발", "시바ㄹ놈", "ㄷㅜㅔ져",
+            "시ㅠ발 ok 시 ㅋ 발", "tlllqkf", "dnjs", "whssk", "ㅅl발", "𝐬ﬁ​시é발 🖕", "ㄱㅏㄳㅣ ㅂㅏㄺ",
+            "- 시원\n- 발코니", "𝐬ㅣ\r\n바알 ㅅㅂ\n놈"
+    };
+
+    // SwearEngine은 구간을 첫 유닛의 시작과 마지막 유닛의 끝으로 계산하므로, 네 범위 배열이 단조 비감소여야 함
+    private static void assertRangesNonDecreasing(TextNormalizedView textNormalizedView) {
+        for (int index = 1; index < textNormalizedView.length(); index++) {
+            assertThat(textNormalizedView.getLightlyNormalizedStart(index))
+                    .isGreaterThanOrEqualTo(textNormalizedView.getLightlyNormalizedStart(index - 1));
+            assertThat(textNormalizedView.getLightlyNormalizedEnd(index))
+                    .isGreaterThanOrEqualTo(textNormalizedView.getLightlyNormalizedEnd(index - 1));
+            assertThat(textNormalizedView.getOriginalStart(index))
+                    .isGreaterThanOrEqualTo(textNormalizedView.getOriginalStart(index - 1));
+            assertThat(textNormalizedView.getOriginalEnd(index))
+                    .isGreaterThanOrEqualTo(textNormalizedView.getOriginalEnd(index - 1));
+        }
+    }
+
+    @Test
+    @DisplayName("난독화 문자열로 정규화 뷰 반환")
+    void testNormalizeLightly_givenObfuscatedTexts_willReturnNormalizedView() {
+        for (String original : OBFUSCATED_TEXTS) {
+            // given & when
+            TextNormalizedView view = textNormalizer.normalizeLightly(original);
+
+            // then
+            assertRangesNonDecreasing(view);
+        }
+    }
+
+    @Test
+    @DisplayName("난독화 문자열로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenObfuscatedTexts_willReturnNormalizedView() {
+        for (String original : OBFUSCATED_TEXTS) {
+            // given & when
+            TextNormalizedView view = textNormalizer.normalizeAggressively(textNormalizer.normalizeLightly(original));
+
+            // then
+            assertRangesNonDecreasing(view);
+        }
+    }
+
+    @Test
+    @DisplayName("난독화 문자열로 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenObfuscatedTexts_willReturnNormalizedView() {
+        for (String original : OBFUSCATED_TEXTS) {
+            // given & when
+            TextNormalizedView view = syllableView(original);
+
+            // then
+            assertRangesNonDecreasing(view);
+        }
+    }
+
+    @Test
+    @DisplayName("난독화 문자열로 키 입력 뷰 반환")
+    void testNormalizeWithKeystroke_givenObfuscatedTexts_willReturnNormalizedView() {
+        for (String original : OBFUSCATED_TEXTS) {
+            // given & when
+            TextNormalizedView view = keystrokeView(original);
+
+            // then
+            assertRangesNonDecreasing(view);
+        }
+    }
+
+    @Test
+    @DisplayName("난독화 문자열로 행 머리 뷰 반환")
+    void testNormalizeWithLineInitial_givenObfuscatedTexts_willReturnNormalizedView() {
+        for (String original : OBFUSCATED_TEXTS) {
+            // given & when
+            TextNormalizedView view = lineInitialView(original);
+
+            // then
+            assertRangesNonDecreasing(view);
+        }
+    }
+
     @Test
     @DisplayName("음절로 키 입력 뷰 반환")
     void testNormalizeWithKeystroke_givenSyllables_willReturnNormalizedView() {

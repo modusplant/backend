@@ -138,7 +138,7 @@ public final class SwearEngine {
                         continue;
                     }
                     SwearMatch swearMatch = new SwearMatch(swearWord, textNormalizationType,
-                            calculateOriginalStart(view, start, end), calculateOriginalEnd(view, start, end));
+                            view.getOriginalStart(start), view.getOriginalEnd(end - 1));
                     if (!overlapsSameWordWithKeptMatch(keptMatches, swearMatch)) {
                         keptMatches.add(swearMatch);
                     }
@@ -180,23 +180,23 @@ public final class SwearEngine {
 
     private static boolean isValidMatch(TextNormalizationType textNormalizationType,
                                         String keyword, TextNormalizedView view,
-                                        LightlyNormalizedView lightlyNormalizedView, KeyboardRuns keyboardRuns,
-                                        int start, int end) {
+                                        LightlyNormalizedView lightlyNormalizedView,
+                                        KeyboardRuns keyboardRuns, int start, int end) {
         return switch (textNormalizationType) {
             case LIGHT -> true;
-            case AGGRESSIVE, SYLLABLE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end);
-            case KEYSTROKE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end)
+            case AGGRESSIVE, SYLLABLE -> isWithinOneTokenOrTokenAligned(view, lightlyNormalizedView, start, end);
+            case KEYSTROKE -> isWithinOneTokenOrTokenAligned(view, lightlyNormalizedView, start, end)
                     && coversWholeKeyboardRuns(view, keyboardRuns, start, end);
             case LINE_INITIAL -> keyword.codePointCount(0, keyword.length())
                     >= MINIMUM_LINE_INITIAL_KEYWORD_CODE_POINT_COUNT;
         };
     }
 
-    private static boolean isTokenAlignedAcrossWhitespace(TextNormalizedView view,
+    private static boolean isWithinOneTokenOrTokenAligned(TextNormalizedView view,
                                                           LightlyNormalizedView lightlyNormalizedView,
                                                           int start, int end) {
-        int lightlyNormalizedStart = calculateLightlyNormalizedStart(view, start, end);
-        int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(view, start, end);
+        int lightlyNormalizedStart = view.getLightlyNormalizedStart(start);
+        int lightlyNormalizedEnd = view.getLightlyNormalizedEnd(end - 1);
         String lightlyNormalizedText = lightlyNormalizedView.getText();
         if (!containsWhitespace(lightlyNormalizedText, lightlyNormalizedStart, lightlyNormalizedEnd)) {
             return true;
@@ -211,8 +211,8 @@ public final class SwearEngine {
     // 자판 문자가 아닌 위치는 빈 구간을 가지므로 항상 덮인 것으로 판정됨
     private static boolean coversWholeKeyboardRuns(TextNormalizedView view, KeyboardRuns keyboardRuns,
                                                    int start, int end) {
-        int lightlyNormalizedStart = calculateLightlyNormalizedStart(view, start, end);
-        int lightlyNormalizedEnd = calculateLightlyNormalizedEnd(view, start, end);
+        int lightlyNormalizedStart = view.getLightlyNormalizedStart(start);
+        int lightlyNormalizedEnd = view.getLightlyNormalizedEnd(end - 1);
         for (int index = lightlyNormalizedStart; index < lightlyNormalizedEnd; index++) {
             if (!keyboardRuns.isCoveredBy(index, lightlyNormalizedStart, lightlyNormalizedEnd)) {
                 return false;
@@ -222,13 +222,13 @@ public final class SwearEngine {
     }
 
     private static boolean containsWhitespace(String text, int start, int end) {
-        int index = start;
-        while (index < end) {
-            int codePoint = text.codePointAt(index);
+        int codeUnitIndex = start;
+        while (codeUnitIndex < end) {
+            int codePoint = text.codePointAt(codeUnitIndex);
             if (UCharacter.isUWhiteSpace(codePoint)) {
                 return true;
             }
-            index += Character.charCount(codePoint);
+            codeUnitIndex += Character.charCount(codePoint);
         }
         return false;
     }
@@ -242,38 +242,6 @@ public final class SwearEngine {
             }
         }
         return false;
-    }
-
-    private static int calculateLightlyNormalizedStart(TextNormalizedView view, int start, int end) {
-        int lightlyNormalizedStart = Integer.MAX_VALUE;
-        for (int index = start; index < end; index++) {
-            lightlyNormalizedStart = Math.min(lightlyNormalizedStart, view.getLightlyNormalizedStart(index));
-        }
-        return lightlyNormalizedStart;
-    }
-
-    private static int calculateLightlyNormalizedEnd(TextNormalizedView view, int start, int end) {
-        int lightlyNormalizedEnd = Integer.MIN_VALUE;
-        for (int index = start; index < end; index++) {
-            lightlyNormalizedEnd = Math.max(lightlyNormalizedEnd, view.getLightlyNormalizedEnd(index));
-        }
-        return lightlyNormalizedEnd;
-    }
-
-    private static int calculateOriginalStart(TextNormalizedView view, int start, int end) {
-        int originalStart = Integer.MAX_VALUE;
-        for (int index = start; index < end; index++) {
-            originalStart = Math.min(originalStart, view.getOriginalStart(index));
-        }
-        return originalStart;
-    }
-
-    private static int calculateOriginalEnd(TextNormalizedView view, int start, int end) {
-        int originalEnd = Integer.MIN_VALUE;
-        for (int index = start; index < end; index++) {
-            originalEnd = Math.max(originalEnd, view.getOriginalEnd(index));
-        }
-        return originalEnd;
     }
 
     // 시작 위치마다 트라이를 루트로 되돌리며, 이어지는 키워드가 없거나 텍스트가 끝나면 다음 시작 위치로 넘어감
@@ -313,23 +281,22 @@ public final class SwearEngine {
     }
 
     // 경량 정규화 텍스트의 각 코드 유닛 인덱스가 속한 두벌식 키보드 문자 연속 구간 [runStart, runEnd)를 한 번의 순회로 계산함
-    // 두벌식 키보드 문자가 아닌 위치는 빈 구간 [index, index)를 가짐
     private record KeyboardRuns(int[] runStarts, int[] runEnds) {
         private static KeyboardRuns of(String lightlyNormalizedText) {
             int[] runStarts = new int[lightlyNormalizedText.length()];
             int[] runEnds = new int[lightlyNormalizedText.length()];
             int runStart = 0;
-            int index = 0;
-            while (index < lightlyNormalizedText.length()) {
-                int codePoint = lightlyNormalizedText.codePointAt(index);
-                int nextIndex = index + Character.charCount(codePoint);
+            int codeUnitIndex = 0;
+            while (codeUnitIndex < lightlyNormalizedText.length()) {
+                int codePoint = lightlyNormalizedText.codePointAt(codeUnitIndex);
+                int nextCodeUnitIndex = codeUnitIndex + Character.charCount(codePoint);
                 if (!isAsciiLowerCaseLetter(codePoint)) {
-                    fillRun(runStarts, runEnds, runStart, index);
-                    Arrays.fill(runStarts, index, nextIndex, index);
-                    Arrays.fill(runEnds, index, nextIndex, index);
-                    runStart = nextIndex;
+                    fillRun(runStarts, runEnds, runStart, codeUnitIndex);
+                    Arrays.fill(runStarts, codeUnitIndex, nextCodeUnitIndex, codeUnitIndex);
+                    Arrays.fill(runEnds, codeUnitIndex, nextCodeUnitIndex, codeUnitIndex);
+                    runStart = nextCodeUnitIndex;
                 }
-                index = nextIndex;
+                codeUnitIndex = nextCodeUnitIndex;
             }
             fillRun(runStarts, runEnds, runStart, lightlyNormalizedText.length());
             return new KeyboardRuns(runStarts, runEnds);
