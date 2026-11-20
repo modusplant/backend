@@ -19,8 +19,7 @@ import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper
 
 @Component
 public class TextNormalizer {
-    public static final int MINIMUM_CONTRIBUTING_LINE_COUNT = 2;
-
+    private static final int MINIMUM_CONTRIBUTING_LINE_COUNT = 2;
     private static final int NOT_CODE_POINT = -1;
     private static final char CONJOINING_CHOSEONG_IEUNG = 'ᄋ';
 

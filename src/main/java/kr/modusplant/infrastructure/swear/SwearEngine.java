@@ -13,16 +13,17 @@ import kr.modusplant.infrastructure.normalization.view.LightlyNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.SyllableNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.supers.TextNormalizedView;
 import kr.modusplant.infrastructure.normalization.TextNormalizer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationType.*;
-import static kr.modusplant.infrastructure.normalization.TextNormalizer.MINIMUM_CONTRIBUTING_LINE_COUNT;
 
 public final class SwearEngine {
-    private static final List<TextNormalizationType> NOT_SWEAR_NORMALIZATION_TYPES = List.of(LIGHT, AGGRESSIVE, SYLLABLE, KEYSTROKE);
+    private static final int MINIMUM_LINE_INITIAL_KEYWORD_CODE_POINT_COUNT = 2;
 
     private final TextNormalizer textNormalizer;
     private final Map<TextNormalizationType, KeywordTrie> swearKeywordTries;
@@ -72,31 +73,26 @@ public final class SwearEngine {
         }
 
         Map<TextNormalizationType, List<String>> keywordNotSwearWords = new EnumMap<>(TextNormalizationType.class);
-        for (TextNormalizationType textNormalizationType : NOT_SWEAR_NORMALIZATION_TYPES) {
+        for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
             keywordNotSwearWords.put(textNormalizationType, new ArrayList<>());
         }
         for (String notSwearWord : notSwearWords) {
             normalizeWord(textNormalizer, notSwearWord)
-                    .forEach((textNormalizationType, keyword) -> {
-                        if (keywordNotSwearWords.containsKey(textNormalizationType)) {
-                            keywordNotSwearWords.get(textNormalizationType).add(keyword);
-                        }
-                    });
+                    .forEach((textNormalizationType, keyword) ->
+                            keywordNotSwearWords.get(textNormalizationType).add(keyword));
         }
 
         Map<TextNormalizationType, KeywordTrie> swearKeywordTries = new EnumMap<>(TextNormalizationType.class);
+        keywordSwearWords.forEach((textNormalizationType, keywordSwearWordsAsValue) ->
+                swearKeywordTries.put(textNormalizationType, KeywordTrie.of(keywordSwearWordsAsValue.keySet())));
         Map<TextNormalizationType, Map<String, List<SwearWord>>> immutableKeywordSwearWords =
-                new EnumMap<>(TextNormalizationType.class);
-        keywordSwearWords.forEach(
-                (textNormalizationType, keywordSwearWordsAsValue) -> {
-                    swearKeywordTries.put(textNormalizationType, KeywordTrie.of(keywordSwearWordsAsValue.keySet()));
-                    Map<String, List<SwearWord>> immutableKeywordSwearWordsAsValue = new HashMap<>();
-                    keywordSwearWordsAsValue.forEach(
-                            (keyword, swearWordsAsValue) ->
-                                    immutableKeywordSwearWordsAsValue.put(keyword, List.copyOf(swearWordsAsValue)));
-                    immutableKeywordSwearWords.put(
-                            textNormalizationType, Map.copyOf(immutableKeywordSwearWordsAsValue));
-                });
+                keywordSwearWords.entrySet().stream()
+                        .collect(Collectors.toUnmodifiableMap(
+                                Map.Entry::getKey,
+                                entry -> entry.getValue().entrySet().stream()
+                                        .collect(Collectors.toUnmodifiableMap(
+                                                Map.Entry::getKey,
+                                                keywordEntry -> List.copyOf(keywordEntry.getValue())))));
         Map<TextNormalizationType, KeywordTrie> notSwearKeywordTries = new EnumMap<>(TextNormalizationType.class);
         keywordNotSwearWords.forEach((textNormalizationType, notSwearKeywordsAsValue) ->
                 notSwearKeywordTries.put(textNormalizationType, KeywordTrie.of(notSwearKeywordsAsValue)));
@@ -105,15 +101,16 @@ public final class SwearEngine {
                 textNormalizer,
                 Collections.unmodifiableMap(swearKeywordTries),
                 Collections.unmodifiableMap(notSwearKeywordTries),
-                Collections.unmodifiableMap(immutableKeywordSwearWords));
+                immutableKeywordSwearWords);
     }
 
     public List<SwearMatch> match(String text) {
-        if (text == null || text.isEmpty()) {
+        if (StringUtils.isBlank(text)) {
             return List.of();
         }
         LightlyNormalizedView lightlyNormalizedView = textNormalizer.normalizeLightly(text);
-        AggressivelyNormalizedView aggressivelyNormalizedView = textNormalizer.normalizeAggressively(lightlyNormalizedView);
+        AggressivelyNormalizedView aggressivelyNormalizedView =
+                textNormalizer.normalizeAggressively(lightlyNormalizedView);
         SyllableNormalizedView syllableView =
                 textNormalizer.normalizeWithSyllable(aggressivelyNormalizedView, lightlyNormalizedView);
         Map<TextNormalizationType, TextNormalizedView> views = new EnumMap<>(TextNormalizationType.class);
@@ -127,9 +124,8 @@ public final class SwearEngine {
         List<SwearMatch> keptMatches = new ArrayList<>();
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
             TextNormalizedView view = views.get(textNormalizationType);
-            List<KeywordMatch> notSwearKeywordMatches = notSwearKeywordTries.containsKey(textNormalizationType)
-                    ? notSwearKeywordTries.get(textNormalizationType).findAll(view.getText())
-                    : List.of();
+            List<KeywordMatch> notSwearKeywordMatches =
+                    notSwearKeywordTries.get(textNormalizationType).findAll(view.getText());
             for (KeywordMatch keywordMatch : swearKeywordTries.get(textNormalizationType).findAll(view.getText())) {
                 int start = keywordMatch.start();
                 int end = keywordMatch.end();
@@ -193,7 +189,7 @@ public final class SwearEngine {
             case KEYSTROKE -> isTokenAlignedAcrossWhitespace(view, lightlyNormalizedView, start, end)
                     && coversWholeKeyboardRuns(view, keyboardRuns, start, end);
             case LINE_INITIAL -> keyword.codePointCount(0, keyword.length())
-                    >= MINIMUM_CONTRIBUTING_LINE_COUNT;
+                    >= MINIMUM_LINE_INITIAL_KEYWORD_CODE_POINT_COUNT;
         };
     }
 
