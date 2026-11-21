@@ -49,10 +49,7 @@ normalization/
   so a step shared by several methods (steps 2–4 of §4 and steps 2–4 of §6) serves each of them.
 
 **`TextNormalizedView`** (`view/supers/`) — immutable, non-`final` so that the subclasses can extend it:
-- Holds its text, the normalized `String` that `getText()` returns, and four parallel `int[]` arrays whose element at
-  index `i` describes the code unit at index `i` of the text: the bounds of the range `[start, end)` of code-unit
-  indexes that code unit derives from in the lightly normalized view and in the original text, the `String` that
-  `normalizeLightly` takes and every view derives from.
+- Holds its text, the normalized `String` that `getText()` returns, and the four parallel `int[]` range arrays of §8.
 - Read through `getText()`, `length()`, `getLightlyNormalizedStart` / `getLightlyNormalizedEnd`, and
   `getOriginalStart` / `getOriginalEnd`, each taking a code-unit index.
 - Built through the public `TextNormalizedView.Builder` (`append` one code unit with its four range bounds, then
@@ -116,9 +113,6 @@ cluster passes these steps in order:
 | 4 | Lowercase per code point with `UCharacter.toLowerCase` |
 | 5 | Map code points through `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP` |
 
-- Every code unit a cluster produces gets, as its lightly normalized range, the range of all code units the
-  cluster produces in the lightly normalized view (`ﬁ` → `fi`: both code units `[0, 2)`), and, as its original range,
-  the whole cluster in the original text, so a surrogate pair is never split (`𝐬` → `s`: `[0, 2)`).
 - Whether a code point belongs to a character class defined by a Unicode property is decided by the return value of an
   ICU4J property query (`UCharacter.hasBinaryProperty` for `Default_Ignorable_Code_Point`, `UCharacter.getType` for the
   general categories).
@@ -164,9 +158,6 @@ The lightly normalized view passes these steps in order, each building a new `Te
   syllable keeps absorbing while it has no final.
 - Step 4, consonant: a Hangul Compatibility Jamo between two Hangul syllables is absorbed into the preceding syllable
   when it equals that syllable's final or the following syllable's initial (`존ㄴ맛` → `존맛`, `시ㅂ발` → `시발`).
-- Steps 2–4: a code unit built from several source code units (collapsed, composed, or merged) takes the union of
-  their lightly normalized ranges and the union of their original ranges (`ㅅㅣ` → `시`: lightly normalized `[0, 2)`).
-- Steps 1–4: every other code unit keeps both its ranges (`시 발` → `시발`: lightly normalized `[0, 1)` and `[2, 3)`).
 
 ---
 
@@ -194,8 +185,6 @@ The aggressively normalized view passes these steps in order, each building a ne
 - Step 2 removes code points wherever they are, including a token with no Hangul syllable, because a jamo or Latin
   letter left between syllables only hides the word (`시ㅠ발`, `시l발`, `시 ㅋ 발`, `시 ok 발` → `시발`). Every other code
   point is kept.
-- Step 1: a composed syllable, or a syllable that takes a final, takes the union of the ranges of its jamo; every other
-  code unit keeps both its ranges.
 
 ---
 
@@ -231,6 +220,37 @@ The aggressively normalized view passes these steps in order, each building a ne
 - Each line of the lightly normalized view contributes its first code point outside the general categories that
   step 1 of §4 removes, so a bullet or indent does not hide the letter (`- 시원\n- 발코니` → `시발`).
 - A supplementary-plane first letter keeps both its code units, so a surrogate pair is never split.
-- Each code unit keeps its lightly normalized and original ranges.
 - Lines are split at the code points that `isLineTerminator` accepts.
 - Fewer than 2 contributing lines yield an empty `TextNormalizedView`.
+
+---
+
+## 8. Source Ranges
+
+`TextNormalizedView` holds four parallel `int[]` arrays, `lightlyNormalizedStarts` / `lightlyNormalizedEnds` and
+`originalStarts` / `originalEnds`, whose element at index `i` describes the code unit at index `i` of the text: the
+bounds of the range `[start, end)` of code-unit indexes that code unit derives from in the lightly normalized view and
+in the original text, the `String` that `normalizeLightly` takes and every view derives from.
+
+**`normalizeLightly`** (§3):
+- Every code unit a cluster produces gets, as its lightly normalized range, the range of all code units the
+  cluster produces in the lightly normalized view (`ﬁ` → `fi`: both code units `[0, 2)`), and, as its original range,
+  the whole cluster in the original text, so a surrogate pair is never split (`𝐬` → `s`: `[0, 2)`).
+
+**`normalizeAggressively`** (§4):
+- Steps 2–4: a code unit built from several source code units (collapsed, composed, or merged) takes the union of
+  their lightly normalized ranges and the union of their original ranges (`ㅅㅣ` → `시`: lightly normalized `[0, 2)`).
+- Steps 1–4: every other code unit keeps both its ranges (`시 발` → `시발`: lightly normalized `[0, 1)` and `[2, 3)`).
+
+**`normalizeWithSyllable`** (§5):
+- Step 1: a composed syllable, or a syllable that takes a final, takes the union of the ranges of its jamo; every other
+  code unit keeps both its ranges.
+- Step 2: every kept code unit keeps both its ranges.
+
+**`normalizeWithKeystroke`** (§6):
+- Step 1: a syllable composed from several ASCII lowercase letters takes the union of their ranges (`tl` → `시`:
+  lightly normalized `[0, 2)`); every other code unit keeps both its ranges.
+- Steps 2–4: the rules of steps 2–4 of `normalizeAggressively` apply.
+
+**`normalizeWithLineInitial`** (§7):
+- Each code unit keeps its lightly normalized and original ranges.
