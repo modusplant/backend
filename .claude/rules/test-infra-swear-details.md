@@ -5,10 +5,6 @@ paths:
 
 # Swear Infrastructure Test Conventions
 
-Applies to every test class under `src/test/java/kr/modusplant/infrastructure/swear/`.
-
----
-
 ## 1. Mocking Exceptions
 
 `SwearEngine` is created with a real `TextNormalizer` built from the `Normalizer2` instances of `new Icu4jConfig()`, not

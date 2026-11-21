@@ -5,10 +5,6 @@ paths:
 
 # Search Domain Test Conventions
 
-Applies to every test class under `src/test/java/kr/modusplant/domains/search/`.
-
----
-
 ## 1. Exception Assertions
 
 Exception assertions check `getErrorCode()` against `SearchErrorCode`.
@@ -24,7 +20,7 @@ Exception assertions check `getErrorCode()` against `SearchErrorCode`.
 ## 3. Repository Test Policy
 
 - **jOOQ repository** (`framework/outbound/jooq/repository`): `integration-test`. Evidence:
-  `src/test/java/kr/modusplant/domains/search/framework/outbound/jooq/repository/SearchPostRepositoryJooqAdapterIntegrationTest.java`
+  `framework/outbound/jooq/repository/SearchPostRepositoryJooqAdapterIntegrationTest.java`
 
 ---
 

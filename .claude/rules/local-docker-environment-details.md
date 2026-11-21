@@ -8,10 +8,6 @@ paths:
 
 # Local Docker Environment Details
 
-Applies to @Dockerfile, @.dockerignore, @docker-compose.yml, and @docker-compose.override.yml.
-
----
-
 ## 1. Files
 
 - @Dockerfile: Runtime-only image; copies a prebuilt jar and runs it. No source compilation happens inside Docker.

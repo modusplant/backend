@@ -5,10 +5,6 @@ paths:
 
 # Normalization Infrastructure Test Conventions
 
-Applies to every test class under `src/test/java/kr/modusplant/infrastructure/normalization/`.
-
----
-
 ## 1. Mocking Exceptions
 
 `TextNormalizer` is built with the real `Normalizer2` instances of `new Icu4jConfig()`, not mocks, because its output is

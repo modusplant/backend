@@ -5,10 +5,6 @@ paths:
 
 # Normalization Infrastructure Conventions
 
-Applies to `kr.modusplant.infrastructure.normalization` and its sub-packages.
-
----
-
 ## 1. Package Structure
 
 ```
@@ -48,7 +44,7 @@ normalization/
 - Each step of a method builds a plain `TextNormalizedView`, and the method wraps the last step's view in its subclass,
   so a step shared by several methods (steps 2–4 of §4 and steps 2–4 of §6) serves each of them.
 
-**`TextNormalizedView`** (`view/supers/`) — immutable, non-`final` so that the subclasses can extend it:
+**`TextNormalizedView`** — immutable, non-`final` so that the subclasses can extend it:
 - Holds its text, the normalized `String` that `getText()` returns, and the four parallel `int[]` range arrays of §8.
 - Read through `getText()`, `length()`, `getLightlyNormalizedStart` / `getLightlyNormalizedEnd`, and
   `getOriginalStart` / `getOriginalEnd`, each taking a code-unit index.

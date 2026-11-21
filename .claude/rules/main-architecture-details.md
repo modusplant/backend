@@ -5,8 +5,6 @@ paths:
 
 # Main Architecture Details
 
-Applies to every class under @src/main/java/.
-
 This rule is the baseline for every area. An area rule (`main-<kind>-<area>-details.md`) adds the area's own variations
 on top of it.
 

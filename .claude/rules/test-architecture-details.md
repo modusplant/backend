@@ -5,8 +5,6 @@ paths:
 
 # Test Architecture Details
 
-Applies to every test class under @src/test/.
-
 This rule is the complete baseline for every test in the tree. A per-area test rule (`test-<kind>-<area>-details.md`)
 may supply names, excluded classes, path exceptions, or Group A / Group B path lists for its area; its values win for
 that area.

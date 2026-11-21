@@ -5,10 +5,6 @@ paths:
 
 # Search Domain Conventions
 
-Applies to `kr.modusplant.domains.search` and its sub-packages.
-
----
-
 ## 1. Package Structure
 
 ```
@@ -45,40 +41,36 @@ search/
 
 ## 2. domain/ Patterns
 
-**Value Object** (`domain/vo/`):
+**Value Object**:
 - Score-like VOs (`SearchKeywordSimilarity`, `SearchPostImportance`) return an internal empty singleton for null input,
   marked by an `empty` flag or an `EMPTY` enum constant instead of a null-object subclass; `isEmpty()` reports it, and
   `getValueIfNotEmpty()` throws `InvalidValueException` with a `SearchErrorCode` on an empty instance
 
-**Enums** (`domain/enums/`):
+**Enums**:
 - Search condition/target/sort values as enums
 
 ---
 
 ## 3. usecase/ Patterns
 
-**Repository Ports** (`usecase/port/repository/`):
+**Repository Ports**:
 - The post-search port exposes one keyword search per sort order (latest, relevance), each returning read models
 - The condition port checks that the requested primary/secondary category IDs exist
 
-**Cache Ports** (`usecase/port/cache/`):
+**Cache Ports**:
 - Serves the transliterated plant names used for plant-name search; implemented in `framework/outbound/caffeine/`
 
-**Response DTOs** (`usecase/response/`):
+**Response DTOs**:
 - A relevance-sorted page response carries its own `of(...)` factory
 
 ---
 
 ## 4. framework/ Patterns
 
-**jOOQ Repository** (`framework/outbound/jooq/repository/`) — serves keyword searches sorted by latest or by relevance,
-returning paginated read models
+**jOOQ Repository** — serves keyword searches sorted by latest or by relevance, returning paginated read models
 
-**JPA Repository** (`framework/outbound/jpa/repository/`) — serves the category-condition existence checks against a
-JPA-managed table
+**JPA Repository** — serves the category-condition existence checks against a JPA-managed table
 
-**Cache Adapter** (`framework/outbound/caffeine/`) — implements a `usecase/port/cache/` interface with an in-memory
-Caffeine cache
+**Cache Adapter** — implements a `usecase/port/cache/` interface with an in-memory Caffeine cache
 
-**Redis Repository** (`framework/outbound/redis/`) — implements the search-history port, recording and retrieving a
-searcher's history in Redis
+**Redis Repository** — implements the search-history port, recording and retrieving a searcher's history in Redis

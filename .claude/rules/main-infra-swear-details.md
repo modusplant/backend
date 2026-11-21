@@ -5,8 +5,6 @@ paths:
 
 # Swear Infrastructure Conventions
 
-Applies to `kr.modusplant.infrastructure.swear`.
-
 The original text is the text that `SwearEngine.match` checks. A view is one of its five normalized forms, named by
 `TextNormalizationType`, and a view's text is that form: `LIGHT` from `normalizeLightly`, `AGGRESSIVE` from
 `normalizeAggressively`, `SYLLABLE` from `normalizeWithSyllable`, `KEYSTROKE` from `normalizeWithKeystroke`, and

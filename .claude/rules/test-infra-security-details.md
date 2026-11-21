@@ -5,10 +5,6 @@ paths:
 
 # Security Infrastructure Test Conventions
 
-Applies to every test class under `src/test/java/kr/modusplant/infrastructure/security/`.
-
----
-
 ## 1. Exception Assertions
 
 Exception assertions check `getErrorCode()` against `SecurityErrorCode`.
