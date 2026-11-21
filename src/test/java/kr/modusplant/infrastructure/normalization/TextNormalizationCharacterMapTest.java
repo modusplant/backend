@@ -3,6 +3,8 @@ package kr.modusplant.infrastructure.normalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.stream.IntStream;
+
 import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,6 +23,19 @@ class TextNormalizationCharacterMapTest {
     void testConjoiningCompatibilityJamoMap_givenVowel_willReturnInteger() {
         // given & when & then
         assertThat(CONJOINING_COMPATIBILITY_JAMO_MAP.get(0x1175)).isEqualTo(0x3163);
+    }
+
+    @Test
+    @DisplayName("현대 조합형 자모 전체로 호환 자모 반환")
+    void testConjoiningCompatibilityJamoMap_givenModernConjoiningJamo_willReturnInteger() {
+        // given
+        IntStream modernConjoiningJamo = IntStream.concat(IntStream.concat(
+                IntStream.rangeClosed(0x1100, 0x1112),
+                IntStream.rangeClosed(0x1161, 0x1175)),
+                IntStream.rangeClosed(0x11A8, 0x11C2));
+
+        // when & then
+        assertThat(modernConjoiningJamo).allMatch(CONJOINING_COMPATIBILITY_JAMO_MAP::containsKey);
     }
 
     @Test
@@ -113,17 +128,17 @@ class TextNormalizationCharacterMapTest {
     @DisplayName("입력 순서의 두 두벌식 키 입력 자모로 겹모음과 겹종성 반환")
     void testCompatibilityJamoCompoundCompatibilityJamoKeystrokeMap_givenKeystrokeJamoPair_willReturnInteger() {
         // given & when & then
-        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP).hasSize(18);
-        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅜㅓ")).isEqualTo('ㅝ');
-        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅂㅅ")).isEqualTo('ㅄ');
+        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP).hasSize(18);
+        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get("ㅜㅓ")).isEqualTo('ㅝ');
+        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get("ㅂㅅ")).isEqualTo('ㅄ');
     }
 
     @Test
     @DisplayName("겹자모를 이루지 않는 두 자모로 null 반환")
     void testCompatibilityJamoCompoundCompatibilityJamoKeystrokeMap_givenNonCompoundPair_willReturnNull() {
         // given & when & then
-        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㅓㅜ")).isNull();
-        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.get("ㄴㄴ")).isNull();
+        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get("ㅓㅜ")).isNull();
+        assertThat(COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.get("ㄴㄴ")).isNull();
     }
 
     @Test
@@ -152,7 +167,7 @@ class TextNormalizationCharacterMapTest {
         assertThatThrownBy(() -> ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
-        assertThatThrownBy(() -> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP.put("", 0))
+        assertThatThrownBy(() -> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put("", 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 }

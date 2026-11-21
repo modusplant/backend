@@ -317,6 +317,18 @@ class TextNormalizerTest {
     }
 
     @Test
+    @DisplayName("모음 낱자 앞 겹종성 낱자로 겹종성을 붙인 음절 뷰 반환")
+    void testNormalizeWithSyllable_givenCompoundTrailingConsonantBeforeVowel_willReturnNormalizedView() {
+        // given
+        TextNormalizedView compoundTrailingConsonantAttachedView = syllableView("가ㄳㅣ");
+
+        // when & then
+        assertThat(syllableText("ㄱㅏㄳㅣ")).isEqualTo("갃");
+        assertThat(compoundTrailingConsonantAttachedView.getText()).isEqualTo("갃");
+        assertSpans(compoundTrailingConsonantAttachedView, 0, 0, 2, 0, 2);
+    }
+
+    @Test
     @DisplayName("같은 토큰의 호환 자모 연속으로 조합된 음절 뷰 반환")
     void testNormalizeWithSyllable_givenCompatibilityJamoRun_willReturnNormalizedView() {
         // given & when & then
@@ -411,6 +423,13 @@ class TextNormalizerTest {
     void testNormalizeWithLineInitial_givenLinesWithoutLetters_willReturnNormalizedView() {
         // given & when & then
         assertThat(lineInitialView("시원\n\n123 !!\n발코니").getText()).isEqualTo("시발");
+    }
+
+    @Test
+    @DisplayName("사용자 정의 문자로 시작하는 행으로 행 머리 뷰 반환")
+    void testNormalizeWithLineInitial_givenLineStartingWithPrivateUseCharacter_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(lineInitialView("시원\n발코니").getText()).isEqualTo("시발");
     }
 
     @Test
@@ -757,13 +776,26 @@ class TextNormalizerTest {
     }
 
     @Test
+    @DisplayName("한글 사이의 서식 문자와 사용자 정의 문자로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenFormatOrPrivateUseCharacterNextToHangul_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("시؀발")).isEqualTo("시발");
+        assertThat(aggressivelyNormalizedText("시발")).isEqualTo("시발");
+    }
+
+    @Test
     @DisplayName("낱자 자모 반복으로 정규화 뷰 반환")
     void testNormalizeAggressively_givenRepeatedJamo_willReturnNormalizedView() {
         // given & when & then
         assertThat(aggressivelyNormalizedText("ㅋㅋㅋ")).isEqualTo("ㅋ");
         assertThat(aggressivelyNormalizedText("ㅅㅣㅂㅂㅏㄹ")).isEqualTo("시발");
-        // 호환 자모가 없는 조합형 자모
-        assertThat(aggressivelyNormalizedText("ᄓᄓᄓ")).isEqualTo("ᄓ");
+    }
+
+    @Test
+    @DisplayName("호환 자모가 없는 조합형 자모 반복으로 정규화 뷰 반환")
+    void testNormalizeAggressively_givenRepeatedConjoiningJamo_willReturnNormalizedView() {
+        // given & when & then
+        assertThat(aggressivelyNormalizedText("ᄓᄓᄓ")).isEqualTo("ᄓᄓᄓ");
     }
 
     @Test

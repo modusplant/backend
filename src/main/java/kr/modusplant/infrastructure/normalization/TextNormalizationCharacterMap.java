@@ -68,7 +68,7 @@ public final class TextNormalizationCharacterMap {
             Map.entry(0x03C4, (int) 't'), // 그리스 τ
             Map.entry(0x03C5, (int) 'u'), // 그리스 υ
             Map.entry(0x03C7, (int) 'x')); // 그리스 χ
-    public static final Map<String, Integer> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP = Map.ofEntries(
+    public static final Map<String, Integer> COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP = Map.ofEntries(
             Map.entry("ㅗㅏ", (int) 'ㅘ'),
             Map.entry("ㅗㅐ", (int) 'ㅙ'),
             Map.entry("ㅗㅣ", (int) 'ㅚ'),

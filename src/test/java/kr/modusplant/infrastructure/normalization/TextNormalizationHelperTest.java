@@ -5,13 +5,12 @@ import org.junit.jupiter.api.Test;
 
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isConjoiningJamo;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutTrailingConsonant;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCombiningMark;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDICP;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isNonLetterNoiseCategory;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TextNormalizationHelperTest {
@@ -49,24 +48,29 @@ class TextNormalizationHelperTest {
     }
 
     @Test
-    @DisplayName("구분자, 제어 문자, 문장 부호, 기호, 숫자로 true 반환")
-    void testIsNonLetterNoiseCategory_givenNonLetterNoise_willReturnTrue() {
+    @DisplayName("문자로 true 반환")
+    void testIsLetter_givenLetter_willReturnTrue() {
         // given & when & then
-        assertThat(isNonLetterNoiseCategory(' ')).isTrue();
-        assertThat(isNonLetterNoiseCategory('\n')).isTrue();
-        assertThat(isNonLetterNoiseCategory('.')).isTrue();
-        assertThat(isNonLetterNoiseCategory('+')).isTrue();
-        assertThat(isNonLetterNoiseCategory('1')).isTrue();
-        assertThat(isNonLetterNoiseCategory(0x1F331)).isTrue();
+        assertThat(isLetter('시')).isTrue();
+        assertThat(isLetter('ㅅ')).isTrue();
+        assertThat(isLetter('a')).isTrue();
+        // 호환 자모가 없는 옛한글 조합형 자모
+        assertThat(isLetter(0x1113)).isTrue();
     }
 
     @Test
-    @DisplayName("문자로 false 반환")
-    void testIsNonLetterNoiseCategory_givenLetter_willReturnFalse() {
+    @DisplayName("구분자, 제어 문자, 문장 부호, 기호, 숫자, 서식 문자, 사용자 정의 문자, 미할당 코드 포인트로 false 반환")
+    void testIsLetter_givenNonLetter_willReturnFalse() {
         // given & when & then
-        assertThat(isNonLetterNoiseCategory('시')).isFalse();
-        assertThat(isNonLetterNoiseCategory('ㅅ')).isFalse();
-        assertThat(isNonLetterNoiseCategory('a')).isFalse();
+        assertThat(isLetter(' ')).isFalse();
+        assertThat(isLetter('\n')).isFalse();
+        assertThat(isLetter('.')).isFalse();
+        assertThat(isLetter('+')).isFalse();
+        assertThat(isLetter('1')).isFalse();
+        assertThat(isLetter(0x1F331)).isFalse();
+        assertThat(isLetter(0x0600)).isFalse();
+        assertThat(isLetter(0xE000)).isFalse();
+        assertThat(isLetter(0x0378)).isFalse();
     }
 
     @Test
@@ -153,22 +157,5 @@ class TextNormalizationHelperTest {
         // given & when & then
         assertThat(isCompatibilityJamo(0x1100)).isFalse();
         assertThat(isCompatibilityJamo('가')).isFalse();
-    }
-
-    @Test
-    @DisplayName("초성, 중성, 종성 자모로 true 반환")
-    void testIsConjoiningJamo_givenConjoiningJamo_willReturnTrue() {
-        // given & when & then
-        assertThat(isConjoiningJamo(0x1100)).isTrue();
-        assertThat(isConjoiningJamo(0x1161)).isTrue();
-        assertThat(isConjoiningJamo(0x11A8)).isTrue();
-    }
-
-    @Test
-    @DisplayName("호환 자모와 음절로 false 반환")
-    void testIsConjoiningJamo_givenCompatibilityJamoOrSyllable_willReturnFalse() {
-        // given & when & then
-        assertThat(isConjoiningJamo(0x3131)).isFalse();
-        assertThat(isConjoiningJamo('가')).isFalse();
     }
 }

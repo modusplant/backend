@@ -68,8 +68,8 @@ public class TextNormalizer {
 
     // 단어를 숨기려고 의도적으로 가한 변형(문자 끼워 넣기, 자모를 풀어 쓰거나 반복하거나 늘여 쓰기)을 되돌림
     public AggressivelyNormalizedView normalizeAggressively(LightlyNormalizedView lightlyNormalizedView) {
-        TextNormalizedView nonLetterNoiseRemovedView = removeNonLetterNoise(lightlyNormalizedView);
-        TextNormalizedView repeatCollapsedView = collapseRepeatedJamo(nonLetterNoiseRemovedView);
+        TextNormalizedView letterKeptView = keepLetters(lightlyNormalizedView);
+        TextNormalizedView repeatCollapsedView = collapseRepeatedJamo(letterKeptView);
         TextNormalizedView jamoComposedView = composeCompatibilityRunIntoSyllables(repeatCollapsedView);
         return new AggressivelyNormalizedView(mergeElongatedJamo(jamoComposedView));
     }
@@ -97,7 +97,7 @@ public class TextNormalizer {
             int codeUnitEnd = codeUnitStart + Character.charCount(codePoint);
             if (isLineTerminator(codePoint)) {
                 isLineInitialFound = true;
-            } else if (isLineInitialFound && !isNonLetterNoiseCategory(codePoint)) {
+            } else if (isLineInitialFound && isLetter(codePoint)) {
                 appendCodePoint(builder, codePoint, lightlyNormalizedView, codeUnitStart, codeUnitEnd);
                 isLineInitialFound = false;
                 contributingLineCount++;
@@ -175,7 +175,8 @@ public class TextNormalizer {
         }
         int trailingConsonant = NOT_CODE_POINT;
         int jamoAfterVowel = jamoAt(jamos, jamoIndex);
-        if (COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(jamoAfterVowel) && !isVowel.test(jamoIndex + 1)) {
+        if (COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(jamoAfterVowel)
+                && !leadsFollowingVowel(jamoAfterVowel, isVowel.test(jamoIndex + 1))) {
             Integer compoundTrailingConsonant = composeCompoundJamo(jamoAfterVowel, jamoAt(jamos, jamoIndex + 1));
             if (compoundTrailingConsonant != null && !isVowel.test(jamoIndex + 2)) {
                 trailingConsonant = compoundTrailingConsonant;
@@ -196,7 +197,7 @@ public class TextNormalizer {
         if (secondJamo == NOT_CODE_POINT) {
             return null;
         }
-        return COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP
+        return COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP
                 .get(Character.toString(firstJamo) + Character.toString(secondJamo));
     }
 
@@ -265,7 +266,8 @@ public class TextNormalizer {
         int nextCodePointIndex = syllableCodePointIndex + 1;
         if (!doesJamoIndexMatchWithCondition.test(nextCodePointIndex)
                 || !COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(codePoints[nextCodePointIndex])
-                || doesVowelIndexMatch(codePoints, nextCodePointIndex + 1, doesJamoIndexMatchWithCondition)) {
+                || leadsFollowingVowel(codePoints[nextCodePointIndex],
+                        doesVowelIndexMatch(codePoints, nextCodePointIndex + 1, doesJamoIndexMatchWithCondition))) {
             return new ComposedCodePoint(syllable, 1);
         }
         int trailingConsonant = codePoints[nextCodePointIndex];
@@ -322,12 +324,12 @@ public class TextNormalizer {
         return builder.build();
     }
 
-    private TextNormalizedView removeNonLetterNoise(TextNormalizedView sourceView) {
+    private TextNormalizedView keepLetters(TextNormalizedView sourceView) {
         TextNormalizedView.Builder builder = new TextNormalizedView.Builder(sourceView.length());
         int codeUnitStart = 0;
         for (int codePoint : sourceView.getText().codePoints().toArray()) {
             int codeUnitEnd = codeUnitStart + Character.charCount(codePoint);
-            if (!isNonLetterNoiseCategory(codePoint)) {
+            if (isLetter(codePoint)) {
                 appendCodePoint(builder, codePoint, sourceView, codeUnitStart, codeUnitEnd);
             }
             codeUnitStart = codeUnitEnd;
@@ -345,8 +347,8 @@ public class TextNormalizer {
             int codePoint = codePoints[codePointIndex];
             int codeUnitEnd = codeUnitStart + Character.charCount(codePoint);
             codePointIndex++;
-            boolean isJamo = isCompatibilityJamo(codePoint) || isConjoiningJamo(codePoint);
-            while (isJamo && codePointIndex < codePoints.length && codePoints[codePointIndex] == codePoint) {
+            boolean isJamo = isCompatibilityJamo(codePoint);
+            while (isJamo &&codePointIndex < codePoints.length && codePoints[codePointIndex] == codePoint) {
                 codeUnitEnd += Character.charCount(codePoint);
                 codePointIndex++;
             }
@@ -400,12 +402,17 @@ public class TextNormalizer {
             int jamoAfterVowelIndex = cursor + 2;
             boolean hasTrailingConsonant = jamoAfterVowelIndex < runEnd
                     && COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(codePoints[jamoAfterVowelIndex])
-                    && !(jamoAfterVowelIndex + 1 < runEnd && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(codePoints[jamoAfterVowelIndex + 1]));
+                    && !leadsFollowingVowel(codePoints[jamoAfterVowelIndex], jamoAfterVowelIndex + 1 < runEnd
+                            && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(codePoints[jamoAfterVowelIndex + 1]));
             int jamoCount = hasTrailingConsonant ? 3 : 2;
             syllableJamoCounts.add(jamoCount);
             cursor += jamoCount;
         }
         return syllableJamoCounts;
+    }
+
+    private boolean leadsFollowingVowel(int consonant, boolean isFollowedByVowel) {
+        return COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.containsKey(consonant) && isFollowedByVowel;
     }
 
     private int composeSyllable(int leadingConsonant, int vowel, int trailingConsonant) {
