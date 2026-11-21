@@ -121,6 +121,7 @@ public final class SwearEngine {
         AsciiLowerCaseRuns asciiLowerCaseRuns = AsciiLowerCaseRuns.of(lightlyNormalizedView.getText());
 
         List<SwearMatch> keptMatches = new ArrayList<>();
+        Map<SwearWord, TreeMap<Integer, Integer>> keptOriginalSpans = new HashMap<>();
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
             TextNormalizedView view = views.get(textNormalizationType);
             List<KeywordMatch> notSwearKeywordMatches =
@@ -139,8 +140,10 @@ public final class SwearEngine {
                     }
                     SwearMatch swearMatch = new SwearMatch(swearWord, textNormalizationType,
                             view.getOriginalStart(keywordMatchStart), view.getOriginalEnd(keywordMatchEnd - 1));
-                    if (!overlapsSameWordWithKeptMatch(keptMatches, swearMatch)) {
+                    if (!overlapsSameWordWithKeptMatch(keptOriginalSpans, swearMatch)) {
                         keptMatches.add(swearMatch);
+                        keptOriginalSpans.computeIfAbsent(swearWord, ignored -> new TreeMap<>())
+                                .put(swearMatch.originalStart(), swearMatch.originalEnd());
                     }
                 }
             }
@@ -217,12 +220,8 @@ public final class SwearEngine {
                                                          int keywordMatchStart, int keywordMatchEnd) {
         int lightlyNormalizedStart = view.getLightlyNormalizedStart(keywordMatchStart);
         int lightlyNormalizedEnd = view.getLightlyNormalizedEnd(keywordMatchEnd - 1);
-        for (int lightlyNormalizedIndex = lightlyNormalizedStart; lightlyNormalizedIndex < lightlyNormalizedEnd; lightlyNormalizedIndex++) {
-            if (!asciiLowerCaseRuns.isCoveredBy(lightlyNormalizedIndex, lightlyNormalizedStart, lightlyNormalizedEnd)) {
-                return false;
-            }
-        }
-        return true;
+        return asciiLowerCaseRuns.isCoveredBy(lightlyNormalizedStart, lightlyNormalizedStart, lightlyNormalizedEnd)
+                && asciiLowerCaseRuns.isCoveredBy(lightlyNormalizedEnd - 1, lightlyNormalizedStart, lightlyNormalizedEnd);
     }
 
     private static boolean containsWhitespace(String text, int start, int end) {
@@ -237,15 +236,15 @@ public final class SwearEngine {
         return false;
     }
 
-    private static boolean overlapsSameWordWithKeptMatch(List<SwearMatch> keptMatches, SwearMatch swearMatch) {
-        for (SwearMatch keptMatch : keptMatches) {
-            if (keptMatch.swearWord().equals(swearMatch.swearWord())
-                    && keptMatch.originalStart() < swearMatch.originalEnd()
-                    && swearMatch.originalStart() < keptMatch.originalEnd()) {
-                return true;
-            }
+    // 후보의 원문 끝보다 앞에서 시작하는 구간 중 가장 늦게 시작하는 구간 하나만 확인함
+    private static boolean overlapsSameWordWithKeptMatch(Map<SwearWord, TreeMap<Integer, Integer>> keptOriginalSpans,
+                                                         SwearMatch swearMatch) {
+        TreeMap<Integer, Integer> originalSpans = keptOriginalSpans.get(swearMatch.swearWord());
+        if (originalSpans == null) {
+            return false;
         }
-        return false;
+        Map.Entry<Integer, Integer> precedingOriginalSpan = originalSpans.lowerEntry(swearMatch.originalEnd());
+        return precedingOriginalSpan != null && swearMatch.originalStart() < precedingOriginalSpan.getValue();
     }
 
     // 시작 위치마다 트라이를 루트로 되돌리며, 이어지는 키워드가 없거나 텍스트가 끝나면 다음 시작 위치로 넘어감

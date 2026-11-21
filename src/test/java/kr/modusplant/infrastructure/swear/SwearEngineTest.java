@@ -145,14 +145,20 @@ class SwearEngineTest implements SwearMatchTestUtils {
         List<SwearMatch> surroundingLetterMatches = swearEngine.match("atlqkfb");
         List<SwearMatch> elongatedMatches = swearEngine.match("tlllqkf");
         List<SwearMatch> mixedMatches = swearEngine.match("ㅅl발");
+        List<SwearMatch> hangulSurroundedRunMatches = swearEngine.match("개tlqkf놈");
+        List<SwearMatch> leadingLetterBeforeSyllableMatches = swearEngine.match("atl발");
+        List<SwearMatch> trailingLetterAfterJamoMatches = swearEngine.match("ㅅlqkfb");
 
         // then
         assertThat(wholeRunMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 5));
         assertThat(elongatedMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 7));
         assertThat(mixedMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 0, 3));
+        assertThat(hangulSurroundedRunMatches).containsExactly(new SwearMatch(testSwearWord, KEYSTROKE, 1, 6));
         assertThat(leadingLetterMatches).isEmpty();
         assertThat(trailingLetterMatches).isEmpty();
         assertThat(surroundingLetterMatches).isEmpty();
+        assertThat(leadingLetterBeforeSyllableMatches).isEmpty();
+        assertThat(trailingLetterAfterJamoMatches).isEmpty();
     }
 
     @Test
