@@ -7,47 +7,23 @@ paths:
 
 ## 1. Package Structure
 
-```
-member/
-├ domain/
-│├ aggregate/
-│├ entity/ # nullobject/ for Null Object singletons
-│├ vo/ # nullobject/ for optional VOs (Empty*)
-│├ event/
-│├ enums/ # Domain status enums
-│└ exception/enums/
-├ usecase/
-│├ port/repository/
-│├ port/mapper/
-│├ record/
-│├ request/
-│├ response/
-││└ supers/ # Marker interfaces for multi-version polymorphic responses
-│└ model/read/
-├ adapter/
-│├ controller/ # *Controller / *AdminController
-│├ helper/ # Pre-condition checks (*ValidationHelper) and I/O (*IOHelper)
-│├ listener/ # Domain event listeners
-│├ mapper/
-│└ translator/
-└ framework/
- ├ inbound/web/rest/
- ├ inbound/web/cache/
- │├ record/ # *CacheValidationResult — ETag/If-Modified-Since result carriers
- │└ service/ # *CacheValidationService — conditional-request evaluation logic
- ├ outbound/ # Repository port implementations (combine JPA + jOOQ)
- ├ outbound/jpa/entity/
- │└ record/ # JPA JSON-column serialization records
- ├ outbound/jpa/repository/
- │└ supers/ # Shared base repository interfaces
- ├ outbound/jpa/mapper/
- │└ supers/ # Shared base mapper interfaces
- ├ outbound/jpa/adapter/ # *RepositoryJpaAdapter — mediates between the outbound port
- │ # implementation and the raw Spring Data JPA repository
- ├ outbound/jpa/compositekey/ # Composite PK classes for join/report tables
- ├ outbound/redis/ # Redis-backed cache port implementations
- └ outbound/jooq/repository/
-```
+- `Member`, `MemberProfile`, `ProposalOrBugReport` — aggregate roots: a member, its profile, and a proposal or bug
+  report
+- `MemberController`, `MemberAdminController` — adapter controllers for member use cases and for the admin report
+  dashboards
+- `MemberValidationHelper` — precondition checks
+- `MemberImageIOHelper` — storage I/O of profile and report images (upload URL issuing, deletion, existence checks)
+- `MemberEventListener` — transactional event listener removing chosen-comment caches and reflecting abuse reports into
+  the report dashboards
+- `MemberSocialTranslator` — calls the social login providers (access token, account deletability)
+- `MemberCacheValidationService` — conditional-request evaluation, returning a `*CacheValidationResult` record
+- `MemberRepositoryAdapter`, `ReportRepositoryAdapter`, `ReportDashboardRepositoryAdapter` (`framework/outbound/`) —
+  repository port implementations combining JPA and jOOQ
+- `*RepositoryJpaAdapter` (`framework/outbound/jpa/adapter/`) — mediates between a repository port implementation and
+  the raw Spring Data JPA repository
+- `ActivitySubjectPostCacheRedisRepository` — Redis cache of the chosen comment path per post
+- `MemberProfileResponse` — marker interface for multi-version polymorphic profile responses
+- `MemberUuidPrimaryKeyJpaRepository` — base interface of the JPA repositories keyed by a member UUID
 
 ---
 

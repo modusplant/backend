@@ -7,22 +7,13 @@ paths:
 
 ## 1. Package Structure
 
-```
-normalization/
-├ view/ # One TextNormalizedView subclass per TextNormalizationType constant
-│├ supers/
-││└ TextNormalizedView # A normalized text and, per code unit, its source ranges
-│├ LightlyNormalizedView
-│├ AggressivelyNormalizedView
-│├ SyllableNormalizedView
-│├ KeystrokeNormalizedView
-│└ LineInitialNormalizedView
-├ TextNormalizer # Spring bean; builds the NFD/NFC forms and the lightly normalized, aggressively normalized,
-│ # syllable, keystroke, and line-initial views
-├ TextNormalizationType # The normalization method that produced a view
-├ TextNormalizationCharacterMap # Immutable code-point maps that TextNormalizer reads
-└ TextNormalizationHelper # Stateless code-point predicates that TextNormalizer calls
-```
+- `TextNormalizer` — Spring bean; builds the NFD/NFC forms and the lightly normalized, aggressively normalized,
+  syllable, keystroke, and line-initial views
+- `TextNormalizedView` (`view/supers/`) — a normalized text and, per code unit, its source ranges; base class of the
+  `view/` subclasses, one per `TextNormalizationType` constant
+- `TextNormalizationType` — the normalization method that produced a view
+- `TextNormalizationCharacterMap` — immutable code-point maps that `TextNormalizer` reads
+- `TextNormalizationHelper` — stateless code-point predicates that `TextNormalizer` calls
 
 ---
 
@@ -58,13 +49,13 @@ accepts only the view it needs:
 - Each is built through its public constructor from a `TextNormalizedView`, whose protected copy constructor shares the
   text and the immutable arrays without copying them.
 
-**`TextNormalizationType`** — enum of the normalization method that produced a view: `LIGHT` (`normalizeLightly`),
+**`TextNormalizationType`** — enum: `LIGHT` (`normalizeLightly`),
 `AGGRESSIVE` (`normalizeAggressively`), `SYLLABLE` (`normalizeWithSyllable`), `KEYSTROKE` (`normalizeWithKeystroke`),
 `LINE_INITIAL` (`normalizeWithLineInitial`).
 
 **`TextNormalizationCharacterMap`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
-- Holds the maps as immutable `public static final Map` constants keyed by code point, with code-point values unless
-  stated otherwise.
+- Holds each map as a `public static final Map` constant keyed by code point, with code-point values unless stated
+  otherwise.
 - Is static, so it takes its `Normalizer2` from `Normalizer2` directly instead of an `Icu4jConfig` bean.
 - `CONJOINING_COMPATIBILITY_JAMO_MAP`: every conjoining jamo whose `Hangul_Syllable_Type` is L, V, or T → the Hangul
   Compatibility Jamo whose NFKD decomposition is a conjoining jamo of the same name once the
@@ -82,8 +73,7 @@ accepts only the view it needs:
 - `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP`: a `String` of two Dubeolsik keystroke jamo in typing
   order → the compound vowel or compound final Hangul Compatibility Jamo they form.
 
-**`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
-- Holds the `public static` code-point predicates of `TextNormalizer`.
+**`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`; each predicate is `public static`:
 - `isDICP`: the `Default_Ignorable_Code_Point` property.
 - `isCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
 - `isNonLetterNoiseCategory`: the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*`.

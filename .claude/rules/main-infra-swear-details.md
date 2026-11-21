@@ -14,15 +14,10 @@ The original text is the text that `SwearEngine.match` checks. A view is one of 
 
 ## 1. Package Structure
 
-The package is flat: four classes, no sub-packages.
-
-```
-swear/
-├ SwearWord # One swear word with its type, severity, and script
-├ SwearEngine # Per-view tries over swear words and not-swear words; returns valid, deduplicated matches
-├ SwearScript # The script a swear word is written in: HANGUL, LATIN, OTHER
-└ SwearMatch # One match: swear word, view, and original span
-```
+- `SwearWord` — one swear word with its type, severity, and script
+- `SwearEngine` — per-view tries over swear words and not-swear words; returns valid, deduplicated matches
+- `SwearScript` — the script a swear word is written in: `HANGUL`, `LATIN`, `OTHER`
+- `SwearMatch` — one match: swear word, view, and original span
 
 ---
 

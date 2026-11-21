@@ -7,26 +7,11 @@ paths:
 
 ## 1. Package Structure
 
-```
-normal/
-├ domain/
-│├ vo/
-│└ exception/enums/
-├ usecase/
-│├ port/repository/ # Create/Read/Update ports
-│├ port/mapper/ # Request → domain mapper interface
-│└ request/
-├ adapter/
-│├ controller/
-│└ mapper/
-└ framework/
- ├ inbound/web/rest/
- └ outbound/persistence/
-  ├ jooq/ # Read port implementation
-  └ jpa/
-   ├ mapper/ # MapStruct Domain → JPA Entity mappers
-   └ repository/ # *RepositoryJpaAdapter (write port implementation)
-```
+- `NormalIdentityCreateRepository`, `NormalIdentityReadRepository`, `NormalIdentityUpdateRepository` — repository ports
+  split into create, read, and update
+- `NormalIdentityJooqRepository` (`framework/outbound/persistence/jooq/`) — read port implementation
+- `NormalIdentityRepositoryJpaAdapter` (`framework/outbound/persistence/jpa/repository/`) — create and update port
+  implementation, converting domain objects to JPA entities through MapStruct mappers
 
 ---
 

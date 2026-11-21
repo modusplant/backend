@@ -7,35 +7,13 @@ paths:
 
 ## 1. Package Structure
 
-```
-search/
-├ domain/
-│├ aggregate/
-│├ entity/
-│├ vo/
-│├ enums/ # Search condition/target/sort enums
-│└ exception/enums/
-├ usecase/
-│├ port/repository/
-│├ port/mapper/
-│├ port/cache/ # Cache port interfaces
-│├ record/
-│├ response/
-│└ model/read/
-├ adapter/
-│├ controller/
-│├ mapper/
-│└ translator/
-└ framework/
- ├ inbound/web/rest/
- └ outbound/
-  ├ jooq/
-  │├ repository/
-  │└ mapper/supers/ # jOOQ record → read model mapper
-  ├ jpa/repository/ # Category-condition lookups
-  ├ caffeine/ # In-memory cache implementations of usecase/port/cache/
-  └ redis/ # Search-history repository
-```
+- `SearchPost` — aggregate root; a post as a search result
+- `SearchPostTranslator` — builds a post's content-preview JSON with its thumbnail path
+- `SearchPlantCache` (`usecase/port/cache/`) — cache port of the transliterated plant names, implemented in memory by
+  `SearchPlantCaffeineCache`
+- `SearchPostRepositoryJooqAdapter` — post search queries
+- `SearchPostConditionRepositoryJpaAdapter` — category-condition lookups
+- `SearchPostHistoryRedisRepository` — per-member search-history repository
 
 ---
 

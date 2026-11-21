@@ -52,14 +52,18 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 ```
 [domain]
 ├ adapter # Orchestration controllers (inbound use-case calls, NO framework deps;
-│ # `shared.framework` belongs to `shared` first, so depending on it is allowed)
-├ domain # Pure business logic: aggregates, entities, VOs, validation
-├ usecase # Ports (interfaces), request/response DTOs, read/write models
+│ # `shared.framework` belongs to `shared` first, so depending on it is allowed),
+│ # plus mapper port implementations, precondition helpers, event listeners, translators
+├ domain # Pure business logic: aggregates, entities, VOs, events, validation
+├ usecase # Ports (interfaces), request/response DTOs, records, read models
 └ framework # Technical implementations:
   # inbound/web/rest → actual @RestController classes
+  # inbound/web/cache → conditional-GET (ETag / Last-Modified) evaluation
   # outbound/jpa → JPA entities, mappers, Spring Data repos
   # outbound/jooq → jOOQ read repositories
-  # outbound/redis → Redis cache services
+  # outbound/persistence → jpa/ and jooq/ grouped under one package (account domains)
+  # outbound/redis → Redis-backed repositories
+  # outbound/scheduler → @Scheduled jobs
 ```
 
 ### Predefined Domain & Infrastructure Area Names

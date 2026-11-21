@@ -7,21 +7,9 @@ paths:
 
 ## 1. Package Structure
 
-```
-identity/
-├ usecase/
-│├ port/repository/
-│└ response/
-├ adapter/
-│└ controller/
-└ framework/
- ├ inbound/web/rest/
- └ outbound/
-  ├ jooq/
-  └ jpa/
-   ├ entity/ # Member-auth table
-   └ repository/
-```
+- `IdentityRepository` — repository port reading an account's authentication information
+- `MemberAuthEntity` — JPA entity of the member-auth table, which the normal-identity and social-identity domains and
+  the security infrastructure also use
 
 ---
 

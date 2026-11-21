@@ -7,16 +7,17 @@ paths:
 
 ## 1. Package Structure
 
-```
-security/
-├ config/ # Spring Security configuration — assembles the SecurityFilterChain bean and its supporting beans
-├ filter/ # Servlet filters inserted into the security filter chain
-├ handler/ # Spring Security callback handlers (login/logout success, failure, access-denied)
-├ models/ # Authentication principal, token, and login-request models
-├ enums/ # Security-specific error code enum
-├ exception/ # Authentication exception hierarchy
-└ util/ # Static helper classes (logging, response writing, authorization assertions)
-```
+- `SecurityConfig` (`config/`) — the Spring Security configuration
+- `DefaultAuthProvider`, `DefaultUserDetailsService` — the `AuthenticationProvider` and `UserDetailsService` of the
+  normal login
+- `DefaultAuthenticationEntryPoint` — the `AuthenticationEntryPoint` answering an unauthenticated request
+- `JwtAuthenticationFilter`, `EmailPasswordAuthenticationFilter`, `SecurityExceptionHandlingFilter` (`filter/`) — the
+  servlet filters inserted into the security filter chain
+- `*Handler` (`handler/`) — Spring Security callback handlers (login/logout success, failure, access-denied)
+- `DefaultAuthToken`, `DefaultUserDetails` (`models/`) — the authentication token and principal
+- `BusinessAuthenticationException` (`exception/`) — root of the authentication exception hierarchy
+- `SecurityAssertionUtils`, `SecurityLoggerUtils`, `SecurityResponseUtils` (`util/`) — static helpers for
+  authorization assertions, logging, and response writing
 
 ---
 

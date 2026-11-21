@@ -7,44 +7,14 @@ paths:
 
 ## 1. Package Structure
 
-```
-comment/
-├ domain/
-│├ aggregate/
-│├ enums/ # Status-style backing enums
-│├ event/
-│├ exception/ # Domain-local exception classes
-││└ enums/
-│└ vo/
-│ └ nullobject/
-├ usecase/
-│├ model/
-│├ port/
-││├ mapper/
-││└ repository/ # Query/Command/Cache/lookup repository port interfaces
-│├ request/
-│└ response/
-├ adapter/
-│├ controller/
-│├ helper/ # Cross-aggregate write-precondition checks
-│├ listener/ # Synchronous listeners for other domains' events
-│└ mapper/
-└ framework/
- ├ inbound/web/rest/
- ├ inbound/web/cache/ # ETag / Last-Modified conditional-GET support
- │└ model/ # Cache result carrier record
- ├ inbound/flyway/ # Flyway callbacks reacting to applied migrations
- └ outbound/
-  ├ jooq/
-  │└ repository/
-  ├ redis/ # Redis-backed idempotency + sibling-order allocation
-  └ jpa/
-   ├ entity/
-   ├ compositekey/
-   ├ mapper/ # Domain ↔ JPA Entity mapping implementation
-   │└ supers/ # Domain ↔ JPA Entity mapping interface
-   └ repository/ # Spring Data JPA interface + write-port adapter
-```
+- `Comment` — aggregate root; a comment on a post, identified by the post and its path
+- `CommentValidationHelper` — cross-aggregate write-precondition checks (author, post, and target comment state)
+- `CommentAdminEventListener` — synchronous listener deleting a comment on another domain's abuse-report approval
+  event
+- `CommentCacheService` — builds the ETag / Last-Modified data for the conditional GET of comment pages
+- `CommentPathCacheEvictionFlywayCallback` — Flyway callback evicting every comment-path cache after a run that applies
+  the comment-path migration
+- `CommentCacheRedisRepository` — Redis-backed idempotency markers and sibling-order allocation of comment paths
 
 ---
 
