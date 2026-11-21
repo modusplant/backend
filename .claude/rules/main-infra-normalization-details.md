@@ -7,8 +7,7 @@ paths:
 
 ## 1. Package Structure
 
-- `TextNormalizer` — Spring bean; builds the NFD/NFC forms and the lightly normalized, aggressively normalized,
-  syllable normalized, keystroke normalized, and line-initial normalized views
+- `TextNormalizer` — Spring bean; builds the NFD/NFC forms and the five normalized views
 - `TextNormalizedView` (`view/supers/`) — a normalized text and, per code unit, its source ranges (§8); base class of
   the `view/` subclasses, one per `TextNormalizationType` constant
 - `TextNormalizationType` — the normalization method that produced a view
@@ -36,7 +35,6 @@ paths:
   subclass it returns, so a step shared by several methods (steps 2–4 of §4 and steps 2–4 of §6) serves each of them.
 
 **`TextNormalizedView`** — immutable, non-`final` so that the subclasses can extend it:
-- Holds its text, the normalized `String` that `getText()` returns, and the four parallel `int[]` range arrays of §8.
 - Read through `getText()`, `length()`, `getLightlyNormalizedStart` / `getLightlyNormalizedEnd`, and
   `getOriginalStart` / `getOriginalEnd`, each taking a code-unit index.
 - Built through the public `TextNormalizedView.Builder` (`append` one code unit with its four range bounds, then
@@ -48,10 +46,6 @@ accepts only the view it needs:
   (`SYLLABLE`), `KeystrokeNormalizedView` (`KEYSTROKE`), `LineInitialNormalizedView` (`LINE_INITIAL`).
 - Each is built through its public constructor from a `TextNormalizedView`, whose protected copy constructor shares the
   text and the immutable arrays without copying them.
-
-**`TextNormalizationType`** — enum: `LIGHT` (`normalizeLightly`),
-`AGGRESSIVE` (`normalizeAggressively`), `SYLLABLE` (`normalizeWithSyllable`), `KEYSTROKE` (`normalizeWithKeystroke`),
-`LINE_INITIAL` (`normalizeWithLineInitial`).
 
 **`TextNormalizationCharacterMap`** — `final`, `@NoArgsConstructor(access = PRIVATE)`:
 - Holds each map as a `public static final Map` constant keyed by code point, with code-point values unless stated
@@ -77,7 +71,9 @@ accepts only the view it needs:
   Dubeolsik keys to form a compound vowel or compound trailing consonant (§9), in typing order → that compound vowel
   or compound trailing consonant.
 
-**`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`; each predicate is `public static`:
+**`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`; each predicate is `public static`
+and decides a Unicode property by the return value of an ICU4J property query (`UCharacter.hasBinaryProperty` for
+`Default_Ignorable_Code_Point`, `UCharacter.getType` for the general categories):
 - `isDICP`: the `Default_Ignorable_Code_Point` property.
 - `isCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
 - `isNonLetterNoiseCategory`: the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*`.
@@ -97,34 +93,28 @@ extended grapheme cluster passes these steps in order:
 
 | Order | Step |
 |---|---|
-| 1 | NFKD, remove code points with the `Default_Ignorable_Code_Point` property and combining marks (general categories `Mn`, `Mc`, `Me`), NFKC |
+| 1 | NFKD, remove code points that `isDICP` or `isCombiningMark` accepts, NFKC |
 | 2 | Map conjoining jamo through `CONJOINING_COMPATIBILITY_JAMO_MAP` |
 | 3 | Map code points through `SYMBOL_CONFUSABLE_LATIN_MAP` |
 | 4 | Lowercase per code point with `UCharacter.toLowerCase` |
 | 5 | Map code points through `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP` |
 
-- Whether a code point belongs to a character class defined by a Unicode property is decided by the return value of an
-  ICU4J property query (`UCharacter.hasBinaryProperty` for `Default_Ignorable_Code_Point`, `UCharacter.getType` for the
-  general categories).
 - Lowercasing is per code point, because `String.toLowerCase` can change the length and break the per-code-unit
   ranges.
-- Step 5 follows step 4, because `CROSS_SCRIPT_CONFUSABLE_LATIN_MAP` is keyed by lowercase letters, so an uppercase
-  confusable is mapped once lowercased (`Ѕ` → `ѕ` → `s`).
+- Step 5 follows step 4, so an uppercase confusable is mapped once lowercased (`Ѕ` → `ѕ` → `s`).
 - Only step 1 removes code points, and it removes combining marks before NFKC, because NFKC would recompose a
   diacritic into its base letter (`é` → `e`); whitespace, punctuation, and an archaic conjoining jamo that
   `CONJOINING_COMPATIBILITY_JAMO_MAP` leaves out are kept.
-- An extended grapheme cluster made up only of default-ignorable code points and combining marks produces no code
-  unit, so an original text of such extended grapheme clusters yields an empty `LightlyNormalizedView`.
 
 ---
 
 ## 4. `normalizeAggressively`
 
-The lightly normalized view passes these steps in order, each building a new `TextNormalizedView`:
+The lightly normalized view passes these steps in order:
 
 | Order | Step |
 |---|---|
-| 1 | Remove code points of the general categories `Z*`, `Cc`, `P*`, `S*`, and `N*` |
+| 1 | Remove code points that `isNonLetterNoiseCategory` accepts |
 | 2 | Collapse consecutive identical jamo into one (rules below) |
 | 3 | Compose each run of Hangul Compatibility Jamo into Hangul syllables (rules below) |
 | 4 | Merge an elongated vowel or elongated consonant (§9) into the preceding Hangul syllable (rules below) |
@@ -135,39 +125,34 @@ The lightly normalized view passes these steps in order, each building a new `Te
   or conjoining jamo (`isConjoiningJamo`), including Hangul Compatibility Jamo that step 3 later composes into a
   Hangul syllable (`ㅋㅋㅋ` → `ㅋ`, `ㅅㅣㅂㅂㅏㄹ` → `ㅅㅣㅂㅏㄹ` → `시발`). Every other code point, such as a Hangul
   syllable or a Latin letter, is kept however often it repeats (`시발발발`, `fuuuck` stay).
-- Step 3: a run is a maximal sequence of consecutive Hangul Compatibility Jamo. Step 3 reads a run left to right as a
-  leading consonant, a vowel, and an optional trailing consonant, and a consonant jamo followed by a vowel jamo starts
-  the next Hangul syllable (`ㅂㅕㅇ신` → `병신`). A run that does not divide entirely into Hangul syllables is kept as
-  it is, because composing only part of it can break up a sequence of Hangul Compatibility Jamo (`ㅅㅂㅠ` stays,
-  instead of becoming `ㅅ뷰`, which no longer contains `ㅅㅂ`). A compound vowel or compound trailing consonant composes
-  only when it is a single Hangul Compatibility Jamo (`ㅂㅏㄺ` → `밝`): two adjacent Hangul Compatibility Jamo are not
-  joined into one (`ㅂㅏㄹㄱ` stays; step 1 of §5 joins them), and a compound trailing consonant followed by a vowel
-  jamo is not split into a trailing consonant and the next leading consonant (`ㄱㅏㄳㅣ` stays instead of becoming
-  `각시`). Step 3 runs before step 4, so a Hangul syllable that step 3 composes can absorb an elongated vowel
-  (`ㅅㅣ이발` → `시이발` in step 3 → `시발` in step 4).
-- Step 4, elongated vowel: a Hangul syllable without a trailing consonant absorbs a following vowel jamo identical to
-  its vowel, or a following Hangul syllable whose leading consonant is `ㅇ` and whose vowel is identical to its vowel,
-  taking the trailing consonant of that following Hangul syllable (`바알` → `발`). The merged Hangul syllable keeps
-  absorbing while it has no trailing consonant.
-- Step 4, elongated consonant: a consonant jamo between two Hangul syllables is absorbed into the preceding Hangul
-  syllable when it is identical to the trailing consonant of the preceding Hangul syllable or to the leading consonant
-  of the following Hangul syllable (`존ㄴ맛` → `존맛`, `시ㅂ발` → `시발`).
+- Step 3 reads a run (§9) left to right as a leading consonant, a vowel, and an optional trailing consonant, and a
+  consonant jamo followed by a vowel jamo starts the next Hangul syllable (`ㅂㅕㅇ신` → `병신`). A run that does not
+  divide entirely into Hangul syllables is kept as it is, because composing only part of it can break up a sequence
+  of Hangul Compatibility Jamo (`ㅅㅂㅠ` stays, instead of becoming `ㅅ뷰`, which no longer contains `ㅅㅂ`). A
+  compound vowel or compound trailing consonant composes only when it is a single Hangul Compatibility Jamo
+  (`ㅂㅏㄺ` → `밝`): two adjacent Hangul Compatibility Jamo are not joined into one (`ㅂㅏㄹㄱ` stays; step 1 of §5
+  joins them), and a compound trailing consonant followed by a vowel jamo is not split into a trailing consonant and
+  the next leading consonant (`ㄱㅏㄳㅣ` stays instead of becoming `각시`). Step 3 runs before step 4, so a Hangul
+  syllable that step 3 composes can absorb an elongated vowel (`ㅅㅣ이발` → `시이발` in step 3 → `시발` in step 4).
+- Step 4, elongated vowel: a Hangul syllable without a trailing consonant absorbs a following elongated vowel, taking
+  the trailing consonant of an elongated vowel written as a Hangul syllable (`바알` → `발`), and keeps absorbing while
+  it has no trailing consonant.
+- Step 4, elongated consonant: the preceding Hangul syllable absorbs it (`존ㄴ맛` → `존맛`, `시ㅂ발` → `시발`).
 
 ---
 
 ## 5. `normalizeWithSyllable`
 
-The aggressively normalized view passes these steps in order, each building a new `TextNormalizedView`:
+The aggressively normalized view passes these steps in order:
 
 | Order | Step |
 |---|---|
 | 1 | Compose each run of Hangul Compatibility Jamo within one token into as many Hangul syllables as possible (rules below) |
 | 2 | Remove every remaining Hangul Compatibility Jamo and ASCII lowercase letter |
 
-- A run is a maximal sequence of consecutive Hangul Compatibility Jamo. A token is a maximal sequence of consecutive
-  code points of the lightly normalized view's text that are not whitespace (ICU4J `isUWhiteSpace`). A code unit
-  belongs to the token holding the start of its lightly normalized range, so Hangul Compatibility Jamo written in
-  different tokens never compose (`ㅅ ㅣ` stays apart).
+- A token is a maximal sequence of consecutive code points of the lightly normalized view's text that are not
+  whitespace (ICU4J `isUWhiteSpace`). A code unit belongs to the token holding the start of its lightly normalized
+  range, so Hangul Compatibility Jamo written in different tokens never compose (`ㅅ ㅣ` stays apart).
 - Step 1 reads a run as step 3 of §4 does, but composes the part that forms Hangul syllables and keeps the rest as
   Hangul Compatibility Jamo (`ㅅㅂㅠ` → `ㅅ뷰`).
   - Two adjacent Hangul Compatibility Jamo that `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP` joins form a
@@ -185,19 +170,19 @@ The aggressively normalized view passes these steps in order, each building a ne
 
 ## 6. `normalizeWithKeystroke`
 
-The aggressively normalized view passes these steps in order, each building a new `TextNormalizedView`:
+The aggressively normalized view passes these steps in order:
 
 | Order | Step |
 |---|---|
 | 1 | Convert ASCII lowercase letters to Dubeolsik Hangul (rules below) |
 | 2–4 | Apply steps 2–4 of §4 again, with the same rules |
 
-- Step 2 of §4 collapses only jamo, so the aggressively normalized view keeps repeated ASCII lowercase letters, and a
-  key typed twice stays both a trailing consonant and the next leading consonant (`whssk` → `존나`, not `조나`).
+- The aggressively normalized view keeps repeated ASCII lowercase letters (step 2 of §4), so a key typed twice stays
+  both a trailing consonant and the next leading consonant (`whssk` → `존나`, not `조나`).
 - Step 1: each ASCII lowercase letter becomes the Hangul Compatibility Jamo on its key through
   `ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP`, and the converted jamo (§9) of adjacent ASCII lowercase letters
-  compose into Hangul syllables, each read left to right as a leading consonant, a vowel, and an optional trailing
-  consonant; a converted jamo that joins no Hangul syllable stays a Hangul Compatibility Jamo (`tlqkf` → `시발`).
+  compose into Hangul syllables as step 3 of §4 reads a run; a converted jamo that joins no Hangul syllable stays a
+  Hangul Compatibility Jamo (`tlqkf` → `시발`).
   - Two adjacent ASCII lowercase letters whose converted jamo `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP`
     joins form a compound vowel or compound trailing consonant (`dnjs` → `원`).
   - A consonant jamo followed by a vowel jamo, whether converted jamo or typed jamo (§9), stays a leading consonant
@@ -206,17 +191,14 @@ The aggressively normalized view passes these steps in order, each building a ne
     (`ㅅl발` → `ㅅㅣ발`).
 - Steps 2–4 run after step 1, because the repeated jamo, the runs of Hangul Compatibility Jamo, and the elongated
   vowels and consonants typed on an English layout appear only once step 1 converts them (`tlllqkf` → `시ㅣㅣ발` →
-  `시ㅣ발` → `시발`); step 3 also composes a converted jamo with a typed jamo (`ㅅl발` → `ㅅㅣ발` → `시발`). A Hangul
-  syllable converted from repeated ASCII lowercase letters is kept, because step 2 of §4 keeps every repeated Hangul
-  syllable (`tltl` → `시시`).
+  `시ㅣ발` → `시발`); step 3 also composes a converted jamo with a typed jamo (`ㅅl발` → `ㅅㅣ발` → `시발`).
 
 ---
 
 ## 7. `normalizeWithLineInitial`
 
-- Each contributing line (§9) of the lightly normalized view's text contributes its first code point outside the
-  general categories that step 1 of §4 removes, so a bullet or indent does not hide the letter (`- 시원\n- 발코니` →
-  `시발`).
+- Each contributing line (§9) contributes the first code point that makes it one, so a bullet or indent does not hide
+  the letter (`- 시원\n- 발코니` → `시발`).
 - A contributed code point in a supplementary plane keeps both its code units, so a surrogate pair is never split.
 - Lines are split at the code points that `isLineTerminator` accepts.
 - Fewer than 2 contributing lines yield an empty `LineInitialNormalizedView`.
@@ -237,24 +219,11 @@ code unit's lightly normalized range and original range.
   `[0, 2)`), and, as its original range, the whole extended grapheme cluster in the original text, so a surrogate pair
   is never split (`𝐬` → `s`: `[0, 2)`).
 
-**`normalizeAggressively`** (§4):
-- Steps 2–4: a code unit built from several source code units (collapsed, composed, or merged) takes the union of
-  their lightly normalized ranges and the union of their original ranges (`ㅅㅣ` → `시`: lightly normalized `[0, 2)`).
-- Steps 1–4: every other code unit keeps both its ranges (`시 발` → `시발`: lightly normalized `[0, 1)` and `[2, 3)`).
-
-**`normalizeWithSyllable`** (§5):
-- Step 1: a Hangul syllable composed from Hangul Compatibility Jamo, or a Hangul syllable that takes a trailing
-  consonant, takes the union of the ranges of the code units it is built from; every other code unit keeps both its
-  ranges.
-- Step 2: every kept code unit keeps both its ranges.
-
-**`normalizeWithKeystroke`** (§6):
-- Step 1: a Hangul syllable composed from several ASCII lowercase letters takes the union of their ranges (`tl` → `시`:
-  lightly normalized `[0, 2)`); every other code unit keeps both its ranges.
-- Steps 2–4: the rules of steps 2–4 of `normalizeAggressively` apply.
-
-**`normalizeWithLineInitial`** (§7):
-- Each code unit keeps its lightly normalized and original ranges.
+**Every other method** (§4–§7):
+- In each step, a code unit built from several source code units (collapsed, composed, merged, or given a trailing
+  consonant) takes the union of their lightly normalized ranges and the union of their original ranges (`ㅅㅣ` → `시`,
+  `tl` → `시`: lightly normalized `[0, 2)`).
+- Every other code unit keeps both its ranges (`시 발` → `시발`: lightly normalized `[0, 1)` and `[2, 3)`).
 
 ---
 
@@ -270,5 +239,6 @@ code unit's lightly normalized range and original range.
   of the preceding one or the leading consonant of the following one (`존ㄴ맛`, `시ㅂ발`).
 - **Elongated vowel**: a vowel written after a Hangul syllable to drag out its sound, as a vowel jamo identical to its
   vowel or as a Hangul syllable with the leading consonant `ㅇ` and the same vowel (`시ㅣ발`, `바알`).
+- **Run**: a maximal sequence of consecutive Hangul Compatibility Jamo.
 - **Typed jamo**: a Hangul Compatibility Jamo that the aggressively normalized view already holds, as opposed to a
   converted jamo.
