@@ -7,7 +7,7 @@ import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isConjoiningJamo;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutFinal;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutTrailingConsonant;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCombiningMark;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDICP;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
@@ -127,16 +127,16 @@ class TextNormalizationHelperTest {
 
     @Test
     @DisplayName("종성 없는 음절로 true 반환")
-    void testIsHangulSyllableWithoutFinal_givenSyllableWithoutFinal_willReturnTrue() {
+    void testIsHangulSyllableWithoutTrailingConsonant_givenSyllableWithoutTrailingConsonant_willReturnTrue() {
         // given & when & then
-        assertThat(isHangulSyllableWithoutFinal('가')).isTrue();
+        assertThat(isHangulSyllableWithoutTrailingConsonant('가')).isTrue();
     }
 
     @Test
     @DisplayName("종성 있는 음절로 false 반환")
-    void testIsHangulSyllableWithoutFinal_givenSyllableWithFinal_willReturnFalse() {
+    void testIsHangulSyllableWithoutTrailingConsonant_givenSyllableWithTrailingConsonant_willReturnFalse() {
         // given & when & then
-        assertThat(isHangulSyllableWithoutFinal('각')).isFalse();
+        assertThat(isHangulSyllableWithoutTrailingConsonant('각')).isFalse();
     }
 
     @Test

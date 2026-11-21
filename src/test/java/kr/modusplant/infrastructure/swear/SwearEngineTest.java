@@ -120,7 +120,7 @@ class SwearEngineTest implements SwearMatchTestUtils {
     @DisplayName("음절 안 자모의 키 입력 매칭으로 List 반환")
     void testMatch_givenKeystrokeKeywordInsideSyllables_willReturnList() {
         // given
-        SwearEngine swearEngine = engineOf(List.of(testInitialConsonantSwearWord), List.of());
+        SwearEngine swearEngine = engineOf(List.of(testLeadingConsonantSwearWord), List.of());
 
         // when
         List<SwearMatch> insideSyllableMatches = swearEngine.match("맛보다");
@@ -129,7 +129,7 @@ class SwearEngineTest implements SwearMatchTestUtils {
         // then
         assertThat(insideSyllableMatches).isEmpty();
         assertThat(standaloneJamoMatches)
-                .containsExactly(new SwearMatch(testInitialConsonantSwearWord, AGGRESSIVE, 0, 3));
+                .containsExactly(new SwearMatch(testLeadingConsonantSwearWord, AGGRESSIVE, 0, 3));
     }
 
     @Test
@@ -178,19 +178,19 @@ class SwearEngineTest implements SwearMatchTestUtils {
 
         // when
         List<SwearMatch> asciiNoiseMatches = swearEngine.match("시X발");
-        List<SwearMatch> finalJamoMatches = swearEngine.match("시바ㄹ놈");
+        List<SwearMatch> trailingConsonantMatches = swearEngine.match("시바ㄹ놈");
 
         // then
         assertThat(asciiNoiseMatches).containsExactly(new SwearMatch(testSwearWord, SYLLABLE, 0, 3));
-        assertThat(finalJamoMatches).containsExactly(new SwearMatch(testSwearWord, SYLLABLE, 0, 3));
+        assertThat(trailingConsonantMatches).containsExactly(new SwearMatch(testSwearWord, SYLLABLE, 0, 3));
     }
 
     @Test
     @DisplayName("음절 정규화가 바꾸는 단어로 음절 키워드 제외한 List 반환")
     void testMatch_givenWordChangedBySyllableNormalization_willReturnList() {
         // given
-        SwearWord initialConsonantSwearWord = swearWordOf("ㅅㅂ", SwearScript.HANGUL);
-        SwearEngine swearEngine = engineOf(List.of(initialConsonantSwearWord), List.of());
+        SwearWord leadingConsonantSwearWord = swearWordOf("ㅅㅂ", SwearScript.HANGUL);
+        SwearEngine swearEngine = engineOf(List.of(leadingConsonantSwearWord), List.of());
 
         // when
         List<SwearMatch> sameWordMatches = swearEngine.match("ㅅㅂ");

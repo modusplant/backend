@@ -35,13 +35,13 @@ public final class TextNormalizationCharacterMap {
     private static final Normalizer2 nfcInstance = Normalizer2.getNFCInstance();
 
     public static final Map<Integer, Integer> CONJOINING_COMPATIBILITY_JAMO_MAP = createConjoiningCompatibilityJamoMap();
-    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_CHOSEONG_MAP = createCompatibilityConjoiningJamoMap(
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP = createCompatibilityConjoiningJamoMap(
             "", Character.toString(CONJOINING_JUNGSEONG_A));
-    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP = createCompatibilityConjoiningJamoMap(
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_VOWEL_MAP = createCompatibilityConjoiningJamoMap(
             Character.toString(CONJOINING_CHOSEONG_KIYEOK), "");
-    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_JONGSEONG_MAP = createCompatibilityConjoiningJamoMap(
+    public static final Map<Integer, Integer> COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP = createCompatibilityConjoiningJamoMap(
             Character.toString(CONJOINING_CHOSEONG_KIYEOK) + Character.toString(CONJOINING_JUNGSEONG_A), "");
-    public static final Map<Integer, Integer> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP = createLetterLikeSymbolLowerCaseLatinMap();
+    public static final Map<Integer, Integer> SYMBOL_CONFUSABLE_LATIN_MAP = createSymbolConfusableLatinMap();
     public static final Map<Integer, Integer> CROSS_SCRIPT_CONFUSABLE_LATIN_MAP = Map.ofEntries(
             Map.entry(0x0430, (int) 'a'), // 키릴 а
             Map.entry(0x0435, (int) 'e'), // 키릴 е
@@ -182,7 +182,7 @@ public final class TextNormalizationCharacterMap {
         return null;
     }
 
-    private static Map<Integer, Integer> createLetterLikeSymbolLowerCaseLatinMap() {
+    private static Map<Integer, Integer> createSymbolConfusableLatinMap() {
         Map<Integer, Integer> map = new HashMap<>();
         for (int offset = 0; offset < LATIN_LETTER_COUNT; offset++) {
             int latin_a_plus_offset = 'a' + offset;

@@ -3,14 +3,7 @@ package kr.modusplant.infrastructure.normalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_CHOSEONG_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_JONGSEONG_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_CONJOINING_JUNGSEONG_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CONJOINING_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.CROSS_SCRIPT_CONFUSABLE_LATIN_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationCharacterMap.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -25,7 +18,7 @@ class TextNormalizationCharacterMapTest {
 
     @Test
     @DisplayName("중성으로 호환 자모 반환")
-    void testConjoiningCompatibilityJamoMap_givenVowelJamo_willReturnInteger() {
+    void testConjoiningCompatibilityJamoMap_givenVowel_willReturnInteger() {
         // given & when & then
         assertThat(CONJOINING_COMPATIBILITY_JAMO_MAP.get(0x1175)).isEqualTo(0x3163);
     }
@@ -49,24 +42,24 @@ class TextNormalizationCharacterMapTest {
     }
 
     @Test
-    @DisplayName("문자형 기호로 ASCII 소문자 반환")
-    void testLetterLikeSymbolLowerCaseLatinMap_givenLetterLikeSymbols_willReturnInteger() {
+    @DisplayName("라틴 문자와 혼동되는 기호로 ASCII 소문자 반환")
+    void testSymbolConfusableLatinMap_givenConfusables_willReturnInteger() {
         // given & when & then
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP).hasSize(78);
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F1E6)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F1FF)).isEqualTo('z');
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F150)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F169)).isEqualTo('z');
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F170)).isEqualTo('a');
-        assertThat(LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.get(0x1F189)).isEqualTo('z');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP).hasSize(78);
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F1E6)).isEqualTo('a');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F1FF)).isEqualTo('z');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F150)).isEqualTo('a');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F169)).isEqualTo('z');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F170)).isEqualTo('a');
+        assertThat(SYMBOL_CONFUSABLE_LATIN_MAP.get(0x1F189)).isEqualTo('z');
     }
 
     @Test
     @DisplayName("변경 시도로 예외 반환")
-    void testLetterLikeSymbolLowerCaseLatinMap_givenModification_willThrowException() {
+    void testSymbolConfusableLatinMap_givenModification_willThrowException() {
         // given & when & then
         //noinspection DataFlowIssue
-        assertThatThrownBy(() -> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.put(0, 0))
+        assertThatThrownBy(() -> SYMBOL_CONFUSABLE_LATIN_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
     }
 
@@ -92,18 +85,18 @@ class TextNormalizationCharacterMapTest {
     @DisplayName("호환 자모로 위치별 조합형 자모 반환")
     void testCompatibilityJamoMaps_givenCompatibilityJamo_willReturnInteger() {
         // given & when & then
-        assertThat(COMPATIBILITY_CONJOINING_CHOSEONG_MAP.get((int) 'ㄱ')).isEqualTo(0x1100);
-        assertThat(COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.get((int) 'ㅏ')).isEqualTo(0x1161);
-        assertThat(COMPATIBILITY_CONJOINING_JONGSEONG_MAP.get((int) 'ㄱ')).isEqualTo(0x11A8);
+        assertThat(COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.get((int) 'ㄱ')).isEqualTo(0x1100);
+        assertThat(COMPATIBILITY_CONJOINING_VOWEL_MAP.get((int) 'ㅏ')).isEqualTo(0x1161);
+        assertThat(COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.get((int) 'ㄱ')).isEqualTo(0x11A8);
     }
 
     @Test
     @DisplayName("현대 한글 자모 전체로 위치별 크기 반환")
     void testCompatibilityJamoMaps_givenModernJamo_willReturnInteger() {
         // given & when & then
-        assertThat(COMPATIBILITY_CONJOINING_CHOSEONG_MAP).hasSize(19);
-        assertThat(COMPATIBILITY_CONJOINING_JUNGSEONG_MAP).hasSize(21);
-        assertThat(COMPATIBILITY_CONJOINING_JONGSEONG_MAP).hasSize(27);
+        assertThat(COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP).hasSize(19);
+        assertThat(COMPATIBILITY_CONJOINING_VOWEL_MAP).hasSize(21);
+        assertThat(COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP).hasSize(27);
     }
 
     @Test
@@ -137,9 +130,9 @@ class TextNormalizationCharacterMapTest {
     @DisplayName("해당 위치에 올 수 없는 자모로 null 반환")
     void testCompatibilityJamoMaps_givenJamoInvalidForPosition_willReturnNull() {
         // given & when & then
-        assertThat(COMPATIBILITY_CONJOINING_CHOSEONG_MAP.get((int) 'ㄳ')).isNull();
-        assertThat(COMPATIBILITY_CONJOINING_JONGSEONG_MAP.get((int) 'ㄸ')).isNull();
-        assertThat(COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.get((int) 'ㄱ')).isNull();
+        assertThat(COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.get((int) 'ㄳ')).isNull();
+        assertThat(COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.get((int) 'ㄸ')).isNull();
+        assertThat(COMPATIBILITY_CONJOINING_VOWEL_MAP.get((int) 'ㄱ')).isNull();
     }
 
     @Test
@@ -147,13 +140,13 @@ class TextNormalizationCharacterMapTest {
     void testCompatibilityJamoMaps_givenModification_willThrowException() {
         // given & when & then
         //noinspection DataFlowIssue
-        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_CHOSEONG_MAP.put(0, 0))
+        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
-        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.put(0, 0))
+        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_VOWEL_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
-        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_JONGSEONG_MAP.put(0, 0))
+        assertThatThrownBy(() -> COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.put(0, 0))
                 .isInstanceOf(UnsupportedOperationException.class);
         //noinspection DataFlowIssue
         assertThatThrownBy(() -> ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP.put(0, 0))

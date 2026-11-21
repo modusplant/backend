@@ -241,7 +241,7 @@ class TextNormalizerTest {
 
     @Test
     @DisplayName("종성과 다음 초성이 같은 자모로 병합되지 않은 키 입력 뷰 반환")
-    void testNormalizeWithKeystroke_givenFinalFollowedByIdenticalInitial_willReturnNormalizedView() {
+    void testNormalizeWithKeystroke_givenTrailingConsonantFollowedByIdenticalLeadingConsonant_willReturnNormalizedView() {
         // given
         TextNormalizedView syllableTypedView = keystrokeView("존나");
         TextNormalizedView asciiLowerCaseTypedView = keystrokeView("whssk");
@@ -295,22 +295,22 @@ class TextNormalizerTest {
 
     @Test
     @DisplayName("종성 없는 음절 뒤 같은 토큰의 자음 낱자를 종성으로 붙인 음절 뷰 반환")
-    void testNormalizeWithSyllable_givenConsonantJamoAfterSyllableWithoutFinal_willReturnNormalizedView() {
+    void testNormalizeWithSyllable_givenConsonantAfterSyllableWithoutTrailingConsonant_willReturnNormalizedView() {
         // given
-        TextNormalizedView finalAttachedView = syllableView("시바ㄹ놈");
-        TextNormalizedView compoundFinalView = syllableView("바ㄹㄱ");
+        TextNormalizedView trailingConsonantAttachedView = syllableView("시바ㄹ놈");
+        TextNormalizedView compoundTrailingConsonantView = syllableView("바ㄹㄱ");
 
         // when & then
-        assertThat(finalAttachedView.getText()).isEqualTo("시발놈");
-        assertSpans(finalAttachedView, 1, 1, 3, 1, 3);
+        assertThat(trailingConsonantAttachedView.getText()).isEqualTo("시발놈");
+        assertSpans(trailingConsonantAttachedView, 1, 1, 3, 1, 3);
         assertThat(syllableText("시ㅈ발")).isEqualTo("싲발");
-        assertThat(compoundFinalView.getText()).isEqualTo("밝");
-        assertSpans(compoundFinalView, 0, 0, 3, 0, 3);
+        assertThat(compoundTrailingConsonantView.getText()).isEqualTo("밝");
+        assertSpans(compoundTrailingConsonantView, 0, 0, 3, 0, 3);
     }
 
     @Test
     @DisplayName("모음 낱자가 뒤따르거나 다른 토큰의 자음 낱자를 붙이지 않은 음절 뷰 반환")
-    void testNormalizeWithSyllable_givenConsonantJamoNotAttachable_willReturnNormalizedView() {
+    void testNormalizeWithSyllable_givenConsonantNotAttachable_willReturnNormalizedView() {
         // given & when & then
         assertThat(syllableText("시바ㄹㅏ")).isEqualTo("시바라");
         assertThat(syllableText("시바 ㄹ")).isEqualTo("시바");
@@ -451,8 +451,8 @@ class TextNormalizerTest {
     }
 
     @Test
-    @DisplayName("호환 분해가 없는 문자형 기호로 정규화 뷰 반환")
-    void testNormalizeLightly_givenLetterLikeSymbols_willReturnNormalizedView() {
+    @DisplayName("호환 분해가 없고 라틴 문자와 혼동되는 기호로 정규화 뷰 반환")
+    void testNormalizeLightly_givenSymbolConfusables_willReturnNormalizedView() {
         // given & when & then
         assertThat(lightlyNormalizedText("🇸🇮🇧🇦🇱")).isEqualTo("sibal");
         assertThat(lightlyNormalizedText("🅢🅘🅑🅐🅛")).isEqualTo("sibal");
@@ -714,7 +714,7 @@ class TextNormalizerTest {
 
     @Test
     @DisplayName("두 낱자로 된 겹종성이나 모음 앞 겹종성이 있는 자모 연속으로 정규화 뷰 반환")
-    void testNormalizeAggressively_givenUnjoinedOrUnsplitCompoundFinalRun_willReturnNormalizedView() {
+    void testNormalizeAggressively_givenUnjoinedOrUnsplitCompoundTrailingConsonantRun_willReturnNormalizedView() {
         // given & when & then
         assertThat(aggressivelyNormalizedText("ㅂㅏㄹㄱ")).isEqualTo("ㅂㅏㄹㄱ");
         assertThat(aggressivelyNormalizedText("ㄱㅏㄳㅣ")).isEqualTo("ㄱㅏㄳㅣ");

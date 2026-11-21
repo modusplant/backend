@@ -116,7 +116,7 @@ public class TextNormalizer {
                 .toString();
         return nfkcNormalizer.normalize(unmarkedText).codePoints()
                 .map(codePoint -> CONJOINING_COMPATIBILITY_JAMO_MAP.getOrDefault(codePoint, codePoint))
-                .map(codePoint -> LETTER_LIKE_SYMBOL_LOWER_CASE_LATIN_MAP.getOrDefault(codePoint, codePoint))
+                .map(codePoint -> SYMBOL_CONFUSABLE_LATIN_MAP.getOrDefault(codePoint, codePoint))
                 .map(UCharacter::toLowerCase)
                 .map(codePoint -> CROSS_SCRIPT_CONFUSABLE_LATIN_MAP.getOrDefault(codePoint, codePoint))
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
@@ -142,8 +142,8 @@ public class TextNormalizer {
                 continue;
             }
             // 음절은 convertedJamos로 조합하되, isVowel 판정은 codePoints를 읽음
-            ComposedCodePoint composedCodePoint = composeLeadingJamo(convertedJamos, codePointIndex,
-                    jamoIndex -> jamoIndex < codePoints.length && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(
+            ComposedCodePoint composedCodePoint = composeFirstSyllable(convertedJamos, codePointIndex,
+                    jamoIndex -> jamoIndex < codePoints.length && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(
                             ASCII_LOWER_CASE_COMPATIBILITY_JAMO_KEYSTROKE_MAP.getOrDefault(codePoints[jamoIndex], codePoints[jamoIndex])));
             // ASCII 소문자는 모두 BMP 문자이므로 코드 포인트 수와 코드 유닛 수가 같음
             appendCodePoint(builder, composedCodePoint.codePoint(), sourceView,
@@ -155,37 +155,37 @@ public class TextNormalizer {
     }
 
     // 자모 배열의 시작 위치에서 음절 하나를 조합하며, 조합하지 못하면 첫 자모를 그대로 반환함
-    private ComposedCodePoint composeLeadingJamo(int[] jamos, int jamoStartIndex, IntPredicate isVowel) {
+    private ComposedCodePoint composeFirstSyllable(int[] jamos, int jamoStartIndex, IntPredicate isVowel) {
         int firstJamo = jamoAt(jamos, jamoStartIndex);
-        boolean startsWithLV = COMPATIBILITY_CONJOINING_CHOSEONG_MAP.containsKey(firstJamo)
-                && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(jamoAt(jamos, jamoStartIndex + 1));
-        if (!startsWithLV && !COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(firstJamo)) {
+        boolean startsWithLV = COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.containsKey(firstJamo)
+                && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(jamoAt(jamos, jamoStartIndex + 1));
+        if (!startsWithLV && !COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(firstJamo)) {
             return new ComposedCodePoint(firstJamo, 1);
         }
         int jamoIndex = startsWithLV ? jamoStartIndex + 1 : jamoStartIndex;
-        int vowelJamo = jamoAt(jamos, jamoIndex);
-        Integer compoundVowelJamo = composeCompoundJamo(vowelJamo, jamoAt(jamos, jamoIndex + 1));
-        if (compoundVowelJamo != null) {
-            vowelJamo = compoundVowelJamo;
+        int vowel = jamoAt(jamos, jamoIndex);
+        Integer compoundVowel = composeCompoundJamo(vowel, jamoAt(jamos, jamoIndex + 1));
+        if (compoundVowel != null) {
+            vowel = compoundVowel;
             jamoIndex++;
         }
         jamoIndex++;
         if (!startsWithLV) {
-            return new ComposedCodePoint(vowelJamo, jamoIndex - jamoStartIndex);
+            return new ComposedCodePoint(vowel, jamoIndex - jamoStartIndex);
         }
-        int finalJamo = NOT_CODE_POINT;
-        int firstFinalJamo = jamoAt(jamos, jamoIndex);
-        if (COMPATIBILITY_CONJOINING_JONGSEONG_MAP.containsKey(firstFinalJamo) && !isVowel.test(jamoIndex + 1)) {
-            Integer compoundFinalJamo = composeCompoundJamo(firstFinalJamo, jamoAt(jamos, jamoIndex + 1));
-            if (compoundFinalJamo != null && !isVowel.test(jamoIndex + 2)) {
-                finalJamo = compoundFinalJamo;
+        int trailingConsonant = NOT_CODE_POINT;
+        int jamoAfterVowel = jamoAt(jamos, jamoIndex);
+        if (COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(jamoAfterVowel) && !isVowel.test(jamoIndex + 1)) {
+            Integer compoundTrailingConsonant = composeCompoundJamo(jamoAfterVowel, jamoAt(jamos, jamoIndex + 1));
+            if (compoundTrailingConsonant != null && !isVowel.test(jamoIndex + 2)) {
+                trailingConsonant = compoundTrailingConsonant;
                 jamoIndex++;
             } else {
-                finalJamo = firstFinalJamo;
+                trailingConsonant = jamoAfterVowel;
             }
             jamoIndex++;
         }
-        return new ComposedCodePoint(composeSyllable(firstJamo, vowelJamo, finalJamo), jamoIndex - jamoStartIndex);
+        return new ComposedCodePoint(composeSyllable(firstJamo, vowel, trailingConsonant), jamoIndex - jamoStartIndex);
     }
 
     private int jamoAt(int[] jamos, int jamoIndex) {
@@ -209,12 +209,12 @@ public class TextNormalizer {
         int codePointIndex = 0;
         while (codePointIndex < codePoints.length) {
             int codePoint = codePoints[codePointIndex];
-            if (isHangulSyllableWithoutFinal(codePoint)) {
+            if (isHangulSyllableWithoutTrailingConsonant(codePoint)) {
                 int syllableCodePointIndex = codePointIndex;
                 int syllableCodeUnitStart = codeUnitStart;
                 int syllableTokenIndex = tokenIndexes[sourceView.getLightlyNormalizedStart(syllableCodeUnitStart)];
                 // 음절과 호환 자모는 모두 BMP 문자이므로, 음절부터 이어지는 호환 자모까지는 배열 인덱스 차이가 코드 유닛 차이와 같음
-                ComposedCodePoint composedCodePoint = attachFollowingFinalJamo(codePoints, syllableCodePointIndex,
+                ComposedCodePoint composedCodePoint = attachFollowingTrailingConsonant(codePoints, syllableCodePointIndex,
                         tempCodePointIndex ->
                                 tempCodePointIndex < codePoints.length &&
                                         isCompatibilityJamo(codePoints[tempCodePointIndex]) &&
@@ -245,9 +245,9 @@ public class TextNormalizer {
             int[] runJamos = Arrays.copyOfRange(codePoints, codePointIndex, runEndIndex);
             int runJamoIndex = 0;
             while (runJamoIndex < runJamos.length) {
-                ComposedCodePoint composedCodePoint = composeLeadingJamo(runJamos, runJamoIndex,
+                ComposedCodePoint composedCodePoint = composeFirstSyllable(runJamos, runJamoIndex,
                         jamoIndex -> jamoIndex < runJamos.length
-                                && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(runJamos[jamoIndex]));
+                                && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(runJamos[jamoIndex]));
                 appendCodePoint(builder, composedCodePoint.codePoint(), sourceView,
                         codeUnitStart, codeUnitStart + composedCodePoint.jamoCount());
                 codeUnitStart += composedCodePoint.jamoCount();
@@ -259,33 +259,33 @@ public class TextNormalizer {
     }
 
     // 모든 위치의 자모 여부는 그 앞 위치가 같은 토큰의 자모일 때만 판정하므로, 판정 위치까지는 모두 BMP 문자임
-    private ComposedCodePoint attachFollowingFinalJamo(int[] codePoints, int syllableCodePointIndex,
-                                                  IntPredicate doesJamoIndexMatchWithCondition) {
+    private ComposedCodePoint attachFollowingTrailingConsonant(int[] codePoints, int syllableCodePointIndex,
+                                                               IntPredicate doesJamoIndexMatchWithCondition) {
         int syllable = codePoints[syllableCodePointIndex];
-        int firstFinalIndex = syllableCodePointIndex + 1;
-        if (!doesJamoIndexMatchWithCondition.test(firstFinalIndex)
-                || !COMPATIBILITY_CONJOINING_JONGSEONG_MAP.containsKey(codePoints[firstFinalIndex])
-                || doesVowelIndexMatch(codePoints, firstFinalIndex + 1, doesJamoIndexMatchWithCondition)) {
+        int nextCodePointIndex = syllableCodePointIndex + 1;
+        if (!doesJamoIndexMatchWithCondition.test(nextCodePointIndex)
+                || !COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(codePoints[nextCodePointIndex])
+                || doesVowelIndexMatch(codePoints, nextCodePointIndex + 1, doesJamoIndexMatchWithCondition)) {
             return new ComposedCodePoint(syllable, 1);
         }
-        int finalJamo = codePoints[firstFinalIndex];
+        int trailingConsonant = codePoints[nextCodePointIndex];
         int jamoCount = 2;
-        if (doesJamoIndexMatchWithCondition.test(firstFinalIndex + 1)) {
-            Integer compoundFinalJamo = composeCompoundJamo(finalJamo, codePoints[firstFinalIndex + 1]);
-            if (compoundFinalJamo != null
-                    && !doesVowelIndexMatch(codePoints, firstFinalIndex + 2, doesJamoIndexMatchWithCondition)) {
-                finalJamo = compoundFinalJamo;
+        if (doesJamoIndexMatchWithCondition.test(nextCodePointIndex + 1)) {
+            Integer compoundTrailingConsonant = composeCompoundJamo(trailingConsonant, codePoints[nextCodePointIndex + 1]);
+            if (compoundTrailingConsonant != null
+                    && !doesVowelIndexMatch(codePoints, nextCodePointIndex + 2, doesJamoIndexMatchWithCondition)) {
+                trailingConsonant = compoundTrailingConsonant;
                 jamoCount = 3;
             }
         }
         StringBuilder conjoiningJamo = new StringBuilder(nfdNormalizer.normalize(Character.toString(syllable)))
-                .appendCodePoint(COMPATIBILITY_CONJOINING_JONGSEONG_MAP.get(finalJamo));
+                .appendCodePoint(COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.get(trailingConsonant));
         return new ComposedCodePoint(nfcNormalizer.normalize(conjoiningJamo).codePointAt(0), jamoCount);
     }
 
     private boolean doesVowelIndexMatch(int[] codePoints, int potentialVowelIndex, IntPredicate doesJamoIndexMatchWithCondition) {
         return doesJamoIndexMatchWithCondition.test(potentialVowelIndex)
-                && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(codePoints[potentialVowelIndex]);
+                && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(codePoints[potentialVowelIndex]);
     }
 
     // 경량 정규화 텍스트의 각 코드 유닛에 대하여 공백으로 나뉜 토큰의 인덱스를 기록함
@@ -393,27 +393,27 @@ public class TextNormalizer {
         int cursor = runStart;
         while (cursor < runEnd) {
             if (cursor + 1 == runEnd
-                    || !COMPATIBILITY_CONJOINING_CHOSEONG_MAP.containsKey(codePoints[cursor])
-                    || !COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(codePoints[cursor + 1])) {
+                    || !COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.containsKey(codePoints[cursor])
+                    || !COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(codePoints[cursor + 1])) {
                 return List.of();
             }
-            int finalIndex = cursor + 2;
-            boolean hasFinal = finalIndex < runEnd
-                    && COMPATIBILITY_CONJOINING_JONGSEONG_MAP.containsKey(codePoints[finalIndex])
-                    && !(finalIndex + 1 < runEnd && COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.containsKey(codePoints[finalIndex + 1]));
-            int jamoCount = hasFinal ? 3 : 2;
+            int jamoAfterVowelIndex = cursor + 2;
+            boolean hasTrailingConsonant = jamoAfterVowelIndex < runEnd
+                    && COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.containsKey(codePoints[jamoAfterVowelIndex])
+                    && !(jamoAfterVowelIndex + 1 < runEnd && COMPATIBILITY_CONJOINING_VOWEL_MAP.containsKey(codePoints[jamoAfterVowelIndex + 1]));
+            int jamoCount = hasTrailingConsonant ? 3 : 2;
             syllableJamoCounts.add(jamoCount);
             cursor += jamoCount;
         }
         return syllableJamoCounts;
     }
 
-    private int composeSyllable(int initialJamo, int vowelJamo, int finalJamo) {
+    private int composeSyllable(int leadingConsonant, int vowel, int trailingConsonant) {
         StringBuilder conjoiningJamo = new StringBuilder(3)
-                .appendCodePoint(COMPATIBILITY_CONJOINING_CHOSEONG_MAP.get(initialJamo))
-                .appendCodePoint(COMPATIBILITY_CONJOINING_JUNGSEONG_MAP.get(vowelJamo));
-        if (finalJamo != NOT_CODE_POINT) {
-            conjoiningJamo.appendCodePoint(COMPATIBILITY_CONJOINING_JONGSEONG_MAP.get(finalJamo));
+                .appendCodePoint(COMPATIBILITY_CONJOINING_LEADING_CONSONANT_MAP.get(leadingConsonant))
+                .appendCodePoint(COMPATIBILITY_CONJOINING_VOWEL_MAP.get(vowel));
+        if (trailingConsonant != NOT_CODE_POINT) {
+            conjoiningJamo.appendCodePoint(COMPATIBILITY_CONJOINING_TRAILING_CONSONANT_MAP.get(trailingConsonant));
         }
         return nfcNormalizer.normalize(conjoiningJamo).codePointAt(0);
     }
@@ -453,7 +453,7 @@ public class TextNormalizer {
     }
 
     private int absorbElongatedVowel(int mergedCodePoint, int nextCodePoint) {
-        if (!isHangulSyllableWithoutFinal(mergedCodePoint)) {
+        if (!isHangulSyllableWithoutTrailingConsonant(mergedCodePoint)) {
             return NOT_CODE_POINT;
         }
         String mergedJamo = nfdNormalizer.normalize(Character.toString(mergedCodePoint));
@@ -481,11 +481,11 @@ public class TextNormalizer {
         }
         String mergedJamo = nfdNormalizer.normalize(Character.toString(mergedCodePoint));
         String afterNextJamo = nfdNormalizer.normalize(Character.toString(afterNextCodePoint));
-        boolean isNextEqualToMergedFinal = mergedJamo.length() == 3
+        boolean isNextEqualToMergedTrailingConsonant = mergedJamo.length() == 3
                 && CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) mergedJamo.charAt(2)) == nextCodePoint;
-        boolean isNextEqualToAfterNextInitial =
+        boolean isNextEqualToAfterNextLeadingConsonant =
                 CONJOINING_COMPATIBILITY_JAMO_MAP.get((int) afterNextJamo.charAt(0)) == nextCodePoint;
-        return isNextEqualToMergedFinal || isNextEqualToAfterNextInitial;
+        return isNextEqualToMergedTrailingConsonant || isNextEqualToAfterNextLeadingConsonant;
     }
 
     // 합쳐진 코드 유닛도 원본 순서를 유지하므로 구간 합은 첫 유닛의 시작과 마지막 유닛의 끝으로 결정됨

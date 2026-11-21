@@ -66,16 +66,16 @@ public final class TextNormalizationHelper {
     }
 
     public static boolean isHangulSyllable(int codePoint) {
-        return isHangulSyllableWithoutFinal(codePoint)
-                || isHangulSyllableWithFinal(codePoint);
+        return isHangulSyllableWithoutTrailingConsonant(codePoint)
+                || isHangulSyllableWithTrailingConsonant(codePoint);
     }
 
-    public static boolean isHangulSyllableWithoutFinal(int codePoint) {
+    public static boolean isHangulSyllableWithoutTrailingConsonant(int codePoint) {
         return UCharacter.getIntPropertyValue(codePoint, UProperty.HANGUL_SYLLABLE_TYPE)
                 == UCharacter.HangulSyllableType.LV_SYLLABLE;
     }
 
-    public static boolean isHangulSyllableWithFinal(int codePoint) {
+    public static boolean isHangulSyllableWithTrailingConsonant(int codePoint) {
         return UCharacter.getIntPropertyValue(codePoint, UProperty.HANGUL_SYLLABLE_TYPE)
                 == UCharacter.HangulSyllableType.LVT_SYLLABLE;
     }
