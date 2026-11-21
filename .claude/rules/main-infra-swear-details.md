@@ -96,7 +96,7 @@ characters (`시.발` → `[0, 3)`).
 |---|---|---|
 | Not-swear word | All views | It is not inside a keyword match of a not-swear word in the same view (`시발점`) |
 | Token alignment | Aggressive, syllable, keystroke | A span whose lightly normalized range contains whitespace (ICU4J `isUWhiteSpace`) starts and ends at token boundaries of the light view (`시발` matches in `시 발 놈`, not in `검사 시 발생`) |
-| Keyboard run | Keystroke | For each keyboard letter (an ASCII lowercase letter) in its lightly normalized range, that range covers the whole maximal run of keyboard letters in the light view containing it, because English text also converts to Hangul (no `시발` match in `atlqkfb`) |
+| ASCII lowercase run | Keystroke | For each ASCII lowercase letter in its lightly normalized range, that range covers the whole maximal run of ASCII lowercase letters in the light view containing it, because English text also converts to Hangul (no `시발` match in `atlqkfb`) |
 | Line-initial | Line-initial | The swear word's lightly normalized text has 2 or more code points |
 
 ---
