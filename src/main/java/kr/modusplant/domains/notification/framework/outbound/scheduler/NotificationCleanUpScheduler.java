@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Component
 @RequiredArgsConstructor
-public class NotificationCleanUpScheculer {
+public class NotificationCleanUpScheduler {
     private final NotificationJpaRepository notificationJpaRepository;
 
     @Transactional
