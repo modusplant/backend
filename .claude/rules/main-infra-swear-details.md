@@ -5,18 +5,18 @@ paths:
 
 # Swear Infrastructure Conventions
 
-The original text is the text that `SwearEngine.match` checks. A view is one of its five normalized forms, each a
-`TextNormalizedView` subclass named by a `TextNormalizationType` constant: the lightly normalized view (`LIGHT`) from
-`normalizeLightly`, the aggressively normalized view (`AGGRESSIVE`) from `normalizeAggressively`, the syllable
-normalized view (`SYLLABLE`) from `normalizeWithSyllable`, the keystroke normalized view (`KEYSTROKE`) from
-`normalizeWithKeystroke`, and the line-initial normalized view (`LINE_INITIAL`) from `normalizeWithLineInitial`.
+The original text is the text that `SwearEngine.match` checks. Each view as a `TextNormalizedView` subclass is named by
+a `TextNormalizationType` constant: the lightly normalized view (`LIGHT`) from `normalizeLightly`, the aggressively
+normalized view (`AGGRESSIVE`) from `normalizeAggressively`, the syllable normalized view (`SYLLABLE`) from
+`normalizeWithSyllable`, the keystroke normalized view (`KEYSTROKE`) from `normalizeWithKeystroke`, and the line-initial
+normalized view (`LINE_INITIAL`) from `normalizeWithLineInitial`.
 - A view's text is the normalized `String` it holds; the lightly normalized text is the lightly normalized view's
   text, and likewise for the other views. A word (§6) has the same five texts, from the views built with the word as
   the original text.
 - Each code unit of a view's text has a lightly normalized range and an original range: the range `[start, end)` of
   code-unit indexes it derives from in the lightly normalized text and in the original text.
-- A token is a maximal sequence of consecutive code points of the lightly normalized text that are not whitespace
-  (ICU4J `isUWhiteSpace`).
+- A token is a sequence of consecutive code points of the lightly normalized text that holds no whitespace (ICU4J
+  `isUWhiteSpace`) and is bounded on each side by whitespace or the start or end of the text.
 
 ---
 
@@ -67,7 +67,7 @@ The keyword of a word for a view is not always the word's text in that view:
   returns for its lightly normalized text, so one application startup reports all mismatches at once.
 - `match(String text)` → a `List<SwearMatch>`. It builds the five views of `text`, the original text, searches each
   view's text with that view's tries, and returns a `SwearMatch` for each keyword match of a swear word that §4 and §5
-  keep, ordered by view in the §5 order, then by start index in the view's text.
+  keep.
 - A search walks a trie from every code-unit index of the view's text, with no case folding, because every view's text
   is already lowercase. Each keyword the walk reaches yields a keyword match, and overlapping keyword matches are all
   kept. Each search creates its own `CharsTrie` from the serialized trie that `create` builds, because a `CharsTrie`
@@ -84,15 +84,13 @@ int originalEnd)`; `[originalStart, originalEnd)` is the original span of the ke
 
 ## 4. Validity Rules
 
-The lightly normalized range of a keyword match runs from the `getLightlyNormalizedStart` of its first code unit to
-the `getLightlyNormalizedEnd` of its last code unit. `match` keeps a keyword match of a swear word only when every
-rule for its view holds:
+`match` keeps a keyword match of a swear word only when every rule for its view holds:
 
 | Rule | Applies to | Keeps the keyword match when |
 |---|---|---|
 | Not-swear word | Every view | Its range lies within the range of no keyword match of a not-swear word in the same view (`시발점`) |
-| Token alignment | Aggressively normalized, syllable normalized, and keystroke normalized views | Its lightly normalized range contains no whitespace, or starts at the start of a token and ends at the end of a token (`시발` matches in `시 발 놈`, not in `검사 시 발생`) |
-| ASCII lowercase run | Keystroke normalized view | For each ASCII lowercase letter in its lightly normalized range, that range covers the whole maximal sequence of consecutive ASCII lowercase letters in the lightly normalized text containing the letter, because English text also converts to Hangul (no `시발` match in `atlqkfb`) |
+| Token alignment | Aggressively normalized, syllable normalized, and keystroke normalized views | Its lightly normalized span contains no whitespace, or starts at the start of a token and ends at the end of a token (`시발` matches in `시 발 놈`, not in `검사 시 발생`) |
+| ASCII lowercase run | Keystroke normalized view | Its lightly normalized span covers each ASCII lowercase run of the lightly normalized text that it overlaps, because the keystroke normalized view converts every ASCII lowercase letter to Hangul, so part of a longer run, such as an English word, can convert to a keyword and give a false match (no `시발` match in `atlqkfb`) |
 | Line-initial | Line-initial normalized view | The swear word's lightly normalized text has 2 or more code points |
 
 ---
@@ -108,12 +106,14 @@ view's text. Two different swear words whose original spans overlap both stay.
 
 ## 6. Glossary
 
-- **Keyword**: a key of a view's tries; the text of a word that §2 assigns to that view.
+- **Keyword**: a text of a word that a view's tries hold as a key and that a search looks for in the view's text; the
+  §2 table gives, per view, which of the word's texts it is and for which words.
 - **Keyword match**: a keyword that a search finds in a view's text, with the range `[start, end)` of code-unit indexes
   it occupies there.
+- **Lightly normalized span** and **original span**: the range of the lightly normalized text and of the original text
+  that a keyword match derives from, from the `getLightlyNormalizedStart` or `getOriginalStart` of its first code unit
+  to the `getLightlyNormalizedEnd` or `getOriginalEnd` of its last code unit, so it includes characters a view removed
+  between them (`시.발` → `[0, 3)`).
 - **Not-swear word**: a word passed to `create` in `notSwearWords` that contains a swear word but is not one
   (`시발점`).
-- **Original span**: the range of the original text that a keyword match derives from, from the `getOriginalStart` of
-  its first code unit to the `getOriginalEnd` of its last code unit, so it includes characters a view removed between
-  them (`시.발` → `[0, 3)`).
 - **Word**: a swear word (`SwearWord`) or a not-swear word.

@@ -15,7 +15,7 @@ the ICU4J normalization result itself.
 ## 2. Range Assertions
 
 `TextNormalizerTest` asserts a code unit's lightly normalized and original ranges together through its private
-`assertSpans` helper.
+`assertRanges` helper.
 
 ---
 

@@ -145,11 +145,12 @@ The aggressively normalized view passes these steps in order:
 | 1 | Compose each run of Hangul Compatibility Jamo within one token into as many Hangul syllables as possible (rules below) |
 | 2 | Remove every remaining Hangul Compatibility Jamo and ASCII lowercase letter |
 
-- A token is a maximal sequence of consecutive code points of the lightly normalized view's text that are not
-  whitespace (ICU4J `isUWhiteSpace`). A code unit belongs to the token holding the start of its lightly normalized
-  range. The aggressively normalized view holds no whitespace, so a run can span several tokens; step 1 ends a run at a
-  token boundary and attaches no consonant jamo across one as a trailing consonant, so nothing composes across tokens
-  (`ㅂ ㅠㅅㅂ` keeps `ㅂㅠㅅㅂ`, `시바 ㄹ놈` keeps `시바ㄹ놈`).
+- A token is a sequence of consecutive code points of the lightly normalized view's text that holds no whitespace
+  (ICU4J `isUWhiteSpace`) and is bounded on each side by whitespace or the start or end of the text. A code unit
+  belongs to the token holding the start of its lightly normalized range. The aggressively normalized view holds no
+  whitespace, so a run can span several tokens; step 1 ends a run at a token boundary and attaches no consonant jamo
+  across one as a trailing consonant, so nothing composes across tokens (`ㅂ ㅠㅅㅂ` keeps `ㅂㅠㅅㅂ`, `시바 ㄹ놈` keeps
+  `시바ㄹ놈`).
 - Step 1 reads a run as step 3 of §4 does, but composes the part that forms Hangul syllables and keeps the rest as
   Hangul Compatibility Jamo (`ㅅㅂㅠ` → `ㅅ뷰`, `ㄱㅏㄳㅣ` → `갃ㅣ`).
   - Two adjacent Hangul Compatibility Jamo that `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP` joins

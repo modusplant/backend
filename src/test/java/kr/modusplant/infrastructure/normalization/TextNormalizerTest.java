@@ -45,9 +45,9 @@ class TextNormalizerTest {
         return textNormalizer.normalizeWithLineInitial(textNormalizer.normalizeLightly(original));
     }
 
-    private static void assertSpans(TextNormalizedView textNormalizedView, int index,
-                                    int lightlyNormalizedStart, int lightlyNormalizedEnd,
-                                    int originalStart, int originalEnd) {
+    private static void assertRanges(TextNormalizedView textNormalizedView, int index,
+                                     int lightlyNormalizedStart, int lightlyNormalizedEnd,
+                                     int originalStart, int originalEnd) {
         assertThat(textNormalizedView.getLightlyNormalizedStart(index)).isEqualTo(lightlyNormalizedStart);
         assertThat(textNormalizedView.getLightlyNormalizedEnd(index)).isEqualTo(lightlyNormalizedEnd);
         assertThat(textNormalizedView.getOriginalStart(index)).isEqualTo(originalStart);
@@ -143,8 +143,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(view.getText()).isEqualTo("시발");
-        assertSpans(view, 0, 0, 1, 0, 1);
-        assertSpans(view, 1, 1, 2, 1, 2);
+        assertRanges(view, 0, 0, 1, 0, 1);
+        assertRanges(view, 1, 1, 2, 1, 2);
     }
 
     @Test
@@ -155,8 +155,8 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(jamoView.getText()).isEqualTo("시발");
-        assertSpans(jamoView, 0, 0, 2, 0, 2);
-        assertSpans(jamoView, 1, 2, 5, 2, 5);
+        assertRanges(jamoView, 0, 0, 2, 0, 2);
+        assertRanges(jamoView, 1, 2, 5, 2, 5);
         assertThat(keystrokeText("씨ㅂㅏㄹ")).isEqualTo("씨발");
         assertThat(keystrokeText("ㅂㅕㅇ신")).isEqualTo("병신");
         assertThat(keystrokeText("ㅅㅣ발")).isEqualTo("시발");
@@ -187,8 +187,8 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(view.getText()).isEqualTo("시발");
-        assertSpans(view, 0, 0, 2, 0, 2);
-        assertSpans(view, 1, 2, 5, 2, 5);
+        assertRanges(view, 0, 0, 2, 0, 2);
+        assertRanges(view, 1, 2, 5, 2, 5);
         assertThat(keystrokeText("qudtls")).isEqualTo("병신");
         assertThat(keystrokeText("시qkf")).isEqualTo("시발");
         assertThat(keystrokeText("tl발")).isEqualTo("시발");
@@ -223,10 +223,10 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(partlyJoinedView.getText()).isEqualTo("랴");
-        assertSpans(partlyJoinedView, 0, 0, 3, 0, 2);
+        assertRanges(partlyJoinedView, 0, 0, 3, 0, 2);
         assertThat(separateView.getText()).isEqualTo("랴ㅐ");
-        assertSpans(separateView, 0, 0, 2, 0, 1);
-        assertSpans(separateView, 1, 2, 3, 1, 2);
+        assertRanges(separateView, 0, 0, 2, 0, 1);
+        assertRanges(separateView, 1, 2, 3, 1, 2);
     }
 
     @Test
@@ -249,9 +249,9 @@ class TextNormalizerTest {
         // when & then
         assertThat(syllableTypedView.getText()).isEqualTo("존나");
         assertThat(asciiLowerCaseTypedView.getText()).isEqualTo("존나");
-        assertSpans(syllableTypedView, 0, 0, 1, 0, 1);
-        assertSpans(asciiLowerCaseTypedView, 0, 0, 3, 0, 3);
-        assertSpans(asciiLowerCaseTypedView, 1, 3, 5, 3, 5);
+        assertRanges(syllableTypedView, 0, 0, 1, 0, 1);
+        assertRanges(asciiLowerCaseTypedView, 0, 0, 3, 0, 3);
+        assertRanges(asciiLowerCaseTypedView, 1, 3, 5, 3, 5);
         assertThat(keystrokeText("구조나")).isEqualTo("구조나");
     }
 
@@ -263,7 +263,7 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(confusableTypedView.getText()).isEqualTo("나");
-        assertSpans(confusableTypedView, 0, 0, 2, 0, 2);
+        assertRanges(confusableTypedView, 0, 0, 2, 0, 2);
     }
 
     @Test
@@ -274,7 +274,7 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(noiseSeparatedJamoView.getText()).isEqualTo("려");
-        assertSpans(noiseSeparatedJamoView, 0, 0, 3, 0, 3);
+        assertRanges(noiseSeparatedJamoView, 0, 0, 3, 0, 3);
         assertThat(keystrokeText("시ㅣ발")).isEqualTo("시발");
     }
 
@@ -286,8 +286,8 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(asciiNoiseView.getText()).isEqualTo("시발");
-        assertSpans(asciiNoiseView, 0, 0, 1, 0, 1);
-        assertSpans(asciiNoiseView, 1, 2, 3, 2, 3);
+        assertRanges(asciiNoiseView, 0, 0, 1, 0, 1);
+        assertRanges(asciiNoiseView, 1, 2, 3, 2, 3);
         assertThat(syllableText("시l발")).isEqualTo("시발");
         assertThat(syllableText("시xx발")).isEqualTo("시발");
         assertThat(syllableText("시 ㅋ 발")).isEqualTo("시발");
@@ -302,10 +302,10 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(trailingConsonantAttachedView.getText()).isEqualTo("시발놈");
-        assertSpans(trailingConsonantAttachedView, 1, 1, 3, 1, 3);
+        assertRanges(trailingConsonantAttachedView, 1, 1, 3, 1, 3);
         assertThat(syllableText("시ㅈ발")).isEqualTo("싲발");
         assertThat(compoundTrailingConsonantView.getText()).isEqualTo("밝");
-        assertSpans(compoundTrailingConsonantView, 0, 0, 3, 0, 3);
+        assertRanges(compoundTrailingConsonantView, 0, 0, 3, 0, 3);
     }
 
     @Test
@@ -325,7 +325,7 @@ class TextNormalizerTest {
         // when & then
         assertThat(syllableText("ㄱㅏㄳㅣ")).isEqualTo("갃");
         assertThat(compoundTrailingConsonantAttachedView.getText()).isEqualTo("갃");
-        assertSpans(compoundTrailingConsonantAttachedView, 0, 0, 2, 0, 2);
+        assertRanges(compoundTrailingConsonantAttachedView, 0, 0, 2, 0, 2);
     }
 
     @Test
@@ -345,7 +345,7 @@ class TextNormalizerTest {
 
         // when & then
         assertThat(tokenBoundedView.getText()).isEqualTo("뷰");
-        assertSpans(tokenBoundedView, 0, 0, 2, 0, 2);
+        assertRanges(tokenBoundedView, 0, 0, 2, 0, 2);
         assertThat(syllableText("ㅂ ㅠㅅㅂ")).isEmpty();
     }
 
@@ -375,7 +375,7 @@ class TextNormalizerTest {
         assertThat(keystrokeText("漢")).isEqualTo("漢");
         assertThat(keystrokeText("ᄓ")).isEqualTo("ᄓ");
         assertThat(supplementaryHanjaView.getText()).isEqualTo("𠀀");
-        assertSpans(supplementaryHanjaView, 1, 0, 2, 0, 2);
+        assertRanges(supplementaryHanjaView, 1, 0, 2, 0, 2);
     }
 
     @Test
@@ -393,8 +393,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(view.getText()).isEqualTo("시발");
-        assertSpans(view, 0, 0, 1, 0, 1);
-        assertSpans(view, 1, 4, 5, 4, 5);
+        assertRanges(view, 0, 0, 1, 0, 1);
+        assertRanges(view, 1, 4, 5, 4, 5);
     }
 
     @Test
@@ -405,8 +405,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(view.getText()).isEqualTo("시발");
-        assertSpans(view, 0, 2, 3, 2, 3);
-        assertSpans(view, 1, 7, 8, 7, 8);
+        assertRanges(view, 0, 2, 3, 2, 3);
+        assertRanges(view, 1, 7, 8, 7, 8);
         assertThat(lineInitialView("😀시원\n  1. 발코니").getText()).isEqualTo("시발");
     }
 
@@ -440,8 +440,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(view.getText()).isEqualTo("𠀀발");
-        assertSpans(view, 1, 0, 2, 0, 2);
-        assertSpans(view, 2, 4, 5, 4, 5);
+        assertRanges(view, 1, 0, 2, 0, 2);
+        assertRanges(view, 2, 4, 5, 4, 5);
     }
 
     @Test
@@ -605,8 +605,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("si");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 2);
-        assertSpans(textNormalizedView, 1, 1, 2, 2, 3);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 2);
+        assertRanges(textNormalizedView, 1, 1, 2, 2, 3);
     }
 
     @Test
@@ -617,9 +617,9 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("시발!");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 2);
-        assertSpans(textNormalizedView, 1, 1, 2, 2, 5);
-        assertSpans(textNormalizedView, 2, 2, 3, 5, 6);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 2);
+        assertRanges(textNormalizedView, 1, 1, 2, 2, 5);
+        assertRanges(textNormalizedView, 2, 2, 3, 5, 6);
     }
 
     @Test
@@ -630,9 +630,9 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("sib");
-        assertSpans(textNormalizedView, 0, 0, 2, 0, 4);
-        assertSpans(textNormalizedView, 1, 0, 2, 0, 4);
-        assertSpans(textNormalizedView, 2, 2, 3, 4, 6);
+        assertRanges(textNormalizedView, 0, 0, 2, 0, 4);
+        assertRanges(textNormalizedView, 1, 0, 2, 0, 4);
+        assertRanges(textNormalizedView, 2, 2, 3, 4, 6);
     }
 
     @Test
@@ -643,10 +643,10 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("si시발");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 2);
-        assertSpans(textNormalizedView, 1, 1, 2, 2, 3);
-        assertSpans(textNormalizedView, 2, 2, 3, 3, 5);
-        assertSpans(textNormalizedView, 3, 3, 4, 5, 6);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 2);
+        assertRanges(textNormalizedView, 1, 1, 2, 2, 3);
+        assertRanges(textNormalizedView, 2, 2, 3, 3, 5);
+        assertRanges(textNormalizedView, 3, 3, 4, 5, 6);
     }
 
     @Test
@@ -657,9 +657,9 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("fi시");
-        assertSpans(textNormalizedView, 0, 0, 2, 0, 1);
-        assertSpans(textNormalizedView, 1, 0, 2, 0, 1);
-        assertSpans(textNormalizedView, 2, 2, 3, 1, 2);
+        assertRanges(textNormalizedView, 0, 0, 2, 0, 1);
+        assertRanges(textNormalizedView, 1, 0, 2, 0, 1);
+        assertRanges(textNormalizedView, 2, 2, 3, 1, 2);
     }
 
     @Test
@@ -670,8 +670,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("시발");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 1);
-        assertSpans(textNormalizedView, 1, 1, 2, 2, 3);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 1);
+        assertRanges(textNormalizedView, 1, 1, 2, 2, 3);
     }
 
     @Test
@@ -841,8 +841,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("존나");
-        assertSpans(textNormalizedView, 0, 0, 2, 0, 2);
-        assertSpans(textNormalizedView, 1, 2, 3, 2, 3);
+        assertRanges(textNormalizedView, 0, 0, 2, 0, 2);
+        assertRanges(textNormalizedView, 1, 2, 3, 2, 3);
         assertThat(aggressivelyNormalizedText("시ㅂ발")).isEqualTo("시발");
         // 자음 낱자가 앞 음절의 종성과만 같고 뒤 음절의 초성과는 다름
         assertThat(aggressivelyNormalizedText("존ㄴ맛")).isEqualTo("존맛");
@@ -856,8 +856,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("시발");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 1);
-        assertSpans(textNormalizedView, 1, 2, 3, 2, 3);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 1);
+        assertRanges(textNormalizedView, 1, 2, 3, 2, 3);
     }
 
     @Test
@@ -868,8 +868,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("병신");
-        assertSpans(textNormalizedView, 0, 0, 3, 0, 3);
-        assertSpans(textNormalizedView, 1, 3, 4, 3, 4);
+        assertRanges(textNormalizedView, 0, 0, 3, 0, 3);
+        assertRanges(textNormalizedView, 1, 3, 4, 3, 4);
     }
 
     @Test
@@ -880,8 +880,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("시ㅋ");
-        assertSpans(textNormalizedView, 0, 0, 1, 0, 1);
-        assertSpans(textNormalizedView, 1, 1, 4, 1, 4);
+        assertRanges(textNormalizedView, 0, 0, 1, 0, 1);
+        assertRanges(textNormalizedView, 1, 1, 4, 1, 4);
     }
 
     @Test
@@ -892,8 +892,8 @@ class TextNormalizerTest {
 
         // then
         assertThat(textNormalizedView.getText()).isEqualTo("씨발");
-        assertSpans(textNormalizedView, 0, 0, 2, 0, 2);
-        assertSpans(textNormalizedView, 1, 2, 4, 2, 4);
+        assertRanges(textNormalizedView, 0, 0, 2, 0, 2);
+        assertRanges(textNormalizedView, 1, 2, 4, 2, 4);
     }
 
     @Test
@@ -909,10 +909,10 @@ class TextNormalizerTest {
 
         // then
         assertThat(repeatedView.getText()).isEqualTo(repeatedSupplementaryCharacter);
-        assertSpans(repeatedView, 0, 0, 2, 0, 2);
-        assertSpans(repeatedView, 1, 0, 2, 0, 2);
-        assertSpans(repeatedView, 2, 2, 4, 2, 4);
-        assertSpans(repeatedView, 3, 2, 4, 2, 4);
+        assertRanges(repeatedView, 0, 0, 2, 0, 2);
+        assertRanges(repeatedView, 1, 0, 2, 0, 2);
+        assertRanges(repeatedView, 2, 2, 4, 2, 4);
+        assertRanges(repeatedView, 3, 2, 4, 2, 4);
         assertThat(aggressivelyNormalizedText(differentSupplementaryCharacters))
                 .isEqualTo(differentSupplementaryCharacters);
     }
