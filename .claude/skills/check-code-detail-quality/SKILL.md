@@ -10,10 +10,9 @@ description: Checks the unpushed changes under src/main/ against .claude/rules/m
 
 # Target Classes
 
-- Every `.java` class under `src/main/java/` not yet pushed to the remote — the union of:
-  - uncommitted changes: `git status --porcelain -- 'src/main/java/*.java'` (staged, unstaged, and untracked)
-  - committed-but-unpushed changes:
-    `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- 'src/main/java/*.java'`
+- Every `.java` class under `src/main/java/` not yet pushed to the remote, resolved per
+  @.claude/documents/guide/git-command-usage-guide.md section 1 with pathspec `'src/main/java/*.java'` and
+  `--name-only`.
 - Termination: if the union is empty, terminate the skill immediately with an empty target set.
 
 # Standard Documents
@@ -27,7 +26,7 @@ description: Checks the unpushed changes under src/main/ against .claude/rules/m
 2. Resolve the Standard Documents.
 3. Launch one subagent per Standard Document with the Agent tool, all in a single message so they run in parallel
    (`subagent_type: Explore`, `model: haiku`; no `fork`, no `isolation`). Each prompt carries:
-   - the Target Class list and the two git commands above, so the subagent reads the actual diff
+   - the Target Class list and the two git commands that resolved it, so the subagent reads the actual diff
    - the instruction to read its one Standard Document in full, then judge the changes against each rule in it that the
      changes fall under, treating a rule no change falls under as satisfied
    - the reply format of step 4

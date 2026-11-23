@@ -23,17 +23,13 @@ Exception assertions check `getErrorCode()` against `CommentErrorCode`.
 
 - **jOOQ repository** (`framework/outbound/jooq/repository`): `unit-test (jOOQ MockConnection/MockDataProvider)`.
   Evidence: `framework/outbound/jooq/repository/CommentJooqRepositoryTest.java`
-- **Redis repository** (`framework/outbound/redis`): `unit-test (mocked StringRedisTemplate)` — a pure unit test that
-  Mockito-mocks `StringRedisTemplate` and the `ValueOperations` returned by `opsForValue()`, stubs `setIfAbsent` /
-  `increment` / `expire`, and asserts on the composed key strings, the counter set value, and the TTL. Bulk eviction
-  stubs `scan` with an iterator-backed mocked `Cursor` per key pattern and records each `delete` batch as a copy at call
-  time. No Spring context.
+- **Redis repository** (`framework/outbound/redis`): `unit-test (mocked StringRedisTemplate)`, stubbing `setIfAbsent` /
+  `increment` / `expire` and also asserting on the counter set value. Bulk eviction stubs `scan` with an iterator-backed
+  mocked `Cursor` per key pattern and records each `delete` batch as a copy at call time.
 
 ---
 
 ## 4. TestUtils
-
-Paths below are relative to `src/main/java/kr/modusplant/domains/comment/`.
 
 - **Shared constant paths:** `domains/comment/common/constant`, `domains/post/common/constant`,
   `domains/member/common/constant`, `domains/notification/common/constant`

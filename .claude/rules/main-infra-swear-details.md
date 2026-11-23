@@ -5,18 +5,8 @@ paths:
 
 # Swear Infrastructure Conventions
 
-The original text is the text that `SwearEngine.match` checks. Each view as a `TextNormalizedView` subclass is named by
-a `TextNormalizationType` constant: the lightly normalized view (`LIGHT`) from `normalizeLightly`, the aggressively
-normalized view (`AGGRESSIVE`) from `normalizeAggressively`, the syllable normalized view (`SYLLABLE`) from
-`normalizeWithSyllable`, the keystroke normalized view (`KEYSTROKE`) from `normalizeWithKeystroke`, and the line-initial
-normalized view (`LINE_INITIAL`) from `normalizeWithLineInitial`.
-- A view's text is the normalized `String` it holds; the lightly normalized text is the lightly normalized view's
-  text, and likewise for the other views. A word (§6) has the same five texts, from the views built with the word as
-  the original text.
-- Each code unit of a view's text has a lightly normalized range and an original range: the range `[start, end)` of
-  code-unit indexes it derives from in the lightly normalized text and in the original text.
-- A token is a sequence of consecutive code points of the lightly normalized text that holds no whitespace (ICU4J
-  `isUWhiteSpace`) and is bounded on each side by whitespace or the start or end of the text.
+The original text is the text that `SwearEngine.match` checks. A word (§6) has the five view texts of the views built
+with the word as the original text.
 
 ---
 

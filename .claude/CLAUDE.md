@@ -114,6 +114,7 @@ Detailed working rules live under `.claude/`:
   - `guide/` — guides addressed to AI for carrying out specific purposes
   - `policy/` — policies currently applied to this project
   - `tech-stack/` — how this project implements specific technologies
+  - `term/` — glossaries of terms that several documents use
 - `.claude/skills/*/SKILL.md` — task workflows.
 
 ## Precaution

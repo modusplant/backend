@@ -10,16 +10,17 @@ import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.shared.enums.PostType;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,6 +74,17 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
     }
 
     @Test
+    @DisplayName("존재하지 않는 게시글로 인해 isPublished 실행 실패")
+    void testIsPublished_givenNotFoundPost_willThrowException() {
+        // given
+        given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.empty());
+
+        // when & then
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isPublished(testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
+    }
+
+    @Test
     @DisplayName("isInQnaPrimaryCategory로 true 반환")
     void testIsInQnaPrimaryCategory_givenQnaCategory_willReturnTrue() {
         // given
@@ -119,7 +131,8 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
         given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isInQnaPrimaryCategory(testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
     }
 
     @Test
@@ -157,7 +170,8 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
         given(postJpaRepository.findByUlid(testActivitySubjectPostId.getValue())).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
     }
 
     @Test
@@ -262,7 +276,8 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.like(testMemberId, testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.like(testMemberId, testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
 
         // then
         verify(postLikeJpaRepository, times(1)).save(any(PostLikeEntity.class));
@@ -290,7 +305,8 @@ class ActivitySubjectPostRepositoryJpaAdapterTest implements PostEntityTestUtils
         given(postJpaRepository.findByUlid(any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectPostIdRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
 
         // then
         verify(postLikeJpaRepository, times(1)).delete(any(PostLikeEntity.class));

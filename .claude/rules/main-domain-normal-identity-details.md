@@ -71,8 +71,8 @@ methods are `@Transactional`:
 - Takes the already-saved member entity as a source parameter for entities that reference it; fixed values use
   `expression = "java( ... )"` (e.g. `AuthProvider.BASIC`)
 
-**Repository Adapter** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor;
-implements the create and update ports:
+**JPA Repository Adapter** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit
+constructor; implements the create and update ports:
 - Sign-up saves the member entity first, then the member-auth, member-term, and member-profile entities built from it
   through the JPA mappers; the raw password is encoded here and passed to the member-auth mapper
 - Updates load the member and its member-auth entity (throwing `NotFoundEntityException` when absent), apply the

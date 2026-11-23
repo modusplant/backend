@@ -43,7 +43,5 @@ profile.
 
 ## 6. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/infrastructure/security/`.
-
 - **Shared constant paths:** `domains/member/common/constant`
 - **Group A (fields):** `models` (`NormalLoginRequest`, `DefaultUserDetails`, `DefaultAuthToken`)

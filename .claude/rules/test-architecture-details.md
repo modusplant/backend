@@ -6,8 +6,7 @@ paths:
 # Test Architecture Details
 
 This rule is the complete baseline for every test in the tree. A per-area test rule (`test-<kind>-<area>-details.md`)
-may supply names, excluded classes, path exceptions, or Group A / Group B path lists for its area; its values win for
-that area.
+supplies the values §9 lists for its area; its values win for that area.
 
 ---
 
@@ -157,6 +156,30 @@ given area actually has. Absent a pre-computed path list, derive the split direc
 
 ---
 
-## 9. Post-Generation Verification
+## 9. Per-Area Test Rule Sections
+
+- **Exception Assertions:** the `*ErrorCode` enum that the area's exception assertions (§7) check `getErrorCode()`
+  against.
+- **Excluded Classes:** classes excluded in addition to §2.
+- **Pure Unit Test Path Exceptions:** paths whose tests may use a real Spring context, `TestEntityManager`, or a real DB
+  instead of a pure POJO test (§1).
+- **Servlet Mock Pattern:** how filters, handlers, and entry points outside the path exceptions mock servlet objects.
+- **Repository Test Policy:** per repository kind and its package, one of the policies below, with its evidence (an
+  existing test file, or its absence):
+  - `excluded` — no test is generated.
+  - `integration-test` — `@SpringBootTest` with a real `DSLContext` and seeded test data (via a test data helper);
+    `DSLContext` is never mocked. Only genuinely time-dependent behavior (e.g. `LocalDateTime.now()`) is controlled via
+    `Mockito.mockStatic`.
+  - `unit-test (jOOQ MockConnection/MockDataProvider)` — a `DSLContext` built over jOOQ's own
+    `MockConnection`/`MockDataProvider` (`org.jooq.tools.jdbc`), asserting on bound parameters and returned `Result`s.
+    No Spring context, and `DSLContext` itself is never Mockito-mocked.
+  - `unit-test (mocked StringRedisTemplate)` — a pure unit test that Mockito-mocks `StringRedisTemplate` and the
+    `ValueOperations` returned by `opsForValue()`, asserting on the composed key strings and the TTL. No Spring context.
+- **TestUtils:** shared constant paths (§8 Parameter Sources), relative to `kr/modusplant/`, and Group A / Group B path
+  lists (§8 Categorized Strategy), relative to the area root under `src/main/java/kr/modusplant/`.
+
+---
+
+## 10. Post-Generation Verification
 
 Once test codes are generated, they must be verified and validated by running them.

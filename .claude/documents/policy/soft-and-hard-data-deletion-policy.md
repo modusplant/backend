@@ -63,8 +63,7 @@ approval transaction.
 role, the reported comment is soft-deleted (section 3), without the author check, synchronously within the approval
 transaction.
 
-**Member withdrawal**: in this order, where "comments in scope" means the member's comments plus every comment in the
-member's published posts:
+**Member withdrawal**: in this order:
 1. S3 objects (every image of the member's published and draft posts, every plant information photo, the profile image)
    and Redis keys (other members' recently-viewed entries and view counts of the published posts; the member's
    recently-viewed entries and search history) are removed by events handled after the transaction commits; the
@@ -114,3 +113,10 @@ Comment counts are computed at read time; no counter column is stored:
   associations cascade `PERSIST` and `MERGE` only.
 
 Every other related row is removed only by an explicit delete in the flow that owns it.
+
+---
+
+## 5. Glossary
+
+- **Comments in scope**: in a member withdrawal, the member's comments plus every comment in the member's published
+  posts.

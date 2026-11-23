@@ -26,8 +26,6 @@ Exception assertions check `getErrorCode()` against `SearchErrorCode`.
 
 ## 4. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/domains/search/`.
-
 - **Shared constant paths:** `domains/search/common/constant`, `domains/post/common/constant`,
   `domains/comment/common/constant`
 - **Group A (fields):** `domain/vo` (incl. `vo/nullobject`), `usecase/model/read`, `usecase/record`, `usecase/response`

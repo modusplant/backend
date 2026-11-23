@@ -145,12 +145,10 @@ The aggressively normalized view passes these steps in order:
 | 1 | Compose each run of Hangul Compatibility Jamo within one token into as many Hangul syllables as possible (rules below) |
 | 2 | Remove every remaining Hangul Compatibility Jamo and ASCII lowercase letter |
 
-- A token is a sequence of consecutive code points of the lightly normalized view's text that holds no whitespace
-  (ICU4J `isUWhiteSpace`) and is bounded on each side by whitespace or the start or end of the text. A code unit
-  belongs to the token holding the start of its lightly normalized range. The aggressively normalized view holds no
-  whitespace, so a run can span several tokens; step 1 ends a run at a token boundary and attaches no consonant jamo
-  across one as a trailing consonant, so nothing composes across tokens (`ㅂ ㅠㅅㅂ` keeps `ㅂㅠㅅㅂ`, `시바 ㄹ놈` keeps
-  `시바ㄹ놈`).
+- A code unit belongs to the token holding the start of its lightly normalized range. The aggressively normalized view
+  holds no whitespace, so a run can span several tokens; step 1 ends a run at a token boundary and attaches no consonant
+  jamo across one as a trailing consonant, so nothing composes across tokens (`ㅂ ㅠㅅㅂ` keeps `ㅂㅠㅅㅂ`, `시바 ㄹ놈`
+  keeps `시바ㄹ놈`).
 - Step 1 reads a run as step 3 of §4 does, but composes the part that forms Hangul syllables and keeps the rest as
   Hangul Compatibility Jamo (`ㅅㅂㅠ` → `ㅅ뷰`, `ㄱㅏㄳㅣ` → `갃ㅣ`).
   - Two adjacent Hangul Compatibility Jamo that `COMPATIBILITY_JAMO_COMPOUND_COMPATIBILITY_JAMO_KEYSTROKE_MAP` joins
@@ -205,11 +203,8 @@ The aggressively normalized view passes these steps in order:
 ## 8. Source Ranges
 
 `TextNormalizedView` holds four parallel `int[]` arrays, whose elements at index `i` give the code unit at index `i` of
-the text two ranges `[start, end)` of code-unit indexes:
-- Lightly normalized range (`lightlyNormalizedStarts` / `lightlyNormalizedEnds`): the code units of the lightly
-  normalized view's text that the code unit derives from.
-- Original range (`originalStarts` / `originalEnds`): the code units of the original text that the code unit derives
-  from.
+the text its lightly normalized range (`lightlyNormalizedStarts` / `lightlyNormalizedEnds`) and original range
+(`originalStarts` / `originalEnds`).
 
 **`normalizeLightly`** (§3):
 - Every code unit an extended grapheme cluster produces gets, as its lightly normalized range, the range of all code

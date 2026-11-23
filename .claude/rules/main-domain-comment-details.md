@@ -43,8 +43,7 @@ paths:
   accepting it as a parameter
 
 **Domain Exceptions**:
-- Validation failures throw the shared kernel exceptions directly, parameterized with a `domain/exception/enums` error
-  code
+- The error codes live in `domain/exception/enums`
 - A failure with no matching shared kernel exception (e.g. a soft-deleted reply target) has a domain-local exception
   extending the shared `BusinessException`, whose no-argument constructor fixes its error code
 
@@ -100,8 +99,7 @@ paths:
 **Validation Helper**:
 - Exposes single-purpose precondition checks
 - Exposes composite methods that bundle the set of checks a given operation needs (create-new vs. modify-existing)
-- Throws the shared kernel exceptions parameterized with a `domain/exception/enums` error code, or a domain-local
-  exception; the ownership failure maps to HTTP 403
+- The ownership failure maps to HTTP 403
 
 **Event Listener** — `@EventListener` methods run in the publisher's transaction:
 - On another domain's abuse-report approval event, requires the event's member to hold the admin role (otherwise throws
@@ -146,7 +144,7 @@ paths:
   columns (root-level: the first-depth column among rows without a second-depth value; nested: the second-depth column
   among rows sharing the root's first-depth value), returning 0 when no sibling exists
 
-**Redis Repository** — implements the cache port over a `StringRedisTemplate`:
+**Redis Repository**:
 - Key strings are built from unified format-string constants, one per purpose (an idempotency marker keyed by the
   write's identifying tuple; a per-parent ordinal counter using a literal sentinel for the root parent), all under a
   bounded, slidingly-refreshed TTL
@@ -169,10 +167,7 @@ resolved by the caller) → JPA Entity via the entity's builder, setting only th
 **JPA Repository** — extends Spring Data `JpaRepository` parameterized by the entity and its composite-key class;
 derived query methods keyed by the natural composite fields (not the JPA-internal key type)
 
-**Repository Adapter** — implements the usecase write port: resolves related entities by their business identifiers,
-maps the Aggregate to an Entity via the JPA mapper, and delegates soft-delete/update operations to the entity's mutation
-methods before saving
-
-**Lookup Repository Adapter** — implements a read-only lookup port over the referenced domain's Spring Data repository;
-a lookup that must return a value throws a not-found exception parameterized with a `domain/exception/enums` error code
-when the referenced row is absent, and a state check returns false for an absent row
+**JPA Repository Adapter**:
+- The write-port adapter resolves related entities by their business identifiers, maps the Aggregate to an Entity via
+  the JPA mapper, and delegates soft-delete/update operations to the entity's mutation methods before saving
+- A lookup port's adapter throws `NotFoundValueException` for an absent row

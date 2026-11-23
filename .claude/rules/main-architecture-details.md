@@ -93,12 +93,27 @@ Each pattern applies wherever the area has that layer.
 
 **JPA Repository** (`framework/outbound/jpa/repository/`) — `@Repository`; Spring Data JPA interface
 
+**Repository Adapter** (`framework/outbound/`) — `@Repository @RequiredArgsConstructor`; implements usecase repository
+ports directly, in one of three kinds by what it is built over:
+- `*RepositoryAdapter` (`framework/outbound/`): combines JPA and jOOQ repositories
+- **JPA Repository Adapter**: `*RepositoryJpaAdapter` (`framework/outbound/jpa/repository/`), over the injected Spring
+  Data JPA repositories (other domains' included) and JPA mappers
+- **jOOQ Repository Adapter**: `*RepositoryJooqAdapter` (`framework/outbound/jooq/repository/`), over jOOQ alone
+- A lookup that must return a value throws an exception when the row is absent; a state check runs only after the row's
+  existence is verified, so it always returns a boolean
+
+**Redis Repository** (`framework/outbound/redis/`) — in a domain, implements a usecase cache port over a
+`StringRedisTemplate`
+
 ---
 
 ## 2. Error Codes
 
 Every `*ErrorCode` enum is `@Getter @RequiredArgsConstructor` and implements `ErrorCode` with three fields:
 `httpStatus(int)`, taken from `HttpStatus.*.value()`, `code(String)`, `message(String)`.
+
+A domain failure throws a shared kernel exception (`shared/exception/`, e.g. `InvalidValueException`,
+`NotFoundValueException`) parameterized with an error code of the domain.
 
 ---
 

@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -186,5 +187,21 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // when & then
         assertThat(memberProfileRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 프로필로 인해 update 실행 실패")
+    void testUpdate_givenNotFoundMemberProfile_willThrowException() {
+        // given
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberProfileRepositoryJpaAdapter.update(createMemberProfile(), false));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+        verify(memberProfileJpaRepository, never()).save(any());
     }
 }

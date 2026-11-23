@@ -19,8 +19,6 @@ paths:
 - `MemberCacheValidationService` — conditional-request evaluation, returning a `*CacheValidationResult` record
 - `MemberRepositoryAdapter`, `ReportRepositoryAdapter`, `ReportDashboardRepositoryAdapter` (`framework/outbound/`) —
   repository port implementations combining JPA and jOOQ
-- `*RepositoryJpaAdapter` (`framework/outbound/jpa/adapter/`) — mediates between a repository port implementation and
-  the raw Spring Data JPA repository
 - `ActivitySubjectPostCacheRedisRepository` — Redis cache of the chosen comment path per post
 - `MemberProfileResponse` — marker interface for multi-version polymorphic profile responses
 - `MemberUuidPrimaryKeyJpaRepository` — base interface of the JPA repositories keyed by a member UUID
@@ -115,17 +113,11 @@ paths:
 **JPA Mapper** — JPA Entity ↔ Domain Aggregate; may include S3 download
 - `supers/` holds base mapper interfaces shared across multiple JPA mappers in this domain
 
-**JPA Adapter** — `*RepositoryJpaAdapter` classes wrap a Spring Data JPA repository to present a narrower, domain-shaped
-interface to the outbound repository implementation
-- Exception: `MemberProfileRepositoryJpaAdapter` implements `MemberProfileRepository` directly (no separate
-  `framework/outbound/`-level adapter)
+**JPA Repository Adapter** — `*RepositoryJpaAdapter` classes live in `framework/outbound/jpa/adapter/`
 
 **Composite Key** — used by join/report tables (e.g. like, abuse report)
-
-**Repository Adapter** — implements usecase port by combining JPA + jOOQ
 
 **jOOQ Repository** — serves bulk cascade deletes that JPA's cascade cannot express, complex joins, paginated read
 models
 
-**Redis Repository** — implements a cache port over a `StringRedisTemplate`, falling back to a JPA lookup and populating
-the cache on a miss
+**Redis Repository** — falls back to a JPA lookup and populates the cache on a miss

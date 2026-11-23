@@ -14,6 +14,4 @@ a mock, because its matches are computed from the normalized views.
 
 ## 2. TestUtils
 
-Paths below are relative to `src/main/java/kr/modusplant/infrastructure/swear/`.
-
 - **Group A (fields):** package root (`SwearWord`, `SwearMatch`)
