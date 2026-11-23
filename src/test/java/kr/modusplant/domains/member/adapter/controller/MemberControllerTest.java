@@ -45,6 +45,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithIm
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.swear.SwearHolder;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -55,13 +56,12 @@ import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception
 import kr.modusplant.shared.framework.aws.exception.enums.AWSErrorCode;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.framework.jpa.generator.UlidIdGenerator;
 import kr.modusplant.shared.generator.UlidGeneratorHolder;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -124,8 +124,6 @@ class MemberControllerTest implements
         MemberProfileEntityTestUtils, PostEntityTestUtils, CommentEntityTestUtils,
         ProposalBugReportEntityTestUtils, PostAbuseReportEntityTestUtils, CommentAbuseReportEntityTestUtils {
     @SuppressWarnings("unused")
-    private final SwearHolder testSwearHolder = SwearHolderTestUtils.createSwearHolder();
-    @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     @SuppressWarnings("unused")
     private final UlidGeneratorHolder ulidGeneratorHolder = new UlidGeneratorHolder(new UlidIdGenerator());
@@ -135,6 +133,7 @@ class MemberControllerTest implements
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
+    private final NicknameValidator nicknameValidator = Mockito.mock(NicknameValidator.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
@@ -150,7 +149,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, activitySubjectPostCacheRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, nicknameValidator, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, activitySubjectPostCacheRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -451,13 +450,12 @@ class MemberControllerTest implements
     void testValidateThatHasSwearV3_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        MemberProfileOverrideRecord_V3 recordWithSwear = new MemberProfileOverrideRecord_V3(
-                testMemberProfileOverrideRecordV3.id(), testMemberProfileOverrideRecordV3.introduction(),
-                testMemberProfileOverrideRecordV3.fileKey(), "나쁜" + SwearHolderTestUtils.testSwearWords.getFirst());
+        willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+                .given(nicknameValidator).validate(any());
 
         // when & then
         InvalidValueException invalidValueException = assertThrows(
-                InvalidValueException.class, () -> memberController.overrideProfile(recordWithSwear));
+                InvalidValueException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
         assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
     }
 
@@ -553,13 +551,12 @@ class MemberControllerTest implements
     void testValidateThatHasSwearV4_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        MemberProfileOverrideRecord_V4 recordWithSwear = new MemberProfileOverrideRecord_V4(
-                testMemberProfileOverrideRecordV4.id(), testMemberProfileOverrideRecordV4.introduction(),
-                testMemberProfileOverrideRecordV4.fileKey(), "나쁜" + SwearHolderTestUtils.testSwearWords.getFirst());
+        willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+                .given(nicknameValidator).validate(any());
 
         // when & then
         InvalidValueException invalidValueException = assertThrows(
-                InvalidValueException.class, () -> memberController.overrideProfile(recordWithSwear));
+                InvalidValueException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
         assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
     }
 

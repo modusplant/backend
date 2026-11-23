@@ -23,15 +23,16 @@ import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.swear.SwearHolder;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,7 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
     private final SwearHolder swearHolder;
+    private final NicknameValidator nicknameValidator;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
     private final MemberProfileMapper memberProfileMapper;
@@ -72,6 +74,7 @@ public class MemberController {
     @Transactional(readOnly = true)
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
         Nickname nickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(nickname);
         return memberRepository.isNicknameExist(nickname);
     }
 
@@ -114,6 +117,7 @@ public class MemberController {
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(memberNickname);
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
@@ -136,6 +140,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V4 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(memberNickname);
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)

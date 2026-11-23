@@ -20,12 +20,14 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
+import kr.modusplant.infrastructure.swear.SwearHolder;
+import kr.modusplant.infrastructure.swear.common.util.SwearHolderTestUtils;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +49,8 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
-    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,swearHolder);
+    private final NicknameValidator nicknameValidator = mock(NicknameValidator.class);
+    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,swearHolder,nicknameValidator);
 
     @Test
     @DisplayName("최초 회원 로그인시 NeedSignupResult 반환하기")
@@ -209,6 +212,24 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         // when & then
         assertThatThrownBy(() -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()))
                 .isInstanceOf(SocialAccountConflictException.class);
+    }
+
+    @Test
+    @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
+    void testCreateNewMember_givenNicknameWithSwear_willThrowException() {
+        // given
+        given(socialIdentityRepository.getSocialMemberProfileByEmail(any())).willReturn(Optional.empty());
+        doThrow(new kr.modusplant.shared.exception.InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+                .when(nicknameValidator).validate(any());
+
+        // when
+        kr.modusplant.shared.exception.InvalidValueException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                kr.modusplant.shared.exception.InvalidValueException.class,
+                () -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        verify(socialIdentityRepository, never()).saveSocialMember(any(), any(), any());
     }
 
     @Test

@@ -13,11 +13,12 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
+import kr.modusplant.infrastructure.swear.SwearHolder;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class SocialIdentityController {
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
     private final SwearHolder swearHolder;
+    private final NicknameValidator nicknameValidator;
 
     @Transactional
     public SocialLoginResult handleSocialLogin(SocialProvider provider, String code, boolean isLocal) {
@@ -87,10 +89,12 @@ public class SocialIdentityController {
         if (member.isPresent()) {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_SIGNED_UP);
         }
+        Nickname nickname = Nickname.create(signUpRequest.nickname());
+        nicknameValidator.validate(nickname);
         SocialMemberProfile memberProfile = SocialMemberProfile.createNewMember(
                 SocialCredentials.create(socialIdentityMapper.toSocialAuthProvider(tempTokenInfo.socialProvider()), tempTokenInfo.providerId()),
                 Email.create(tempTokenInfo.email()),
-                Nickname.create(signUpRequest.nickname()),
+                nickname,
                 Role.USER
         );
         AgreedTerms agreedTerms = AgreedTerms.create(AgreedTermVersion.create(signUpRequest.agreedTermsOfUseVersion()),AgreedTermVersion.create(signUpRequest.agreedPrivacyPolicyVersion()),AgreedTermVersion.create(signUpRequest.agreedCommunityPolicyVersion()));

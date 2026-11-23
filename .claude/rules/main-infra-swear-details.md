@@ -1,6 +1,7 @@
 ---
 paths:
   - "src/main/java/kr/modusplant/infrastructure/swear/**"
+  - "src/main/java/kr/modusplant/infrastructure/config/swear/**"
 ---
 
 # Swear Infrastructure Conventions
@@ -17,6 +18,7 @@ with the word as the original text.
   that §4 and §5 keep
 - `SwearScript` — the script a swear word is written in: `HANGUL`, `LATIN`, `OTHER`
 - `SwearMatch` — one match: swear word, view, and original span (§6)
+- `SwearHolder` — Spring entry point of the engine for masking and the nickname swear check
 
 ---
 
@@ -50,7 +52,9 @@ The keyword of a word for a view is not always the word's text in that view:
 
 **`SwearWord`** — record `(String word, SwearType type, int severity, SwearScript script)`.
 
-**`SwearEngine`** — `final`, immutable, private constructor; not a Spring bean:
+**`SwearEngine`** — `final`, immutable, private constructor; a Spring bean that `config/swear/SwearConfig` builds once
+at application startup, with no reload, from `swear` (word, type, severity, script) and `not_swear` (word), loaded
+through `JdbcTemplate`:
 - `static create(TextNormalizer, List<SwearWord> swearWords, List<String> notSwearWords)` normalizes every word into
   its keywords for each view and builds the tries of each view from them once (§2). It fails with
   `ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT`, listing every swear word whose `script` is not what `SwearScript.of`
@@ -69,6 +73,11 @@ code point (ICU4J `UScript.HANGUL`) gives `HANGUL`; otherwise any Latin code poi
 
 **`SwearMatch`** — record `(SwearWord swearWord, TextNormalizationType textNormalizationType, int originalStart,
 int originalEnd)`; `[originalStart, originalEnd)` is the original span of the keyword match.
+
+**`SwearHolder`** — Spring bean that injects `SwearEngine` and implements `shared/kernel/inspector/SwearInspector`:
+- `maskSwear(String text)` returns null or blank text unchanged; otherwise it merges the overlapping or adjacent
+  original spans of the `SwearMatch`es not from `LINE_INITIAL` and replaces each merged span with `***`.
+- `containsSwear(String text)`, the `SwearInspector` method, returns whether `match` returns any `SwearMatch`.
 
 ---
 

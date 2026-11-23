@@ -6,8 +6,6 @@ import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.nullobject.EmptyReplyToCommentPath;
 import kr.modusplant.shared.exception.EmptyValueException;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class CommentTest implements
         CommentTestUtils, ParentPostIdTestUtils, CommentPathTestUtils, ReplyToCommentPathTestUtils, CommentAuthorIdTestUtils, EmptyCommentAuthorIdTestUtils,
         CommentContentTestUtils, CommentStatusTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     @Test
     @DisplayName("null인 게시글 id로 댓글 생성 시 예외 반환")
     void testCreate_givenNullPostId_willThrowException() {

@@ -2,8 +2,6 @@ package kr.modusplant.domains.member.adapter.helper;
 
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.shared.exception.NotAccessibleException;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
@@ -24,9 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 class MemberValidationHelperTest {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final MemberRepository memberRepository = Mockito.mock(MemberRepository.class);
     private final MemberProfileRepository memberProfileRepository = Mockito.mock(MemberProfileRepository.class);
     private final ReportRepository reportRepository = Mockito.mock(ReportRepository.class);
