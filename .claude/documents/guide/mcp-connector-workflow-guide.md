@@ -32,6 +32,7 @@ fields; the rules below are otherwise shared.
 The first line is exactly one status string, followed by its summary, so that the caller's context holds only the
 result instead of external content and tool output:
 
-- `SUCCEEDED`: the connector's summary fields per changed target, and every local file written.
+- `SUCCEEDED`: the connector's summary fields per changed target, or that no target was changed, and every local file
+  written.
 - `FAILED`: the cause, the step at which it stopped, and every external change made before stopping, or that none was
   made.

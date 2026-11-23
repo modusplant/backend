@@ -116,6 +116,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -176,6 +177,22 @@ class MemberControllerTest implements
 
             // when & then
             assertThat(memberController.checkExistedNickname(testMemberNicknameCheckRecord)).isEqualTo(false);
+        }
+
+        @Test
+        @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
+        void testCheckExistedNickname_givenNicknameWithSwear_willThrowException() {
+            // given
+            willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+                    .given(nicknameValidator).validate(any());
+
+            // when
+            InvalidValueException exception = assertThrows(InvalidValueException.class,
+                    () -> memberController.checkExistedNickname(testMemberNicknameCheckRecord));
+
+            // then
+            assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+            verify(memberRepository, never()).isNicknameExist(any());
         }
     }
 

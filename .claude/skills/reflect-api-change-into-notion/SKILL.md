@@ -1,7 +1,7 @@
 ---
 name: reflect-api-change-into-notion
 description: Detects API-relevant codebase changes in the member/comment/search domains and the security-related auth surface, then produces and applies Notion-ready edit instructions for the corresponding API-specification documents.
-allowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(/.claude/skills/reflect-api-change-into-notion/reflected-change/**) Bash(rm .claude/skills/reflect-api-change-into-notion/detected-change/detected_*.md) Edit(/.claude/temp/reflect-api-change-into-notion-prompt-to-*.md) Bash(rm .claude/temp/reflect-api-change-into-notion-prompt-to-*.md)
+allowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(/.claude/skills/reflect-api-change-into-notion/reflected-change/**) Bash(rm .claude/skills/reflect-api-change-into-notion/detected-change/detected_*.md) Bash(rm .claude/skills/reflect-api-change-into-notion/reflected-change/*__*__*.md) Edit(/.claude/temp/reflect-api-change-into-notion-prompt-to-*.md) Bash(rm .claude/temp/reflect-api-change-into-notion-prompt-to-*.md)
 disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) Edit(/.claude/skills/reflect-api-change-into-notion/document-format.md) Edit(/.claude/skills/reflect-api-change-into-notion/prompt-template.md)
 ---
 
@@ -135,7 +135,8 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
      the run — do not proceed to step 5.
 5. Call `notion-mcp-connector` once with @.claude/skills/reflect-api-change-into-notion/prompt-template.md, listing
    each affected page's latest reflected-change file by `RUN_ID`, then handle its result:
-   - `SUCCEEDED`: report the returned summary of Notion changes.
+   - `SUCCEEDED`: report the returned summary of Notion changes. If it reports that no page was changed, delete this
+     run's detected-change file and every reflected-change file of this run via the scoped `rm`.
    - `FAILED`: report the returned cause and the Notion changes already made, then terminate the run.
 6. Delete the prompt file written in step 5. A termination in step 5 runs this step first.
 

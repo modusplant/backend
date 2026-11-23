@@ -30,7 +30,7 @@ class SwearEngineTest implements SwearMatchTestUtils {
     }
 
     @Test
-    @DisplayName("문자 체계가 일치하지 않는 단어로 예외 반환")
+    @DisplayName("문자 집합가 일치하지 않는 단어로 예외 반환")
     void testCreate_givenMismatchedScripts_willThrowException() {
         // given
         List<SwearWord> swearWords = List.of(testSwearWord, swearWordOf("sibal", SwearScript.HANGUL),

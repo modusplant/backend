@@ -22,4 +22,4 @@ COMMENT ON COLUMN public.not_swear.id         IS '식별자';
 COMMENT ON COLUMN public.not_swear.word       IS '비속어가 아닌 단어';
 COMMENT ON COLUMN public.not_swear.created_at IS '생성일';
 COMMENT ON COLUMN public.swear.severity       IS '심각도';
-COMMENT ON COLUMN public.swear.script         IS '단어의 문자 체계';
+COMMENT ON COLUMN public.swear.script         IS '단어의 문자 집합';

@@ -46,7 +46,7 @@ public class TextNormalizer {
         return nfcNormalizer.normalize(stringIncludingKorean);
     }
 
-    // 인코딩 수준의 변형을 제거하고, 라틴 문자와 닮은 기호, 그리고 다른 문자 체계의 문자를 라틴 문자로 바꿈
+    // 인코딩 수준의 변형을 제거하고, 라틴 문자와 닮은 기호, 그리고 다른 문자 집합의 문자를 라틴 문자로 바꿈
     public LightlyNormalizedView normalizeLightly(String originalText) {
         TextNormalizedView.Builder builder = new TextNormalizedView.Builder(originalText.length());
         BreakIterator originalClusters = BreakIterator.getCharacterInstance();
