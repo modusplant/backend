@@ -53,7 +53,8 @@ public class MemberProfileRepositoryJpaAdapter implements MemberProfileRepositor
         String introduction = memberProfile.getMemberProfileIntroduction().getValue();
         String nickname = memberProfile.getNickname().getValue();
         MemberProfileEntity memberProfileEntity = memberProfileJpaRepository
-                .findByUuid(memberProfile.getMemberId().getValue()).orElseThrow();
+                .findByUuid(memberProfile.getMemberId().getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_MEMBER_PROFILE, "memberProfile"));
         memberProfileEntity.updateImagePath(imagePath);
         memberProfileEntity.updateIntroduction(introduction);
         memberProfileEntity.getMember().updateNickname(nickname);

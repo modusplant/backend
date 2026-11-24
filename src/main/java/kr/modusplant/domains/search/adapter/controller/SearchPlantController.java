@@ -5,7 +5,7 @@ import kr.modusplant.domains.search.domain.vo.SearchResultListSize;
 import kr.modusplant.domains.search.usecase.model.read.SearchPlantNameReadModel;
 import kr.modusplant.domains.search.usecase.port.cache.SearchPlantCache;
 import kr.modusplant.domains.search.usecase.record.SearchPlantNameRecord;
-import kr.modusplant.infrastructure.transliterate.UnicodeTransliterator;
+import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
@@ -22,13 +22,13 @@ import static kr.modusplant.domains.search.domain.exception.enums.SearchErrorCod
 @RequiredArgsConstructor
 public class SearchPlantController {
     private final SearchPlantCache searchPlantCache;
-    private final UnicodeTransliterator unicodeTransliterator;
+    private final TextNormalizer textNormalizer;
     private final JaroWinklerSimilarity jaroWinklerSimilarity;
 
     public List<SearchPlantNameReadModel> searchPlantNameByKeyword(
             SearchPlantNameRecord record) {
         SearchKeyword keyword = SearchKeyword.create(
-                unicodeTransliterator.separateKoreanIntoConsonantAndVowel(record.keyword()));
+                textNormalizer.nfdNormalize(record.keyword()));
         String keywordValue = keyword.getValue();
         SearchResultListSize searchResultListSize = SearchResultListSize.create(record.size());
         int resultListSize = searchResultListSize.getValue();
@@ -40,14 +40,14 @@ public class SearchPlantController {
                 if (similarityPriorityQueue.size() < resultListSize) {
                     similarityPriorityQueue.offer(
                             new SearchPlantNameReadModel(
-                                    unicodeTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
+                                    textNormalizer.nfcNormalize(plantName), similarity));
                 } else if (similarityPriorityQueue.peek() == null) {
                     throw new InvalidValueException(SEARCH_SIZE_OUT_OF_RANGE, "searchSize");
                 } else if (similarity > similarityPriorityQueue.peek().similarity()) {
                     similarityPriorityQueue.poll();
                     similarityPriorityQueue.offer(
                             new SearchPlantNameReadModel(
-                                    unicodeTransliterator.combineKoreanIntoConsonantAndVowel(plantName), similarity));
+                                    textNormalizer.nfcNormalize(plantName), similarity));
                 }
             }
         }

@@ -5,11 +5,11 @@ import kr.modusplant.domains.comment.framework.outbound.jpa.repository.CommentJp
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentLikeJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +17,7 @@ import static kr.modusplant.domains.comment.common.constant.CommentConstant.TEST
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectCommentIdTestUtils.testActivitySubjectCommentId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_COMMENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -119,7 +120,8 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isDeleted(testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isDeleted(testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
     }
 
     @Test
@@ -157,7 +159,8 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectCommentRepositoryJpaAdapter.isWrittenByMember(testMemberId, testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
     }
 
     @Test
@@ -195,7 +198,8 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(TEST_POST_ULID, TEST_COMMENT_PATH)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.choose(testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectCommentRepositoryJpaAdapter.choose(testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
     }
 
     @Test
@@ -220,7 +224,8 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.like(testMemberId, testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectCommentRepositoryJpaAdapter.like(testMemberId, testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
 
         // then
         verify(commentLikeJpaRepository, times(1)).save(any(CommentLikeEntity.class));
@@ -248,7 +253,8 @@ class ActivitySubjectCommentRepositoryJpaAdapterTest {
         given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> activitySubjectCommentRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> activitySubjectCommentRepositoryJpaAdapter.unlike(testMemberId, testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
 
         // then
         verify(commentLikeJpaRepository, times(1)).delete(any(CommentLikeEntity.class));

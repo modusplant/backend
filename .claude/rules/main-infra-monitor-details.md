@@ -5,10 +5,6 @@ paths:
 
 # Monitor Infrastructure Conventions
 
-Applies to `kr.modusplant.infrastructure.monitor`.
-
----
-
 ## 1. Purpose
 
 This package is diagnostic-only — it contains no real business logic.

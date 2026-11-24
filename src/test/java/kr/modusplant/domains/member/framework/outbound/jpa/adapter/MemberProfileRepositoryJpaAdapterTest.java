@@ -11,8 +11,6 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaR
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberProfileJpaRepository;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +22,7 @@ import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberProfileConstant.MEMBER_PROFILE_BASIC_USER_IMAGE_PATH;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_PROFILE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,9 +33,6 @@ import static org.mockito.Mockito.*;
 class MemberProfileRepositoryJpaAdapterTest implements
         MemberProfileTestUtils,
         MemberEntityTestUtils, MemberProfileEntityTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final PendingFileService pendingFileService = Mockito.mock(PendingFileService.class);
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
@@ -186,5 +182,21 @@ class MemberProfileRepositoryJpaAdapterTest implements
 
         // when & then
         assertThat(memberProfileRepositoryJpaAdapter.isIdExist(testMemberId)).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 회원 프로필로 인해 update 실행 실패")
+    void testUpdate_givenNotFoundMemberProfile_willThrowException() {
+        // given
+        given(memberProfileJpaRepository.findByUuid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> memberProfileRepositoryJpaAdapter.update(createMemberProfile(), false));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_PROFILE);
+        verify(memberProfileJpaRepository, never()).save(any());
     }
 }

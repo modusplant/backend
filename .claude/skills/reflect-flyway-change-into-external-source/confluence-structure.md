@@ -31,7 +31,7 @@ Tables in page order, as they currently appear on each page.
 | `environment-and-plant` | `plant`, `plant_variety`, `plant_variety_addition`, `plant_variety_middle_category`, `plant_variety_major_category`, `plant_space`, `plant_info`, `plant_info_photo` |
 | `user-activity` | `comm_comment`, `comm_comment_archive`, `comm_comment_like`, `comm_comment_abu_rep`, `prop_bug_rep`, `prop_bug_rep_archive` |
 | `server-function` | `refresh_token`, `fcm_token`, `comm_notification`, `pending_file` |
-| `policy-implementation` | `term`, `swear`, `common_code_group`, `common_code` |
+| `policy-implementation` | `term`, `swear`, `not_swear`, `common_code_group`, `common_code` |
 
 ## Prefix Map
 

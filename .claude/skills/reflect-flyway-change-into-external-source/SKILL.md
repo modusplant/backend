@@ -23,11 +23,8 @@ disallowed-tools: Edit(/.claude/skills/reflect-flyway-change-into-external-sourc
 
 # Target Sources
 
-- Primary: every file below not yet pushed to the remote, with its git status (`A`, `M`, `D`, or `R` with its old path)
-  — the union of:
-  - uncommitted changes: `git status --porcelain -- <pathspecs>` (staged, unstaged, and untracked)
-  - committed-but-unpushed changes:
-    `git diff --name-status $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- <pathspecs>`
+- Primary: every file below not yet pushed to the remote, with its git status, resolved per
+  @.claude/documents/guide/git-command-usage-guide.md section 1 with the `<pathspecs>` below and `--name-status`.
 - `<pathspecs>`:
   - Flyway migrations: `'src/main/resources/db/migration/*.sql'` and `'src/main/java/db/migration/*.java'`
   - JPA entity classes: `'src/main/java/*/jpa/entity/*Entity.java'`

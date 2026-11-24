@@ -21,7 +21,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Objects;
 
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INPUT_OUT_OF_RANGE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -35,7 +34,7 @@ class AmazonS3ServiceTest {
     private S3Presigner uploadS3Presigner;
     private AmazonS3Service amazonS3Service;
 
-    private static final String ENDPOINT = System.getenv("DEV_PUBLIC_ENDPOINT") != null ? System.getenv("DEV_PUBLIC_ENDPOINT") : "https://test-endpoint";
+    private static final String ENDPOINT = "https://test-endpoint";
     private static final String BUCKET_NAME = "test-bucket";
 
     @BeforeEach
@@ -45,12 +44,7 @@ class AmazonS3ServiceTest {
         uploadS3Presigner = mock(S3Presigner.class);
         amazonS3Service = new AmazonS3Service(s3Client, s3Presigner, uploadS3Presigner);
         ReflectionTestUtils.setField(amazonS3Service, "bucket", BUCKET_NAME);
-        if (System.getenv("DEV_PUBLIC_ENDPOINT") != null) {
-            ReflectionTestUtils.setField(amazonS3Service, "profile", "dev");
-            ReflectionTestUtils.setField(amazonS3Service, "devPublicEndpoint", ENDPOINT);
-        } else {
-            ReflectionTestUtils.setField(amazonS3Service, "profile", "prod");
-        }
+        ReflectionTestUtils.setField(amazonS3Service, "profile", "prod");
     }
 
     @Test
@@ -149,9 +143,24 @@ class AmazonS3ServiceTest {
 
         // then
         assertThat(result).isEqualTo(expected);
-        if (!Objects.equals(ReflectionTestUtils.getField(amazonS3Service, "profile"), "dev")) {
-            verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
-        }
+        verify(s3Presigner, times(1)).presignGetObject(any(GetObjectPresignRequest.class));
+    }
+
+    @Test
+    @DisplayName("개발 환경에서 파일 키로 서명되지 않은 문자열 반환")
+    void testGenerateGetPresignedUrl_givenFileKeyOnDevProfile_willReturnUnsignedString() {
+        // given
+        String fileKey = "test-file-key";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
+        ReflectionTestUtils.setField(amazonS3Service, "profile", "dev");
+        ReflectionTestUtils.setField(amazonS3Service, "devPublicEndpoint", ENDPOINT);
+
+        // when
+        String result = amazonS3Service.generateGetPresignedUrl(fileKey);
+
+        // then
+        assertThat(result).isEqualTo(expected);
+        verify(s3Presigner, never()).presignGetObject(any(GetObjectPresignRequest.class));
     }
 
     @Test

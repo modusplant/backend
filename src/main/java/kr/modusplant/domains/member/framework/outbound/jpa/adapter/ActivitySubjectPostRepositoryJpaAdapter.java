@@ -9,9 +9,12 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJp
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.enums.PostType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,12 +30,16 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
 
     @Override
     public boolean isPublished(ActivitySubjectPostId activitySubjectPostId) {
-        return postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow().getIsPublished().equals(true);
+        return postJpaRepository.findByUlid(activitySubjectPostId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
+                .getIsPublished().equals(true);
     }
 
     @Override
     public boolean isInQnaPrimaryCategory(ActivitySubjectPostId activitySubjectPostId) {
-        PrimaryCategoryEntity primaryCategory = postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow().getPrimaryCategory();
+        PrimaryCategoryEntity primaryCategory = postJpaRepository.findByUlid(activitySubjectPostId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
+                .getPrimaryCategory();
         return primaryCategory != null && PostType.QNA.getValue().equals(primaryCategory.getCategory());
     }
 
@@ -58,7 +65,8 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
 
     @Override
     public boolean isWrittenByMember(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
-        return postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow()
+        return postJpaRepository.findByUlid(activitySubjectPostId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
                 .getAuthMember().getUuid().equals(memberId.getValue());
     }
 
@@ -67,7 +75,9 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
         String postId = activitySubjectPostId.getValue();
 
         postLikeJpaRepository.save(PostLikeEntity.of(postId, memberId.getValue()));
-        postJpaRepository.findByUlid(postId).orElseThrow().increaseLikeCount();
+        postJpaRepository.findByUlid(postId)
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
+                .increaseLikeCount();
     }
 
     @Override
@@ -75,7 +85,9 @@ public class ActivitySubjectPostRepositoryJpaAdapter implements ActivitySubjectP
         String postId = activitySubjectPostId.getValue();
 
         postLikeJpaRepository.delete(PostLikeEntity.of(postId, memberId.getValue()));
-        postJpaRepository.findByUlid(postId).orElseThrow().decreaseLikeCount();
+        postJpaRepository.findByUlid(postId)
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
+                .decreaseLikeCount();
     }
 
     @Override

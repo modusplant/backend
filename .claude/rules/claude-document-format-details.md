@@ -24,8 +24,16 @@ read.
 
 ---
 
-## 3. Directory Trees
+## 3. Package Structure and Directory Trees
 
+**Package Structure** (a section describing the Java packages of an area, e.g. `## 1. Package Structure`):
+- Lists classes instead of drawing a directory tree, one `` - `ClassName` — overview `` item per class; classes sharing
+  one role may share one item.
+- Lists only the area's top-level interfaces and classes (e.g. an aggregate root, a base class that other classes
+  extend) and the classes with an independent role; a class whose role a reader can infer from the package it sits in
+  (e.g. a VO, DTO, port, mapper, or JPA entity) is left out.
+
+**Directory Trees** (any other directory structure, e.g. resource folders or a layer layout):
 - Inside a code block, each depth level takes one glyph column: `│` under an ancestor with later siblings, a space under
   one without, then `├` or `└` and one space before the entry. No `─`.
 - A `#` comment follows its entry after one space, with single spaces inside it.

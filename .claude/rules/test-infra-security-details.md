@@ -5,10 +5,6 @@ paths:
 
 # Security Infrastructure Test Conventions
 
-Applies to every test class under `src/test/java/kr/modusplant/infrastructure/security/`.
-
----
-
 ## 1. Exception Assertions
 
 Exception assertions check `getErrorCode()` against `SecurityErrorCode`.
@@ -46,9 +42,6 @@ profile.
 ---
 
 ## 6. TestUtils
-
-Paths below are relative to `src/main/java/kr/modusplant/infrastructure/security/` and mirrored 1:1 under
-`src/test/java/kr/modusplant/infrastructure/security/common/util/`.
 
 - **Shared constant paths:** `domains/member/common/constant`
 - **Group A (fields):** `models` (`NormalLoginRequest`, `DefaultUserDetails`, `DefaultAuthToken`)

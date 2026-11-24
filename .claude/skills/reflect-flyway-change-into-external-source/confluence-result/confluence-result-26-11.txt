@@ -1,0 +1,1 @@
+2026-11-23T21:55:09+09:00	V7.4.0__Add_severity_and_script_to_swear_and_create_not_swear.sql	policy-implementation

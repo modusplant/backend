@@ -5,53 +5,50 @@ paths:
 
 # Security Infrastructure Conventions
 
-Applies to `kr.modusplant.infrastructure.security` and its sub-packages.
-
----
-
 ## 1. Package Structure
 
-```
-security/
-├ config/ # Spring Security configuration — assembles the SecurityFilterChain bean and its supporting beans
-├ filter/ # Servlet filters inserted into the security filter chain
-├ handler/ # Spring Security callback handlers (login/logout success, failure, access-denied)
-├ models/ # Authentication principal, token, and login-request models
-├ enums/ # Security-specific error code enum
-├ exception/ # Authentication exception hierarchy
-└ util/ # Static helper classes (logging, response writing, authorization assertions)
-```
+- `SecurityConfig` (`config/`) — the Spring Security configuration
+- `DefaultAuthProvider`, `DefaultUserDetailsService` — the `AuthenticationProvider` and `UserDetailsService` of the
+  normal login
+- `DefaultAuthenticationEntryPoint` — the `AuthenticationEntryPoint` answering an unauthenticated request
+- `JwtAuthenticationFilter`, `EmailPasswordAuthenticationFilter`, `SecurityExceptionHandlingFilter` (`filter/`) — the
+  servlet filters inserted into the security filter chain
+- `*Handler` (`handler/`) — Spring Security callback handlers (login/logout success, failure, access-denied)
+- `DefaultAuthToken`, `DefaultUserDetails` (`models/`) — the authentication token and principal
+- `BusinessAuthenticationException` (`exception/`) — root of the authentication exception hierarchy
+- `SecurityAssertionUtils`, `SecurityLoggerUtils`, `SecurityResponseUtils` (`util/`) — static helpers for
+  authorization assertions, logging, and response writing
 
 ---
 
 ## 2. Directory Patterns
 
-**Config** (`config/`):
+**Config**:
 - A single `@Configuration` class assembles one `SecurityFilterChain` bean plus its supporting beans (password encoders,
   authentication manager, providers, handlers, filters, CORS source)
 
-**Filter** (`filter/`):
+**Filter**:
 - Extend `OncePerRequestFilter` for cross-cutting, always-run concerns (JWT parsing/verification, chain-wide exception
   translation), or `AbstractAuthenticationProcessingFilter` for a filter dedicated to intercepting one login endpoint
 - Naming: `Jwt*Filter` for token-based components; plain descriptive `*Filter` otherwise (e.g.
   `EmailPasswordAuthenticationFilter`, `SecurityExceptionHandlingFilter`)
 
-**Handler** (`handler/`):
+**Handler**:
 - Each implements a single Spring Security handler interface; naming mirrors the interface (`*SuccessHandler`,
   `*FailureHandler`, `*LogoutHandler`)
 - `WriteResponse*` prefix marks handlers that write a JSON body directly rather than redirecting
 
-**Models** (`models/`):
+**Models**:
 - `Default*` prefix marks the normal-login (non-social-login) principal/token implementations (`DefaultAuthToken`,
   `DefaultUserDetails`)
 - Login request DTOs use a plain `*Request` suffix (e.g. `NormalLoginRequest`)
 
-**Exception** (`exception/`):
+**Exception**:
 - All extend a single package-local root that itself extends Spring Security's `AuthenticationException`
 - Naming describes the specific business condition (`Banned*`, `Inactive*`, `DisabledByLinking*`, `BadCredential*`,
   `AccountState*`)
 
-**Util** (`util/`):
+**Util**:
 - Static-only helper classes with a private constructor; naming suffix `*Utils`
 
 ---
@@ -107,7 +104,7 @@ A matched request passes through these filters in order:
 **Outside `/api/**`**
 - Not matched by `securityMatcher`, so no filter of this chain runs.
 
-**Login success** (`POST /api/auth/login`)
+**Login success**
 - `SecurityExceptionHandlingFilter` → `LogoutFilter` (no match) → `JwtAuthenticationFilter` →
   `EmailPasswordAuthenticationFilter` → `AuthenticationManager` → `DefaultAuthProvider` → `DefaultUserDetailsService` →
   `WriteResponseLoginSuccessHandler`
@@ -118,7 +115,7 @@ A matched request passes through these filters in order:
 - `WriteResponseLoginSuccessHandler` updates the member's last login time, issues a token pair through `TokenService`,
   writes the access token in the JSON body and the refresh token as a `Set-Cookie` header. The chain ends here.
 
-**Login failure** (`POST /api/auth/login`)
+**Login failure**
 - `EmailPasswordAuthenticationFilter` → (`AuthenticationManager` → `DefaultAuthProvider` → `DefaultUserDetailsService`)
   → `WriteResponseLoginFailureHandler`
 - Any `AuthenticationException` raised during the attempt reaches `WriteResponseLoginFailureHandler`, which writes the
@@ -130,7 +127,7 @@ A matched request passes through these filters in order:
 - Exceptions that are not `AuthenticationException` (an unreadable request body, or a failure inside
   `WriteResponseLoginSuccessHandler`) propagate to `SecurityExceptionHandlingFilter` instead.
 
-**Logout** (`/api/auth/logout`)
+**Logout**
 - `SecurityExceptionHandlingFilter` → `LogoutFilter` → `JwtClearingLogoutHandler` → `WriteResponseLogoutSuccessHandler`
 - `LogoutFilter` runs before `JwtAuthenticationFilter`, so the access token is not validated on this path;
   `JwtClearingLogoutHandler` reads the `refreshToken` cookie and the `Authorization` header directly, removes the

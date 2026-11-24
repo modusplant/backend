@@ -52,14 +52,18 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 ```
 [domain]
 ├ adapter # Orchestration controllers (inbound use-case calls, NO framework deps;
-│ # `shared.framework` belongs to `shared` first, so depending on it is allowed)
-├ domain # Pure business logic: aggregates, entities, VOs, validation
-├ usecase # Ports (interfaces), request/response DTOs, read/write models
+│ # `shared.framework` belongs to `shared` first, so depending on it is allowed),
+│ # plus mapper port implementations, precondition helpers, event listeners, translators
+├ domain # Pure business logic: aggregates, entities, VOs, events, validation
+├ usecase # Ports (interfaces), request/response DTOs, records, read models
 └ framework # Technical implementations:
   # inbound/web/rest → actual @RestController classes
+  # inbound/web/cache → conditional-GET (ETag / Last-Modified) evaluation
   # outbound/jpa → JPA entities, mappers, Spring Data repos
   # outbound/jooq → jOOQ read repositories
-  # outbound/redis → Redis cache services
+  # outbound/persistence → jpa/ and jooq/ grouped under one package (account domains)
+  # outbound/redis → Redis-backed repositories
+  # outbound/scheduler → @Scheduled jobs
 ```
 
 ### Predefined Domain & Infrastructure Area Names
@@ -71,8 +75,8 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `email-identity` → `domains/account/email/`
   - `normal-identity` → `domains/account/normal/`
   - `social-identity` → `domains/account/social/`
-- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `security`, `transliterate` (all under
-  `infrastructure/<area>/`).
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `normalization`, `security`, `swear` (all
+  under `infrastructure/<area>/`).
 
 ### Technical Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins
@@ -103,18 +107,14 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
 
 Detailed working rules live under `.claude/`:
 
-- `.claude/rules/*.md` — convention specs, auto-attached by path glob:
-  - `main-architecture-details.md` / `test-architecture-details.md` (baselines for all main / test code)
-  - `main-<kind>-<area>-details.md` / `test-<kind>-<area>-details.md` (per-area main / test conventions, `<kind>` being
-    `domain` or `infra`)
-  - `claude-document-format-details.md` (whitespace-lean formatting of the handwritten docs under `.claude/`)
-- `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by type:
-  - `policy/data-deletion-policy.md` (hard-delete/soft-delete policy, archiving, per-flow related-data handling, and
-    cascade rules)
-  - `architecture/observability-tagging-architecture.md` (backend-to-monitoring-stack identity/correlation tagging)
-  - `tech-stack/open-authentication-implementation.md` (OAuth 2.0 authorization-code flow across
-    `domains/account/social`, `infrastructure/security`, and `infrastructure/jwt`)
-  - `guide/performance-test-guide.md` (nGrinder deployment, host log locations, and Groovy script-writing gotchas)
+- `.claude/rules/*.md` — convention specs, auto-attached by path glob.
+- `.claude/documents/<type>/*.md` — on-demand reference docs, grouped by directory. Before reading one, decide whether
+  it is needed from its document name (`<type>/<file-name>`, e.g. `policy/soft-and-hard-data-deletion-policy.md`):
+  - `architecture/` — explanations of specific concerns that span the backend architecture
+  - `guide/` — guides addressed to AI for carrying out specific purposes
+  - `policy/` — policies currently applied to this project
+  - `tech-stack/` — how this project implements specific technologies
+  - `term/` — glossaries of terms that several documents use
 - `.claude/skills/*/SKILL.md` — task workflows.
 
 ## Precaution

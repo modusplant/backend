@@ -20,8 +20,6 @@ import kr.modusplant.domains.post.framework.outbound.jooq.record.PostIsPublished
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,9 +46,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntityTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);
