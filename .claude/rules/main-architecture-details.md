@@ -5,11 +5,6 @@ paths:
 
 # Main Architecture Details
 
-This rule is the baseline for every area. An area rule (`main-<kind>-<area>-details.md`) adds the area's own variations
-on top of it.
-
----
-
 ## 1. Layer Patterns
 
 Each pattern applies wherever the area has that layer.

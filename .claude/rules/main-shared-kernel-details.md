@@ -5,10 +5,16 @@ paths:
 
 # Shared Kernel Conventions
 
+## Parent Document
+
+- `.claude/documents/policy/swear-filtering-policy.md` — the nickname rejection that `NicknameValidator` runs (§2.3),
+  and the stored nicknames it skips (§3.5)
+
+---
+
 ## 1. Package Structure
 
-- `Email`, `Nickname`, `Password` — kernel value objects shared across domains, following the value object pattern of
-  `main-architecture-details.md` §1.1
+- `Email`, `Nickname`, `Password` — kernel value objects shared across domains
 - `SwearInspector` (`inspector/`) — interface of the swear check that `NicknameValidator` runs
 - `NicknameValidator` (`validator/`) — Spring bean that rejects a swear nickname
 
@@ -21,5 +27,3 @@ paths:
 
 **`validator/`** — Spring beans for the checks that a value object's `create` cannot run, because `create` also runs in
 the JPA mappers and has no Spring bean; a write path calls them right after `create`.
-`NicknameValidator.validate(Nickname)` runs only the swear check through `SwearInspector` and throws
-`InvalidValueException(SWEAR_CONTAINED_NICKNAME)` on any match.

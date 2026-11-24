@@ -11,6 +11,14 @@ with the word as the original text.
 
 ---
 
+## Parent Document
+
+- `.claude/documents/term/text-normalization-term.md` — the original text, view, and token terms (§1)
+- `.claude/documents/policy/swear-filtering-policy.md` — the dictionary (§2.1) and the masking behavior (§2.2) that
+  `SwearEngine` and `maskSwear` implement
+
+---
+
 ## 1. Package Structure
 
 - `SwearWord` — one swear word with its type, severity, and script
@@ -53,8 +61,8 @@ The keyword of a word for a view is not always the word's text in that view:
 **`SwearWord`** — record `(String word, SwearType type, int severity, SwearScript script)`.
 
 **`SwearEngine`** — `final`, immutable, private constructor; a Spring bean that `config/swear/SwearConfig` builds once
-at application startup, with no reload, from `swear` (word, type, severity, script) and `not_swear` (word), loaded
-through `JdbcTemplate`:
+at application startup from `swear` (word, type, severity, script) and `not_swear` (word), loaded through
+`JdbcTemplate`:
 - `static create(TextNormalizer, List<SwearWord> swearWords, List<String> notSwearWords)` normalizes every word into
   its keywords for each view and builds the tries of each view from them once (§2). It fails with
   `ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT`, listing every swear word whose `script` is not what `SwearScript.of`
@@ -75,8 +83,8 @@ code point (ICU4J `UScript.HANGUL`) gives `HANGUL`; otherwise any Latin code poi
 int originalEnd)`; `[originalStart, originalEnd)` is the original span of the keyword match.
 
 **`SwearHolder`** — Spring bean that injects `SwearEngine` and implements `shared/kernel/inspector/SwearInspector`:
-- `maskSwear(String text)` returns null or blank text unchanged; otherwise it merges the overlapping or adjacent
-  original spans of the `SwearMatch`es not from `LINE_INITIAL` and replaces each merged span with `***`.
+- `maskSwear(String text)` merges the overlapping or adjacent original spans of the `SwearMatch`es not from
+  `LINE_INITIAL` and replaces each merged span with `***`.
 - `containsSwear(String text)`, the `SwearInspector` method, returns whether `match` returns any `SwearMatch`.
 
 ---
@@ -113,6 +121,5 @@ view's text. Two different swear words whose original spans overlap both stay.
   that a keyword match derives from, from the `getLightlyNormalizedStart` or `getOriginalStart` of its first code unit
   to the `getLightlyNormalizedEnd` or `getOriginalEnd` of its last code unit, so it includes characters a view removed
   between them (`시.발` → `[0, 3)`).
-- **Not-swear word**: a word passed to `create` in `notSwearWords` that contains a swear word but is not one
-  (`시발점`).
+- **Not-swear word**: a word passed to `create` in `notSwearWords`.
 - **Word**: a swear word (`SwearWord`) or a not-swear word.

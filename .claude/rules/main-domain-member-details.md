@@ -5,6 +5,17 @@ paths:
 
 # Member Domain Conventions
 
+## Parent Document
+
+- `.claude/documents/policy/swear-filtering-policy.md` — the introduction masking and nickname checks of profile
+  override and nickname check, and their order (§3.2)
+- `.claude/documents/policy/soft-and-hard-data-deletion-policy.md` — the member withdrawal and post abuse-report
+  approval steps (§2.3)
+- `.claude/documents/tech-stack/open-authentication-implementation.md` — the social login provider calls of
+  `MemberSocialTranslator`
+
+---
+
 ## 1. Package Structure
 
 - `Member`, `MemberProfile`, `ProposalOrBugReport` — aggregate roots: a member, its profile, and a proposal or bug

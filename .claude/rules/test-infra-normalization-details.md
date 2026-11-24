@@ -5,6 +5,13 @@ paths:
 
 # Normalization Infrastructure Test Conventions
 
+## Parent Document
+
+- `.claude/documents/term/text-normalization-term.md` — the view, lightly normalized range, and original range terms
+  (§1)
+
+---
+
 ## 1. Mocking Exceptions
 
 `TextNormalizer` is built with the real `Normalizer2` instances of `new Icu4jConfig()`, not mocks, because its output is

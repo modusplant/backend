@@ -5,11 +5,6 @@ paths:
 
 # Test Architecture Details
 
-This rule is the complete baseline for every test in the tree. A per-area test rule (`test-<kind>-<area>-details.md`)
-supplies the values §9 lists for its area; its values win for that area.
-
----
-
 ## 1. Pure Unit Test Baseline
 
 Unit tests must maintain a pure POJO state. **Do not use** Spring Context (`@SpringBootTest`, `@WebMvcTest`) or Mockito
@@ -163,6 +158,7 @@ given area actually has. Absent a pre-computed path list, derive the split direc
 - **Excluded Classes:** classes excluded in addition to §2.
 - **Pure Unit Test Path Exceptions:** paths whose tests may use a real Spring context, `TestEntityManager`, or a real DB
   instead of a pure POJO test (§1).
+- **Mocking Exceptions:** dependencies built from real instances instead of mocks (§3), with the reason.
 - **Servlet Mock Pattern:** how filters, handlers, and entry points outside the path exceptions mock servlet objects.
 - **Repository Test Policy:** per repository kind and its package, one of the policies below, with its evidence (an
   existing test file, or its absence):

@@ -5,6 +5,13 @@ paths:
 
 # Security Infrastructure Conventions
 
+## Parent Document
+
+- `.claude/documents/tech-stack/open-authentication-implementation.md` — the session issuance, access-token blacklist,
+  and filter chain integration shared with OAuth sessions (§3)
+
+---
+
 ## 1. Package Structure
 
 - `SecurityConfig` (`config/`) — the Spring Security configuration
