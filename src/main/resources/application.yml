@@ -178,3 +178,16 @@ cloud:
       connection-max-idle-time: 30
       connection-ttl: 300
       connection-acquisition-timeout: 5
+
+# FFmpeg
+ffmpeg:
+  thumbnail:
+    width: 540
+    height: 960
+    quality: 2
+    start-offset-ms: 200
+  transcode:
+    preset: veryfast
+    constant-rate-factor: 23
+    max-bitrate: 4000000      # 4Mbps → 5MB 상한 자동 준수 (2.5s × 4Mbps)
+    buffer-size: 8000000      # 8MB
