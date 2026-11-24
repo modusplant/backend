@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum TokenScope {
     AUTH_CODE_EMAIL("authCodeEmail"),
     RESET_PASSWORD_EMAIL("resetPasswordEmail"),
-    RESET_PASSWORD_INPUT("resetPasswordInput");
+    RESET_PASSWORD_INPUT("resetPasswordInput"),
+    UPLOAD_RECORD("uploadRecord");
 
     private final String value;
 

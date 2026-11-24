@@ -5,6 +5,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import jakarta.annotation.PostConstruct;
+import kr.modusplant.infrastructure.jwt.claim.UploadTokenClaims;
+import kr.modusplant.infrastructure.jwt.enums.TokenScope;
 import kr.modusplant.infrastructure.jwt.exception.InvalidTokenException;
 import kr.modusplant.infrastructure.jwt.exception.TokenKeyCreationException;
 import kr.modusplant.infrastructure.jwt.exception.TokenKeyStorageException;
@@ -198,6 +200,21 @@ public class JwtTokenProvider {
 
     public Date getExpirationFromToken(String token) {
         return getClaimsFromToken(token).getExpiration();
+    }
+
+    // uploadToken 검증 및 클레임 추출
+    public UploadTokenClaims getUploadTokenClaims(String token) {
+        Claims claims = getClaimsFromToken(token);
+        String scope = claims.get("scope", String.class);
+        if (!TokenScope.UPLOAD_RECORD.getValue().equals(scope)) {
+            throw new InvalidTokenException();
+        }
+        return new UploadTokenClaims(
+                claims.getSubject(),
+                UUID.fromString(claims.get("memberId", String.class)),
+                claims.get("videoKey", String.class),
+                claims.get("originalFilename", String.class)
+        );
     }
 
     // 자가 서명된 인증서 만들기
