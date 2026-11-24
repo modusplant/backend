@@ -5,7 +5,7 @@ fixed layout keeps every plan consistent, short, and readable.
 
 ---
 
-## 1. Document Hierarchy
+## 1. API Implementation Document Hierarchy
 
 - One implementation spec covers the whole implementation.
 - One step document covers each implementation step listed in the spec.

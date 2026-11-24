@@ -5,6 +5,13 @@ paths:
 
 # Normalization Infrastructure Conventions
 
+## Parent Document
+
+- `.claude/documents/term/text-normalization-term.md` — the original text, view, token, lightly normalized range, and
+  original range terms (§1)
+
+---
+
 ## 1. Package Structure
 
 - `TextNormalizer` — Spring bean; builds the NFD/NFC forms and the five normalized views

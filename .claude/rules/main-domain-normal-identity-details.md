@@ -5,6 +5,12 @@ paths:
 
 # Normal Identity Domain Conventions
 
+## Parent Document
+
+- `.claude/documents/policy/swear-filtering-policy.md` — the nickname checks of sign-up and their order (§3.3)
+
+---
+
 ## 1. Package Structure
 
 - `NormalIdentityCreateRepository`, `NormalIdentityReadRepository`, `NormalIdentityUpdateRepository` — repository ports
@@ -46,9 +52,6 @@ paths:
 
 **Controller** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor; write
 methods are `@Transactional`:
-- Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then
-  rejects a swear nickname through `NicknameValidator` and then a duplicate nickname, before saving the mapped sign-up
-  data
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and
   that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before
   calling the update port

@@ -6,6 +6,12 @@ paths:
 
 # Swear Infrastructure Test Conventions
 
+## Parent Document
+
+- `.claude/documents/term/text-normalization-term.md` — the view term (§1)
+
+---
+
 ## 1. Mocking Exceptions
 
 `SwearEngine` is created with a real `TextNormalizer` built from the `Normalizer2` instances of `new Icu4jConfig()`, not

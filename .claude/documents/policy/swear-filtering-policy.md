@@ -37,7 +37,6 @@ Every other user input is stored as submitted, including post titles and content
   matches, whitespace inside it included, becomes one `***` (`시.발` → `***`, `시 발` → `***`).
 - A match formed by the first characters of lines, and a not-swear word, are not masked.
 - Masking never rejects the request.
-- The matching itself is defined in `rules/main-infra-swear-details.md`.
 
 ### 2.3 Rejection (Nickname Write Paths)
 

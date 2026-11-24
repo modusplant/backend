@@ -19,7 +19,7 @@ Resolved per @.claude/documents/guide/git-command-usage-guide.md:
 
 # Document Mapping per Class
 
-Classification follows `CLAUDE.md`; determine which section each class belongs to before checking anything.
+Determine which section each class belongs to before checking anything.
 
 - Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under
   @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that domain.
