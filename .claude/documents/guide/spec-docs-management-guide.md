@@ -43,7 +43,9 @@ names start with.
 2. Scope
 3. Structure Design
    - 3.1 End-to-End Flow
-   - 3.2 Package Structure: each package that takes part in the flow of 3.1.
+   - 3.2 Package Structure: each package that takes part in the flow of 3.1, listing only the classes whose role
+     neither their package nor `.claude/rules/main-architecture-details.md` shows. An existing class gives only its
+     change, and a new class only the feature or role it adds.
    - 3.3 Implementation-Wide Changes: changes that two or more steps make together, such as a rule that every step's
      changes follow.
    - 3.4 Step-Specific Changes: changes that one step makes, each naming the number of the step it belongs to, even
@@ -59,6 +61,7 @@ names start with.
    - Every step's result must build and pass its tests, unless an exception is stated for the step.
 7. Reference Documents: one table row per reference document, giving its name and what it holds; only when the
    implementation has one.
+8. Glossary: as the **Glossary** rule of `CLAUDE.local.md` requires.
 
 ### 4.2 Content Rules
 
@@ -70,6 +73,8 @@ names start with.
 - Write a change to a file outside the repository root (e.g. an external monitoring repository) as steps the user
   carries out by hand, because Claude cannot edit files there.
 - Write each fact once within the implementation document.
+- Write a Scope row or Package Structure item that spans several steps as semicolon-separated clauses that each belong
+  to one step, and name no step number in it, so each step document copies only its own clauses.
 - Write a technical term in its full name at its first use, with its abbreviation in parentheses, and use only the
   abbreviation after that. When the first use falls inside a code block, give the full name in the prose before the
   block and keep only the abbreviation inside it.
@@ -90,12 +95,15 @@ names start with.
    workflow among them.
 4. Technical Details: subsections as the step needs.
 5. Other Implementation Requirements
+6. Glossary: as the **Glossary** rule of `CLAUDE.local.md` requires.
 
 ### 5.2 Content Rules
 
 - Section 1 and 3.1 are written for the step. Section 1 states what the step delivers and why it is a separate step.
-- Section 2 and section 3 from 3.2 on copy, word for word, only the implementation document text that applies to the
-  step. Do not link or redirect to the implementation document, so the step document reads on its own.
+- Section 2 and section 3 from 3.2 on copy, word for word, only the implementation document text (rows, items, or
+  clauses) that the step needs. A Package Structure item copies its class name and `existing` marker, then only the
+  clauses the step needs. Do not link or redirect to the implementation document, so the step document reads on its
+  own.
 - Section 4 does not copy the implementation document; rewrite its technical details in concrete form for the step.
 - Section 5 holds what must exist when the step is done and the manual procedures the step requires, then repeats the
   implementation document's section 6 constraints.
