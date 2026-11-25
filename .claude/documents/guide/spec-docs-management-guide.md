@@ -52,7 +52,7 @@ names start with.
      under `.claude/documents/`): each only when the implementation needs it, numbered consecutively from `.1` in this
      order. Each of 3.3 and 3.4 exists only when it holds one of these, numbered consecutively from 3.3 in this order.
      No other subsections.
-4. Technical Details: subsections as the implementation needs.
+4. Technical Details: subsections as the implementation needs, in the order of the steps they belong to.
 5. Implementation Steps: one table row per step, giving its step number, document name, purpose, and the steps it
    depends on.
 6. Constraints
@@ -110,8 +110,10 @@ names start with.
   unpushed, or uncommitted), update every spec document it affects in the same task. Text that a step document copies
   from the implementation document stays identical to it.
 - Include in the documents only what no document of a Claude document hierarchy states.
-- When the user asks to delete a spec document, delete it and every mention of it in the other
-  documents as well. When the deleted document is a step document, the remaining steps keep their numbers.
+- When the user asks to delete a spec document, delete it and every mention of it in the other documents as well. When
+  the deleted document is a step document, the mentions include all content of its step: the step's design, the
+  dependencies on it, and the references to the sections removed with it. The remaining steps and the implementation
+  document's section 4 subsections keep their numbers.
 - Insert a new step at its place in dependency order, and raise the number of each later step by one, in its document
   name and in every reference to it.
 - Report to the user any rule this guide lacks or needs to strengthen that writing or revising the documents reveals.
