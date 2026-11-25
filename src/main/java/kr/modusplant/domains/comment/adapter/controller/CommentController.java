@@ -16,7 +16,7 @@ import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentCursorPageResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
-import kr.modusplant.infrastructure.swear.SwearHolder;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class CommentController {
     private final CommentCommandRepository commandRepository;
     private final CommentCacheRepository cacheRepository;
     private final CommentValidationHelper commentValidationHelper;
-    private final SwearHolder swearHolder;
+    private final ProhibitedWordHolder prohibitedWordHolder;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional(readOnly = true)
@@ -105,7 +105,7 @@ public class CommentController {
         if (!(replyToPath instanceof EmptyReplyToCommentPath)) {
             validateIfReplyToCommentPathIsValid(parentPostId, path, replyToPath);
         }
-        String maskedContent = swearHolder.maskSwear(request.content());
+        String maskedContent = prohibitedWordHolder.maskProhibitedWord(request.content());
 
         // 멱등성 검증 후, 같은 부모 아래의 다음 형제 경로 순서 값을 Redis에서 예약받는다.
         // DB 하한값 조회(findMaximumSiblingPathOrder)는 Redis 예약 키가 전혀 없을 때만 실행되도록 지연 전달한다.
@@ -131,7 +131,7 @@ public class CommentController {
         CommentPath path = CommentPath.create(request.path());
         CommentAuthorId commentAuthorId = CommentAuthorId.fromUuid(authorId);
         commentValidationHelper.validateIfAuthorCanWriteCommentWithinPost(parentPostId, path, commentAuthorId);
-        String maskedContent = swearHolder.maskSwear(request.content());
+        String maskedContent = prohibitedWordHolder.maskProhibitedWord(request.content());
 
         commandRepository.updateContent(parentPostId, path, CommentContent.create(maskedContent));
     }

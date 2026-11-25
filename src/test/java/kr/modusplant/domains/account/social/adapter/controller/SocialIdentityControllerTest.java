@@ -20,8 +20,8 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
-import kr.modusplant.infrastructure.swear.SwearHolder;
-import kr.modusplant.infrastructure.swear.common.util.SwearHolderTestUtils;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
+import kr.modusplant.infrastructure.prohibitedword.common.util.ProhibitedWordHolderTestUtils;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
@@ -44,13 +44,13 @@ import static org.mockito.Mockito.*;
 
 class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
         AgreedTermsTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils {
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+    private final ProhibitedWordHolder prohibitedWordHolder = ProhibitedWordHolderTestUtils.createProhibitedWordHolder();
 
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
     private final NicknameValidator nicknameValidator = mock(NicknameValidator.class);
-    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,swearHolder,nicknameValidator);
+    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,prohibitedWordHolder,nicknameValidator);
 
     @Test
     @DisplayName("최초 회원 로그인시 NeedSignupResult 반환하기")
@@ -215,11 +215,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
     }
 
     @Test
-    @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
-    void testCreateNewMember_givenNicknameWithSwear_willThrowException() {
+    @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+    void testCreateNewMember_givenNicknameWithProhibitedWord_willThrowException() {
         // given
         given(socialIdentityRepository.getSocialMemberProfileByEmail(any())).willReturn(Optional.empty());
-        doThrow(new kr.modusplant.shared.exception.InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+        doThrow(new kr.modusplant.shared.exception.InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
                 .when(nicknameValidator).validate(any());
 
         // when
@@ -228,7 +228,7 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
                 () -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
         verify(socialIdentityRepository, never()).saveSocialMember(any(), any(), any());
     }
 

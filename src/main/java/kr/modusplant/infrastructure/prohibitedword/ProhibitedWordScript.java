@@ -1,11 +1,11 @@
-package kr.modusplant.infrastructure.swear;
+package kr.modusplant.infrastructure.prohibitedword;
 
 import com.ibm.icu.lang.UScript;
 
-public enum SwearScript {
+public enum ProhibitedWordScript {
     HANGUL, LATIN, OTHER;
 
-    public static SwearScript of(String lightlyNormalizedWord) {
+    public static ProhibitedWordScript of(String lightlyNormalizedWord) {
         boolean containsLatin = false;
         int index = 0;
         while (index < lightlyNormalizedWord.length()) {

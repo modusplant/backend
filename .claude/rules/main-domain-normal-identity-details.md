@@ -7,7 +7,7 @@ paths:
 
 ## Parent Document
 
-- `.claude/documents/policy/swear-filtering-policy.md` — the nickname checks of sign-up and their order (§3.3)
+- `.claude/documents/policy/prohibited-word-filtering-policy.md` — the nickname checks of sign-up and their order (§3.3)
 
 ---
 

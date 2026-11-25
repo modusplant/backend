@@ -23,7 +23,7 @@ import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.*;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.swear.SwearHolder;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -56,7 +56,7 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 @Slf4j
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final SwearHolder swearHolder;
+    private final ProhibitedWordHolder prohibitedWordHolder;
     private final NicknameValidator nicknameValidator;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
@@ -128,7 +128,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.maskSwear(record.introduction()));
+                MemberProfileIntroduction.create(prohibitedWordHolder.maskProhibitedWord(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
@@ -151,7 +151,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.maskSwear(record.introduction()));
+                MemberProfileIntroduction.create(prohibitedWordHolder.maskProhibitedWord(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
