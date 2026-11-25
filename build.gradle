@@ -68,7 +68,6 @@ dependencies {
 	// Lombok (Version managed by Spring Boot BOM)
 	annotationProcessor 'org.projectlombok:lombok'
 	compileOnly 'org.projectlombok:lombok'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Version required
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 
@@ -84,12 +83,6 @@ dependencies {
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
 	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
-
-	// MapStruct
-	def mapstructVersion = '1.5.3.Final'
-	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-	implementation "org.mapstruct:mapstruct:$mapstructVersion"
-	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
 	// Spring Boot Starters (Version managed by Spring Boot BOM)
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -206,9 +199,7 @@ jooq {
 tasks.withType(JavaCompile).configureEach {
 	options.annotationProcessorPath = configurations.annotationProcessor
 	options.compilerArgs += ["-parameters",
-							 "-Xlint:unchecked",
-							 "-Amapstruct.defaultComponentModel=spring",
-							 "-Amapstruct.unmappedTargetPolicy=ERROR"
+							 "-Xlint:unchecked"
 	]
 }
 
@@ -249,7 +240,6 @@ afterEvaluate {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
 					'**/generated/**',     		// Exclude generated classes
-					'**/*_*',           	   	// Exclude MapStruct-generated classes
 					'**/*Builder.*',	       	// Exclude builders
 					'**/kr/modusplant/jooq/**'	// Exclude jOOQ-generated classes
 			])

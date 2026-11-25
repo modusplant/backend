@@ -86,8 +86,6 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   (eliminates N+1).
 - **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package.
   Never edit manually.
-- **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or
-  `@Mapping(target=..., ignore=true)` must be set.
 - **Redis**: Used for multi-purpose caching (e.g. concurrency control) and JWT access-token blacklisting.
 
 ### Project Conventions
