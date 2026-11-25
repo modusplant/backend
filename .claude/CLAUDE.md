@@ -123,8 +123,9 @@ Detailed working rules live under `.claude/`:
 ## Claude Document Hierarchy
 
 A Claude document hierarchy is a parent document and the child documents under it, among the documents under
-`.claude/` outside `.claude/temp/`. A child may depend on its parent; a parent does not depend on its children. Each
-level is the parent of each document of a lower level that falls under it:
+`.claude/` outside `.claude/temp/`. A child may depend on its parent; a parent does not depend on its children, so it
+states every fact it needs itself, even one taken from a child, which then drops that fact. Each level is the parent of
+each document of a lower level that falls under it:
 
 1. `CLAUDE.md` — every other document.
 2. A term document under `.claude/documents/term/` — each document that uses its terms.

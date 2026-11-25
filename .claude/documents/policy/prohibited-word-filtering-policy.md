@@ -9,6 +9,12 @@ Applies to every flow that reaches prohibited word handling, either through the 
 
 ---
 
+## Parent Document
+
+- `.claude/documents/term/text-normalization-term.md` — the view, lightly normalized text, and token terms (§2.1)
+
+---
+
 ## 1. Filtering Targets
 
 | Target | Handling | Applied by |
@@ -31,6 +37,27 @@ Every other user input is stored as submitted, including post titles and content
 - A dictionary change takes effect at the next application startup.
 - Only Flyway `data/seed` migrations write `prohibited_word` and `allowed_word`, and an applied seed migration is never
   edited.
+- Every row a seed migration inserts meets these entry rules:
+  - A prohibited word is entered only when its false-positive likelihood is 1 or less, counting every match the engine
+    makes in normal text: as a substring of a normal word (`개년` in `5개년`), as a bare form (`18` in ages and dates),
+    and as a match across spaced tokens (`십 알`). Allowed words for the few normal words it matches can bring its
+    likelihood to 1 or less (`시발` with `시발점`).
+  - A lexical variant is entered as a prohibited word, not derived by an engine rule, because a general rule for it
+    matches normal words (folding the tense `ㅆ` into `ㅅ` turns `씨바` into `시바`, as in `시바견`).
+  - A lexical variant takes the `type` and `severity` of its base word, so it counts the same as the spelling it evades.
+  - A prohibited word's `script` is the script of its own characters (`씨x` → `HANGUL`, `sibal` → `LATIN`, `🖕` →
+    `OTHER`), because the application fails to start when a `script` differs from the one its lightly normalized text
+    gives.
+  - A word is entered as its lightly normalized text.
+  - A candidate is not entered when, in some view built from its text, the engine matches another word of the same table
+    over the whole text (`시 발`, `시이발`, `시바알` for `시발`). Among candidates that match one another this way, only
+    the one the others reduce to is entered (`시발`, not `시바알`). The reason is that the engine compares a stored word
+    with each view's text as it is, so a stored word that some view would rewrite matches only in the views that leave
+    it as it is. A spelling that no view matches to another word is entered even when it means the same (`씨발` beside 
+    `시발`).
+  - An existing word is not entered again, and a word fits its column (`varchar(10)` for `prohibited_word`,
+    `varchar(20)` for `allowed_word`).
+  - An allowed word contains a match of a prohibited word, because one without a match suppresses nothing.
 
 ### 2.2 Masking (`maskProhibitedWord`)
 
@@ -112,3 +139,11 @@ dictionary.
 - **Prohibited word**: A word that is masked and rejected in a nickname, stored in `prohibited_word`: a profanity, a
   sexual term, or a non-verbal string such as an emoji
 - **Allowed word**: A normal word that contains a prohibited word, stored in `allowed_word` (`시발점`)
+- **False-positive likelihood**: How likely a prohibited word is to match normal text, rated 0 to 5:
+  - 0: It matches no normal text
+  - 1: It matches only normal expressions that plant posts rarely use
+  - 2: It matches a few normal words that plant posts sometimes use
+  - 3: It matches normal words that plant posts commonly use
+  - 4: It matches many normal words or phrases
+  - 5: It matches almost any normal text
+- **Lexical variant**: A word-specific spelling of a prohibited word that no view derives (`쓰벌` for `씨벌`)
