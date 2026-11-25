@@ -22,7 +22,8 @@ Write every document directly under `.claude/temp/`.
 
 ## 3. Document Names
 
-- Every name starts with the implementation goal the document serves, in English kebab-case (e.g. `swear-auto-report`).
+- Every name starts with the implementation goal the document serves, in English kebab-case (e.g.
+  `prohibited-word-auto-report`).
 - Implementation spec: `<goal>-implementation-spec.md`.
 - Step document: `<goal>-step-<NN>-<detail-goal>.md`, where `<NN>` is the two-digit step number (e.g. `01`) so names
   sort in step order, and `<detail-goal>` is the step's own goal in English kebab-case.
