@@ -1,7 +1,7 @@
-package kr.modusplant.infrastructure.swear;
+package kr.modusplant.infrastructure.prohibitedword;
 
 import kr.modusplant.infrastructure.normalization.TextNormalizationType;
-import kr.modusplant.shared.kernel.inspector.SwearInspector;
+import kr.modusplant.shared.kernel.inspector.ProhibitedWordInspector;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -9,19 +9,19 @@ import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
-public class SwearHolder implements SwearInspector {
-    private final SwearEngine swearEngine;
+public class ProhibitedWordHolder implements ProhibitedWordInspector {
+    private final ProhibitedWordEngine prohibitedWordEngine;
 
-    public String maskSwear(String text) {
+    public String maskProhibitedWord(String text) {
         if (text == null || text.isBlank()) {
             return text;
         }
         boolean[] maskedCodeUnits = new boolean[text.length()];
-        for (SwearMatch swearMatch : swearEngine.match(text)) {
-            if (swearMatch.textNormalizationType() == TextNormalizationType.LINE_INITIAL) {
+        for (ProhibitedWordMatch prohibitedWordMatch : prohibitedWordEngine.match(text)) {
+            if (prohibitedWordMatch.textNormalizationType() == TextNormalizationType.LINE_INITIAL) {
                 continue;
             }
-            Arrays.fill(maskedCodeUnits, swearMatch.originalStart(), swearMatch.originalEnd(), true);
+            Arrays.fill(maskedCodeUnits, prohibitedWordMatch.originalStart(), prohibitedWordMatch.originalEnd(), true);
         }
         StringBuilder maskedText = new StringBuilder(text.length());
         for (int codeUnitIndex = 0; codeUnitIndex < text.length(); codeUnitIndex++) {
@@ -35,7 +35,7 @@ public class SwearHolder implements SwearInspector {
     }
 
     @Override
-    public boolean containsSwear(String text) {
-        return !swearEngine.match(text).isEmpty();
+    public boolean containsProhibitedWord(String text) {
+        return !prohibitedWordEngine.match(text).isEmpty();
     }
 }

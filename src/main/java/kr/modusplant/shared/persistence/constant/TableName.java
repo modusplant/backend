@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TableName {
+    public static final String ALLOWED_WORD = "allowed_word";
     public static final String COMM_COMMENT = "comm_comment";
     public static final String COMM_COMMENT_ABUSE_REPORT_DASHBOARD = "comm_comment_abuse_report_dashboard";
     public static final String COMM_COMMENT_ABU_REP = "comm_comment_abu_rep";
@@ -19,14 +20,13 @@ public final class TableName {
     public static final String COMM_PRI_CATE = "comm_pri_cate";
     public static final String COMM_SECO_CATE = "comm_seco_cate";
     public static final String FCM_TOKEN = "fcm_token";
-    public static final String NOT_SWEAR = "not_swear";
     public static final String PENDING_FILE = "pending_file";
+    public static final String PROHIBITED_WORD = "prohibited_word";
     public static final String PROP_BUG_REP = "prop_bug_rep";
     public static final String SITE_MEMBER = "site_member";
     public static final String SITE_MEMBER_AUTH = "site_member_auth";
     public static final String SITE_MEMBER_PROF = "site_member_prof";
     public static final String SITE_MEMBER_TERM = "site_member_term";
     public static final String SITE_MEMBER_WITHDRAW = "site_member_withdraw";
-    public static final String SWEAR = "swear";
     public static final String TERM = "term";
 }

@@ -19,12 +19,12 @@ Resolved per @.claude/documents/guide/git-command-usage-guide.md:
 
 # Document Mapping per Class
 
-Classification follows `CLAUDE.md`; determine which section each class belongs to before checking anything.
+Determine which section each class belongs to before checking anything.
 
 - Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under
   @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that domain.
 - Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md, plus any file under
-  @.claude/documents/ or @.claude/rules/ relevant to that area.
+  @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that area.
 - Not associated with any domain:
   - Local Docker-related (e.g. @docker-compose.yml): @.claude/rules/local-docker-environment-details.md only.
   - CI/CD-related (e.g. @.github/workflows/modusplant-backend-ci-cd.yml):

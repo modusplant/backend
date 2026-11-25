@@ -69,11 +69,11 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
     }
 
     @Test
-    @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
-    public void testRegisterNormalMember_givenNicknameWithSwear_willThrowException() {
+    @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+    public void testRegisterNormalMember_givenNicknameWithProhibitedWord_willThrowException() {
         // given
         NormalSignUpRequest request = testNormalSignUpRequest;
-        doThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+        doThrow(new InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
                 .when(nicknameValidator).validate(Nickname.create(request.nickname()));
 
         // when
@@ -81,7 +81,7 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
                 () -> controller.registerNormalMember(request));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
         verify(readRepository, never()).existsByNickname(any());
     }
 

@@ -5,6 +5,15 @@ paths:
 
 # Comment Domain Conventions
 
+## Parent Document
+
+- `.claude/documents/policy/prohibited-word-filtering-policy.md` — the content masking of register and content update,
+  and its point in each flow (§3.1)
+- `.claude/documents/policy/soft-and-hard-data-deletion-policy.md` — the soft-delete of a comment (§3), which the
+  comment abuse-report approval also runs (§2.3)
+
+---
+
 ## 1. Package Structure
 
 - `Comment` — aggregate root; a comment on a post, identified by the post and its path
@@ -102,9 +111,9 @@ paths:
 - The ownership failure maps to HTTP 403
 
 **Event Listener** — `@EventListener` methods run in the publisher's transaction:
-- On another domain's abuse-report approval event, requires the event's member to hold the admin role (otherwise throws
-  `NotAccessibleException` with `GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS`), runs the helper's parent-post and
-  comment existence checks, then soft-deletes the comment without an author-ownership check
+- On another domain's abuse-report approval event, throws `NotAccessibleException` with
+  `GeneralErrorCode.ADMIN_ROLE_REQUIRED_TO_ACCESS` when the event's member lacks the admin role, and runs the helper's
+  parent-post and comment existence checks before the deletion
 
 **Mapper**:
 - Exposes a reply target as deleted with a null nickname when it is soft-deleted, or when its row is absent while the
