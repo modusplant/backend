@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TextNormalizationHelper {
-    public static boolean isDICP(int codePoint) {
+    public static boolean isDefaultIgnorableCodePoint(int codePoint) {
         return UCharacter.hasBinaryProperty(codePoint, UProperty.DEFAULT_IGNORABLE_CODE_POINT);
     }
 

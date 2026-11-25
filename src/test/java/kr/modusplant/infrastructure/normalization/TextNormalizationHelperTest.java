@@ -8,7 +8,7 @@ import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutTrailingConsonant;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCombiningMark;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDICP;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDefaultIgnorableCodePoint;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,18 +16,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TextNormalizationHelperTest {
     @Test
     @DisplayName("기본 무시 코드 포인트로 true 반환")
-    void testIsDICP_givenDefaultIgnorableCodePoint_willReturnTrue() {
+    void testIsDefaultIgnorableCodePoint_givenDefaultIgnorableCodePoint_willReturnTrue() {
         // given & when & then
-        assertThat(isDICP(0x200B)).isTrue();
-        assertThat(isDICP(0x3164)).isTrue();
+        assertThat(isDefaultIgnorableCodePoint(0x200B)).isTrue();
+        assertThat(isDefaultIgnorableCodePoint(0x3164)).isTrue();
     }
 
     @Test
     @DisplayName("기본 무시 코드 포인트가 아닌 문자로 false 반환")
-    void testIsDICP_givenOtherCharacter_willReturnFalse() {
+    void testIsDefaultIgnorableCodePoint_givenOtherCharacter_willReturnFalse() {
         // given & when & then
-        assertThat(isDICP('a')).isFalse();
-        assertThat(isDICP('시')).isFalse();
+        assertThat(isDefaultIgnorableCodePoint('a')).isFalse();
+        assertThat(isDefaultIgnorableCodePoint('시')).isFalse();
     }
 
     @Test

@@ -1,12 +1,14 @@
 ---
 paths:
   - ".claude/**"
+  - "CLAUDE.md"
+  - "CLAUDE.local.md"
 ---
 
 # Claude Document Format Conventions
 
-Applies to the handwritten Markdown documents under `.claude/`. Generated output and data files (e.g.
-`detected-change/`, `reflected-change/`, `cache/`, logs, URL lists) are exempt.
+Applies to `CLAUDE.md`, `CLAUDE.local.md`, and the handwritten Markdown documents under `.claude/`. Generated output
+and data files (e.g. `detected-change/`, `reflected-change/`, `cache/`, logs, URL lists) are exempt.
 
 ---
 

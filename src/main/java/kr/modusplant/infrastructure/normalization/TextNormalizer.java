@@ -87,7 +87,6 @@ public class TextNormalizer {
         return new KeystrokeNormalizedView(mergeElongatedJamo(jamoComposedView));
     }
 
-    // 각 행의 첫 글자를 세로로 이어 읽어야 드러나는 단어를 한 줄로 만듦
     public LineInitialNormalizedView normalizeWithLineInitial(LightlyNormalizedView lightlyNormalizedView) {
         TextNormalizedView.Builder builder = new TextNormalizedView.Builder(lightlyNormalizedView.length());
         int contributingLineCount = 0;
@@ -111,7 +110,7 @@ public class TextNormalizer {
 
     private String canonicalize(String originalCluster) {
         String unmarkedText = nfkdNormalizer.normalize(originalCluster).codePoints()
-                .filter(codePoint -> !isDICP(codePoint) && !isCombiningMark(codePoint))
+                .filter(codePoint -> !isDefaultIgnorableCodePoint(codePoint) && !isCombiningMark(codePoint))
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
                 .toString();
         return nfkcNormalizer.normalize(unmarkedText).codePoints()

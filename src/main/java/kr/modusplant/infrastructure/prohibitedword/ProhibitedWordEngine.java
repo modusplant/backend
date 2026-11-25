@@ -247,8 +247,6 @@ public final class ProhibitedWordEngine {
         return precedingOriginalSpan != null && prohibitedWordMatch.originalStart() < precedingOriginalSpan.getValue();
     }
 
-    // 시작 위치마다 트라이를 루트로 되돌리며, 이어지는 키워드가 없거나 텍스트가 끝나면 다음 시작 위치로 넘어감
-    // findAll 호출마다 만든 CharsTrie 하나를 모든 시작 위치에서 재사용함
     private record KeywordTrie(CharSequence serializedSequence) {
         private static KeywordTrie of(Collection<String> keywords) {
             if (keywords.isEmpty()) {

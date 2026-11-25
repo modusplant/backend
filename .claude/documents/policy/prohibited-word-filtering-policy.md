@@ -53,7 +53,7 @@ Every other user input is stored as submitted, including post titles and content
     over the whole text (`시 발`, `시이발`, `시바알` for `시발`). Among candidates that match one another this way, only
     the one the others reduce to is entered (`시발`, not `시바알`). The reason is that the engine compares a stored word
     with each view's text as it is, so a stored word that some view would rewrite matches only in the views that leave
-    it as it is. A spelling that no view matches to another word is entered even when it means the same (`씨발` beside 
+    it as it is. A spelling that no view matches to another word is entered even when it means the same (`씨발` beside
     `시발`).
   - An existing word is not entered again, and a word fits its column (`varchar(10)` for `prohibited_word`,
     `varchar(20)` for `allowed_word`).

@@ -80,7 +80,7 @@ paths:
 
 **`TextNormalizationHelper`** — `final`, `@NoArgsConstructor(access = PRIVATE)`; each predicate is `public static`
 and decides a Unicode property by the return value of an ICU4J property query:
-- `isDICP`: the `Default_Ignorable_Code_Point` property.
+- `isDefaultIgnorableCodePoint`: the `Default_Ignorable_Code_Point` property.
 - `isCombiningMark`: the general categories `Mn`, `Mc`, and `Me`.
 - `isLetter`: the general categories `L*`.
 - `isLineTerminator`: the `Line_Break` values BK, CR, LF, and NL.
@@ -98,7 +98,7 @@ extended grapheme cluster passes these steps in order:
 
 | Order | Step |
 |---|---|
-| 1 | NFKD, remove code points that `isDICP` or `isCombiningMark` accepts, NFKC |
+| 1 | NFKD, remove code points that `isDefaultIgnorableCodePoint` or `isCombiningMark` accepts, NFKC |
 | 2 | Map conjoining jamo through `CONJOINING_COMPATIBILITY_JAMO_MAP` |
 | 3 | Map code points through `SYMBOL_CONFUSABLE_LATIN_MAP` |
 | 4 | Lowercase per code point with `UCharacter.toLowerCase` |
