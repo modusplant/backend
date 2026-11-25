@@ -20,7 +20,7 @@ import kr.modusplant.domains.comment.usecase.request.CommentUpdateRequest;
 import kr.modusplant.domains.comment.usecase.response.CommentCursorPageResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOfPostResponse;
 import kr.modusplant.domains.comment.usecase.response.CommentOffsetPageResponse;
-import kr.modusplant.infrastructure.swear.SwearHolder;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
@@ -56,10 +56,10 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
     private final CommentCommandRepository commandRepository = Mockito.mock(CommentCommandRepository.class);
     private final CommentCacheRepository cacheRepository = Mockito.mock(CommentCacheRepository.class);
     private final CommentValidationHelper validationHelper = Mockito.mock(CommentValidationHelper.class);
-    private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
+    private final ProhibitedWordHolder prohibitedWordHolder = Mockito.mock(ProhibitedWordHolder.class);
     private final ApplicationEventPublisher publisher = Mockito.mock(ApplicationEventPublisher.class);
     private final CommentController controller = new CommentController(mapper, queryRepository,
-            commandRepository, cacheRepository, validationHelper, swearHolder, publisher);
+            commandRepository, cacheRepository, validationHelper, prohibitedWordHolder, publisher);
 
     // ---------- gatherByPost ----------
 
@@ -405,7 +405,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.3")));
-        given(swearHolder.maskSwear(content)).willReturn(content);
+        given(prohibitedWordHolder.maskProhibitedWord(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -447,7 +447,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.maskSwear(content)).willReturn(content);
+        given(prohibitedWordHolder.maskProhibitedWord(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -473,7 +473,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
-        given(swearHolder.maskSwear(content)).willReturn(content);
+        given(prohibitedWordHolder.maskProhibitedWord(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -494,7 +494,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         given(cacheRepository.reservePath(eq(ParentPostId.create(TEST_POST_ULID)), eq(CommentPath.create("1.2")),
                 eq(CommentAuthorId.fromUuid(MEMBER_BASIC_USER_UUID)), any()))
                 .willReturn(Optional.of(CommentPath.create("1.2")));
-        given(swearHolder.maskSwear(content)).willReturn(content);
+        given(prohibitedWordHolder.maskProhibitedWord(content)).willReturn(content);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -524,7 +524,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
     }
 
     @Test
-    @DisplayName("비속어가 포함된 내용은 마스킹된 내용으로 저장하는 활동 수행")
+    @DisplayName("금지된 말이 포함된 내용은 마스킹된 내용으로 저장하는 활동 수행")
     void testRegister_givenContentContainingProfanity_willProcessAction() {
         // given
         String rawContent = "욕설 포함 내용";
@@ -532,13 +532,13 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", rawContent);
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.maskSwear(rawContent)).willReturn(maskedContent);
+        given(prohibitedWordHolder.maskProhibitedWord(rawContent)).willReturn(maskedContent);
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(swearHolder).should(times(1)).maskSwear(rawContent);
+        then(prohibitedWordHolder).should(times(1)).maskProhibitedWord(rawContent);
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
         then(commandRepository).should(times(1)).save(captor.capture());
         assertThat(captor.getValue().getContent()).isEqualTo(CommentContent.create(maskedContent));
@@ -554,7 +554,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         CommentRegisterRequest request = new CommentRegisterRequest(null, TEST_POST_ULID, "1", "content");
         given(cacheRepository.reservePath(any(), any(), any(), any()))
                 .willReturn(Optional.of(CommentPath.create("2")));
-        given(swearHolder.maskSwear("content")).willReturn("content");
+        given(prohibitedWordHolder.maskProhibitedWord("content")).willReturn("content");
 
         // when
         controller.register(request, MEMBER_BASIC_USER_UUID);
@@ -572,7 +572,7 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
         // given
         String updatedContent = "updated content";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1.2", updatedContent);
-        given(swearHolder.maskSwear(updatedContent)).willReturn(updatedContent);
+        given(prohibitedWordHolder.maskProhibitedWord(updatedContent)).willReturn(updatedContent);
 
         // when
         controller.updateContent(request, MEMBER_BASIC_USER_UUID);
@@ -585,19 +585,19 @@ public class CommentControllerTest implements ParentPostIdTestUtils, CommentAuth
     }
 
     @Test
-    @DisplayName("비속어가 포함된 수정 내용은 마스킹된 내용으로 갱신하는 활동 수행")
+    @DisplayName("금지된 말이 포함된 수정 내용은 마스킹된 내용으로 갱신하는 활동 수행")
     void testUpdateContent_givenContentContainingProfanity_willProcessAction() {
         // given
         String rawContent = "욕설 포함 내용";
         String maskedContent = "*** 포함 내용";
         CommentUpdateRequest request = new CommentUpdateRequest(TEST_POST_ULID, "1.2", rawContent);
-        given(swearHolder.maskSwear(rawContent)).willReturn(maskedContent);
+        given(prohibitedWordHolder.maskProhibitedWord(rawContent)).willReturn(maskedContent);
 
         // when
         controller.updateContent(request, MEMBER_BASIC_USER_UUID);
 
         // then
-        then(swearHolder).should(times(1)).maskSwear(rawContent);
+        then(prohibitedWordHolder).should(times(1)).maskProhibitedWord(rawContent);
         then(commandRepository).should(times(1)).updateContent(
                 ParentPostId.create(TEST_POST_ULID), CommentPath.create("1.2"), CommentContent.create(maskedContent));
     }

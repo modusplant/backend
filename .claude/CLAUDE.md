@@ -78,8 +78,8 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   - `email-identity` → `domains/account/email/`
   - `normal-identity` → `domains/account/normal/`
   - `social-identity` → `domains/account/social/`
-- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `normalization`, `security`, `swear` (all
-  under `infrastructure/<area>/`).
+- Infrastructure areas: `advice`, `aop`, `config`, `file`, `jwt`, `monitor`, `normalization`, `security`,
+  `prohibitedword` (all under `infrastructure/<area>/`).
 
 ### Technical Design Decisions
 - **JPA vs jOOQ**: JPA/Hibernate for simple DML and dirty-checking; jOOQ for bulk reads, aggregations, and complex joins
@@ -136,10 +136,10 @@ level is the parent of each document of a lower level that falls under it:
 
 A child whose content depends on a parent names that parent in a `Parent Document` section, one
 `` - `<path>` — <what it depends on> `` item per parent, where `<path>` is the parent's path from the repository root
-(e.g. `.claude/documents/policy/swear-filtering-policy.md`). The section is the document's first section, right after
-its title and any introduction, unnumbered and at the level of its other sections. A parent that always loads with the
-child is not named: `CLAUDE.md`, and a rule whose path glob covers the child's own path glob. A parent names none of
-its children, and a document with no parent left to name has no such section.
+(e.g. `.claude/documents/policy/prohibited-word-filtering-policy.md`). The section is the document's first section,
+right after its title and any introduction, unnumbered and at the level of its other sections. A parent that always
+loads with the child is not named: `CLAUDE.md`, and a rule whose path glob covers the child's own path glob. A parent
+names none of its children, and a document with no parent left to name has no such section.
 
 ## Precaution
 

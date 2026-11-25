@@ -3,14 +3,14 @@ package kr.modusplant.shared.enums;
 import lombok.Getter;
 
 @Getter
-public enum SwearType {
+public enum ProhibitedWordType {
     GENERAL("general"),
     FAMILY("family"),
     SEXUAL("sexual");
 
     private final String value;
 
-    SwearType(String value) {
+    ProhibitedWordType(String value) {
         this.value = value;
     }
 }

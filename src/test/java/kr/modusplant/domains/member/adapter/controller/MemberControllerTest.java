@@ -45,7 +45,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithIm
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
-import kr.modusplant.infrastructure.swear.SwearHolder;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.ExistsValueException;
@@ -133,7 +133,7 @@ class MemberControllerTest implements
 
     private final JwtTokenProvider jwtTokenProvider = Mockito.mock(JwtTokenProvider.class);
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
-    private final SwearHolder swearHolder = Mockito.mock(SwearHolder.class);
+    private final ProhibitedWordHolder prohibitedWordHolder = Mockito.mock(ProhibitedWordHolder.class);
     private final NicknameValidator nicknameValidator = Mockito.mock(NicknameValidator.class);
     private final MemberImageIOHelper memberImageIOHelper = Mockito.mock(MemberImageIOHelper.class);
     private final MemberValidationHelper memberValidationHelper = Mockito.mock(MemberValidationHelper.class);
@@ -150,7 +150,7 @@ class MemberControllerTest implements
 
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
 
-    private final MemberController memberController = new MemberController(jwtTokenProvider, swearHolder, nicknameValidator, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, activitySubjectPostCacheRepository, reportRepository, applicationEventPublisher);
+    private final MemberController memberController = new MemberController(jwtTokenProvider, prohibitedWordHolder, nicknameValidator, memberImageIOHelper, memberValidationHelper, memberProfileMapper, proposalOrBugReportMapper, memberSocialTranslator, memberRepository, memberProfileRepository, activitySubjectPostRepository, activitySubjectCommentRepository, activitySubjectPostCacheRepository, reportRepository, applicationEventPublisher);
 
     private final NotFoundEntityException notFoundEntityExceptionForMember = new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId");
     private final NotFoundEntityException notFoundEntityExceptionForActivitySubjectPost = new NotFoundEntityException(NOT_FOUND_ACTIVITY_SUBJECT_POST_ID, "activitySubjectPostId");
@@ -180,10 +180,10 @@ class MemberControllerTest implements
         }
 
         @Test
-        @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
-        void testCheckExistedNickname_givenNicknameWithSwear_willThrowException() {
+        @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+        void testCheckExistedNickname_givenNicknameWithProhibitedWord_willThrowException() {
             // given
-            willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+            willThrow(new InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
                     .given(nicknameValidator).validate(any());
 
             // when
@@ -191,7 +191,7 @@ class MemberControllerTest implements
                     () -> memberController.checkExistedNickname(testMemberNicknameCheckRecord));
 
             // then
-            assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+            assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
             verify(memberRepository, never()).isNicknameExist(any());
         }
     }
@@ -410,7 +410,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(swearHolder.maskSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(prohibitedWordHolder.maskProhibitedWord(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
@@ -463,17 +463,17 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile V3로 프로필 덮어쓰기 실패")
-    void testValidateThatHasSwearV3_willThrowException() {
+    @DisplayName("닉네임에 사용된 금지된 말로 인해 overrideProfile V3로 프로필 덮어쓰기 실패")
+    void testValidateThatHasProhibitedWordV3_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+        willThrow(new InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
                 .given(nicknameValidator).validate(any());
 
         // when & then
         InvalidValueException invalidValueException = assertThrows(
                 InvalidValueException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV3));
-        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
     }
 
     @Test
@@ -510,7 +510,7 @@ class MemberControllerTest implements
         MemberProfile memberProfile = createMemberProfile();
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
         given(memberRepository.getByNickname(any())).willReturn(Optional.empty());
-        given(swearHolder.maskSwear(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
+        given(prohibitedWordHolder.maskProhibitedWord(any())).willReturn(MEMBER_PROFILE_BASIC_USER_INTRODUCTION);
         willDoNothing().given(memberImageIOHelper).validateIfImageExistsInStorage(any());
         given(memberProfileRepository.getByIdWithoutImageBytes(any())).willReturn(memberProfile);
         willDoNothing().given(memberImageIOHelper).deleteImage(any());
@@ -564,17 +564,17 @@ class MemberControllerTest implements
     }
 
     @Test
-    @DisplayName("닉네임에 사용된 비속어로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
-    void testValidateThatHasSwearV4_willThrowException() {
+    @DisplayName("닉네임에 사용된 금지된 말로 인해 overrideProfile V4로 프로필 덮어쓰기 실패")
+    void testValidateThatHasProhibitedWordV4_willThrowException() {
         // given
         willDoNothing().given(memberValidationHelper).validateIfMemberExists(any());
-        willThrow(new InvalidValueException(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME, "nickname"))
+        willThrow(new InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
                 .given(nicknameValidator).validate(any());
 
         // when & then
         InvalidValueException invalidValueException = assertThrows(
                 InvalidValueException.class, () -> memberController.overrideProfile(testMemberProfileOverrideRecordV4));
-        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        assertThat(invalidValueException.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
     }
 
     @Test

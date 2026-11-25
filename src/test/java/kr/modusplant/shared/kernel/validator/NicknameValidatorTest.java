@@ -1,6 +1,6 @@
 package kr.modusplant.shared.kernel.validator;
 
-import kr.modusplant.infrastructure.swear.common.util.SwearHolderTestUtils;
+import kr.modusplant.infrastructure.prohibitedword.common.util.ProhibitedWordHolderTestUtils;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.kernel.Nickname;
@@ -16,12 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class NicknameValidatorTest {
     private final NicknameValidator nicknameValidator =
-            new NicknameValidator(SwearHolderTestUtils.createSwearHolder());
+            new NicknameValidator(ProhibitedWordHolderTestUtils.createProhibitedWordHolder());
 
     @ParameterizedTest
     @ValueSource(strings = {"시1발", "시이발", "tlqkf", "바보"})
-    @DisplayName("비속어를 포함한 닉네임으로 예외 반환")
-    void testValidate_givenNicknameWithSwear_willThrowException(String value) {
+    @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+    void testValidate_givenNicknameWithProhibitedWord_willThrowException(String value) {
         // given
         Nickname nickname = Nickname.create(value);
 
@@ -30,12 +30,12 @@ class NicknameValidatorTest {
                 () -> nicknameValidator.validate(nickname));
 
         // then
-        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.SWEAR_CONTAINED_NICKNAME);
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
     }
 
     @Test
-    @DisplayName("비속어를 포함하지 않은 닉네임으로 검증 수행")
-    void testValidate_givenNicknameWithoutSwear_willValidateNickname() {
+    @DisplayName("금지된 말을 포함하지 않은 닉네임으로 검증 수행")
+    void testValidate_givenNicknameWithoutProhibitedWord_willValidateNickname() {
         // given
         Nickname nickname = Nickname.create(MEMBER_BASIC_USER_NICKNAME);
 

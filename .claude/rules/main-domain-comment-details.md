@@ -7,8 +7,8 @@ paths:
 
 ## Parent Document
 
-- `.claude/documents/policy/swear-filtering-policy.md` — the content masking of register and content update, and its
-  point in each flow (§3.1)
+- `.claude/documents/policy/prohibited-word-filtering-policy.md` — the content masking of register and content update,
+  and its point in each flow (§3.1)
 - `.claude/documents/policy/soft-and-hard-data-deletion-policy.md` — the soft-delete of a comment (§3), which the
   comment abuse-report approval also runs (§2.3)
 

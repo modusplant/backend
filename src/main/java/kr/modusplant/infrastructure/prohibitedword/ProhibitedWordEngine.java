@@ -1,4 +1,4 @@
-package kr.modusplant.infrastructure.swear;
+package kr.modusplant.infrastructure.prohibitedword;
 
 import com.ibm.icu.lang.UCharacter;
 import com.ibm.icu.util.BytesTrie;
@@ -21,89 +21,89 @@ import java.util.stream.Collectors;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
 import static kr.modusplant.infrastructure.normalization.TextNormalizationType.*;
 
-public final class SwearEngine {
+public final class ProhibitedWordEngine {
     private static final int MINIMUM_LINE_INITIAL_KEYWORD_CODE_POINT_COUNT = 2;
 
     private final TextNormalizer textNormalizer;
-    private final Map<TextNormalizationType, KeywordTrie> swearKeywordTries;
-    private final Map<TextNormalizationType, KeywordTrie> notSwearKeywordTries;
-    private final Map<TextNormalizationType, Map<String, List<SwearWord>>> keywordSwearWords;
+    private final Map<TextNormalizationType, KeywordTrie> prohibitedWordKeywordTries;
+    private final Map<TextNormalizationType, KeywordTrie> allowedWordKeywordTries;
+    private final Map<TextNormalizationType, Map<String, List<ProhibitedWord>>> keywordProhibitedWords;
 
-    private SwearEngine(TextNormalizer textNormalizer,
-                        Map<TextNormalizationType, KeywordTrie> swearKeywordTries,
-                        Map<TextNormalizationType, KeywordTrie> notSwearKeywordTries,
-                        Map<TextNormalizationType, Map<String, List<SwearWord>>> keywordSwearWords) {
+    private ProhibitedWordEngine(TextNormalizer textNormalizer,
+                        Map<TextNormalizationType, KeywordTrie> prohibitedWordKeywordTries,
+                        Map<TextNormalizationType, KeywordTrie> allowedWordKeywordTries,
+                        Map<TextNormalizationType, Map<String, List<ProhibitedWord>>> keywordProhibitedWords) {
         this.textNormalizer = textNormalizer;
-        this.swearKeywordTries = swearKeywordTries;
-        this.notSwearKeywordTries = notSwearKeywordTries;
-        this.keywordSwearWords = keywordSwearWords;
+        this.prohibitedWordKeywordTries = prohibitedWordKeywordTries;
+        this.allowedWordKeywordTries = allowedWordKeywordTries;
+        this.keywordProhibitedWords = keywordProhibitedWords;
     }
 
-    public static SwearEngine create(TextNormalizer textNormalizer,
-                                     List<SwearWord> swearWords,
-                                     List<String> notSwearWords) {
-        Map<TextNormalizationType, Map<String, List<SwearWord>>> keywordSwearWords =
+    public static ProhibitedWordEngine create(TextNormalizer textNormalizer,
+                                     List<ProhibitedWord> prohibitedWords,
+                                     List<String> allowedWords) {
+        Map<TextNormalizationType, Map<String, List<ProhibitedWord>>> keywordProhibitedWords =
                 new EnumMap<>(TextNormalizationType.class);
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
-            keywordSwearWords.put(textNormalizationType, new HashMap<>());
+            keywordProhibitedWords.put(textNormalizationType, new HashMap<>());
         }
         List<String> scriptMismatches = new ArrayList<>();
-        for (SwearWord swearWord : swearWords) {
-            Map<TextNormalizationType, String> keywords = normalizeWord(textNormalizer, swearWord.word());
+        for (ProhibitedWord prohibitedWord : prohibitedWords) {
+            Map<TextNormalizationType, String> keywords = normalizeWord(textNormalizer, prohibitedWord.word());
             if (keywords.isEmpty()) {
                 continue;
             }
-            SwearScript derivedScript = SwearScript.of(keywords.get(LIGHT));
-            if (swearWord.script() != derivedScript) {
-                scriptMismatches.add(swearWord.word() + "(" + swearWord.script() + " → " + derivedScript + ")");
+            ProhibitedWordScript derivedScript = ProhibitedWordScript.of(keywords.get(LIGHT));
+            if (prohibitedWord.script() != derivedScript) {
+                scriptMismatches.add(prohibitedWord.word() + "(" + prohibitedWord.script() + " → " + derivedScript + ")");
                 continue;
             }
-            if (swearWord.script() != SwearScript.HANGUL) {
+            if (prohibitedWord.script() != ProhibitedWordScript.HANGUL) {
                 keywords.remove(KEYSTROKE);
             }
             keywords.forEach((textNormalizationType, keyword) ->
-                    keywordSwearWords.get(textNormalizationType)
+                    keywordProhibitedWords.get(textNormalizationType)
                             .computeIfAbsent(keyword, ignored -> new ArrayList<>())
-                            .add(swearWord));
+                            .add(prohibitedWord));
         }
         if (!scriptMismatches.isEmpty()) {
             throw new ConfigurationException(
-                    ConfigurationErrorCode.INCORRECT_SWEAR_SCRIPT, scriptMismatches.toArray(String[]::new));
+                    ConfigurationErrorCode.INCORRECT_PROHIBITED_WORD_SCRIPT, scriptMismatches.toArray(String[]::new));
         }
 
-        Map<TextNormalizationType, List<String>> keywordNotSwearWords = new EnumMap<>(TextNormalizationType.class);
+        Map<TextNormalizationType, List<String>> keywordAllowedWords = new EnumMap<>(TextNormalizationType.class);
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
-            keywordNotSwearWords.put(textNormalizationType, new ArrayList<>());
+            keywordAllowedWords.put(textNormalizationType, new ArrayList<>());
         }
-        for (String notSwearWord : notSwearWords) {
-            normalizeWord(textNormalizer, notSwearWord)
+        for (String allowedWord : allowedWords) {
+            normalizeWord(textNormalizer, allowedWord)
                     .forEach((textNormalizationType, keyword) ->
-                            keywordNotSwearWords.get(textNormalizationType).add(keyword));
+                            keywordAllowedWords.get(textNormalizationType).add(keyword));
         }
 
-        Map<TextNormalizationType, KeywordTrie> swearKeywordTries = new EnumMap<>(TextNormalizationType.class);
-        keywordSwearWords.forEach((textNormalizationType, keywordSwearWordsAsValue) ->
-                swearKeywordTries.put(textNormalizationType, KeywordTrie.of(keywordSwearWordsAsValue.keySet())));
-        Map<TextNormalizationType, Map<String, List<SwearWord>>> immutableKeywordSwearWords =
-                keywordSwearWords.entrySet().stream()
+        Map<TextNormalizationType, KeywordTrie> prohibitedWordKeywordTries = new EnumMap<>(TextNormalizationType.class);
+        keywordProhibitedWords.forEach((textNormalizationType, keywordProhibitedWordsAsValue) ->
+                prohibitedWordKeywordTries.put(textNormalizationType, KeywordTrie.of(keywordProhibitedWordsAsValue.keySet())));
+        Map<TextNormalizationType, Map<String, List<ProhibitedWord>>> immutableKeywordProhibitedWords =
+                keywordProhibitedWords.entrySet().stream()
                         .collect(Collectors.toUnmodifiableMap(
                                 Map.Entry::getKey,
                                 entry -> entry.getValue().entrySet().stream()
                                         .collect(Collectors.toUnmodifiableMap(
                                                 Map.Entry::getKey,
                                                 keywordEntry -> List.copyOf(keywordEntry.getValue())))));
-        Map<TextNormalizationType, KeywordTrie> notSwearKeywordTries = new EnumMap<>(TextNormalizationType.class);
-        keywordNotSwearWords.forEach((textNormalizationType, notSwearKeywordsAsValue) ->
-                notSwearKeywordTries.put(textNormalizationType, KeywordTrie.of(notSwearKeywordsAsValue)));
+        Map<TextNormalizationType, KeywordTrie> allowedWordKeywordTries = new EnumMap<>(TextNormalizationType.class);
+        keywordAllowedWords.forEach((textNormalizationType, allowedWordKeywordsAsValue) ->
+                allowedWordKeywordTries.put(textNormalizationType, KeywordTrie.of(allowedWordKeywordsAsValue)));
 
-        return new SwearEngine(
+        return new ProhibitedWordEngine(
                 textNormalizer,
-                Collections.unmodifiableMap(swearKeywordTries),
-                Collections.unmodifiableMap(notSwearKeywordTries),
-                immutableKeywordSwearWords);
+                Collections.unmodifiableMap(prohibitedWordKeywordTries),
+                Collections.unmodifiableMap(allowedWordKeywordTries),
+                immutableKeywordProhibitedWords);
     }
 
-    public List<SwearMatch> match(String text) {
+    public List<ProhibitedWordMatch> match(String text) {
         if (StringUtils.isBlank(text)) {
             return List.of();
         }
@@ -120,30 +120,30 @@ public final class SwearEngine {
         views.put(LINE_INITIAL, textNormalizer.normalizeWithLineInitial(lightlyNormalizedView));
         AsciiLowerCaseRuns asciiLowerCaseRuns = AsciiLowerCaseRuns.of(lightlyNormalizedView.getText());
 
-        List<SwearMatch> keptMatches = new ArrayList<>();
-        Map<SwearWord, TreeMap<Integer, Integer>> keptOriginalSpans = new HashMap<>();
+        List<ProhibitedWordMatch> keptMatches = new ArrayList<>();
+        Map<ProhibitedWord, TreeMap<Integer, Integer>> keptOriginalSpans = new HashMap<>();
         for (TextNormalizationType textNormalizationType : TextNormalizationType.values()) {
             TextNormalizedView view = views.get(textNormalizationType);
-            List<KeywordMatch> notSwearKeywordMatches =
-                    notSwearKeywordTries.get(textNormalizationType).findAll(view.getText());
-            for (KeywordMatch keywordMatch : swearKeywordTries.get(textNormalizationType).findAll(view.getText())) {
+            List<KeywordMatch> allowedWordKeywordMatches =
+                    allowedWordKeywordTries.get(textNormalizationType).findAll(view.getText());
+            for (KeywordMatch keywordMatch : prohibitedWordKeywordTries.get(textNormalizationType).findAll(view.getText())) {
                 int keywordMatchStart = keywordMatch.start();
                 int keywordMatchEnd = keywordMatch.end();
-                if (isInsideNotSwearKeywordMatch(notSwearKeywordMatches, keywordMatchStart, keywordMatchEnd)) {
+                if (isInsideAllowedWordKeywordMatch(allowedWordKeywordMatches, keywordMatchStart, keywordMatchEnd)) {
                     continue;
                 }
-                for (SwearWord swearWord :
-                        keywordSwearWords.get(textNormalizationType).get(keywordMatch.keyword())) {
+                for (ProhibitedWord prohibitedWord :
+                        keywordProhibitedWords.get(textNormalizationType).get(keywordMatch.keyword())) {
                     if (!isValidMatch(textNormalizationType, keywordMatch.keyword(), view,
                             lightlyNormalizedView, asciiLowerCaseRuns, keywordMatchStart, keywordMatchEnd)) {
                         continue;
                     }
-                    SwearMatch swearMatch = new SwearMatch(swearWord, textNormalizationType,
+                    ProhibitedWordMatch prohibitedWordMatch = new ProhibitedWordMatch(prohibitedWord, textNormalizationType,
                             view.getOriginalStart(keywordMatchStart), view.getOriginalEnd(keywordMatchEnd - 1));
-                    if (!overlapsSameWordWithKeptMatch(keptOriginalSpans, swearMatch)) {
-                        keptMatches.add(swearMatch);
-                        keptOriginalSpans.computeIfAbsent(swearWord, ignored -> new TreeMap<>())
-                                .put(swearMatch.originalStart(), swearMatch.originalEnd());
+                    if (!overlapsSameWordWithKeptMatch(keptOriginalSpans, prohibitedWordMatch)) {
+                        keptMatches.add(prohibitedWordMatch);
+                        keptOriginalSpans.computeIfAbsent(prohibitedWord, ignored -> new TreeMap<>())
+                                .put(prohibitedWordMatch.originalStart(), prohibitedWordMatch.originalEnd());
                     }
                 }
             }
@@ -172,9 +172,9 @@ public final class SwearEngine {
         return keywords;
     }
 
-    private static boolean isInsideNotSwearKeywordMatch(List<KeywordMatch> notSwearKeywordMatches, int start, int end) {
-        for (KeywordMatch notSwearKeywordMatch : notSwearKeywordMatches) {
-            if (notSwearKeywordMatch.start() <= start && end <= notSwearKeywordMatch.end()) {
+    private static boolean isInsideAllowedWordKeywordMatch(List<KeywordMatch> allowedWordKeywordMatches, int start, int end) {
+        for (KeywordMatch allowedWordKeywordMatch : allowedWordKeywordMatches) {
+            if (allowedWordKeywordMatch.start() <= start && end <= allowedWordKeywordMatch.end()) {
                 return true;
             }
         }
@@ -237,14 +237,14 @@ public final class SwearEngine {
     }
 
     // 후보의 원문 끝보다 앞에서 시작하는 구간 중 가장 늦게 시작하는 구간 하나만 확인함
-    private static boolean overlapsSameWordWithKeptMatch(Map<SwearWord, TreeMap<Integer, Integer>> keptOriginalSpans,
-                                                         SwearMatch swearMatch) {
-        TreeMap<Integer, Integer> originalSpans = keptOriginalSpans.get(swearMatch.swearWord());
+    private static boolean overlapsSameWordWithKeptMatch(Map<ProhibitedWord, TreeMap<Integer, Integer>> keptOriginalSpans,
+                                                         ProhibitedWordMatch prohibitedWordMatch) {
+        TreeMap<Integer, Integer> originalSpans = keptOriginalSpans.get(prohibitedWordMatch.prohibitedWord());
         if (originalSpans == null) {
             return false;
         }
-        Map.Entry<Integer, Integer> precedingOriginalSpan = originalSpans.lowerEntry(swearMatch.originalEnd());
-        return precedingOriginalSpan != null && swearMatch.originalStart() < precedingOriginalSpan.getValue();
+        Map.Entry<Integer, Integer> precedingOriginalSpan = originalSpans.lowerEntry(prohibitedWordMatch.originalEnd());
+        return precedingOriginalSpan != null && prohibitedWordMatch.originalStart() < precedingOriginalSpan.getValue();
     }
 
     // 시작 위치마다 트라이를 루트로 되돌리며, 이어지는 키워드가 없거나 텍스트가 끝나면 다음 시작 위치로 넘어감

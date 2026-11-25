@@ -61,7 +61,7 @@ class TextNormalizerTest {
             "- 시원\n- 발코니", "𝐬ㅣ\r\n바알 ㅅㅂ\n놈"
     };
 
-    // SwearEngine은 구간을 첫 유닛의 시작과 마지막 유닛의 끝으로 계산하므로, 네 범위 배열이 단조 비감소여야 함
+    // ProhibitedWordEngine은 구간을 첫 유닛의 시작과 마지막 유닛의 끝으로 계산하므로, 네 범위 배열이 단조 비감소여야 함
     private static void assertRangesNonDecreasing(TextNormalizedView textNormalizedView) {
         for (int index = 1; index < textNormalizedView.length(); index++) {
             assertThat(textNormalizedView.getLightlyNormalizedStart(index))
