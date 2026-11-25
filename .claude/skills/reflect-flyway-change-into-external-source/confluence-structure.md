@@ -31,7 +31,7 @@ Tables in page order, as they currently appear on each page.
 | `environment-and-plant` | `plant`, `plant_variety`, `plant_variety_addition`, `plant_variety_middle_category`, `plant_variety_major_category`, `plant_space`, `plant_info`, `plant_info_photo` |
 | `user-activity` | `comm_comment`, `comm_comment_archive`, `comm_comment_like`, `comm_comment_abu_rep`, `prop_bug_rep`, `prop_bug_rep_archive` |
 | `server-function` | `refresh_token`, `fcm_token`, `comm_notification`, `pending_file` |
-| `policy-implementation` | `term`, `swear`, `not_swear`, `common_code_group`, `common_code` |
+| `policy-implementation` | `term`, `prohibited_word`, `allowed_word`, `common_code_group`, `common_code` |
 
 ## Prefix Map
 
@@ -52,7 +52,7 @@ Pages fall into two kinds, which the rows and any page proposed to the user foll
   - `server-function`: tables backing server-side functions such as tokens, notifications, and file handling (e.g.
     `refresh_token`, `pending_file`).
   - `policy-implementation`: tables for pure policy independent of users; they contain no user identifier column (e.g.
-    `term`, `swear`).
+    `term`, `prohibited_word`).
 
 | Table name pattern | page-slug |
 |---|---|
@@ -60,7 +60,7 @@ Pages fall into two kinds, which the rows and any page proposed to the user foll
 | `site_member*` | `member` |
 | `plant*` | `environment-and-plant` |
 | `comm_post*`, `comm_pri_cate*`, `comm_seco_cate*` | `post` |
-| `term*`, `swear*`, `common_code*` | `policy-implementation` |
+| `term*`, `prohibited_word*`, `common_code*` | `policy-implementation` |
 | `comm_comment*`, `prop_bug_rep*` | `user-activity` |
 | `comm_notification*`, `refresh_token*`, `fcm_token*`, `pending_file*` | `server-function` |
 
