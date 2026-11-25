@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils.testEmptyCommentAuthorId;
 import static kr.modusplant.domains.comment.common.util.domain.vo.CommentAuthorIdTestUtils.testCommentAuthorId;
+import static kr.modusplant.domains.comment.common.util.domain.vo.nullobject.EmptyCommentAuthorIdTestUtils.testEmptyCommentAuthorId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;

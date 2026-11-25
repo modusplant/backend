@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
 import kr.modusplant.domains.account.social.domain.exception.SocialAccountConflictException;
 import kr.modusplant.domains.account.social.domain.exception.enums.SocialIdentityErrorCode;
 import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
@@ -18,14 +19,7 @@ import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.nullobject.EmptyMemberProfileImage;
-import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
-import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
-import kr.modusplant.domains.member.domain.event.CommentChooseCacheRemoveEvent;
-import kr.modusplant.domains.member.domain.event.CommentChooseEvent;
-import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
-import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
-import kr.modusplant.domains.member.domain.event.PostLikeEvent;
-import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
+import kr.modusplant.domains.member.domain.event.*;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberProfileImagePath;
 import kr.modusplant.domains.member.domain.vo.ReportImagePath;
@@ -44,6 +38,7 @@ import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithIm
 import kr.modusplant.domains.member.usecase.response.MemberProfileResponseWithImageUrl;
 import kr.modusplant.domains.member.usecase.response.ProposalOrBugReportPrepareResponse;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
+import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.enums.Role;
@@ -116,9 +111,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 class MemberControllerTest implements
         MemberTestUtils, MemberProfileTestUtils,
@@ -1512,4 +1505,4 @@ class MemberControllerTest implements
             assertThat(invalidValueException.getErrorCode()).isEqualTo(MISMATCHED_AUTH_INFO);
         }
     }
-}
+}

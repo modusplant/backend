@@ -8,11 +8,11 @@ import com.ibm.icu.util.StringTrieBuilder;
 import kr.modusplant.infrastructure.config.exception.ConfigurationException;
 import kr.modusplant.infrastructure.config.exception.enums.ConfigurationErrorCode;
 import kr.modusplant.infrastructure.normalization.TextNormalizationType;
+import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import kr.modusplant.infrastructure.normalization.view.AggressivelyNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.LightlyNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.SyllableNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.supers.TextNormalizedView;
-import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;

@@ -8,9 +8,7 @@ import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.Memb
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -3,14 +3,7 @@ package kr.modusplant.infrastructure.normalization;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isAsciiLowerCaseLetter;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCompatibilityJamo;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllable;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isHangulSyllableWithoutTrailingConsonant;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isCombiningMark;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isDefaultIgnorableCodePoint;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLetter;
-import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.isLineTerminator;
+import static kr.modusplant.infrastructure.normalization.TextNormalizationHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TextNormalizationHelperTest {

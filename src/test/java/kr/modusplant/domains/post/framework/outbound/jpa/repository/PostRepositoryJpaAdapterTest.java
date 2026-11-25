@@ -2,11 +2,7 @@ package kr.modusplant.domains.post.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberEntityTestUtils;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.post.common.util.domain.aggregate.PostTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PostEntityTestUtils;
 import kr.modusplant.domains.post.common.util.framework.outbound.jpa.entity.PrimaryCategoryEntityTestUtils;

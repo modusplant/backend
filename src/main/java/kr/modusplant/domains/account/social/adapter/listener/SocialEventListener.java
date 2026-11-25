@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.listener;
 
-import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

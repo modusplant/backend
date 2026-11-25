@@ -2,7 +2,10 @@ package kr.modusplant.domains.member.framework.outbound.jpa.entity;
 
 import jakarta.persistence.*;
 import kr.modusplant.domains.member.framework.outbound.jpa.compositekey.PostBookmarkCompositeKey;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.springframework.data.annotation.CreatedDate;
