@@ -239,9 +239,15 @@ afterEvaluate {
 	tasks.named('jacocoTestReport') {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					'**/generated/**',     		// Exclude generated classes
-					'**/*Builder.*',	       	// Exclude builders
-					'**/kr/modusplant/jooq/**'	// Exclude jOOQ-generated classes
+					'**/generated/**',     					// 만들어지는 클래스 제외
+					'**/*$*EntityBuilder.class',			// 엔터티의 중첩 빌더 제외
+					'**/*$*KeyBuilder.class',				// 복합 키의 중첩 빌더 제외
+					'**/kr/modusplant/jooq/**',				// jOOQ가 만들어내는 클래스 제외
+					'db/migration/**',						// Flyway Java 마이그레이션 제외
+					'**/enums/*ErrorCode.class',			// 상수 전용 오류 코드 열거형 제외
+					'**/enums/*SuccessCode.class',			// 상수 전용 성공 코드 열거형 제외
+					'**/*Exception.class',					// 예외 클래스 제외
+					'**/*Exception$*.class'					// 예외 클래스의 내부 클래스 제외
 			])
 		}))
 	}
