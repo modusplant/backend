@@ -48,7 +48,7 @@ document names start with.
 1. Purpose
 2. Scope
 3. Structure Design
-   - 3.1 End-to-End Flow
+   - 3.1 End-to-End Flow, drawn as §6 states
    - 3.2 Package Structure: each package that takes part in the flow of 3.1, listing only the classes whose role
      neither their package nor `.claude/rules/main-architecture-details.md` shows. An existing class gives only its
      change, and a new class only the feature or role it adds.
@@ -93,7 +93,7 @@ document names start with.
 2. Scope
 3. Structure Design
    - 3.1 Component Flow: the relations between the step's implementations (which class calls, implements, or reads
-     which) and the workflow among them.
+     which) and the workflow among them, drawn as §6 states.
    - 3.2 Package Structure
    - 3.3 Step-Specific Changes: the step's Storage, External Infrastructure Changes, then Claude Document Changes, each
      only when the step needs it, numbered consecutively from 3.3.1 in this order, with no other subsections. 3.3
@@ -115,12 +115,33 @@ document names start with.
 - A detail that several steps need lives only in the document of the earliest step that implements it. In each section
   of a later step document that needs the detail, the step's own content comes first, then a
   `**From step <NN>** (§<section>):` block that names the source section and gives only the gist the step needs.
+- When several steps change the same section of a document, each step's Claude Document Changes give only the part of
+  the change that its own implementation needs, so each step's changes apply independently of the other steps.
 - The implementation document's content rules on left-out content, files outside the repository root, and
   abbreviations apply as well.
 
 ---
 
-## 6. Document Management
+## 6. Flow Diagrams
+
+The End-to-End Flow and Component Flow code blocks draw each line as one step, so that a reader tells an ordered step
+from a branch alternative by its glyphs alone:
+- `├→` and `└→` without a label: a step that the line above runs; siblings all run, in order from top to bottom.
+- `├[<condition>]→` and `└[<condition>]→`: an alternative of a branch; exactly one sibling runs, the one whose condition
+  holds. The conditions of one branch exclude each other, and a branch sits under the step that decides it, never
+  among ordered steps as their sibling.
+- `→ stop` ends an alternative that ends the path, and `→ continue` stands for an alternative that takes no step of
+  its own and goes on to the step after the next `↓`.
+- `↓` on its own line leads to the next step of one path, optionally followed by an annotation, such as how the step is
+  reached or the condition under which the path continues. After a branch, it continues every alternative that does
+  not end with `→ stop`.
+- `→` inside a line leads from a call to what it calls, returns, or produces.
+- `┐` and `┴→` join several entry lines into one next step.
+- A `#` comment explains the step it follows after one space on the same line, or the step right above its own lines.
+
+---
+
+## 7. Document Management
 
 - When code, a `.claude/` document, or a design decision that the documents describe changes (whether committed,
   unpushed, or uncommitted), update every spec document it affects in the same task. When an implementation document

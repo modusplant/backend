@@ -4,16 +4,17 @@ Expands `prohibited-word-auto-report-implementation.md`.
 
 ## 1. Purpose
 
-Turns the engine's matches into a score and an auto-report decision, and binds the threshold, cap, and kill switch. It
-is a separate step because masking and nickname rejection use matches without a score, while only content
-auto-reporting uses the score. No flow calls it until step 12.
+Makes masking return the engine's matches, turns matches into a score and an auto-report decision, and binds the
+threshold, cap, and kill switch. It is a separate step because masking and nickname rejection use matches without a
+score, while only content auto-reporting uses the score. No flow calls the new methods until steps 11 and 12.
 
 ---
 
 ## 2. Scope
 
-- **Report decision**, the score against a configurable threshold: `ProhibitedWordDetection` computes the score and the
-  decision (§4.1), and `ProhibitedWordProperties` binds the threshold, the per-word cap, and the kill switch (§4.2).
+- **Report decision**, the score against a configurable threshold: `ProhibitedWordHolder.inspectProhibitedWord`
+  returns the matches that masking finds (§4.3), `ProhibitedWordDetection` computes the score and the decision from
+  them (§4.1), and `ProhibitedWordProperties` binds the threshold, the per-word cap, and the kill switch (§4.2).
 
 ---
 
@@ -23,17 +24,21 @@ auto-reporting uses the score. No flow calls it until step 12.
 
 ```
 ProhibitedWordProperties ← app.moderation.prohibited-word (application.yml), validated at startup
-ProhibitedWordHolder.detectProhibitedWord(texts...)
- ├→ enabled = false → ProhibitedWordDetection.disabled() (isDisabled() true: neither reportable nor clean)
- ├→ ProhibitedWordEngine.match per text (texts never joined)
- └→ ProhibitedWordDetection.of(pooled matches, ProhibitedWordProperties) → score, isReportable()
+ProhibitedWordHolder.inspectProhibitedWord(text)
+ └→ ProhibitedWordEngine.match(text) once → ProhibitedWordInspection (masked text, matches)
+ProhibitedWordHolder.maskProhibitedWord(text) → inspectProhibitedWord(text).maskedText()
+ProhibitedWordHolder.detectProhibitedWord(matches)
+ ├[enabled = false]→ ProhibitedWordDetection.disabled() (isDisabled() true: neither reportable nor clean)
+ └[enabled = true]→ ProhibitedWordDetection.of(matches, ProhibitedWordProperties) → score, isReportable()
 ```
 
 ### 3.2 Package Structure
 
 - `infrastructure/prohibitedword/`
-  - `ProhibitedWordHolder` — existing; `detectProhibitedWord(texts...)` scans each text with the engine and returns
-    one detection for the pooled matches (§4.3)
+  - `ProhibitedWordHolder` — existing; `inspectProhibitedWord(text)` masks a text and returns its matches from the
+    same engine scan, `maskProhibitedWord` delegates to it, and `detectProhibitedWord(matches)` returns one detection
+    for the given matches (§4.3)
+  - `ProhibitedWordInspection` — record of the masked text and the matches of one text (§4.3)
   - `ProhibitedWordProperties` — a record validated at startup and registered explicitly (§4.2)
   - `ProhibitedWordDetection` — `of(matches, properties)` scores the matches and exposes `isReportable()`;
     `disabled()` is the detection of a disabled kill switch, whose `isDisabled()` is true (§4.1, §4.3)
@@ -70,11 +75,14 @@ isReportable() = score ≥ autoReportThreshold
   `@Bean` method), and no properties scan is configured, so the record is registered explicitly.
 - `application.yml` gets the initial values next to the existing `app.semaphore` block.
 
-### 4.3 `ProhibitedWordHolder.detectProhibitedWord`
+### 4.3 `ProhibitedWordHolder.inspectProhibitedWord` and `detectProhibitedWord`
 
-- Each text is scanned separately and the pooled matches are scored once, so a post's title and body share the
-  per-word cap, and a prohibited word split across the end of one text and the start of the next is not matched,
-  because joining them would create matches across the seam.
+- `inspectProhibitedWord` masks as `maskProhibitedWord` does, skipping `LINE_INITIAL` matches, and returns every match,
+  `LINE_INITIAL` ones included, so the score counts what the masking leaves visible as well. A null or blank text
+  returns the text unchanged with no matches.
+- `detectProhibitedWord` scores the matches it gets once, so a caller that pools the matches of several texts (a post's
+  title and body) makes them share the per-word cap. Each text is still scanned by its own `inspectProhibitedWord`
+  call, so a prohibited word split across the end of one text and the start of the next is not matched.
 - With `enabled = false` it returns `ProhibitedWordDetection.disabled()`, whose `isDisabled()` is true, so the step 12
   listener writes and deletes nothing instead of treating the text as clean; masking and nickname checks keep using the
   engine.
@@ -83,4 +91,5 @@ isReportable() = score ≥ autoReportThreshold
 
 ## 5. Other Implementation Requirements
 
-- When the step is done, the application starts with the new properties, and nothing calls `detectProhibitedWord` yet.
+- When the step is done, the application starts with the new properties, `maskProhibitedWord` masks as before, and
+  nothing calls `inspectProhibitedWord` or `detectProhibitedWord` yet.

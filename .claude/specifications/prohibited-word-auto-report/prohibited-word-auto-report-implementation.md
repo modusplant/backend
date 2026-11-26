@@ -32,28 +32,36 @@ Non-goals: profile introduction auto-reporting, admin notifications.
 From a published write to an auto-detected dashboard row:
 
 ```
-PostController.createPost/updatePost (published) ┐
-CommentController.register/updateContent ────────┴→ PostAutoAbuseInspectionEvent.create / CommentAutoAbuseInspectionEvent.create
- │ (raw text before masking, createdAt)
+PostController.createPost/updatePost ┐
+CommentController.register/updateContent ┴→ ProhibitedWordHolder.inspectProhibitedWord per text → ProhibitedWordInspection
+ # ProhibitedWordInspection: the result of one engine scan of the text, holding the masked text, which the write saves
+ # in place of the submitted text, and the text's matches
+ ↓
+PostController / CommentController after the save, by the write's pooled matches
+ ├[published post or comment, with matches or by an update]→ PostProhibitedWordMatchInspectedEvent /
+ │ CommentProhibitedWordMatchInspectedEvent (pooled matches, possibly empty; createdAt)
+ └[draft, or create or register without matches]→ stop
  ↓ @Async("memberDomainExecutor") @TransactionalEventListener(AFTER_COMMIT)
-MemberEventListener.inspectPost / inspectComment, inside acquireAndProcess
+MemberEventListener.reflectAutoAbuseReport per event, inside acquireAndProcess
  ↓
-ProhibitedWordHolder.detectProhibitedWord(title, contentText) / detectProhibitedWord(content)
- └→ ProhibitedWordEngine.match per text → ProhibitedWordDetection.of(matches, ProhibitedWordProperties)
-   # score; disabled() when disabled
- ↓
-ProhibitedWordDetection.isDisabled() true → stop
- ↓ reportable or clean: in one transaction, if the target still exists
+ProhibitedWordHolder.detectProhibitedWord(event's matches)
+ ├[kill switch off]→ ProhibitedWordDetection.disabled() → stop
+ └[kill switch on]→ ProhibitedWordDetection.of(matches, ProhibitedWordProperties)
+   # score summed from the matched words' severities: reportable at or above the threshold, clean below it
+ ↓ in one transaction, if the target still exists
 AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseReport (target, detection, createdAt)
  └→ AutoAbuseReportRepositoryAdapter (reflect rules)
-   ├→ reportable: auto-report row written, dashboard row given auto marking
-   └→ clean: auto-report row deleted, dashboard row given auto unmarking or deleted if auto-only
+   ├[reportable]→ auto-report row written, dashboard row given auto marking
+   └[clean]→ auto-report row deleted, dashboard row given auto unmarking or deleted if auto-only
 ```
 
 - Detection runs after the write commits, so the write path gains no latency and a detection failure never rolls back a
   user's post or comment.
-- The event carries the raw text, because posts and comments are masked by `maskProhibitedWord` before they are saved,
-  and a masked text can no longer be scored.
+- The engine matches each text once: the matches that masking finds travel in the event, so detection only scores them
+  and never rescans the text.
+- One inspected event per target type carries the write's matches, empty or not, because detection treats a score
+  below the threshold and no matches alike as clean, and a clean detection lets a re-edit remove the earlier
+  auto-report. A create or register without matches publishes nothing, because its target holds no auto-report yet.
 - The handlers are added to `MemberEventListener` and run inside its private `acquireAndProcess` bulkhead, so
   auto-reporting shares the `adminSemaphore` and its timeout; a separate listener class could not reach that method.
   A detection skipped by a bulkhead timeout is dropped with a warning log and not retried, the same as every other task
@@ -65,20 +73,25 @@ Packages are relative to `src/main/java/kr/modusplant/`. Classes marked `existin
 new.
 
 - `infrastructure/prohibitedword/`
-  - `ProhibitedWordHolder` — existing; gains `detectProhibitedWord`
+  - `ProhibitedWordHolder` — existing; gains `inspectProhibitedWord`, which masks a text and returns its matches, and
+    `detectProhibitedWord`, which scores matches
   - `ProhibitedWordProperties` — `app.moderation.prohibited-word` binding: kill switch, threshold, per-word cap
-  - `ProhibitedWordDetection` — The matches of one inspection, their score, and the auto-report decision
+  - `ProhibitedWordDetection` — The matches of one write, their score, and the auto-report decision
+- `infrastructure/prohibitedword/event/`
+  - `PostProhibitedWordMatchInspectedEvent`, `CommentProhibitedWordMatchInspectedEvent` — A published write's matches
+    handed to detection
 - `domains/post/adapter/controller/`
-  - `PostController` — existing; masks a post's title and body on create and update, and publishes
-    `PostAutoAbuseInspectionEvent` after a published create or update; deletes the auto-report on post deletion
+  - `PostController` — existing; masks a post's title and body on create and update, and publishes a post inspected
+    event after a published create or update; deletes the auto-report on post deletion
 - `domains/post/adapter/listener/`
   - `PostAdminEventListener` — existing; post abuse-report approval also deletes the auto-report
 - `domains/post/framework/outbound/jpa/repository/`
   - `PostRepositoryJpaAdapter` — existing; `save` returns `PostId`; gains the auto-report deletion
 - `domains/comment/adapter/controller/`
-  - `CommentController` — existing; publishes `CommentAutoAbuseInspectionEvent` after register and update
+  - `CommentController` — existing; masks with `inspectProhibitedWord`, and publishes a comment inspected event after
+    register and update
 - `domains/member/adapter/listener/`
-  - `MemberEventListener` — existing; runs detection for both events and reflects results that are not disabled
+  - `MemberEventListener` — existing; runs detection for the two events and reflects results that are not disabled
 - `domains/member/framework/outbound/`
   - `AutoAbuseReportRepositoryAdapter` — Applies the auto-report reflect rules
   - `ReportDashboardRepositoryAdapter` — existing; a human report on an auto-only row sets `first_reported_at`
@@ -109,9 +122,9 @@ Every step's Claude document changes follow these rules:
 
 | Step | Document | Purpose | Depends on |
 |---|---|---|---|
-| 09 | `prohibited-word-auto-report-step-09-scoring-and-properties.md` | Score, threshold, and kill switch | — |
+| 09 | `prohibited-word-auto-report-step-09-scoring-and-properties.md` | Matches returned by masking, score, threshold, and kill switch | — |
 | 10 | `prohibited-word-auto-report-step-10-auto-report-storage.md` | Auto-report tables, dashboard columns, entities, repository port and adapter | 09 |
-| 11 | `prohibited-word-auto-report-step-11-event-publish-sites.md` | Post masking, inspection events, and their publish sites | — |
+| 11 | `prohibited-word-auto-report-step-11-event-publish-sites.md` | Post masking, inspected events, and their publish sites | 09 |
 | 12 | `prohibited-word-auto-report-step-12-detection-listener.md` | Handlers that detect and write | 09, 10, 11 |
 | 13 | `prohibited-word-auto-report-step-13-admin-read-model.md` | Dashboard read models | 10, 12 |
 | 14 | `prohibited-word-auto-report-step-14-data-deletion.md` | Auto-report rows in every deletion flow | 10, 12 |
@@ -139,10 +152,10 @@ Every step's Claude document changes follow these rules:
   profanity, a sexual term, or a non-verbal string such as an emoji
 - **Published post, draft**: A post visible to every member, or a post visible only to its author
   (`isPublished = false`)
-- **Raw content**: The text as the request carries it, before `maskProhibitedWord` masks it
-- **Inspection event**: `PostAutoAbuseInspectionEvent` or `CommentAutoAbuseInspectionEvent`, which hands a written text
-  to detection
-- **Detection**: A `ProhibitedWordDetection`: the matches of one inspection, their score, and the auto-report decision
+- **Inspected event**: `PostProhibitedWordMatchInspectedEvent` or `CommentProhibitedWordMatchInspectedEvent`, which
+  hands the matches of a published write, possibly none, to detection; a write publishes it when it has matches or is
+  an update
+- **Detection**: A `ProhibitedWordDetection`: the matches of one write, their score, and the auto-report decision
 - **Reportable detection, clean detection**: A detection whose score reaches the auto-report threshold, or one that is
   neither reportable nor disabled
 - **Auto-report**: A report that the detector writes for admin review while the latest write of its target is
