@@ -1,12 +1,16 @@
-# Spec Docs Management Guide
+---
+paths:
+  - ".claude/specifications/**"
+---
 
-How to write and manage the spec documents of a new spec, from creating them to revising them as its implementation
-proceeds: their hierarchy, location, names, and sections. The spec documents of one spec are its implementation
-document, step documents, and reference documents. A fixed layout keeps every spec consistent, short, and readable.
+# Specification Document Details
+
+The spec documents of one spec are its implementation document, step documents, and reference documents. A fixed
+layout keeps every spec consistent, short, and readable.
 
 ---
 
-## 1. Spec Document Hierarchy
+## 1. Spec Document Structure
 
 - One implementation document covers the whole implementation.
 - One step document covers each implementation step listed in the implementation document.
@@ -18,8 +22,8 @@ document, step documents, and reference documents. A fixed layout keeps every sp
 
 ## 2. Location
 
-Write every document directly under `.claude/temp/<goal>/`, where `<goal>` is the implementation goal that the document
-names start with.
+Write every document directly under `.claude/specifications/<goal>/`, where `<goal>` is the implementation goal that the
+document names start with.
 
 ---
 
@@ -124,4 +128,4 @@ names start with.
   document's section 4 subsections keep their numbers.
 - Insert a new step at its place in dependency order, and raise the number of each later step by one, in its document
   name and in every reference to it.
-- Report to the user any rule this guide lacks or needs to strengthen that writing or revising the documents reveals.
+- Report to the user any rule this document lacks or needs to strengthen that writing or revising the documents reveals.
