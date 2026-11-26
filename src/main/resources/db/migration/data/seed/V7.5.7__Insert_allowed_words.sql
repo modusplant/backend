@@ -28,7 +28,6 @@ VALUES
 ('금딸기', NOW()),
 ('대딸기', NOW()),
 
-('shitake', NOW()),
 ('thorny', NOW()),
 ('milfoil', NOW()),
 ('pussy willow', NOW()),
