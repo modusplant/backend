@@ -29,13 +29,6 @@ MemberAdminRestController (dashboard list, dismiss, approve)
      └→ Post/CommentAbuseReportDashboardResponse (list) or the single read model
 ```
 
-### 3.2 Package Structure
-
-- `domains/member/framework/outbound/jooq/repository/`
-  - `PostAbuseReportDashboardJooqRepository`, `CommentAbuseReportDashboardJooqRepository` — existing;
-    `getDashboardFields()` selects the two columns, and `getDashboardReadModelMapper()` maps them after
-    `lastReportedAt` (§4.1)
-
 ### 3.3 Step-Specific Changes
 
 #### 3.3.1 Claude Document Changes
@@ -51,7 +44,8 @@ MemberAdminRestController (dashboard list, dismiss, approve)
 ### 4.1 Read Models
 
 - Both read models are records without `@Schema`, built only by the two `*AbuseReportDashboardJooqRepository` classes;
-  they gain `isAutoDetected` and `autoDetectedAt` after `lastReportedAt`.
+  they gain `isAutoDetected` and `autoDetectedAt` after `lastReportedAt`, which each repository selects in
+  `getDashboardFields()` and maps in `getDashboardReadModelMapper()`.
 - `PostAbuseReportDashboardResponse` and `CommentAbuseReportDashboardResponse` carry the read models as a list, and the
   dismiss and approve endpoints of `MemberAdminRestController` return a single read model, so every response gains the
   fields without a change of its own.

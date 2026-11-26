@@ -32,12 +32,6 @@ ProhibitedWordHolder.detectProhibitedWord(event.matches())
 AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseReport (target, detection, createdAt)
 ```
 
-### 3.2 Package Structure
-
-- `domains/member/adapter/listener/`
-  - `MemberEventListener` — existing; the two `reflectAutoAbuseReport` overloads reflect a reportable or clean
-    detection with the event's creation time, in one transaction that first checks the target still exists (§4.1)
-
 ### 3.3 Step-Specific Changes
 
 #### 3.3.1 Claude Document Changes

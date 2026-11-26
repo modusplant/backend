@@ -35,8 +35,6 @@ AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseRe
 - `domains/member/framework/outbound/`
   - `AutoAbuseReportRepositoryAdapter` — implements `AutoAbuseReportRepository` with the auto-report and dashboard
     Jakarta Persistence API (JPA) repositories, in the caller's transaction (§4.2)
-  - `ReportDashboardRepositoryAdapter` — existing; `reflectPostAbuseReport` and `reflectCommentAbuseReport` set a null
-    `firstReportedAt` (§4.1)
 
 ### 3.3 Step-Specific Changes
 

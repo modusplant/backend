@@ -34,8 +34,7 @@ From a published write to an auto-detected dashboard row:
 ```
 PostController.createPost/updatePost ┐
 CommentController.register/updateContent ┴→ ProhibitedWordHolder.inspectProhibitedWord per text → ProhibitedWordInspection
- # ProhibitedWordInspection: the result of one engine scan of the text, holding the masked text, which the write saves
- # in place of the submitted text, and the text's matches
+ # the write saves the masked text in place of the submitted text
  ↓
 PostController / CommentController after the save, by the write's pooled matches
  ├[published post or comment, with matches or by an update]→ PostProhibitedWordMatchInspectedEvent /
@@ -63,7 +62,8 @@ AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseRe
   below the threshold and no matches alike as clean, and a clean detection lets a re-edit remove the earlier
   auto-report. A create or register without matches publishes nothing, because its target holds no auto-report yet.
 - The handlers are added to `MemberEventListener` and run inside its private `acquireAndProcess` bulkhead, so
-  auto-reporting shares the `adminSemaphore` and its timeout; a separate listener class could not reach that method.
+  auto-reporting shares the `adminSemaphore` and its timeout; a separate listener class could inject the semaphore,
+  but would have to duplicate that private method to share the bulkhead.
   A detection skipped by a bulkhead timeout is dropped with a warning log and not retried, the same as every other task
   behind that bulkhead.
 
@@ -75,31 +75,11 @@ new.
 - `infrastructure/prohibitedword/`
   - `ProhibitedWordHolder` — existing; gains `inspectProhibitedWord`, which masks a text and returns its matches, and
     `detectProhibitedWord`, which scores matches
+  - `ProhibitedWordInspection` — The result of one engine scan of a text: its masked text and its matches
   - `ProhibitedWordProperties` — `app.moderation.prohibited-word` binding: kill switch, threshold, per-word cap
   - `ProhibitedWordDetection` — The matches of one write, their score, and the auto-report decision
-- `infrastructure/prohibitedword/event/`
-  - `PostProhibitedWordMatchInspectedEvent`, `CommentProhibitedWordMatchInspectedEvent` — A published write's matches
-    handed to detection
-- `domains/post/adapter/controller/`
-  - `PostController` — existing; masks a post's title and body on create and update, and publishes a post inspected
-    event after a published create or update; deletes the auto-report on post deletion
-- `domains/post/adapter/listener/`
-  - `PostAdminEventListener` — existing; post abuse-report approval also deletes the auto-report
-- `domains/post/framework/outbound/jpa/repository/`
-  - `PostRepositoryJpaAdapter` — existing; `save` returns `PostId`; gains the auto-report deletion
-- `domains/comment/adapter/controller/`
-  - `CommentController` — existing; masks with `inspectProhibitedWord`, and publishes a comment inspected event after
-    register and update
-- `domains/member/adapter/listener/`
-  - `MemberEventListener` — existing; runs detection for the two events and reflects results that are not disabled
 - `domains/member/framework/outbound/`
   - `AutoAbuseReportRepositoryAdapter` — Applies the auto-report reflect rules
-  - `ReportDashboardRepositoryAdapter` — existing; a human report on an auto-only row sets `first_reported_at`
-- `domains/member/framework/outbound/jooq/repository/`
-  - `PostAbuseReportDashboardJooqRepository`, `CommentAbuseReportDashboardJooqRepository` — existing; select and map
-    the two new dashboard columns
-  - `ActivitySubjectPostJooqRepository` — existing; withdrawal step 3 deletes post auto-reports
-  - `ActivitySubjectCommentJooqRepository` — existing; withdrawal step 4 deletes comment auto-reports
 
 - The member domain owns abuse reports and dashboards today, so it also owns auto-reports. The post and comment domains
   only publish events, as they already do for `CommentRegisterEvent`.

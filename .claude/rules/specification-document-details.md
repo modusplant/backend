@@ -49,9 +49,10 @@ document names start with.
 2. Scope
 3. Structure Design
    - 3.1 End-to-End Flow, drawn as §6 states
-   - 3.2 Package Structure: each package that takes part in the flow of 3.1, listing only the classes whose role
-     neither their package nor `.claude/rules/main-architecture-details.md` shows. An existing class gives only its
-     change, and a new class only the feature or role it adds.
+   - 3.2 Package Structure: each package that takes part in the flow of 3.1, with the classes that
+     `.claude/rules/claude-document-format-details.md` §3 lists for a document that designs class changes: new classes
+     whose role their package does not show, and existing classes whose responsibility the change alters. 3.2 exists
+     only when it holds a class, and 3.3 keeps its number without it.
    - 3.3 Implementation-Wide Changes: changes that two or more steps make together, such as a rule that every step's
      changes follow. It holds Storage, External Infrastructure Changes, then Claude Document Changes (changes to files
      under `.claude/documents/`): each only when the implementation needs it, numbered consecutively from 3.3.1 in this
@@ -94,7 +95,7 @@ document names start with.
 3. Structure Design
    - 3.1 Component Flow: the relations between the step's implementations (which class calls, implements, or reads
      which) and the workflow among them, drawn as §6 states.
-   - 3.2 Package Structure
+   - 3.2 Package Structure: only when it holds a class, as in the implementation document
    - 3.3 Step-Specific Changes: the step's Storage, External Infrastructure Changes, then Claude Document Changes, each
      only when the step needs it, numbered consecutively from 3.3.1 in this order, with no other subsections. 3.3
      exists only when it holds one of these.
@@ -108,8 +109,8 @@ document names start with.
   is read together with it, so it restates none of the implementation document's facts.
 - Section 1 states what the step delivers and why it is a separate step.
 - Sections 2 and 3.2 expand the implementation document's clauses that belong to the step. Each Scope item names the
-  Scope row it expands, and each Package Structure item names the class whose clause it expands, with its `existing`
-  marker; then each gives the step's details of that clause.
+  Scope row it expands, and each Package Structure item names the class whose clause it expands, with the `existing`
+  marker of an existing class; then each gives the step's details of that clause.
 - Section 4 gives the step's technical details in concrete form.
 - Section 5 holds what must exist when the step is done and the manual procedures the step requires.
 - A detail that several steps need lives only in the document of the earliest step that implements it. In each section

@@ -131,8 +131,9 @@ then drops that fact. Each level is the parent of each document of a lower level
 3. A policy document under `.claude/documents/policy/` or a tech-stack document under `.claude/documents/tech-stack/` —
    each document on the area its `Applies to` statement names, where the policy applies or the technology is
    implemented.
-4. Every other document; among the rules, a baseline rule is the parent of the per-area rules under it, all
-   auto-attached by path glob (e.g. `main-architecture-details.md` over `main-<kind>-<area>-details.md`).
+4. Every other document; among the rules, all auto-attached by path glob, a baseline rule is the parent of each rule
+   whose every path glob it covers (e.g. `main-architecture-details.md` over `main-<kind>-<area>-details.md`,
+   `claude-document-format-details.md` over `specification-document-details.md`).
 
 A child whose content depends on a parent names that parent in a `Parent Document` section, one
 `` - `<path>` — <what it depends on> `` item per parent, where `<path>` is the parent's path from the repository root

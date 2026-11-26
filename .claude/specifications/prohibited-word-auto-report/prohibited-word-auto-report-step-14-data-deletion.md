@@ -33,22 +33,6 @@ Member withdrawal
    └→ one dsl.batch: comment abuse reports, dashboards, and comm_comment_auto_abu_rep
 ```
 
-### 3.2 Package Structure
-
-- `domains/post/adapter/controller/`
-  - `PostController` — existing; `deletePost` calls the new `PostRepository` auto-report deletion next to
-    `deletePostAbuseReportByPostId` (§4.1)
-- `domains/post/adapter/listener/`
-  - `PostAdminEventListener` — existing; `deletePost` calls the same deletion (§4.1)
-- `domains/post/framework/outbound/jpa/repository/`
-  - `PostRepositoryJpaAdapter` — existing; implements the deletion with the member domain's
-    `PostAutoAbuseReportJpaRepository` (§4.1)
-- `domains/member/framework/outbound/jooq/repository/`
-  - `ActivitySubjectPostJooqRepository` — existing; `deleteRelatedRecordsByPostUlids` adds `comm_post_auto_abu_rep` to
-    its `dsl.batch` (§4.1)
-  - `ActivitySubjectCommentJooqRepository` — existing; `deleteRelatedRecordsByMemberIdAndPostUlids` adds
-    `comm_comment_auto_abu_rep` to its `dsl.batch` (§4.1)
-
 ### 3.3 Step-Specific Changes
 
 #### 3.3.1 Claude Document Changes
@@ -75,8 +59,10 @@ Member withdrawal
 - The new `PostRepository` operation sits next to `deletePostAbuseReportByPostId` and is called at the same sites;
   `PostRepositoryJpaAdapter` implements it with the member domain's Jakarta Persistence API (JPA) repositories, as it
   does for the abuse reports.
-- In withdrawal, the auto-report tables join the existing `dsl.batch` deletes with the same conditions as the human
-  abuse-report tables, so the rows of other members' targets are kept.
+- In withdrawal, the auto-report tables join the existing `dsl.batch` deletes of
+  `ActivitySubjectPostJooqRepository.deleteRelatedRecordsByPostUlids` and
+  `ActivitySubjectCommentJooqRepository.deleteRelatedRecordsByMemberIdAndPostUlids`, with the same conditions as the
+  human abuse-report tables, so the rows of other members' targets are kept.
 - Draft deletion deletes no auto-report, because drafts are never inspected.
 - Withdrawal step 9 (rows keyed by the member) is unaffected, because the auto-report tables have no member column.
 
