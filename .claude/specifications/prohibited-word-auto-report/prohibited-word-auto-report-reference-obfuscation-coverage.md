@@ -1,7 +1,8 @@
 # Prohibited Word Auto-Report Reference: Obfuscation Coverage
 
 Taxonomy of the text-obfuscation techniques used to evade a profanity dictionary, and how the prohibited-word engine
-handles each one. "Implementation §" refers to `prohibited-word-auto-report-implementation.md`, "Normalization §" to
+handles each one. "Implementation §" refers to `prohibited-word-auto-report-implementation.md`, "step 09 §" to
+`prohibited-word-auto-report-step-09-scoring-and-properties.md`, "Normalization §" to
 `.claude/rules/main-infra-normalization-details.md`, which defines the views, and "prohibited-word §" to
 `.claude/rules/main-infra-prohibited-word-details.md`, which defines the match rules, and "policy §" to
 `.claude/documents/policy/prohibited-word-filtering-policy.md`, which defines the dictionary entry rules. Each technique
@@ -97,7 +98,7 @@ seed migration.
 | OB-17 | Latin leetspeak | `s1bal`, `$ibal`, `5hit` | Reading a digit or symbol as a Latin letter depends on context and misreads normal text (`as5`, `mp3`); a form that spreads is entered as OB-35 |
 | OB-24 | English written as its Dubeolsik keystroke jamo | `ㅇㅑㅊㅏ` | The keystroke normalized view covers only Korean typed on the Dubeolsik layout (prohibited-word §2) |
 | OB-36 | Splitting across messages | comment 1 `시`, comment 2 `발` | Needs per-member history; the detector is stateless |
-| OB-37 | Splitting between title and body | title ends `시`, body starts `발` | Title and body are scanned separately (implementation §4.2) |
+| OB-37 | Splitting between title and body | title ends `시`, body starts `발` | Title and body are scanned separately (step 09 §4.3) |
 | OB-38 | Reversed or scrambled order | `발시` | Rare, and a reversed view matches normal words; a form that spreads is entered as OB-35 |
 | OB-39 | Mixed romanization and Hangul | `시bal` | Combinations multiply per word; neither a view nor entries cover them at a reasonable cost |
 | OB-40 | Semantic insults | euphemism, sarcasm, insults without a profanity | Needs a context-aware classifier, which the cost limit of implementation §2 excludes by allowing no machine learning runtime |
@@ -105,3 +106,9 @@ seed migration.
 | OB-42 | Non-text content | text in images, American Standard Code for Information Interchange (ASCII) art | Image moderation is a non-goal (implementation §2); ASCII art has no character-level form |
 | OB-43 | English typed on a Korean layout | `야차` | The Hangul syllables a Dubeolsik input method composes from the same keys cannot be told from Korean text |
 | OB-44 | Latin letter repetition | `ssiiibal`, `fuuuck` | Collapsing a repeated Latin letter changes normal English words (`book` → `bok`) |
+
+---
+
+## 8. Glossary
+
+- **Seed migration**: A Flyway migration under `data/seed/` that writes dictionary rows

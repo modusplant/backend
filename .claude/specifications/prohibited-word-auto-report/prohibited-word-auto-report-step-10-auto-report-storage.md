@@ -1,5 +1,7 @@
 # Step 10: Auto-Report Storage
 
+Expands `prohibited-word-auto-report-implementation.md`.
+
 ## 1. Purpose
 
 Creates the persistence for auto-reports and the auto-detection marker on the dashboards, with the member-domain port
@@ -10,9 +12,8 @@ without the event flow.
 
 ## 2. Scope
 
-| Item | Decision |
-|---|---|
-| Admin surface | The existing post/comment abuse-report dashboards, with an auto-detection marker |
+- **Report decision**, the auto-report following the latest write: the reflect rules (§3.3.1) overwrite the auto-report
+  on each reportable detection, delete it on a clean one, and drop a detection older than the stored one.
 
 ---
 
@@ -31,21 +32,17 @@ AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseRe
 
 ### 3.2 Package Structure
 
-Packages are relative to `src/main/java/kr/modusplant/`. Classes marked `existing` are changed; every other class is
-new.
-
 - `domains/member/framework/outbound/`
-  - `AutoAbuseReportRepositoryAdapter` — Applies the auto-report reflect rules
-  - `ReportDashboardRepositoryAdapter` — existing; a human report on an auto-only row sets `first_reported_at`
-
-- The member domain owns abuse reports and dashboards today, so it also owns auto-reports. The post and comment domains
-  only publish events, as they already do for `CommentRegisterEvent`.
+  - `AutoAbuseReportRepositoryAdapter` — implements `AutoAbuseReportRepository` with the auto-report and dashboard
+    Jakarta Persistence API (JPA) repositories, in the caller's transaction (§4.2)
+  - `ReportDashboardRepositoryAdapter` — existing; `reflectPostAbuseReport` and `reflectCommentAbuseReport` set a null
+    `firstReportedAt` (§4.1)
 
 ### 3.3 Step-Specific Changes
 
 #### 3.3.1 Storage
 
-**Step 10**: `schema/V7.5.8__Create_auto_abuse_report_tables.sql` creates the new tables and their indexes, and
+`schema/V7.5.8__Create_auto_abuse_report_tables.sql` creates the new tables and their indexes, and
 `schema/V7.5.9__Add_auto_detection_columns_to_abuse_report_dashboard.sql` makes the dashboard changes; both take the
 next free versions after `V7.5.7`.
 
@@ -124,26 +121,12 @@ Reflect rules of one detection that is not disabled, run in the caller's transac
   `detected_at` to apply the first reflect rule.
 - The Korean display label of `AutoAbuseReportReason.PROHIBITED_WORD` follows the existing member enums.
 
+**From step 09** (§3.2): `ProhibitedWordDetection` holds the matches and their score, and exposes `isReportable()` and
+`isDisabled()`.
+
 ---
 
 ## 5. Other Implementation Requirements
 
 - When the step is done, `V7.5.8` and `V7.5.9` apply locally, no `is_auto_detected` is null, and `first_reported_at`
   and `last_reported_at` are nullable.
-- Every step's result must build and pass its tests.
-
----
-
-## 6. Glossary
-
-- **Detection**: A `ProhibitedWordDetection`: the matches of one inspection, their score, and the auto-report decision
-- **Reportable detection, clean detection**: A detection whose score reaches the auto-report threshold, or one that is
-  neither reportable nor disabled
-- **Auto-report**: A report that the detector writes for admin review while the latest write of its target is
-  reportable, stored apart from human abuse reports and never counted in them
-- **Dashboard row**: One row of `comm_post_abuse_report_dashboard` or `comm_comment_abuse_report_dashboard`, which the
-  admin reviews per target
-- **Auto-only row**: A dashboard row without human reports: `report_count = 0`, null `first_reported_at` and
-  `last_reported_at`
-- **Auto marking, auto unmarking**: Setting `isAutoDetected` to true and `autoDetectedAt` to the detection time on a
-  dashboard row, or `isAutoDetected` to false and `autoDetectedAt` to null

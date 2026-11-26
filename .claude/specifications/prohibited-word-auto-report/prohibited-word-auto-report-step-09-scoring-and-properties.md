@@ -1,18 +1,19 @@
 # Step 09: Scoring and Properties
 
+Expands `prohibited-word-auto-report-implementation.md`.
+
 ## 1. Purpose
 
 Turns the engine's matches into a score and an auto-report decision, and binds the threshold, cap, and kill switch. It
-is separate from the holder switch because nickname rejection uses matches without a score, while only content
+is a separate step because masking and nickname rejection use matches without a score, while only content
 auto-reporting uses the score. No flow calls it until step 12.
 
 ---
 
 ## 2. Scope
 
-| Item | Decision |
-|---|---|
-| Report decision | A text is auto-reported when the severity-weighted score of its matches reaches a configurable threshold; the auto-report follows the latest write, so a re-edit below the threshold removes it |
+- **Report decision**, the score against a configurable threshold: `ProhibitedWordDetection` computes the score and the
+  decision (§4.1), and `ProhibitedWordProperties` binds the threshold, the per-word cap, and the kill switch (§4.2).
 
 ---
 
@@ -30,13 +31,12 @@ ProhibitedWordHolder.detectProhibitedWord(texts...)
 
 ### 3.2 Package Structure
 
-Packages are relative to `src/main/java/kr/modusplant/`. Classes marked `existing` are changed; every other class is
-new.
-
 - `infrastructure/prohibitedword/`
-  - `ProhibitedWordHolder` — existing; gains `detectProhibitedWord`
-  - `ProhibitedWordProperties` — `app.moderation.prohibited-word` binding: kill switch, threshold, per-word cap
-  - `ProhibitedWordDetection` — The matches of one inspection, their score, and the auto-report decision
+  - `ProhibitedWordHolder` — existing; `detectProhibitedWord(texts...)` scans each text with the engine and returns
+    one detection for the pooled matches (§4.3)
+  - `ProhibitedWordProperties` — a record validated at startup and registered explicitly (§4.2)
+  - `ProhibitedWordDetection` — `of(matches, properties)` scores the matches and exposes `isReportable()`;
+    `disabled()` is the detection of a disabled kill switch, whose `isDisabled()` is true (§4.1, §4.3)
 
 ---
 
@@ -84,14 +84,3 @@ isReportable() = score ≥ autoReportThreshold
 ## 5. Other Implementation Requirements
 
 - When the step is done, the application starts with the new properties, and nothing calls `detectProhibitedWord` yet.
-- Every step's result must build and pass its tests.
-
----
-
-## 6. Glossary
-
-- **Engine**: `ProhibitedWordEngine`, which matches an original text against the dictionary
-- **Prohibited word**: A word that is masked, rejected in a nickname, and scored, stored in `prohibited_word`
-- **Detection**: A `ProhibitedWordDetection`: the matches of one inspection, their score, and the auto-report decision
-- **Reportable detection, clean detection**: A detection whose score reaches the auto-report threshold, or one that is
-  neither reportable nor disabled

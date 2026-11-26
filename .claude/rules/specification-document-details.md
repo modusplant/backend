@@ -12,8 +12,10 @@ layout keeps every spec consistent, short, and readable.
 
 ## 1. Spec Document Structure
 
-- One implementation document covers the whole implementation.
-- One step document covers each implementation step listed in the implementation document.
+- One implementation document covers the whole implementation: what it does and why, as the basis that every step
+  document builds on.
+- One step document covers each implementation step listed in the implementation document: the details that implement
+  the step's part of the implementation document.
 - A reference document holds supporting material that the implementation and step documents cite (e.g. a taxonomy of
   the cases the implementation handles), only when the implementation needs it; it follows the implementation
   document's abbreviation rule.
@@ -51,39 +53,34 @@ document names start with.
      neither their package nor `.claude/rules/main-architecture-details.md` shows. An existing class gives only its
      change, and a new class only the feature or role it adds.
    - 3.3 Implementation-Wide Changes: changes that two or more steps make together, such as a rule that every step's
-     changes follow.
-   - 3.4 Step-Specific Changes: changes that one step makes, each naming the number of the step it belongs to, even
-     when later steps use the result.
-   - 3.3 and 3.4 each hold Storage, External Infrastructure Changes, then Claude Document Changes (changes to files
-     under `.claude/documents/`): each only when the implementation needs it, numbered consecutively from `.1` in this
-     order. Each of 3.3 and 3.4 exists only when it holds one of these, numbered consecutively from 3.3 in this order.
-     No other subsections.
-4. Technical Details: subsections as the implementation needs, in the order of the steps they belong to.
-5. Implementation Steps: one table row per step, giving its step number, document name, purpose, and the steps it
+     changes follow. It holds Storage, External Infrastructure Changes, then Claude Document Changes (changes to files
+     under `.claude/documents/`): each only when the implementation needs it, numbered consecutively from 3.3.1 in this
+     order, with no other subsections. 3.3 exists only when it holds one of these.
+4. Implementation Steps: one table row per step, giving its step number, document name, purpose, and the steps it
    depends on.
-6. Constraints
+5. Constraints
    - Every step's result must build and pass its tests, unless an exception is stated for the step.
-7. Reference Documents: one table row per reference document, giving its name and what it holds; only when the
+6. Reference Documents: one table row per reference document, giving its name and what it holds; only when the
    implementation has one.
-8. Glossary: as the **Glossary** rule of `CLAUDE.local.md` requires.
+7. Glossary: follows the **Glossary** rule of `CLAUDE.local.md`, except that every term that two or more documents of
+   the spec use is kept here instead of under `.claude/documents/term/`.
 
 ### 4.2 Content Rules
 
 - Leave out everything else `.claude/skills/postprocess-main-code-change/SKILL.md` handles (code quality check, tests,
   Claude document updates outside `.claude/documents/`, Notion API specs, Confluence table definitions), so the
-  implementation document stays on the implementation. The Storage subsections still hold the table, column, and
-  migration design the implementation needs, and the Claude Document Changes subsections hold the `.claude/documents/`
-  changes.
+  implementation document stays on the implementation. The Storage subsections of the implementation and step documents
+  still hold the table, column, and migration design the implementation needs, and their Claude Document Changes
+  subsections hold the `.claude/documents/` changes.
+- State what the implementation does and why, and leave how each step does it to the step documents.
 - Write a change to a file outside the repository root (e.g. an external monitoring repository) as steps the user
   carries out by hand, because Claude cannot edit files there.
 - Write each fact once within the implementation document.
 - Write a Scope row or Package Structure item that spans several steps as semicolon-separated clauses that each belong
-  to one step, and name no step number in it, so each step document copies only its own clauses.
+  to one step, and name no step number in it, so each step document expands only its own clauses.
 - Write a technical term in its full name at its first use, with its abbreviation in parentheses, and use only the
   abbreviation after that. When the first use falls inside a code block, give the full name in the prose before the
   block and keep only the abbreviation inside it.
-- Section 2 and section 3 from 3.2 on refer to no other section, because step documents copy them word for word and a
-  copied reference would point outside the step document.
 - Name a file type by its extension in inline code (`.sql` migrations) rather than by an abbreviation.
 
 ---
@@ -94,23 +91,30 @@ document names start with.
 
 1. Purpose
 2. Scope
-3. Structure Design: the same subsections as the implementation document, except that 3.1 is named `Component Flow`.
-   It covers the relations between the step's implementations (which class calls, implements, or reads which) and the
-   workflow among them.
+3. Structure Design
+   - 3.1 Component Flow: the relations between the step's implementations (which class calls, implements, or reads
+     which) and the workflow among them.
+   - 3.2 Package Structure
+   - 3.3 Step-Specific Changes: the step's Storage, External Infrastructure Changes, then Claude Document Changes, each
+     only when the step needs it, numbered consecutively from 3.3.1 in this order, with no other subsections. 3.3
+     exists only when it holds one of these.
 4. Technical Details: subsections as the step needs.
 5. Other Implementation Requirements
-6. Glossary: as the **Glossary** rule of `CLAUDE.local.md` requires.
+6. Glossary: only the terms that no other document of the spec uses, and only when the step document has one.
 
 ### 5.2 Content Rules
 
-- Section 1 and 3.1 are written for the step. Section 1 states what the step delivers and why it is a separate step.
-- Section 2 and section 3 from 3.2 on copy, word for word, only the implementation document text (rows, items, or
-  clauses) that the step needs. A Package Structure item copies its class name and `existing` marker, then only the
-  clauses the step needs. Do not link or redirect to the implementation document, so the step document reads on its
-  own.
-- Section 4 does not copy the implementation document; rewrite its technical details in concrete form for the step.
-- Section 5 holds what must exist when the step is done and the manual procedures the step requires, then repeats the
-  implementation document's section 6 constraints.
+- The line after the title is `Expands <goal>-implementation.md.`, naming the implementation document. A step document
+  is read together with it, so it restates none of the implementation document's facts.
+- Section 1 states what the step delivers and why it is a separate step.
+- Sections 2 and 3.2 expand the implementation document's clauses that belong to the step. Each Scope item names the
+  Scope row it expands, and each Package Structure item names the class whose clause it expands, with its `existing`
+  marker; then each gives the step's details of that clause.
+- Section 4 gives the step's technical details in concrete form.
+- Section 5 holds what must exist when the step is done and the manual procedures the step requires.
+- A detail that several steps need lives only in the document of the earliest step that implements it. In each section
+  of a later step document that needs the detail, the step's own content comes first, then a
+  `**From step <NN>** (§<section>):` block that names the source section and gives only the gist the step needs.
 - The implementation document's content rules on left-out content, files outside the repository root, and
   abbreviations apply as well.
 
@@ -119,13 +123,14 @@ document names start with.
 ## 6. Document Management
 
 - When code, a `.claude/` document, or a design decision that the documents describe changes (whether committed,
-  unpushed, or uncommitted), update every spec document it affects in the same task. Text that a step document copies
-  from the implementation document stays identical to it.
+  unpushed, or uncommitted), update every spec document it affects in the same task. When an implementation document
+  clause changes, update the step document that expands it; when a step document's detail changes, update the
+  `From step` blocks that receive it.
 - Include in the documents only what no document of a Claude document hierarchy states.
 - When the user asks to delete a spec document, delete it and every mention of it in the other documents as well. When
   the deleted document is a step document, the mentions include all content of its step: the step's design, the
-  dependencies on it, and the references to the sections removed with it. The remaining steps and the implementation
-  document's section 4 subsections keep their numbers.
+  dependencies on it, the `From step` blocks that receive from it, and the references to the sections removed with it.
+  The remaining steps keep their numbers.
 - Insert a new step at its place in dependency order, and raise the number of each later step by one, in its document
   name and in every reference to it.
 - Report to the user any rule this document lacks or needs to strengthen that writing or revising the documents reveals.

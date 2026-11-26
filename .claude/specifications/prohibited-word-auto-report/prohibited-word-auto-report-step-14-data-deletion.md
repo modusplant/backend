@@ -1,5 +1,7 @@
 # Step 14: Data Deletion
 
+Expands `prohibited-word-auto-report-implementation.md`.
+
 ## 1. Purpose
 
 Removes auto-report rows wherever the human abuse reports of the same target are removed, so no auto-report outlives
@@ -10,9 +12,8 @@ data-deletion policy document.
 
 ## 2. Scope
 
-| Item | Decision |
-|---|---|
-| Data deletion | Auto-reports are deleted wherever the human abuse reports of the same target are deleted |
+- **Data deletion**: the auto-report tables join the deletes of post deletion, post abuse-report approval, and
+  withdrawal steps 3 and 4, and comment abuse-report approval keeps them, as it keeps the human abuse reports (§4.1).
 
 ---
 
@@ -33,36 +34,23 @@ Member withdrawal
 
 ### 3.2 Package Structure
 
-Packages are relative to `src/main/java/kr/modusplant/`. Classes marked `existing` are changed; every other class is
-new.
-
 - `domains/post/adapter/controller/`
-  - `PostController` — existing; deletes the auto-report on post deletion
+  - `PostController` — existing; `deletePost` calls the new `PostRepository` auto-report deletion next to
+    `deletePostAbuseReportByPostId` (§4.1)
 - `domains/post/adapter/listener/`
-  - `PostAdminEventListener` — existing; post abuse-report approval also deletes the auto-report
+  - `PostAdminEventListener` — existing; `deletePost` calls the same deletion (§4.1)
 - `domains/post/framework/outbound/jpa/repository/`
-  - `PostRepositoryJpaAdapter` — existing; gains the auto-report deletion
+  - `PostRepositoryJpaAdapter` — existing; implements the deletion with the member domain's
+    `PostAutoAbuseReportJpaRepository` (§4.1)
 - `domains/member/framework/outbound/jooq/repository/`
-  - `ActivitySubjectPostJooqRepository` — existing; withdrawal step 3 deletes post auto-reports
-  - `ActivitySubjectCommentJooqRepository` — existing; withdrawal step 4 deletes comment auto-reports
+  - `ActivitySubjectPostJooqRepository` — existing; `deleteRelatedRecordsByPostUlids` adds `comm_post_auto_abu_rep` to
+    its `dsl.batch` (§4.1)
+  - `ActivitySubjectCommentJooqRepository` — existing; `deleteRelatedRecordsByMemberIdAndPostUlids` adds
+    `comm_comment_auto_abu_rep` to its `dsl.batch` (§4.1)
 
-### 3.3 Implementation-Wide Changes
+### 3.3 Step-Specific Changes
 
 #### 3.3.1 Claude Document Changes
-
-Every step's Claude document changes follow these rules:
-- Paths are relative to `.claude/`.
-- `documents/policy/prohibited-word-filtering-policy.md` holds the prohibited-word policy across domains, and states
-  every implementation fact of `infrastructure/prohibitedword/` it needs in its own sentences, without naming the rule
-  that covers it, because a parent document does not depend on its children.
-- The policy uses a term this implementation coins only after its Glossary section defines it, because a coined term
-  needs its own definition in every document that uses it.
-
-### 3.4 Step-Specific Changes
-
-#### 3.4.1 Claude Document Changes
-
-**Step 14**:
 
 | Document | Section | Change |
 |---|---|---|
@@ -89,7 +77,10 @@ Every step's Claude document changes follow these rules:
 - In withdrawal, the auto-report tables join the existing `dsl.batch` deletes with the same conditions as the human
   abuse-report tables, so the rows of other members' targets are kept.
 - Draft deletion deletes no auto-report, because drafts are never inspected.
-- The auto-report tables have no member column, so withdrawal step 9 (rows keyed by the member) is unaffected.
+- Withdrawal step 9 (rows keyed by the member) is unaffected, because the auto-report tables have no member column.
+
+**From step 10** (§3.3.1): `comm_post_auto_abu_rep` is keyed by `post_ulid`, and `comm_comment_auto_abu_rep` by
+`post_ulid` and `path`.
 
 ---
 
@@ -97,14 +88,3 @@ Every step's Claude document changes follow these rules:
 
 - When the step is done, deleting an auto-reported post and withdrawing a member with auto-reported comments leave no
   auto-report row for those targets locally.
-- Every step's result must build and pass its tests.
-
----
-
-## 6. Glossary
-
-- **Auto-report**: A report that the detector writes for admin review while the latest write of its target is
-  reportable, stored apart from human abuse reports and never counted in them
-- **Published post, draft**: A post visible to every member, or a post visible only to its author
-  (`isPublished = false`)
-- **Withdrawal step**: One numbered step of the member withdrawal flow in the data-deletion policy
