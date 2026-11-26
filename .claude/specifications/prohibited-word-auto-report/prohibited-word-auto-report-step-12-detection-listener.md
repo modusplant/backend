@@ -94,9 +94,7 @@ Every step's Claude document changes follow these rules:
 - When the step is done, a published post with a severe prohibited word creates an auto-detected dashboard row, and a
   post with a single severity-2 prohibited word creates none; re-editing the first post without prohibited words
   deletes its auto-only row.
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 

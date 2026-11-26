@@ -115,9 +115,7 @@ Every step's Claude document changes follow these rules:
 
 - When the step is done, published post titles and bodies are stored masked, both events are published from their
   sites, and no listener handles them yet.
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 

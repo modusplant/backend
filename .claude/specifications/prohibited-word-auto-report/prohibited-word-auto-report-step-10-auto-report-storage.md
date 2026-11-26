@@ -41,22 +41,13 @@ new.
 - The member domain owns abuse reports and dashboards today, so it also owns auto-reports. The post and comment domains
   only publish events, as they already do for `CommentRegisterEvent`.
 
-### 3.3 Implementation-Wide Changes
+### 3.3 Step-Specific Changes
 
 #### 3.3.1 Storage
 
-**Migrations** (next free versions after `V7.5.7`), allocated across the steps that write them:
-
-| File | Step |
-|---|---|
-| `schema/V7.5.8__Create_auto_abuse_report_tables.sql` | 10 |
-| `schema/V7.5.9__Add_auto_detection_columns_to_abuse_report_dashboard.sql` | 10 |
-
-### 3.4 Step-Specific Changes
-
-#### 3.4.1 Storage
-
-**Step 10**: `V7.5.8` creates the new tables and their indexes, and `V7.5.9` makes the dashboard changes.
+**Step 10**: `schema/V7.5.8__Create_auto_abuse_report_tables.sql` creates the new tables and their indexes, and
+`schema/V7.5.9__Add_auto_detection_columns_to_abuse_report_dashboard.sql` makes the dashboard changes; both take the
+next free versions after `V7.5.7`.
 
 New tables (one row per target while its latest write is reportable, overwritten by each reportable detection and
 deleted by a clean one, dated by the event's `createdAt`):
@@ -139,9 +130,7 @@ Reflect rules of one detection that is not disabled, run in the caller's transac
 
 - When the step is done, `V7.5.8` and `V7.5.9` apply locally, no `is_auto_detected` is null, and `first_reported_at`
   and `last_reported_at` are nullable.
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 

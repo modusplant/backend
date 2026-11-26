@@ -81,9 +81,7 @@ Every step's Claude document changes follow these rules:
 
 - When the step is done, an auto-only row from step 12 is listed locally with `reportCount` 0, null `firstReportedAt`
   and `lastReportedAt`, `isAutoDetected` true, and `autoDetectedAt` set.
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 

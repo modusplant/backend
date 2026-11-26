@@ -16,7 +16,6 @@ built on the existing `ProhibitedWordEngine`. The same engine also masks publish
 | Targets | Published post title and body (create and update); comment content (register and update) |
 | Action | Flag for admin review only; nothing is blocked or given Hidden processing automatically |
 | Report decision | A text is auto-reported when the severity-weighted score of its matches reaches a configurable threshold; the auto-report follows the latest write, so a re-edit below the threshold removes it |
-| Dictionary | Missing prohibited words are added, and prohibited words with a high false-positive likelihood are removed |
 | Masking | Published post title and body (create and update) are masked |
 | Admin surface | The existing post/comment abuse-report dashboards, with an auto-detection marker |
 | Data deletion | Auto-reports are deleted wherever the human abuse reports of the same target are deleted |
@@ -95,21 +94,7 @@ new.
 
 ### 3.3 Implementation-Wide Changes
 
-#### 3.3.1 Storage
-
-**Migrations** (next free versions after `V7.5.2`), allocated across the steps that write them:
-
-| File | Step |
-|---|---|
-| `data/seed/V7.5.3__Truncate_prohibited_word_and_allowed_word.sql` | 08 |
-| `data/seed/V7.5.4__Insert_general_prohibited_words.sql` | 08 |
-| `data/seed/V7.5.5__Insert_family_prohibited_words.sql` | 08 |
-| `data/seed/V7.5.6__Insert_sexual_prohibited_words.sql` | 08 |
-| `data/seed/V7.5.7__Insert_allowed_words.sql` | 08 |
-| `schema/V7.5.8__Create_auto_abuse_report_tables.sql` | 10 |
-| `schema/V7.5.9__Add_auto_detection_columns_to_abuse_report_dashboard.sql` | 10 |
-
-#### 3.3.2 Claude Document Changes
+#### 3.3.1 Claude Document Changes
 
 Every step's Claude document changes follow these rules:
 - Paths are relative to `.claude/`.
@@ -123,11 +108,9 @@ Every step's Claude document changes follow these rules:
 
 #### 3.4.1 Storage
 
-**Step 08**: `V7.5.3` empties `prohibited_word` and `allowed_word`; `V7.5.4`, `V7.5.5`, and `V7.5.6` insert the
-`GENERAL`, `FAMILY`, and `SEXUAL` prohibited words, each graded from 1 to 3 by intensity; `V7.5.7` inserts the allowed
-words.
-
-**Step 10**: `V7.5.8` creates the new tables and their indexes, and `V7.5.9` makes the dashboard changes.
+**Step 10**: `schema/V7.5.8__Create_auto_abuse_report_tables.sql` creates the new tables and their indexes, and
+`schema/V7.5.9__Add_auto_detection_columns_to_abuse_report_dashboard.sql` makes the dashboard changes; both take the
+next free versions after `V7.5.7`.
 
 New tables (one row per target while its latest write is reportable, overwritten by each reportable detection and
 deleted by a clean one, dated by the event's `createdAt`):
@@ -211,11 +194,6 @@ Reflect rules of one detection that is not disabled, run in the caller's transac
 
 ## 4. Technical Details
 
-### 4.1 Dictionary
-
-Every dictionary change arrives as a new `data/seed` migration whose rows meet the entry rules of
-`.claude/documents/policy/prohibited-word-filtering-policy.md` §2.1.
-
 ### 4.2 Scoring
 
 ```
@@ -271,9 +249,8 @@ The repository methods next to `PostRepository.deletePostAbuseReportByPostId` ga
 
 | Step | Document | Purpose | Depends on |
 |---|---|---|---|
-| 08 | `prohibited-word-auto-report-step-08-dictionary-supplement.md` | Removal of high false-positive prohibited words, and missing prohibited words | — |
 | 09 | `prohibited-word-auto-report-step-09-scoring-and-properties.md` | Score, threshold, and kill switch | — |
-| 10 | `prohibited-word-auto-report-step-10-auto-report-storage.md` | Auto-report tables, dashboard columns, entities, repository port and adapter | 08, 09 |
+| 10 | `prohibited-word-auto-report-step-10-auto-report-storage.md` | Auto-report tables, dashboard columns, entities, repository port and adapter | 09 |
 | 11 | `prohibited-word-auto-report-step-11-event-publish-sites.md` | Published post masking, inspection events, and their publish sites | — |
 | 12 | `prohibited-word-auto-report-step-12-detection-listener.md` | Handlers that detect and write | 09, 10, 11 |
 | 13 | `prohibited-word-auto-report-step-13-admin-read-model.md` | Dashboard read models | 10, 12 |
@@ -283,9 +260,7 @@ The repository methods next to `PostRepository.deletePostAbuseReportByPostId` ga
 
 ## 6. Constraints
 
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 
@@ -298,9 +273,6 @@ The repository methods next to `PostRepository.deletePostAbuseReportByPostId` ga
 ---
 
 ## 8. Glossary
-
-Allowed word and false-positive likelihood are defined in the Glossary of
-`.claude/documents/policy/prohibited-word-filtering-policy.md`.
 
 - **Engine**: `ProhibitedWordEngine`, which matches an original text against the dictionary
 - **Prohibited word**: A word that is masked, rejected in a nickname, and scored, stored in `prohibited_word`: a

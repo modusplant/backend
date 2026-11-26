@@ -84,9 +84,7 @@ isReportable() = score ≥ autoReportThreshold
 ## 5. Other Implementation Requirements
 
 - When the step is done, the application starts with the new properties, and nothing calls `detectProhibitedWord` yet.
-- Every step's result must build and pass its tests, except step 08: its result is a seed migration file, which is
-  written only and never compiled, built, or tested, because compilation runs `flywayMigrate` and would apply it to the
-  database.
+- Every step's result must build and pass its tests.
 
 ---
 
