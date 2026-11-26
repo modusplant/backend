@@ -103,7 +103,7 @@ seed migration.
 | OB-39 | Mixed romanization and Hangul | `시bal` | Combinations multiply per word; neither a view nor entries cover them at a reasonable cost |
 | OB-40 | Semantic insults | euphemism, sarcasm, insults without a profanity | Needs a context-aware classifier, which the cost limit of implementation §2 excludes by allowing no machine learning runtime |
 | OB-41 | Character references and encodings | `&#49884;&#48156;`, `%EC%8B%9C` | Post and comment text is assumed to be rendered as plain text, so the encoded form is shown as typed |
-| OB-42 | Non-text content | text in images, American Standard Code for Information Interchange (ASCII) art | Image moderation is a non-goal (implementation §2); ASCII art has no character-level form |
+| OB-42 | Non-text content | text in images, American Standard Code for Information Interchange (ASCII) art | Only text is inspected (implementation §2, Inspection targets); ASCII art has no character-level form |
 | OB-43 | English typed on a Korean layout | `야차` | The Hangul syllables a Dubeolsik input method composes from the same keys cannot be told from Korean text |
 | OB-44 | Latin letter repetition | `ssiiibal`, `fuuuck` | Collapsing a repeated Latin letter changes normal English words (`book` → `bok`) |
 

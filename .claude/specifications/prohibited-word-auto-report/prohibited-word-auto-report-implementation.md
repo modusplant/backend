@@ -5,7 +5,7 @@
 ## 1. Purpose
 
 Automatically report prohibited words in posts and comments to admins through the existing abuse-report dashboards,
-built on the existing `ProhibitedWordEngine`. The same engine also masks published post titles and bodies.
+built on the existing `ProhibitedWordEngine`.
 
 ---
 
@@ -13,15 +13,15 @@ built on the existing `ProhibitedWordEngine`. The same engine also masks publish
 
 | Item | Decision |
 |---|---|
-| Targets | Published post title and body (create and update); comment content (register and update) |
+| Inspection targets | Published post title and body (create and update); comment content (register and update) |
 | Action | Flag for admin review only; nothing is blocked or given Hidden processing automatically |
 | Report decision | A text is auto-reported when the severity-weighted score of its matches reaches a configurable threshold; the auto-report follows the latest write, so a re-edit below the threshold removes it |
-| Masking | Published post title and body (create and update) are masked |
+| Masking | Post title and body of published posts and drafts (create and update) are masked |
 | Admin surface | The existing post/comment abuse-report dashboards, with an auto-detection marker |
-| Data deletion | Auto-reports are deleted wherever the human abuse reports of the same target are deleted |
+| Data deletion | An auto-report depends only on its target, never on human abuse reports: every flow that hard-deletes a post or comment deletes its auto-reports, and a soft-deleted comment keeps them |
 | Cost | No new container, no external application programming interface (API), no machine learning (ML) runtime, and no new library |
 
-Non-goals: spam detection, image/video moderation, profile introduction auto-reporting, admin notifications.
+Non-goals: profile introduction auto-reporting, admin notifications.
 
 ---
 
@@ -52,8 +52,8 @@ AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseRe
 
 - Detection runs after the write commits, so the write path gains no latency and a detection failure never rolls back a
   user's post or comment.
-- The event carries the raw text, because published posts and comments are masked by `maskProhibitedWord` before they
-  are saved, and a masked text can no longer be scored.
+- The event carries the raw text, because posts and comments are masked by `maskProhibitedWord` before they are saved,
+  and a masked text can no longer be scored.
 - The handlers are added to `MemberEventListener` and run inside its private `acquireAndProcess` bulkhead, so
   auto-reporting shares the `adminSemaphore` and its timeout; a separate listener class could not reach that method.
   A detection skipped by a bulkhead timeout is dropped with a warning log and not retried, the same as every other task
@@ -69,8 +69,8 @@ new.
   - `ProhibitedWordProperties` — `app.moderation.prohibited-word` binding: kill switch, threshold, per-word cap
   - `ProhibitedWordDetection` — The matches of one inspection, their score, and the auto-report decision
 - `domains/post/adapter/controller/`
-  - `PostController` — existing; masks a published post's title and body and publishes `PostAutoAbuseInspectionEvent`
-    after a published create or update; deletes the auto-report on post deletion
+  - `PostController` — existing; masks a post's title and body on create and update, and publishes
+    `PostAutoAbuseInspectionEvent` after a published create or update; deletes the auto-report on post deletion
 - `domains/post/adapter/listener/`
   - `PostAdminEventListener` — existing; post abuse-report approval also deletes the auto-report
 - `domains/post/framework/outbound/jpa/repository/`
@@ -111,7 +111,7 @@ Every step's Claude document changes follow these rules:
 |---|---|---|---|
 | 09 | `prohibited-word-auto-report-step-09-scoring-and-properties.md` | Score, threshold, and kill switch | — |
 | 10 | `prohibited-word-auto-report-step-10-auto-report-storage.md` | Auto-report tables, dashboard columns, entities, repository port and adapter | 09 |
-| 11 | `prohibited-word-auto-report-step-11-event-publish-sites.md` | Published post masking, inspection events, and their publish sites | — |
+| 11 | `prohibited-word-auto-report-step-11-event-publish-sites.md` | Post masking, inspection events, and their publish sites | — |
 | 12 | `prohibited-word-auto-report-step-12-detection-listener.md` | Handlers that detect and write | 09, 10, 11 |
 | 13 | `prohibited-word-auto-report-step-13-admin-read-model.md` | Dashboard read models | 10, 12 |
 | 14 | `prohibited-word-auto-report-step-14-data-deletion.md` | Auto-report rows in every deletion flow | 10, 12 |

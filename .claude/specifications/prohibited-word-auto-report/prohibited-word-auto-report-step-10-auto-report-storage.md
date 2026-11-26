@@ -25,7 +25,7 @@ without the event flow.
 AutoAbuseReportRepository.reflectPostAutoAbuseReport / reflectCommentAutoAbuseReport (target, detection, createdAt)
  └→ AutoAbuseReportRepositoryAdapter (reflect rules, caller's transaction)
    ├→ Post/CommentAutoAbuseReportJpaRepository → Post/CommentAutoAbuseReportEntity
-   │ (AutoAbuseReportReason, score, MatchedWordEntityRecord list, detectedAt); deleted on a clean detection
+   │ (score, MatchedWordEntityRecord list, detectedAt); deleted on a clean detection
    └→ Post/CommentAbuseReportDashboardEntity → auto marking or unmarking (isAutoDetected, autoDetectedAt);
      an auto-only row deleted on a clean detection
 ```
@@ -51,11 +51,9 @@ deleted by a clean one, dated by the event's `createdAt`):
 
 | Table | Key | Columns |
 |---|---|---|
-| `comm_post_auto_abu_rep` | `post_ulid` | `reason varchar(20)`, `score integer`, `matched_words jsonb`, `detected_at timestamp` |
+| `comm_post_auto_abu_rep` | `post_ulid` | `score integer`, `matched_words jsonb`, `detected_at timestamp` |
 | `comm_comment_auto_abu_rep` | `post_ulid`, `path` | same as above |
 
-- `reason` holds an `AutoAbuseReportReason`, `PROHIBITED_WORD` now, and leaves room for `SPAM` and `MEDIA` later
-  without a schema change.
 - `matched_words` stores one `MatchedWordEntityRecord` per matched prohibited word (normalized form, `type`, count),
   never the user's raw text.
 
@@ -113,13 +111,12 @@ Reflect rules of one detection that is not disabled, run in the caller's transac
 
 ### 4.2 Auto-Report Entities and Port
 
-- Each auto-report entity overwrites its detection (reason, score, matched words, detection time) in place, so one row
-  per target holds the latest reportable detection.
+- Each auto-report entity overwrites its detection (score, matched words, detection time) in place, so one row per
+  target holds the latest reportable detection.
 - `CommentAutoAbuseReportEntity` is keyed by `CommentAutoAbuseReportCompositeKey` (`post_ulid`, `path`).
 - `AutoAbuseReportRepository` has one reflect operation per target, taking the target identifiers, a reportable or
   clean `ProhibitedWordDetection`, and the detection time; the adapter compares that time with the stored
   `detected_at` to apply the first reflect rule.
-- The Korean display label of `AutoAbuseReportReason.PROHIBITED_WORD` follows the existing member enums.
 
 **From step 09** (§3.2): `ProhibitedWordDetection` holds the matches and their score, and exposes `isReportable()` and
 `isDisabled()`.

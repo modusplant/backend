@@ -4,16 +4,17 @@ Expands `prohibited-word-auto-report-implementation.md`.
 
 ## 1. Purpose
 
-Removes auto-report rows wherever the human abuse reports of the same target are removed, so no auto-report outlives
-its post or comment. It is separate from storage because it touches the post and member deletion flows and the
-data-deletion policy document.
+Removes auto-report rows in every flow that hard-deletes their post or comment, so no auto-report outlives its target.
+It is separate from storage because it touches the post and member deletion flows and the data-deletion policy
+document.
 
 ---
 
 ## 2. Scope
 
 - **Data deletion**: the auto-report tables join the deletes of post deletion, post abuse-report approval, and
-  withdrawal steps 3 and 4, and comment abuse-report approval keeps them, as it keeps the human abuse reports (§4.1).
+  withdrawal steps 3 and 4, and comment abuse-report approval keeps them, because it only soft-deletes the comment
+  (§4.1).
 
 ---
 
@@ -67,7 +68,7 @@ Member withdrawal
 |---|---|
 | Post deletion (published) | Delete `comm_post_auto_abu_rep` with the post's abuse reports and dashboard |
 | Post abuse-report approval | Same steps as post deletion |
-| Comment abuse-report approval | None: `comm_comment_auto_abu_rep` is kept, as `comm_comment_abu_rep` is |
+| Comment abuse-report approval | None: `comm_comment_auto_abu_rep` is kept, because the comment is only soft-deleted |
 | Member withdrawal step 3 | Add the published posts' auto-reports |
 | Member withdrawal step 4 | Add the in-scope comments' auto-reports |
 
