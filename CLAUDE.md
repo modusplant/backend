@@ -125,7 +125,7 @@ documents under `.claude/` outside `.claude/temp/`. A child may depend on its pa
 children, so it states every fact it needs itself, even one taken from a child, which then drops that fact. Each level
 is the parent of each document of a lower level that falls under it:
 
-1. `CLAUDE.md` — every other document.
+1. `CLAUDE.md`, `CLAUDE.local.md` — every other document.
 2. A term document under `.claude/documents/term/` — each document that uses its terms.
 3. A policy document under `.claude/documents/policy/` or a tech-stack document under `.claude/documents/tech-stack/` —
    each document on the area its `Applies to` statement names, where the policy applies or the technology is
