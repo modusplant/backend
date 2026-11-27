@@ -29,13 +29,18 @@ app:
 # Debugging & Logging
 logging:
   level:
-    root: DEBUG
-    io.lettuce: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: DEBUG
+    root: INFO
+    io.lettuce: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql: INFO
 security:
   debug:
     enabled: true
+
+# FFmpeg
+ffmpeg:
+  ffmpeg-path: ${FFMPEG_PATH:/usr/bin/ffmpeg}
+  ffprobe-path: ${FFPROBE_PATH:/usr/bin/ffprobe}
 
 # MinIO
 minio:

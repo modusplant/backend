@@ -1,6 +1,7 @@
 package kr.modusplant.shared.framework.aws.service;
 
 import kr.modusplant.shared.enums.ImageContentType;
+import kr.modusplant.shared.enums.VideoContentType;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.framework.aws.exception.NotFoundFileKeyOnS3Exception;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +57,17 @@ public class AmazonS3Service {
                 .build();
 
         s3Client.putObject(request, RequestBody.fromBytes(file.getBytes()));
+    }
+
+    public void uploadFile(byte[] bytes, String fileKey, String contentType) {
+        PutObjectRequest request = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(fileKey)
+                .contentType(contentType)
+                .contentLength((long) bytes.length)
+                .build();
+
+        s3Client.putObject(request, RequestBody.fromBytes(bytes));
     }
 
     public byte[] downloadFile(String fileKey) {
@@ -121,6 +133,24 @@ public class AmazonS3Service {
     public String generatePutPresignedUrl(String fileKey, String contentType) {
         if (!ImageContentType.getImageExtensionValues(contentType)
                 .contains(StringUtils.substringAfterLast(fileKey, "."))) {
+            throw new InvalidValueException(INPUT_OUT_OF_RANGE, List.of("fileKey", "contentType"));
+        }
+
+        PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(10))
+                .putObjectRequest(req -> req
+                        .bucket(bucket)
+                        .key(fileKey)
+                        .contentType(contentType))
+                .build();
+
+        PresignedPutObjectRequest presignedPutObjectRequest = uploadS3Presigner.presignPutObject(presignRequest);
+        return presignedPutObjectRequest.url().toString();
+    }
+
+    public String generateVideoPutPresignedUrl(String fileKey, String contentType) {
+        VideoContentType videoContentType = VideoContentType.fromMimeType(contentType);
+        if (!videoContentType.getExtension().getValue().equals(StringUtils.substringAfterLast(fileKey, "."))) {
             throw new InvalidValueException(INPUT_OUT_OF_RANGE, List.of("fileKey", "contentType"));
         }
 
