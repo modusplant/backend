@@ -21,6 +21,7 @@ public final class TableName {
     public static final String COMM_SECO_CATE = "comm_seco_cate";
     public static final String FCM_TOKEN = "fcm_token";
     public static final String PENDING_FILE = "pending_file";
+    public static final String PLANT_RECORD = "plant_record";
     public static final String PROHIBITED_WORD = "prohibited_word";
     public static final String PROP_BUG_REP = "prop_bug_rep";
     public static final String SITE_MEMBER = "site_member";
@@ -29,5 +30,4 @@ public final class TableName {
     public static final String SITE_MEMBER_TERM = "site_member_term";
     public static final String SITE_MEMBER_WITHDRAW = "site_member_withdraw";
     public static final String TERM = "term";
-    public static final String PLANT_RECORD = "plant_record";
 }

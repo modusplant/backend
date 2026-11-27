@@ -18,7 +18,7 @@ public record RecordUploadUrlResponse(
         @Schema(description = "업로드 요청 시 반드시 포함해야 할 헤더")
         Map<String, String> requiredHeaders,
 
-        @Schema(description = "업로드 URL 및 토큰 만료 시각", example = "2026-11-07T14:10:00Z")
+        @Schema(description = "업로드 URL 및 토큰 만료 시각", example = "2026-11-07T14:10:00.123456Z")
         Instant expiresAt
 ) {
 }

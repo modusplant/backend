@@ -37,14 +37,14 @@ security:
   debug:
     enabled: true
 
-# MinIO
-minio:
-  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
-
 # FFmpeg
 ffmpeg:
   ffmpeg-path: ${FFMPEG_PATH:/usr/bin/ffmpeg}
   ffprobe-path: ${FFPROBE_PATH:/usr/bin/ffprobe}
+
+# MinIO
+minio:
+  public-endpoint: ${DEV_PUBLIC_ENDPOINT}
 
 # Monitoring
 management:
