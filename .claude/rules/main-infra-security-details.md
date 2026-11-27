@@ -127,12 +127,13 @@ A matched request passes through these filters in order:
   → `WriteResponseLoginFailureHandler`
 - Any `AuthenticationException` raised during the attempt reaches `WriteResponseLoginFailureHandler`, which writes the
   error code of a `BusinessAuthenticationException` or `AUTHENTICATION_FAILED` otherwise:
+  - Request body: `AUTHENTICATION_FAILED` for a body that does not deserialize into `NormalLoginRequest`
   - Request validation: `BAD_PASSWORD_FORMAT`, `BAD_EMAIL_FORMAT`, or `AUTHENTICATION_FAILED`
   - Lookup in `DefaultUserDetailsService`: `AccountStateException` (member auth or member not found)
   - Checks in `DefaultAuthProvider`: `BAD_PASSWORD`, `FORBIDDEN_GOOGLE_LINKED_ACCOUNT` /
     `FORBIDDEN_KAKAO_LINKED_ACCOUNT`, `BannedException`, `InactiveException`
-- Exceptions that are not `AuthenticationException` (an unreadable request body, or a failure inside
-  `WriteResponseLoginSuccessHandler`) propagate to `SecurityExceptionHandlingFilter` instead.
+- Exceptions that are not `AuthenticationException` (e.g. a failure inside `WriteResponseLoginSuccessHandler`)
+  propagate to `SecurityExceptionHandlingFilter` instead.
 
 **Logout**
 - `SecurityExceptionHandlingFilter` → `LogoutFilter` → `JwtClearingLogoutHandler` → `WriteResponseLogoutSuccessHandler`
@@ -178,6 +179,10 @@ A matched request passes through these filters in order:
 
 `SecurityExceptionHandlingFilter` and `ExceptionTranslationFilter` share `DefaultAuthenticationEntryPoint`; it and
 `DefaultAccessDeniedHandler` both write a `DataResponse`.
+
+Only failures that a client cannot cause are logged, at ERROR with the stack trace via
+`SecurityLoggerUtils.logUnknownException`: a non-`BusinessAuthenticationException` in
+`WriteResponseLoginFailureHandler`, and the "any other exception" branch of `SecurityExceptionHandlingFilter`.
 
 ---
 

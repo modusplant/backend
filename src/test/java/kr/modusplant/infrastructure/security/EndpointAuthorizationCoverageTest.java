@@ -160,7 +160,31 @@ class EndpointAuthorizationCoverageTest {
     }
 
     private static boolean matchesAny(List<String> patterns, String path) {
-        return patterns != null && patterns.stream().anyMatch(pattern -> PATH_MATCHER.match(pattern, path));
+        return patterns != null && patterns.stream()
+                .anyMatch(pattern -> PATH_MATCHER.match(removePathVariableRegex(pattern), path));
+    }
+
+    private static String removePathVariableRegex(String pattern) {
+        StringBuilder result = new StringBuilder();
+        int depth = 0;
+        boolean insideRegex = false;
+        for (char character : pattern.toCharArray()) {
+            if (character == '{') {
+                depth++;
+            } else if (character == '}') {
+                depth--;
+                if (depth == 0) {
+                    insideRegex = false;
+                }
+            } else if (character == ':' && depth == 1) {
+                insideRegex = true;
+                continue;
+            }
+            if (!insideRegex) {
+                result.append(character);
+            }
+        }
+        return result.toString();
     }
 
     private static String joinPaths(String basePath, String methodPath) {

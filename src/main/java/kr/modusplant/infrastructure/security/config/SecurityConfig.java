@@ -48,6 +48,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static kr.modusplant.shared.constant.Regex.REGEX_ULID;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -67,7 +69,9 @@ public class SecurityConfig {
                     "/api/v2/communication/comments/post/**",
                     "/api/v1/members/check/nickname/**",
                     "/api/v1/search/posts",
-                    "/api/v1/communication/posts/**"
+                    "/api/v1/communication/posts",
+                    "/api/v1/communication/posts/{postId:" + REGEX_ULID + "}",
+                    "/api/v1/communication/posts/{postId:" + REGEX_ULID + "}/views"
             ),
             HttpMethod.POST, List.of(
                     "/api/members/register",

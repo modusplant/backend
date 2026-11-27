@@ -9,6 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 public final class SecurityLoggerUtils {
 
     public static void logUnknownException(Exception exception) {
-        log.error("[Security Error] exceptionName={} | message={}", exception.getClass(), exception.getMessage());
+        log.error("[Security Error] exceptionName={} | message={}", exception.getClass(), exception.getMessage(), exception);
     }
 }

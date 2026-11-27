@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.security.filter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -40,7 +41,12 @@ public class EmailPasswordAuthenticationFilter extends AbstractAuthenticationPro
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
-        NormalLoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
+        NormalLoginRequest loginRequest;
+        try {
+            loginRequest = objectMapper.readValue(request.getInputStream(), NormalLoginRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new BadCredentialException(SecurityErrorCode.AUTHENTICATION_FAILED);
+        }
         BeanPropertyBindingResult result = new BeanPropertyBindingResult(loginRequest, "loginRequest");
         validator.validate(loginRequest, result);
 

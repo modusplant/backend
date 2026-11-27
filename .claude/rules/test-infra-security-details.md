@@ -37,7 +37,8 @@ assert on the captured JSON.
 
 `EndpointAuthorizationCoverageTest` (at the area test root) is a pure reflection/classpath-scan test with no Spring
 context, so `@Profile` is not evaluated and a `LOCAL_PUBLIC_ENDPOINTS` entry counts as public regardless of the active
-profile.
+profile. It compares each public-endpoint pattern against the mapping template (e.g. `/{postId}`), so it drops the
+`:regex` part of each `{name:regex}` path variable in the pattern before matching.
 
 ---
 

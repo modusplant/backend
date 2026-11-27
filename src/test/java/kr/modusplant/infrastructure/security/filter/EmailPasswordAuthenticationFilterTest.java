@@ -1,5 +1,6 @@
 package kr.modusplant.infrastructure.security.filter;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,6 +51,22 @@ class EmailPasswordAuthenticationFilterTest {
 
         // then
         assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("읽을 수 없는 요청 본문으로 예외 반환")
+    void testAttemptAuthentication_givenUnreadableRequestBody_willThrowException() throws Exception {
+        // given
+        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
+        given(request.getInputStream()).willReturn(Mockito.mock(ServletInputStream.class));
+        given(objectMapper.readValue(any(ServletInputStream.class), eq(NormalLoginRequest.class)))
+                .willThrow(new JsonParseException(null, "invalid json"));
+
+        // when & then
+        assertThatThrownBy(() -> filter.attemptAuthentication(request, response))
+                .isInstanceOf(BadCredentialException.class)
+                .extracting("errorCode").isEqualTo(SecurityErrorCode.AUTHENTICATION_FAILED);
     }
 
     @Test

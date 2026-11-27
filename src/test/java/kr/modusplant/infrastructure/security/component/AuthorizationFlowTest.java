@@ -8,6 +8,7 @@ import kr.modusplant.domains.comment.common.util.usecase.request.CommentRegister
 import kr.modusplant.domains.comment.common.util.usecase.response.CommentResponseTestUtils;
 import kr.modusplant.domains.comment.framework.inbound.web.rest.CommentRestController;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
+import kr.modusplant.domains.post.framework.inbound.web.rest.PostRestController;
 import kr.modusplant.infrastructure.jwt.framework.outbound.redis.AccessTokenRedisRepository;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
 import kr.modusplant.infrastructure.jwt.service.TokenService;
@@ -25,6 +26,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -59,6 +61,9 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
 
     @MockitoBean
     private CommentController commentController;
+
+    @MockitoBean
+    private PostRestController postRestController;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -123,5 +128,22 @@ public class AuthorizationFlowTest implements CommentRegisterRequestTestUtils, C
                 .andExpect(jsonPath("$.status").value(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus()))
                 .andExpect(jsonPath("$.code").value(SecurityErrorCode.AUTHENTICATION_FAILED.getCode()))
                 .andExpect(jsonPath("$.message").value(SecurityErrorCode.AUTHENTICATION_FAILED.getMessage()));
+    }
+
+    @Test
+    @DisplayName("인증 정보 없이 본인 게시글 경로 요청 시 인증 실패 응답 반환")
+    public void testAuthorize_givenNoAuthenticationOnOwnPostsPath_willReturnErrorResponse() throws Exception {
+        // when & then
+        mockMvc.perform(get("/api/v1/communication/posts/me"))
+                .andExpect(status().is(SecurityErrorCode.AUTHENTICATION_FAILED.getHttpStatus()))
+                .andExpect(jsonPath("$.code").value(SecurityErrorCode.AUTHENTICATION_FAILED.getCode()));
+    }
+
+    @Test
+    @DisplayName("인증 정보 없이 ULID 게시글 경로 요청 시 정상 응답 반환")
+    public void testAuthorize_givenNoAuthenticationOnPostUlidPath_willReturnOkResponse() throws Exception {
+        // when & then
+        mockMvc.perform(get("/api/v1/communication/posts/" + TEST_POST_ULID))
+                .andExpect(status().isOk());
     }
 }
