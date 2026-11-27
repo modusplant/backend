@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.Objects;
 
 import static kr.modusplant.shared.exception.enums.GeneralErrorCode.INPUT_OUT_OF_RANGE;
+import static kr.modusplant.shared.exception.enums.GeneralErrorCode.UNSUPPORTED_FILE;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
@@ -184,5 +185,94 @@ class AmazonS3ServiceTest {
 
         // then
         assertThat(invalidValueException.getErrorCode()).isEqualTo(INPUT_OUT_OF_RANGE);
+    }
+
+    @Test
+    @DisplayName("바이트 배열로 S3 객체 업로드 활동 수행")
+    void testUploadFile_givenBytes_willPutObjectToS3() {
+        // given
+        String fileKey = "record/test/video.mp4";
+        byte[] fileContent = "video-content".getBytes();
+
+        // when
+        amazonS3Service.uploadFile(fileContent, fileKey, "video/mp4");
+
+        // then
+        ArgumentCaptor<PutObjectRequest> requestCaptor = ArgumentCaptor.forClass(PutObjectRequest.class);
+        ArgumentCaptor<RequestBody> bodyCaptor = ArgumentCaptor.forClass(RequestBody.class);
+        verify(s3Client, times(1)).putObject(requestCaptor.capture(), bodyCaptor.capture());
+        PutObjectRequest actualRequest = requestCaptor.getValue();
+
+        assertThat(actualRequest.bucket()).isEqualTo(BUCKET_NAME);
+        assertThat(actualRequest.key()).isEqualTo(fileKey);
+        assertThat(actualRequest.contentType()).isEqualTo("video/mp4");
+        assertThat(actualRequest.contentLength()).isEqualTo((long) fileContent.length);
+        assertThat(bodyCaptor.getValue().optionalContentLength()).isEqualTo(java.util.Optional.of((long) fileContent.length));
+    }
+
+    @Test
+    @DisplayName("mp4 파일 키와 contentType으로 문자열 반환")
+    void testGenerateVideoPutPresignedUrl_givenMp4KeyAndContentType_willReturnString() throws Exception {
+        // given
+        String fileKey = "record/test/video.mp4";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
+        PresignedPutObjectRequest mockPresignedRequest = mock(PresignedPutObjectRequest.class);
+        given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
+        given(uploadS3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
+
+        // when
+        String result = amazonS3Service.generateVideoPutPresignedUrl(fileKey, "video/mp4");
+
+        // then
+        assertThat(result).isEqualTo(expected);
+        ArgumentCaptor<PutObjectPresignRequest> captor = ArgumentCaptor.forClass(PutObjectPresignRequest.class);
+        verify(uploadS3Presigner, times(1)).presignPutObject(captor.capture());
+        verify(s3Presigner, never()).presignPutObject(any(PutObjectPresignRequest.class));
+        PutObjectPresignRequest presignRequest = captor.getValue();
+        assertThat(presignRequest.signatureDuration()).isEqualTo(java.time.Duration.ofMinutes(10));
+        assertThat(presignRequest.putObjectRequest().bucket()).isEqualTo(BUCKET_NAME);
+        assertThat(presignRequest.putObjectRequest().key()).isEqualTo(fileKey);
+        assertThat(presignRequest.putObjectRequest().contentType()).isEqualTo("video/mp4");
+    }
+
+    @Test
+    @DisplayName("mov 파일 키와 quicktime contentType으로 문자열 반환")
+    void testGenerateVideoPutPresignedUrl_givenMovKeyAndQuicktime_willReturnString() throws Exception {
+        // given
+        String fileKey = "record/test/video.mov";
+        String expected = ENDPOINT + "/" + BUCKET_NAME + "/" + fileKey;
+        PresignedPutObjectRequest mockPresignedRequest = mock(PresignedPutObjectRequest.class);
+        given(mockPresignedRequest.url()).willReturn(URI.create(expected).toURL());
+        given(uploadS3Presigner.presignPutObject(any(PutObjectPresignRequest.class))).willReturn(mockPresignedRequest);
+
+        // when
+        String result = amazonS3Service.generateVideoPutPresignedUrl(fileKey, "video/quicktime");
+
+        // then
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    @DisplayName("확장자와 불일치하는 영상 contentType으로 예외 반환")
+    void testGenerateVideoPutPresignedUrl_givenExtensionMismatch_willThrowException() {
+        // given & when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> amazonS3Service.generateVideoPutPresignedUrl("record/test/video.mov", "video/mp4"));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(INPUT_OUT_OF_RANGE);
+        verify(uploadS3Presigner, never()).presignPutObject(any(PutObjectPresignRequest.class));
+    }
+
+    @Test
+    @DisplayName("지원되지 않는 영상 contentType으로 예외 반환")
+    void testGenerateVideoPutPresignedUrl_givenUnsupportedContentType_willThrowException() {
+        // given & when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> amazonS3Service.generateVideoPutPresignedUrl("record/test/video.webm", "video/webm"));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(UNSUPPORTED_FILE);
+        verify(uploadS3Presigner, never()).presignPutObject(any(PutObjectPresignRequest.class));
     }
 }
