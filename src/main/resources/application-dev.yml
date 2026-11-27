@@ -41,12 +41,6 @@ security:
 minio:
   public-endpoint: ${DEV_PUBLIC_ENDPOINT}
 
-# Monitoring
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-
 # Scheduler
 scheduler:
   sync-interval-ms : 300000           # 5분

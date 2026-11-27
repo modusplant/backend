@@ -3,10 +3,14 @@
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
+    <!-- WARN 이상 로그를 현재 스팬에 표시 -->
+    <appender name="SPAN_LOG_LEVEL_MARKING" class="kr.modusplant.infrastructure.trace.SpanLogLevelMarkingAppender"/>
+
     <!-- ===== dev/local: 콘솔만 (Spring Boot 기본 콘솔 포맷 유지) ===== -->
     <root level="INFO">
         <!-- Spring Boot가 제공하는 CONSOLE appender -->
         <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="SPAN_LOG_LEVEL_MARKING"/>
     </root>
 
     <!-- 도커에서만 true로 줄 토글 -->
@@ -23,6 +27,7 @@
             <root level="INFO">
                 <appender-ref ref="CONSOLE"/>
                 <appender-ref ref="FILE_JSON"/>
+                <appender-ref ref="SPAN_LOG_LEVEL_MARKING"/>
             </root>
             <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
                 <file>${LOG_DIR}/app.log</file>

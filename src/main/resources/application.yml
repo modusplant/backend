@@ -147,6 +147,9 @@ management:
         http.client.requests: true
       slo:
         http.server.requests: 100ms, 250ms, 500ms, 1s, 2s
+  tracing:
+    sampling:
+      probability: 1.0
 
 # Redis
 redis:

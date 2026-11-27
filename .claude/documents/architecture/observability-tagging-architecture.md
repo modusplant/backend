@@ -63,6 +63,10 @@ Request-scoped. They live in the log line body as `logfmt` tokens and are never 
   OpenTelemetry Collector.
 - `logback-spring.xml` → the `FILE_JSON` encoder writes `service_name`, `deployment_environment`, `trace_id`, `span_id`
   alongside `message`, `timestamp`, `thread`, `level`, `logger`.
+- `logback-spring.xml` → the `SPAN_LOG_LEVEL_MARKING` appender (`SpanLogLevelMarkingAppender`) sets the span attribute
+  `log.level` to the highest level of the `WARN` / `ERROR` logs written while the span is current. Every environment
+  exports all spans (`management.tracing.sampling.probability: 1.0`), and the OpenTelemetry Collector's
+  `tail_sampling` processor keeps each trace with a `log.level` span plus a probabilistic share of the rest.
 
 ---
 
