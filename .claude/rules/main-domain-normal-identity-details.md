@@ -17,7 +17,7 @@ paths:
   split into create, read, and update
 - `NormalIdentityJooqRepository` (`framework/outbound/persistence/jooq/`) — read port implementation
 - `NormalIdentityRepositoryJpaAdapter` (`framework/outbound/persistence/jpa/repository/`) — create and update port
-  implementation, converting domain objects to JPA entities through MapStruct mappers
+  implementation, converting domain objects to JPA entities through the JPA mappers
 
 ---
 
@@ -69,11 +69,11 @@ methods are `@Transactional`:
 **jOOQ Repository**:
 - Single-column lookups convert the result into a domain VO or `AuthProvider` and return `null` when the row is absent
 
-**JPA Mapper** — MapStruct `@Mapper` interfaces, one per target JPA entity:
-- Every method uses `@BeanMapping(ignoreByDefault = true)` and maps each field explicitly with `@Mapping`, reading VO
-  values through `source = "...value"` paths
-- Takes the already-saved member entity as a source parameter for entities that reference it; fixed values use
-  `expression = "java( ... )"` (e.g. `AuthProvider.BASIC`)
+**JPA Mapper** — `@Component` classes without an interface, one per target JPA entity:
+- Every method builds the entity through its builder, setting only the mapped fields and reading VO values through
+  `getValue()`
+- Takes the already-saved member entity as a parameter for entities that reference it; fixed values are set directly
+  (e.g. `AuthProvider.BASIC`)
 
 **JPA Repository Adapter** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit
 constructor; implements the create and update ports:

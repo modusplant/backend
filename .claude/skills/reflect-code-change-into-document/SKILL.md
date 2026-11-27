@@ -21,9 +21,9 @@ Resolved per @.claude/documents/guide/git-command-usage-guide.md:
 
 Determine which section each class belongs to before checking anything.
 
-- Domain submodules under `domains` (e.g. `member`, `search`): @.claude/CLAUDE.md, plus any file under
+- Domain submodules under `domains` (e.g. `member`, `search`): @CLAUDE.md, plus any file under
   @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that domain.
-- Other top-level architecture (e.g. `infrastructure`, `shared`): @.claude/CLAUDE.md, plus any file under
+- Other top-level architecture (e.g. `infrastructure`, `shared`): @CLAUDE.md, plus any file under
   @.claude/documents/, @.claude/rules/ or @.claude/skills/ relevant to that area.
 - Not associated with any domain:
   - Local Docker-related (e.g. @docker-compose.yml): @.claude/rules/local-docker-environment-details.md only.

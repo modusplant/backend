@@ -2,14 +2,14 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberProfileEntity;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface NormalIdentityProfileJpaMapper {
+@Component
+public class NormalIdentityProfileJpaMapper {
 
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "member", source = "savedMember")
-    MemberProfileEntity toSiteMemberProfileEntity(MemberEntity savedMember);
+    public MemberProfileEntity toSiteMemberProfileEntity(MemberEntity savedMember) {
+        return MemberProfileEntity.builder()
+                .member(savedMember)
+                .build();
+    }
 }

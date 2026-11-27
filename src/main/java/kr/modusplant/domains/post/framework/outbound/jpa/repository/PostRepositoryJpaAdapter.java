@@ -1,11 +1,7 @@
 package kr.modusplant.domains.post.framework.outbound.jpa.repository;
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.MemberJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportDashboardJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostAbuseReportJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostBookmarkJpaRepository;
-import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJpaRepository;
+import kr.modusplant.domains.member.framework.outbound.jpa.repository.*;
 import kr.modusplant.domains.post.domain.aggregate.Post;
 import kr.modusplant.domains.post.domain.exception.AuthorNotFoundException;
 import kr.modusplant.domains.post.domain.exception.InvalidValueException;

@@ -2,14 +2,14 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.
 
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.shared.kernel.Nickname;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface NormalIdentityJpaMapper {
+@Component
+public class NormalIdentityJpaMapper {
 
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "nickname", source = "nickname.value")
-    MemberEntity toMemberEntity(Nickname nickname);
+    public MemberEntity toMemberEntity(Nickname nickname) {
+        return MemberEntity.builder()
+                .nickname(nickname.getValue())
+                .build();
+    }
 }

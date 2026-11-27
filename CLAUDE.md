@@ -86,8 +86,6 @@ Every domain under `domains/` follows this four-layer layout — dependency flow
   (eliminates N+1).
 - **jOOQ generated code**: Auto-generated under `build/generated/sources/jooq/main` in the `kr.modusplant.jooq` package.
   Never edit manually.
-- **MapStruct**: Configured with `unmappedTargetPolicy=ERROR` — every target field must be explicitly mapped or
-  `@Mapping(target=..., ignore=true)` must be set.
 - **Redis**: Used for multi-purpose caching (e.g. concurrency control) and JWT access-token blacklisting.
 
 ### Project Conventions
@@ -119,20 +117,23 @@ Detailed working rules live under `.claude/`:
   - `tech-stack/` — how this project implements specific technologies
   - `term/` — glossaries of terms that several documents use
 - `.claude/skills/*/SKILL.md` — task workflows.
+- `.claude/specifications/<goal>/*.md` — spec documents, one directory per implementation goal.
 
 ## Claude Document Hierarchy
 
-A Claude document hierarchy is a parent document and the child documents under it, among the documents under
-`.claude/` outside `.claude/temp/`. A child may depend on its parent; a parent does not depend on its children. Each
-level is the parent of each document of a lower level that falls under it:
+A Claude document hierarchy is a parent document and the child documents under it, among `CLAUDE.md` and the
+documents under `.claude/` outside `.claude/temp/` and `.claude/specifications/`. A child may depend on its parent; a
+parent does not depend on its children, so it states every fact it needs itself, even one taken from a child, which
+then drops that fact. Each level is the parent of each document of a lower level that falls under it:
 
-1. `CLAUDE.md` — every other document.
+1. `CLAUDE.md`, `CLAUDE.local.md` — every other document.
 2. A term document under `.claude/documents/term/` — each document that uses its terms.
 3. A policy document under `.claude/documents/policy/` or a tech-stack document under `.claude/documents/tech-stack/` —
    each document on the area its `Applies to` statement names, where the policy applies or the technology is
    implemented.
-4. Every other document; among the rules, a baseline rule is the parent of the per-area rules under it, all
-   auto-attached by path glob (e.g. `main-architecture-details.md` over `main-<kind>-<area>-details.md`).
+4. Every other document; among the rules, all auto-attached by path glob, a baseline rule is the parent of each rule
+   whose every path glob it covers (e.g. `main-architecture-details.md` over `main-<kind>-<area>-details.md`,
+   `claude-document-format-details.md` over `specification-document-details.md`).
 
 A child whose content depends on a parent names that parent in a `Parent Document` section, one
 `` - `<path>` — <what it depends on> `` item per parent, where `<path>` is the parent's path from the repository root

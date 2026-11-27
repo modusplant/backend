@@ -23,9 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static kr.modusplant.jooq.Tables.PLANT;
-import static kr.modusplant.jooq.Tables.PLANT_VARIETY;
-import static kr.modusplant.jooq.Tables.PLANT_VARIETY_ADDITION;
+import static kr.modusplant.jooq.Tables.*;
 
 @Configuration
 @EnableCaching

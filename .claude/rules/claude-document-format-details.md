@@ -1,19 +1,22 @@
 ---
 paths:
   - ".claude/**"
+  - "CLAUDE.md"
+  - "CLAUDE.local.md"
 ---
 
 # Claude Document Format Conventions
 
-Applies to the handwritten Markdown documents under `.claude/`. Generated output and data files (e.g.
-`detected-change/`, `reflected-change/`, `cache/`, logs, URL lists) are exempt.
+Applies to `CLAUDE.md`, `CLAUDE.local.md`, and the handwritten Markdown documents under `.claude/`. Generated output
+and data files (e.g. `detected-change/`, `reflected-change/`, `cache/`, logs, URL lists) are exempt.
 
 ---
 
 ## 1. Purpose
 
 Depth and structure are shown with minimal whitespace, because whitespace used only for layout costs tokens on every
-read.
+read. A Package Structure lists only the classes whose role a reader cannot infer, because a class whose package
+already shows its role costs tokens without telling the reader anything.
 
 ---
 
@@ -29,9 +32,13 @@ read.
 **Package Structure** (a section describing the Java packages of an area, e.g. `## 1. Package Structure`):
 - Lists classes instead of drawing a directory tree, one `` - `ClassName` — overview `` item per class; classes sharing
   one role may share one item.
-- Lists only the area's top-level interfaces and classes (e.g. an aggregate root, a base class that other classes
-  extend) and the classes with an independent role; a class whose role a reader can infer from the package it sits in
-  (e.g. a VO, DTO, port, mapper, or JPA entity) is left out.
+- Leaves out a class or interface whose role a reader can infer from the package it sits in (e.g. a VO, DTO, port,
+  mapper, or JPA entity).
+- In a document that does not design additions or changes to classes, lists only the area's top-level interfaces and
+  classes (e.g. an aggregate root, a base class that other classes extend) and the classes with an independent role.
+- In a document that designs additions or changes to classes, lists each new interface and class, giving only the
+  feature or role it adds, and an existing one only when the change alters its responsibility, giving only its new
+  responsibility.
 
 **Directory Trees** (any other directory structure, e.g. resource folders or a layer layout):
 - Inside a code block, each depth level takes one glyph column: `│` under an ancestor with later siblings, a space under

@@ -4,11 +4,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
-import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
-import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
-import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.domains.member.domain.event.*;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
@@ -36,7 +32,8 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
-import static kr.modusplant.domains.post.common.constant.PostConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_JSON_NODE;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;

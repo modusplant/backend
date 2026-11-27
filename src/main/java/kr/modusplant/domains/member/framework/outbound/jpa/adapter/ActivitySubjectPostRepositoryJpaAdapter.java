@@ -9,8 +9,8 @@ import kr.modusplant.domains.member.framework.outbound.jpa.repository.PostLikeJp
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectPostRepository;
 import kr.modusplant.domains.post.framework.outbound.jpa.entity.PrimaryCategoryEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
-import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.enums.PostType;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

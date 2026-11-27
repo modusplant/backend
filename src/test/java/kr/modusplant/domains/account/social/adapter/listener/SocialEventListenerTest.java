@@ -1,7 +1,7 @@
 package kr.modusplant.domains.account.social.adapter.listener;
 
-import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
+import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClient;
 import kr.modusplant.domains.account.social.usecase.port.client.SocialAuthClientFactory;
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +12,7 @@ import static kr.modusplant.domains.account.social.common.constant.SocialStringC
 import static kr.modusplant.domains.account.social.common.constant.SocialStringConstant.TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 

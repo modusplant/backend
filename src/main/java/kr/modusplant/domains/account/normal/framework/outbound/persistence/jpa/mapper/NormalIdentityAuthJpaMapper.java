@@ -3,18 +3,18 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.
 import kr.modusplant.domains.account.identity.framework.outbound.jpa.entity.MemberAuthEntity;
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import kr.modusplant.shared.enums.AuthProvider;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface NormalIdentityAuthJpaMapper {
+@Component
+public class NormalIdentityAuthJpaMapper {
 
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "member", source = "savedMember")
-    @Mapping(target = "email", source = "sign.normalCredentials.email.value")
-    @Mapping(target = "pw", source = "encodedPassword")
-    @Mapping(target = "provider", expression = "java( kr.modusplant.shared.enums.AuthProvider.BASIC )")
-    MemberAuthEntity toSiteMemberAuthEntity(MemberEntity savedMember, SignUpData sign, String encodedPassword);
-
+    public MemberAuthEntity toSiteMemberAuthEntity(MemberEntity savedMember, SignUpData sign, String encodedPassword) {
+        return MemberAuthEntity.builder()
+                .member(savedMember)
+                .email(sign.getNormalCredentials().getEmail().getValue())
+                .pw(encodedPassword)
+                .provider(AuthProvider.BASIC)
+                .build();
+    }
 }

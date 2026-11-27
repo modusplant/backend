@@ -17,9 +17,11 @@ controllers, mappers, value objects, entities — is a pure POJO test.
 
 Never generate tests for:
 
-- Enum classes
+- Enum classes that declare no methods besides constructors and accessors
 - Exception classes
 - Classes that contain only constructors
+- Flyway Java migrations under `db/migration`, which run once per database
+- Nested builder classes of JPA entities (`*EntityBuilder`) and composite keys (`*KeyBuilder`)
 
 ---
 

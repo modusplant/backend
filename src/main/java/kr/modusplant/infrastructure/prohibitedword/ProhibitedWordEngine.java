@@ -8,11 +8,11 @@ import com.ibm.icu.util.StringTrieBuilder;
 import kr.modusplant.infrastructure.config.exception.ConfigurationException;
 import kr.modusplant.infrastructure.config.exception.enums.ConfigurationErrorCode;
 import kr.modusplant.infrastructure.normalization.TextNormalizationType;
+import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import kr.modusplant.infrastructure.normalization.view.AggressivelyNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.LightlyNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.SyllableNormalizedView;
 import kr.modusplant.infrastructure.normalization.view.supers.TextNormalizedView;
-import kr.modusplant.infrastructure.normalization.TextNormalizer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
@@ -247,8 +247,6 @@ public final class ProhibitedWordEngine {
         return precedingOriginalSpan != null && prohibitedWordMatch.originalStart() < precedingOriginalSpan.getValue();
     }
 
-    // 시작 위치마다 트라이를 루트로 되돌리며, 이어지는 키워드가 없거나 텍스트가 끝나면 다음 시작 위치로 넘어감
-    // findAll 호출마다 만든 CharsTrie 하나를 모든 시작 위치에서 재사용함
     private record KeywordTrie(CharSequence serializedSequence) {
         private static KeywordTrie of(Collection<String> keywords) {
             if (keywords.isEmpty()) {
