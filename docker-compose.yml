@@ -5,10 +5,10 @@ services:
       dockerfile: Dockerfile
     image: ghcr.io/modusplant/backend
     environment:
-      SPRING_PROFILES_ACTIVE: secrets
-      SERVER_FORWARD_HEADERS_STRATEGY: framework  # Nginx 리버스 프록시 관련 설정
-      LOG_TO_FILE: true
       LOG_DIR: /var/log/app
+      LOG_TO_FILE: true
+      SERVER_FORWARD_HEADERS_STRATEGY: framework  # Nginx 리버스 프록시 관련 설정
+      SPRING_PROFILES_ACTIVE: secrets
     expose:
       - 8080
     container_name: modusplant-be
