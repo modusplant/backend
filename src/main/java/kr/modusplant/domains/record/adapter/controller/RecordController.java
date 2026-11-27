@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +46,6 @@ import java.util.concurrent.CompletionException;
 import java.util.stream.Stream;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class RecordController {
@@ -71,6 +70,7 @@ public class RecordController {
     private final VideoTranscodeService videoTranscodeService;
     private final PlantRecordJpaRepository plantRecordJpaRepository;
     private final MemberJpaRepository memberJpaRepository;
+    private final TransactionTemplate transactionTemplate;
 
     public RecordUploadUrlResponse createUploadUrl(UUID memberId, RecordUploadUrlRequest request) {
         String normalizedContentType = request.contentType().toLowerCase(Locale.ROOT);
@@ -103,7 +103,6 @@ public class RecordController {
         );
     }
 
-    @Transactional
     public RecordCreateResponse createRecord(UUID authenticatedMemberId, RecordCreateRequest request) {
         UploadTokenClaims claims = jwtTokenProvider.getUploadTokenClaims(request.uploadToken());
         if (!claims.memberId().equals(authenticatedMemberId)) {
@@ -137,8 +136,8 @@ public class RecordController {
 
             pendingFileService.trackPendingFiles(
                     finalVideoKey.equals(claims.videoKey())
-                            ? List.of(thumbnailKey)
-                            : List.of(finalVideoKey, thumbnailKey)
+                            ? List.of(thumbnailKey)                     // 최종 키 = 비디오키인 경우 썸네일만 추가(원본 .mp4)
+                            : List.of(finalVideoKey, thumbnailKey)      // 최종 키 != 비디오키인 경우 변환된 비디오, 썸네일 추가(원본 .mp4 이외)
             );
             byte[] finalVideoBytes = Files.readAllBytes(finalVideo);
             byte[] thumbnailBytes = Files.readAllBytes(thumbnail);
@@ -147,7 +146,8 @@ public class RecordController {
                     CompletableFuture.runAsync(() -> amazonS3Service.uploadFile(thumbnailBytes, thumbnailKey, THUMBNAIL_CONTENT_TYPE))
             );
 
-            persistRecord(claims, request.description(), finalVideoKey, thumbnailKey, finalVideoBytes.length);
+            transactionTemplate.executeWithoutResult(status -> persistRecord(
+                    claims, request.description(), finalVideoKey, thumbnailKey, finalVideoBytes.length));
 
             if (!finalVideoKey.equals(claims.videoKey())) {
                 amazonS3Service.deleteFile(claims.videoKey());
