@@ -3,8 +3,6 @@ package kr.modusplant.domains.member.adapter.mapper;
 import kr.modusplant.domains.member.common.util.domain.aggregate.MemberProfileTestUtils;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.shared.framework.aws.service.AmazonS3Service;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,9 +19,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 class MemberProfileMapperImplTest implements MemberProfileTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final AmazonS3Service amazonS3Service = Mockito.mock(AmazonS3Service.class);
     private final MemberProfileMapper memberProfileMapper = new MemberProfileMapperImpl(amazonS3Service);
 

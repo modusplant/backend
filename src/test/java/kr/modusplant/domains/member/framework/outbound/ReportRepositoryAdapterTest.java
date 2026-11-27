@@ -22,13 +22,13 @@ import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepos
 import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_UUID;
@@ -36,8 +36,12 @@ import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubject
 import static kr.modusplant.domains.member.common.util.domain.vo.ActivitySubjectPostIdTestUtils.testActivitySubjectPostId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.ReportIdTestUtils.testReportId;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_PROPOSAL_OR_BUG_REPORT;
 import static kr.modusplant.domains.post.common.constant.PostConstant.*;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_COMMENT;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -90,6 +94,36 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     }
 
     @Test
+    @DisplayName("존재하지 않는 보고서로 인해 isUncheckedInProposalOrBugReport 실행 실패")
+    void testIsUncheckedInProposalOrBugReport_givenNotFoundReport_willThrowException() {
+        // given
+        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportRepositoryAdapter.isUncheckedInProposalOrBugReport(testReportId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_PROPOSAL_OR_BUG_REPORT);
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 보고서로 인해 isCheckedInProposalOrBugReport 실행 실패")
+    void testIsCheckedInProposalOrBugReport_givenNotFoundReport_willThrowException() {
+        // given
+        given(proposalOrBugReportJpaRepository.findByUlid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportRepositoryAdapter.isCheckedInProposalOrBugReport(testReportId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_PROPOSAL_OR_BUG_REPORT);
+    }
+
+    @Test
     @DisplayName("신고가 존재할 때 isMemberAbusePost로 게시글 신고 여부 반환")
     void testIsMemberAbusePost_givenExistedAbuse_willReturnResponse() {
         // given
@@ -115,6 +149,21 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
 
         // then
         assertThat(isMemberAbusePost).isFalse();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 게시글로 인해 isMemberAbusePost 실행 실패")
+    void testIsMemberAbusePost_givenNotFoundPost_willThrowException() {
+        // given
+        given(postJpaRepository.findByUlid(any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportRepositoryAdapter.isMemberAbusePost(testMemberId, testActivitySubjectPostId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
     }
 
     @Test
@@ -149,6 +198,21 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
     }
 
     @Test
+    @DisplayName("존재하지 않는 댓글로 인해 isMemberAbuseComment 실행 실패")
+    void testIsMemberAbuseComment_givenNotFoundComment_willThrowException() {
+        // given
+        given(commentJpaRepository.findByPostUlidAndPath(any(), any())).willReturn(Optional.empty());
+
+        // when
+        NotFoundEntityException notFoundEntityException = assertThrows(
+                NotFoundEntityException.class,
+                () -> reportRepositoryAdapter.isMemberAbuseComment(testMemberId, testActivitySubjectCommentId));
+
+        // then
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
+    }
+
+    @Test
     @DisplayName("reportProposalOrBug 실행 시 건의 및 버그 제보 저장 성공 및 대기 파일 추적 해제")
     void testReportProposalOrBug_givenValidData_willSaveReportAndUntrackPendingFiles() {
         // given
@@ -170,7 +234,8 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> reportRepositoryAdapter.reportProposalOrBug(testMemberId, createProposalOrBugReport()));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
 
         // then
         verify(proposalOrBugReportJpaRepository, never()).save(any());
@@ -202,7 +267,8 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
 
         // then
         verify(postAbuseReportJpaRepository, never()).save(any());
@@ -217,7 +283,8 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(postJpaRepository.findByUlid(TEST_POST_ULID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> reportRepositoryAdapter.reportPostAbuse(testMemberId, testActivitySubjectPostId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_POST);
 
         // then
         verify(postAbuseReportJpaRepository, never()).save(any());
@@ -251,7 +318,8 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(memberJpaRepository.findByUuid(MEMBER_BASIC_USER_UUID)).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_MEMBER_ID);
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());
@@ -266,7 +334,8 @@ class ReportRepositoryAdapterTest implements PostAbuseReportEntityTestUtils, Com
         given(commentJpaRepository.findById(any(CommentCompositeKey.class))).willReturn(Optional.empty());
 
         // when
-        assertThrows(NoSuchElementException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        NotFoundEntityException notFoundEntityException = assertThrows(NotFoundEntityException.class, () -> reportRepositoryAdapter.reportCommentAbuse(testMemberId, testActivitySubjectCommentId));
+        assertThat(notFoundEntityException.getErrorCode()).isEqualTo(NOT_FOUND_COMMENT);
 
         // then
         verify(commentAbuseReportJpaRepository, never()).save(any());

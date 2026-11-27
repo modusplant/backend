@@ -8,8 +8,6 @@ import kr.modusplant.domains.account.social.domain.vo.enums.SocialProvider;
 import kr.modusplant.domains.account.social.framework.outbound.exception.UnsupportedSocialProviderException;
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -27,9 +25,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 class MemberSocialTranslatorTest implements SocialMemberProfileTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final SocialIdentityLinkController socialIdentityLinkController = Mockito.mock(SocialIdentityLinkController.class);
     private final SocialIdentityRepository socialIdentityRepository = Mockito.mock(SocialIdentityRepository.class);
     private final Environment environment = Mockito.mock(Environment.class);

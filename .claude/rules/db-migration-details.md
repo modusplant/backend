@@ -7,11 +7,6 @@ paths:
 
 # DB Migration Conventions
 
-Applies to `src/main/resources/db/migration/`, `src/main/java/db/migration/`, and the Flyway/jOOQ configuration in
-`application*.yml`.
-
----
-
 ## 1. Directory Structure & Version Sequencing
 
 ```

@@ -2,8 +2,6 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jooq
 
 import kr.modusplant.jooq.tables.SiteMemberAuth;
 import kr.modusplant.shared.enums.AuthProvider;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.common.util.NicknameTestUtils;
@@ -24,9 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class NormalIdentityJooqRepositoryTest implements
         EmailTestUtils, NicknameTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final SiteMemberAuth memberAuth = SiteMemberAuth.SITE_MEMBER_AUTH;
 
     private NormalIdentityJooqRepository createRepository(MockDataProvider provider) {

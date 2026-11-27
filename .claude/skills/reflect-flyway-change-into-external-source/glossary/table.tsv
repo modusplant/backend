@@ -23,7 +23,6 @@ fcm_token	FCM 토큰
 comm_comment	소통 댓글
 comm_comment_like	소통 댓글 좋아요
 comm_comment_abu_rep	소통 댓글 신고
-swear	비속어
 prop_bug_rep	건의 및 버그 제보
 prop_bug_rep_archive	건의 및 버그 제보 아카이브
 comm_notification	소통 컨텐츠 알림
@@ -35,3 +34,5 @@ comm_comment_archive	소통 댓글 아카이브
 plant_variety_middle_category	식물 품종 중분류
 plant_variety_major_category	식물 품종 대분류
 plant_variety_addition	식물 품종 추가
+prohibited_word	금지된 말
+allowed_word	허용된 말

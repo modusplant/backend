@@ -1,5 +1,6 @@
 package kr.modusplant.domains.member.adapter.controller;
 
+import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
 import kr.modusplant.domains.member.adapter.helper.MemberImageIOHelper;
 import kr.modusplant.domains.member.adapter.helper.MemberValidationHelper;
 import kr.modusplant.domains.member.adapter.translator.MemberSocialTranslator;
@@ -8,30 +9,25 @@ import kr.modusplant.domains.member.domain.aggregate.MemberProfile;
 import kr.modusplant.domains.member.domain.aggregate.ProposalOrBugReport;
 import kr.modusplant.domains.member.domain.entity.MemberProfileImage;
 import kr.modusplant.domains.member.domain.entity.ProposalOrBugReportImage;
-import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
-import kr.modusplant.domains.member.domain.event.CommentAbuseReportEvent;
-import kr.modusplant.domains.member.domain.event.CommentChooseCacheRemoveEvent;
-import kr.modusplant.domains.member.domain.event.CommentChooseEvent;
-import kr.modusplant.domains.member.domain.event.CommentLikeEvent;
-import kr.modusplant.domains.member.domain.event.PostAbuseReportEvent;
-import kr.modusplant.domains.member.domain.event.PostLikeEvent;
-import kr.modusplant.domains.account.social.domain.event.SocialAccessRevokeEvent;
+import kr.modusplant.domains.member.domain.event.*;
 import kr.modusplant.domains.member.domain.vo.*;
 import kr.modusplant.domains.member.usecase.port.mapper.MemberProfileMapper;
 import kr.modusplant.domains.member.usecase.port.mapper.ProposalOrBugReportMapper;
 import kr.modusplant.domains.member.usecase.port.repository.*;
 import kr.modusplant.domains.member.usecase.record.*;
 import kr.modusplant.domains.member.usecase.response.*;
+import kr.modusplant.infrastructure.jwt.event.AccessTokenBlacklistEvent;
 import kr.modusplant.infrastructure.jwt.provider.JwtTokenProvider;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.exception.EmptyValueException;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.NotAccessibleException;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,7 +51,8 @@ import static kr.modusplant.shared.exception.enums.GeneralErrorCode.EMPTY_VALUE;
 @Slf4j
 public class MemberController {
     private final JwtTokenProvider jwtTokenProvider;
-    private final SwearHolder swearHolder;
+    private final ProhibitedWordHolder prohibitedWordHolder;
+    private final NicknameValidator nicknameValidator;
     private final MemberImageIOHelper memberImageIOHelper;
     private final MemberValidationHelper memberValidationHelper;
     private final MemberProfileMapper memberProfileMapper;
@@ -72,6 +69,7 @@ public class MemberController {
     @Transactional(readOnly = true)
     public boolean checkExistedNickname(MemberNicknameCheckRecord record) {
         Nickname nickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(nickname);
         return memberRepository.isNicknameExist(nickname);
     }
 
@@ -114,6 +112,7 @@ public class MemberController {
     public MemberProfileResponseWithImagePath overrideProfile(MemberProfileOverrideRecord_V3 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(memberNickname);
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
@@ -124,7 +123,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(prohibitedWordHolder.maskProhibitedWord(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 
@@ -136,6 +135,7 @@ public class MemberController {
     public MemberProfileResponseWithImageUrl overrideProfile(MemberProfileOverrideRecord_V4 record) throws IOException {
         MemberId memberId = MemberId.fromUuid(record.id());
         Nickname memberNickname = Nickname.create(record.nickname());
+        nicknameValidator.validate(memberNickname);
         MemberProfileImage memberProfileImage = MemberProfileImage.create(
                 MemberProfileImagePath.create(record.fileKey()),
                 MemberProfileImageBytes.create(null)
@@ -146,7 +146,7 @@ public class MemberController {
         memberImageIOHelper.deleteImage(memberProfile.getMemberProfileImage());
 
         MemberProfileIntroduction memberProfileIntroduction =
-                MemberProfileIntroduction.create(swearHolder.filterSwear(record.introduction()));
+                MemberProfileIntroduction.create(prohibitedWordHolder.maskProhibitedWord(record.introduction()));
         memberProfile = MemberProfile.create(
                 memberId, memberProfileImage, memberProfileIntroduction, memberNickname);
 

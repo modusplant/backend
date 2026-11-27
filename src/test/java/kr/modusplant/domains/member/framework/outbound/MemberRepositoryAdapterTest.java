@@ -4,11 +4,7 @@ import kr.modusplant.domains.member.common.util.domain.aggregate.MemberTestUtils
 import kr.modusplant.domains.member.common.util.framework.outbound.jpa.entity.MemberProfileEntityTestUtils;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
-import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
-import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
-import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.domains.member.domain.event.*;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectPostJooqRepository;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.MemberJooqRepository;
@@ -20,8 +16,6 @@ import kr.modusplant.domains.post.framework.outbound.jooq.record.PostIsPublished
 import kr.modusplant.domains.post.framework.outbound.jooq.repository.PostJooqRepository;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
 import kr.modusplant.shared.framework.jackson.holder.ObjectMapperHolder;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +32,8 @@ import static kr.modusplant.domains.member.common.constant.MemberProfileConstant
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberIdTestUtils.testMemberId;
 import static kr.modusplant.domains.member.common.util.domain.vo.MemberWithdrawOpinionTestUtils.testMemberWithdrawOpinion;
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
-import static kr.modusplant.domains.post.common.constant.PostConstant.*;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_CONTENT_JSON_NODE;
+import static kr.modusplant.domains.post.common.constant.PostConstant.TEST_POST_ULID;
 import static kr.modusplant.infrastructure.config.jackson.JacksonConfig.objectMapper;
 import static kr.modusplant.shared.kernel.common.util.NicknameTestUtils.testNormalUserNickname;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,9 +43,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 class MemberRepositoryAdapterTest implements MemberTestUtils, MemberProfileEntityTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     @SuppressWarnings("unused")
     private final ObjectMapperHolder objectMapperHolder = new ObjectMapperHolder(objectMapper());
     private final ApplicationEventPublisher eventPublisher = mock(ApplicationEventPublisher.class);

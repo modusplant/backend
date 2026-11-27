@@ -20,12 +20,14 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
+import kr.modusplant.infrastructure.prohibitedword.common.util.ProhibitedWordHolderTestUtils;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
+import kr.modusplant.shared.exception.enums.GeneralErrorCode;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -42,25 +44,24 @@ import static org.mockito.Mockito.*;
 
 class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, SocialSignUpRequestTestUtils, SocialMemberProfileTestUtils, SocialProfileTestUtils,
         AgreedTermsTestUtils, SocialLoginResultTestUtils, TempTokenInfoTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
+    private final ProhibitedWordHolder prohibitedWordHolder = ProhibitedWordHolderTestUtils.createProhibitedWordHolder();
 
     private final SocialAuthClientFactory clientFactory = mock(SocialAuthClientFactory.class);
     private final SocialIdentityRepository socialIdentityRepository = mock(SocialIdentityRepository.class);
     private final SocialIdentityMapper socialIdentityMapper = mock(SocialIdentityMapper.class);
-    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper);
+    private final NicknameValidator nicknameValidator = mock(NicknameValidator.class);
+    private final SocialIdentityController socialIdentityController = new SocialIdentityController(clientFactory,socialIdentityRepository,socialIdentityMapper,prohibitedWordHolder,nicknameValidator);
 
     @Test
     @DisplayName("최초 회원 로그인시 NeedSignupResult 반환하기")
     void testHandleSocialLogin_givenSocialProviderAndSocialAccessToken_willReturnSocialLoginResult() {
         // given
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code,false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfile);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfile.getEmail())).willReturn(Optional.empty());
 
@@ -82,12 +83,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
     void testHandleSocialLogin_givenNewSocialMemberSocialProfile_willReturnNeedLinkResult() {
         // given
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail()))
                 .willReturn(Optional.of(testBasicSocialMemberProfile));
@@ -111,12 +111,11 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         // given
         SocialAuthClient authClient = mock(SocialAuthClient.class);
         String code = createTestKakaoLoginRequest().code();
-        String socialAccessToken = TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN;
         SocialUserInfo userInfo = mock(SocialUserInfo.class);
 
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
         given(authClient.getTokenInfo(code, false)).willReturn(userInfo);
-        given(userInfo.socialAccessToken()).willReturn(socialAccessToken);
+        given(userInfo.socialAccessToken()).willReturn(TEST_SOCIAL_KAKAO_SOCIAL_ACCESS_TOKEN);
         given(socialIdentityMapper.toSocialProfile(SocialProvider.KAKAO,userInfo)).willReturn(testKakaoSocialProfileWithBasicEmail);
         given(socialIdentityRepository.getSocialMemberProfileByEmail(testKakaoSocialProfileWithBasicEmail.getEmail())).willReturn(Optional.of(testGoogleSocialMemberProfileWithBasicEmail));
         given(clientFactory.getClient(SocialProvider.KAKAO)).willReturn(authClient);
@@ -213,6 +212,24 @@ class SocialIdentityControllerTest implements SocialAuthRequestTestUtils, Social
         // when & then
         assertThatThrownBy(() -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()))
                 .isInstanceOf(SocialAccountConflictException.class);
+    }
+
+    @Test
+    @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+    void testCreateNewMember_givenNicknameWithProhibitedWord_willThrowException() {
+        // given
+        given(socialIdentityRepository.getSocialMemberProfileByEmail(any())).willReturn(Optional.empty());
+        doThrow(new kr.modusplant.shared.exception.InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
+                .when(nicknameValidator).validate(any());
+
+        // when
+        kr.modusplant.shared.exception.InvalidValueException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                kr.modusplant.shared.exception.InvalidValueException.class,
+                () -> socialIdentityController.createNewMember(createTestSocialSignUpRequest(), createGoogleTempTokenInfo()));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
+        verify(socialIdentityRepository, never()).saveSocialMember(any(), any(), any());
     }
 
     @Test

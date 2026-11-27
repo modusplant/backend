@@ -3,18 +3,17 @@ package kr.modusplant.domains.account.normal.framework.outbound.persistence.jpa.
 import kr.modusplant.domains.account.normal.domain.vo.SignUpData;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.MemberEntity;
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface NormalIdentityTermJpaMapper {
+@Component
+public class NormalIdentityTermJpaMapper {
 
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "member", source = "savedMember")
-    @Mapping(target = "agreedTermsOfUseVersion", source = "sign.agreedTermsOfUseVersion.value")
-    @Mapping(target = "agreedPrivacyPolicyVersion", source = "sign.agreedPrivacyPolicyVersion.value")
-    @Mapping(target = "agreedCommunityPolicyVersion", source = "sign.agreedCommunityPolicyVersion.value")
-    MemberTermEntity toSiteMemberTermEntity(MemberEntity savedMember, SignUpData sign);
-
+    public MemberTermEntity toSiteMemberTermEntity(MemberEntity savedMember, SignUpData sign) {
+        return MemberTermEntity.builder()
+                .member(savedMember)
+                .agreedTermsOfUseVersion(sign.getAgreedTermsOfUseVersion().getValue())
+                .agreedPrivacyPolicyVersion(sign.getAgreedPrivacyPolicyVersion().getValue())
+                .agreedCommunityPolicyVersion(sign.getAgreedCommunityPolicyVersion().getValue())
+                .build();
+    }
 }

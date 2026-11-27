@@ -1,7 +1,7 @@
 ---
 name: reflect-api-change-into-notion
 description: Detects API-relevant codebase changes in the member/comment/search domains and the security-related auth surface, then produces and applies Notion-ready edit instructions for the corresponding API-specification documents.
-allowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(/.claude/skills/reflect-api-change-into-notion/reflected-change/**) Bash(rm .claude/skills/reflect-api-change-into-notion/detected-change/detected_*.md) Edit(/.claude/temp/reflect-api-change-into-notion-prompt-to-*.md) Bash(rm .claude/temp/reflect-api-change-into-notion-prompt-to-*.md)
+allowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/detected-change/**) Edit(/.claude/skills/reflect-api-change-into-notion/reflected-change/**) Bash(rm .claude/skills/reflect-api-change-into-notion/detected-change/detected_*.md) Bash(rm .claude/skills/reflect-api-change-into-notion/reflected-change/*__*__*.md) Edit(/.claude/temp/reflect-api-change-into-notion-prompt-to-*.md) Bash(rm .claude/temp/reflect-api-change-into-notion-prompt-to-*.md)
 disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) Edit(/.claude/skills/reflect-api-change-into-notion/document-format.md) Edit(/.claude/skills/reflect-api-change-into-notion/prompt-template.md)
 ---
 
@@ -15,15 +15,12 @@ disallowed-tools: Edit(/.claude/skills/reflect-api-change-into-notion/SKILL.md) 
 
 # Target Classes
 
-- Primary: every `.java` class under `src/main/java/` not yet pushed to the remote — the union of:
-  - uncommitted changes: `git status --porcelain -- 'src/main/java/*.java'` (staged, unstaged, and untracked)
-  - committed-but-unpushed changes:
-    `git diff --name-only $(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null || echo origin/main)...HEAD -- 'src/main/java/*.java'`
-- Affected: every `src/main/java/` class that uses a Primary class (found per Primary class with
-  `git grep -lw '<SimpleName>' -- 'src/main/java/*.java'`), whose API-observable behavior the change reaches — e.g. a
-  new exception now thrown through it. A deleted Primary class is searched by its old name, and the lookup runs before
+Resolved per @.claude/documents/guide/git-command-usage-guide.md:
+
+- Primary: section 1, with pathspec `'src/main/java/*.java'` and `--name-only`.
+- Affected: section 2, with pathspec `'src/main/java/*.java'`, counting API-observable behavior. The lookup runs before
   the Watched API Surface filter, so a Primary class outside the mapping table still seeds it. Affected classes are
-  Target Classes too. This repository-wide `git grep` lookup is permitted.
+  Target Classes too.
 - Termination: if the union of Primary classes is empty, terminate the skill immediately.
 
 # Watched API Surface
@@ -138,7 +135,8 @@ columns in canonical order, `필수`/`선택` not `required`/`optional`>
      the run — do not proceed to step 5.
 5. Call `notion-mcp-connector` once with @.claude/skills/reflect-api-change-into-notion/prompt-template.md, listing
    each affected page's latest reflected-change file by `RUN_ID`, then handle its result:
-   - `SUCCEEDED`: report the returned summary of Notion changes.
+   - `SUCCEEDED`: report the returned summary of Notion changes. If it reports that no page was changed, delete this
+     run's detected-change file and every reflected-change file of this run via the scoped `rm`.
    - `FAILED`: report the returned cause and the Notion changes already made, then terminate the run.
 6. Delete the prompt file written in step 5. A termination in step 5 runs this step first.
 

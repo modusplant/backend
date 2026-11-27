@@ -22,7 +22,10 @@ public final class TableColumnName {
     public static final String PRI_CATE_ID = "pri_cate_id";
     public static final String RECIPIENT_ID = "recipient_id";
     public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String SCRIPT = "script";
     public static final String SECO_CATE_ID = "seco_cate_id";
+    public static final String SEVERITY = "severity";
+    public static final String TYPE = "type";
     public static final String VER_NUM = "ver_num";
     public static final String WORD = "word";
 }

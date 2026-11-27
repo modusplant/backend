@@ -20,12 +20,18 @@ import kr.modusplant.domains.post.framework.outbound.jpa.entity.PostEntity;
 import kr.modusplant.domains.post.framework.outbound.jpa.repository.PostJpaRepository;
 import kr.modusplant.infrastructure.file.service.PendingFileService;
 import kr.modusplant.shared.framework.aws.event.ImagesRemoveTask;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
+import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_PROPOSAL_OR_BUG_REPORT;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_COMMENT;
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_POST;
 
 @Repository
 @RequiredArgsConstructor
@@ -49,19 +55,24 @@ public class ReportRepositoryAdapter implements ReportRepository {
 
     @Override
     public boolean isUncheckedInProposalOrBugReport(ReportId reportId) {
-        return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow().getCheckedAt() == null;
+        return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"))
+                .getCheckedAt() == null;
     }
 
     @Override
     public boolean isCheckedInProposalOrBugReport(ReportId reportId) {
-        return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue()).orElseThrow().getCheckedAt() != null;
+        return proposalOrBugReportJpaRepository.findByUlid(reportId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_PROPOSAL_OR_BUG_REPORT, "proposalOrBugReport"))
+                .getCheckedAt() != null;
     }
 
     @Override
     public boolean isMemberAbusePost(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
         return postAbuseReportJpaRepository.findByMemberIdAndPost(
                 memberId.getValue(),
-                postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow()
+                postJpaRepository.findByUlid(activitySubjectPostId.getValue())
+                        .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"))
         ).isPresent();
     }
 
@@ -71,7 +82,8 @@ public class ReportRepositoryAdapter implements ReportRepository {
                 memberId.getValue(),
                 commentJpaRepository.findByPostUlidAndPath(
                         activitySubjectCommentId.getActivitySubjectPostId().getValue(),
-                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow()
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
+                        .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
         ).isPresent();
     }
 
@@ -95,7 +107,8 @@ public class ReportRepositoryAdapter implements ReportRepository {
         for (int i = 0; i < imagePaths.size(); i++) {
             imageList.add(new FilenameAndSrcEntityRecord(filenames.get(i), imagePaths.get(i)));
         }
-        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId"));
         proposalOrBugReportJpaRepository.save(
                 ProposalOrBugReportEntity.builder()
                         .ulid(reportId)
@@ -110,21 +123,24 @@ public class ReportRepositoryAdapter implements ReportRepository {
 
     @Override
     public ReportTime reportPostAbuse(MemberId memberId, ActivitySubjectPostId activitySubjectPostId) {
-        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
-        PostEntity postEntity = postJpaRepository.findByUlid(activitySubjectPostId.getValue()).orElseThrow();
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId"));
+        PostEntity postEntity = postJpaRepository.findByUlid(activitySubjectPostId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_POST, "post"));
         PostAbuseReportEntity reportEntity = PostAbuseReportEntity.builder().member(memberEntity).post(postEntity).build();
         return ReportTime.create(postAbuseReportJpaRepository.save(reportEntity).getCreatedAt());
     }
 
     @Override
     public ReportTime reportCommentAbuse(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
-        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue()).orElseThrow();
+        MemberEntity memberEntity = memberJpaRepository.findByUuid(memberId.getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_MEMBER_ID, "memberId"));
         CommentEntity commentEntity = commentJpaRepository.findById(
                 CommentCompositeKey.builder()
                         .post(activitySubjectCommentId.getActivitySubjectPostId().getValue())
                         .path(activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
                         .build()
-        ).orElseThrow();
+        ).orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"));
         return ReportTime.create(
                 commentAbuseReportJpaRepository.save(
                                 CommentAbuseReportEntity.builder()

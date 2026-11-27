@@ -1,0 +1,2 @@
+2026-11-23T21:55:09+09:00	V7.4.0__Add_severity_and_script_to_swear_and_create_not_swear.sql	policy-implementation
+2026-11-25T17:17:21+09:00	V7.5.0__Rename_dictionary_tables_to_prohibited_word_and_allowed_word.sql	policy-implementation

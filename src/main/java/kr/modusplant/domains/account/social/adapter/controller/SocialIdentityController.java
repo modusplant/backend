@@ -13,10 +13,12 @@ import kr.modusplant.domains.account.social.usecase.port.mapper.SocialIdentityMa
 import kr.modusplant.domains.account.social.usecase.port.repository.SocialIdentityRepository;
 import kr.modusplant.domains.account.social.usecase.record.*;
 import kr.modusplant.domains.account.social.usecase.request.SocialSignUpRequest;
+import kr.modusplant.infrastructure.prohibitedword.ProhibitedWordHolder;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
 import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class SocialIdentityController {
     private final SocialAuthClientFactory clientFactory;
     private final SocialIdentityRepository socialIdentityRepository;
     private final SocialIdentityMapper socialIdentityMapper;
+    private final ProhibitedWordHolder prohibitedWordHolder;
+    private final NicknameValidator nicknameValidator;
 
     @Transactional
     public SocialLoginResult handleSocialLogin(SocialProvider provider, String code, boolean isLocal) {
@@ -85,14 +89,16 @@ public class SocialIdentityController {
         if (member.isPresent()) {
             throw new SocialAccountConflictException(SocialIdentityErrorCode.ALREADY_SIGNED_UP);
         }
+        Nickname nickname = Nickname.create(signUpRequest.nickname());
+        nicknameValidator.validate(nickname);
         SocialMemberProfile memberProfile = SocialMemberProfile.createNewMember(
                 SocialCredentials.create(socialIdentityMapper.toSocialAuthProvider(tempTokenInfo.socialProvider()), tempTokenInfo.providerId()),
                 Email.create(tempTokenInfo.email()),
-                Nickname.create(signUpRequest.nickname()),
+                nickname,
                 Role.USER
         );
         AgreedTerms agreedTerms = AgreedTerms.create(AgreedTermVersion.create(signUpRequest.agreedTermsOfUseVersion()),AgreedTermVersion.create(signUpRequest.agreedPrivacyPolicyVersion()),AgreedTermVersion.create(signUpRequest.agreedCommunityPolicyVersion()));
-        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, signUpRequest.introduction(), agreedTerms));
+        return socialIdentityMapper.toLoginResult(socialIdentityRepository.saveSocialMember(memberProfile, prohibitedWordHolder.maskProhibitedWord(signUpRequest.introduction()), agreedTerms));
     }
 
     // 기존 일반 계정과 연동

@@ -5,11 +5,6 @@ paths:
 
 # Prod / Dev CI/CD Pipeline Details
 
-Applies to the GitHub Actions pipeline in @.github/workflows/modusplant-backend-ci-cd.yml, which tests, builds, and
-deploys the Spring Boot backend to the prod and dev environments.
-
----
-
 ## 1. Triggers
 
 - Push to `develop`: common pipeline, then the dev pipeline.

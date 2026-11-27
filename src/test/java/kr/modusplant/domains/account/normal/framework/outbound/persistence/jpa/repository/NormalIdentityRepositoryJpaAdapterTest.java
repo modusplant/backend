@@ -16,8 +16,6 @@ import kr.modusplant.domains.term.common.util.framework.outbound.jpa.entity.Memb
 import kr.modusplant.domains.term.framework.outbound.jpa.entity.MemberTermEntity;
 import kr.modusplant.domains.term.framework.outbound.jpa.repository.MemberTermJpaRepository;
 import kr.modusplant.shared.enums.AuthProvider;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,9 +23,7 @@ import org.mockito.Mockito;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_EMAIL;
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_PW;
-import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.MEMBER_AUTH_BASIC_USER_RAW_PW;
+import static kr.modusplant.domains.account.identity.common.constant.MemberAuthConstant.*;
 import static kr.modusplant.domains.member.common.constant.MemberConstant.MEMBER_BASIC_USER_NICKNAME;
 import static kr.modusplant.domains.term.common.constant.MemberTermConstant.*;
 import static org.mockito.BDDMockito.given;
@@ -35,9 +31,6 @@ import static org.mockito.Mockito.times;
 
 public class NormalIdentityRepositoryJpaAdapterTest implements MemberEntityTestUtils,
         MemberAuthEntityTestUtils, MemberTermEntityTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final MemberJpaRepository memberJpaRepository = Mockito.mock(MemberJpaRepository.class);
     private final MemberAuthJpaRepository authJpaRepository = Mockito.mock(MemberAuthJpaRepository.class);
     private final MemberTermJpaRepository termJpaRepository = Mockito.mock(MemberTermJpaRepository.class);

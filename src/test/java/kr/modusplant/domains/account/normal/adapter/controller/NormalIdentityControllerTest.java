@@ -17,8 +17,6 @@ import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.exception.ExistsValueException;
 import kr.modusplant.shared.exception.InvalidValueException;
 import kr.modusplant.shared.exception.enums.GeneralErrorCode;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import kr.modusplant.shared.framework.jpa.exception.ExistsEntityException;
 import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import kr.modusplant.shared.kernel.Email;
@@ -26,6 +24,7 @@ import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.kernel.common.util.EmailTestUtils;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,16 +42,14 @@ import static org.mockito.Mockito.*;
 public class NormalIdentityControllerTest implements EmailTestUtils,
         NormalSignUpRequestTestUtils, SignUpDataTestUtils,
         EmailModificationRequestTestUtils, PasswordModificationRequestTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final NormalIdentityMapper identityMapper = Mockito.mock(NormalIdentityMapperImpl.class);
     private final NormalIdentityCreateRepository createRepository = Mockito.mock(NormalIdentityCreateRepository.class);
     private final NormalIdentityUpdateRepository updateRepository = Mockito.mock(NormalIdentityUpdateRepository.class);
     private final NormalIdentityReadRepository readRepository = Mockito.mock(NormalIdentityReadRepository.class);
+    private final NicknameValidator nicknameValidator = Mockito.mock(NicknameValidator.class);
     PasswordEncoder encoder = Mockito.mock(PasswordEncoder.class);
     private final NormalIdentityController controller = new NormalIdentityController(
-            identityMapper, createRepository, updateRepository, readRepository, encoder);
+            identityMapper, createRepository, updateRepository, readRepository, nicknameValidator, encoder);
 
     @Test
     @DisplayName("이미 존재하는 닉네임으로 요청 시 ExistsValueException 발생")
@@ -69,6 +66,23 @@ public class NormalIdentityControllerTest implements EmailTestUtils,
 
         verify(readRepository, times(1)).existsByNickname(Nickname.create(request.nickname()));
         verify(readRepository, times(1)).existsByEmail(Email.create(request.email()));
+    }
+
+    @Test
+    @DisplayName("금지된 말을 포함한 닉네임으로 예외 반환")
+    public void testRegisterNormalMember_givenNicknameWithProhibitedWord_willThrowException() {
+        // given
+        NormalSignUpRequest request = testNormalSignUpRequest;
+        doThrow(new InvalidValueException(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME, "nickname"))
+                .when(nicknameValidator).validate(Nickname.create(request.nickname()));
+
+        // when
+        InvalidValueException exception = assertThrows(InvalidValueException.class,
+                () -> controller.registerNormalMember(request));
+
+        // then
+        assertThat(exception.getErrorCode()).isEqualTo(GeneralErrorCode.PROHIBITED_WORD_CONTAINED_NICKNAME);
+        verify(readRepository, never()).existsByNickname(any());
     }
 
     @Test

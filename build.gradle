@@ -68,7 +68,6 @@ dependencies {
 	// Lombok (Version managed by Spring Boot BOM)
 	annotationProcessor 'org.projectlombok:lombok'
 	compileOnly 'org.projectlombok:lombok'
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0' // Version required
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
 
@@ -84,12 +83,6 @@ dependencies {
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:$jjwtVersion"
 	implementation "io.jsonwebtoken:jjwt-api:$jjwtVersion"
-
-	// MapStruct
-	def mapstructVersion = '1.5.3.Final'
-	annotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
-	implementation "org.mapstruct:mapstruct:$mapstructVersion"
-	testAnnotationProcessor "org.mapstruct:mapstruct-processor:$mapstructVersion"
 
 	// Spring Boot Starters (Version managed by Spring Boot BOM)
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -131,6 +124,7 @@ dependencies {
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.2.4'
 	implementation 'com.github.f4b6a3:ulid-creator:5.2.3'
 	implementation 'com.google.firebase:firebase-admin:9.8.0'
+	implementation 'com.ibm.icu:icu4j:79.1'
 	implementation 'com.mailjet:mailjet-client:5.2.5'
 	implementation 'net.bramp.ffmpeg:ffmpeg:0.8.0'
 	implementation 'org.apache.commons:commons-lang3:3.18.0'
@@ -206,9 +200,7 @@ jooq {
 tasks.withType(JavaCompile).configureEach {
 	options.annotationProcessorPath = configurations.annotationProcessor
 	options.compilerArgs += ["-parameters",
-							 "-Xlint:unchecked",
-							 "-Amapstruct.defaultComponentModel=spring",
-							 "-Amapstruct.unmappedTargetPolicy=ERROR"
+							 "-Xlint:unchecked"
 	]
 }
 
@@ -248,10 +240,15 @@ afterEvaluate {
 	tasks.named('jacocoTestReport') {
 		classDirectories.setFrom(files(classDirectories.files.collect {
 			fileTree(dir: it, exclude: [
-					'**/generated/**',     		// Exclude generated classes
-					'**/*_*',           	   	// Exclude MapStruct-generated classes
-					'**/*Builder.*',	       	// Exclude builders
-					'**/kr/modusplant/jooq/**'	// Exclude jOOQ-generated classes
+					'**/generated/**',     					// 만들어지는 클래스 제외
+					'**/*$*EntityBuilder.class',			// 엔터티의 중첩 빌더 제외
+					'**/*$*KeyBuilder.class',				// 복합 키의 중첩 빌더 제외
+					'**/kr/modusplant/jooq/**',				// jOOQ가 만들어내는 클래스 제외
+					'db/migration/**',						// Flyway Java 마이그레이션 제외
+					'**/enums/*ErrorCode.class',			// 상수 전용 오류 코드 열거형 제외
+					'**/enums/*SuccessCode.class',			// 상수 전용 성공 코드 열거형 제외
+					'**/*Exception.class',					// 예외 클래스 제외
+					'**/*Exception$*.class'					// 예외 클래스의 내부 클래스 제외
 			])
 		}))
 	}

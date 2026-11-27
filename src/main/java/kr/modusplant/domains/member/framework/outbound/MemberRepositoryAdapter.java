@@ -3,11 +3,7 @@ package kr.modusplant.domains.member.framework.outbound;
 import com.fasterxml.jackson.databind.JsonNode;
 import kr.modusplant.domains.member.domain.aggregate.Member;
 import kr.modusplant.domains.member.domain.enums.MemberWithdrawReason;
-import kr.modusplant.domains.member.domain.event.CommentChooseCachesRemoveEvent;
-import kr.modusplant.domains.member.domain.event.MemberSearchHistoryRemoveEvent;
-import kr.modusplant.domains.member.domain.event.PostViewCountRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewMemberRemoveEvent;
-import kr.modusplant.domains.member.domain.event.RecentlyViewPostRemoveEvent;
+import kr.modusplant.domains.member.domain.event.*;
 import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.domain.vo.MemberWithdrawOpinion;
 import kr.modusplant.domains.member.framework.outbound.jooq.repository.ActivitySubjectCommentJooqRepository;
@@ -31,11 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static kr.modusplant.domains.member.domain.exception.enums.MemberErrorCode.NOT_FOUND_MEMBER_ID;
 

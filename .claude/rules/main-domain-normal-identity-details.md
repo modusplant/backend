@@ -5,38 +5,25 @@ paths:
 
 # Normal Identity Domain Conventions
 
-Applies to `kr.modusplant.domains.account.normal` and its sub-packages.
+## Parent Document
+
+- `.claude/documents/policy/prohibited-word-filtering-policy.md` — the nickname checks of sign-up and their order (§3.3)
 
 ---
 
 ## 1. Package Structure
 
-```
-normal/
-├ domain/
-│├ vo/
-│└ exception/enums/
-├ usecase/
-│├ port/repository/ # Create/Read/Update ports
-│├ port/mapper/ # Request → domain mapper interface
-│└ request/
-├ adapter/
-│├ controller/
-│└ mapper/
-└ framework/
- ├ inbound/web/rest/
- └ outbound/persistence/
-  ├ jooq/ # Read port implementation
-  └ jpa/
-   ├ mapper/ # MapStruct Domain → JPA Entity mappers
-   └ repository/ # *RepositoryJpaAdapter (write port implementation)
-```
+- `NormalIdentityCreateRepository`, `NormalIdentityReadRepository`, `NormalIdentityUpdateRepository` — repository ports
+  split into create, read, and update
+- `NormalIdentityJooqRepository` (`framework/outbound/persistence/jooq/`) — read port implementation
+- `NormalIdentityRepositoryJpaAdapter` (`framework/outbound/persistence/jpa/repository/`) — create and update port
+  implementation, converting domain objects to JPA entities through the JPA mappers
 
 ---
 
 ## 2. domain/ Patterns
 
-**Value Object** (`domain/vo/`):
+**Value Object**:
 - A VO with its own format rules exposes a `public static validateSource(String)` called by `create`, which throws the
   shared `EmptyValueException` for null/blank input and the shared `InvalidValueException` for a mismatch with a `Regex`
   constant, each with a `NormalIdentityErrorCode` and the field name
@@ -50,23 +37,21 @@ normal/
 
 ## 3. usecase/ Patterns
 
-**Repository Ports** (`usecase/port/repository/`):
+**Repository Ports**:
 - Split by operation into `*CreateRepository`, `*ReadRepository`, and `*UpdateRepository`, implemented by different
   framework technologies (jOOQ for reads, JPA for writes)
 - Parameters use domain VOs (account-shared `AccountId`, shared kernel `Email`/`Password`/`Nickname`, domain VOs);
   return types are domain VOs, `AuthProvider`, `boolean`, or a raw `String` for a stored password hash
 
-**Mapper Port** (`usecase/port/mapper/`):
+**Mapper Port**:
 - Declares request DTO → domain VO construction
 
 ---
 
 ## 4. adapter/ Patterns
 
-**Controller** (`adapter/controller/`) — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an
-explicit constructor; write methods are `@Transactional`:
-- Sign-up rejects an existing email with a conflict error code chosen by the stored `AuthProvider` of that account, then
-  rejects a duplicate nickname, before saving the mapped sign-up data
+**Controller** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor; write
+methods are `@Transactional`:
 - Email/password modification verifies, in order, that the account exists, (for email) that its provider is `BASIC`, and
   that the submitted current value matches the stored one (the password through `PasswordEncoder.matches`), before
   calling the update port
@@ -78,22 +63,20 @@ explicit constructor; write methods are `@Transactional`:
 
 ## 5. framework/ Patterns
 
-**REST Controller** (`framework/inbound/web/rest/`):
+**REST Controller**:
 - Each mapping carries its full path (no class-level `@RequestMapping`)
 
-**jOOQ Repository** (`framework/outbound/persistence/jooq/`):
+**jOOQ Repository**:
 - Single-column lookups convert the result into a domain VO or `AuthProvider` and return `null` when the row is absent
 
-**JPA Mapper** (`framework/outbound/persistence/jpa/mapper/`) — MapStruct `@Mapper` interfaces, one per target JPA
-entity:
-- Every method uses `@BeanMapping(ignoreByDefault = true)` and maps each field explicitly with `@Mapping`, reading VO
-  values through `source = "...value"` paths
-- Takes the already-saved member entity as a source parameter for entities that reference it; fixed values use
-  `expression = "java( ... )"` (e.g. `AuthProvider.BASIC`)
+**JPA Mapper** — `@Component` classes without an interface, one per target JPA entity:
+- Every method builds the entity through its builder, setting only the mapped fields and reading VO values through
+  `getValue()`
+- Takes the already-saved member entity as a parameter for entities that reference it; fixed values are set directly
+  (e.g. `AuthProvider.BASIC`)
 
-**Repository Adapter** (`framework/outbound/persistence/jpa/repository/`) — injects
-`@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit constructor; implements the create and update
-ports:
+**JPA Repository Adapter** — injects `@Qualifier("bcryptPasswordEncoder") PasswordEncoder` through an explicit
+constructor; implements the create and update ports:
 - Sign-up saves the member entity first, then the member-auth, member-term, and member-profile entities built from it
   through the JPA mappers; the raw password is encoded here and passed to the member-auth mapper
 - Updates load the member and its member-auth entity (throwing `NotFoundEntityException` when absent), apply the

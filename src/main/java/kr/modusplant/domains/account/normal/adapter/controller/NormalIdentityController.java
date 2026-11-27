@@ -20,6 +20,7 @@ import kr.modusplant.shared.kernel.Email;
 import kr.modusplant.shared.kernel.Nickname;
 import kr.modusplant.shared.kernel.Password;
 import kr.modusplant.shared.kernel.enums.KernelErrorCode;
+import kr.modusplant.shared.kernel.validator.NicknameValidator;
 import kr.modusplant.shared.persistence.constant.TableName;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,7 @@ public class NormalIdentityController {
     private final NormalIdentityCreateRepository createRepository;
     private final NormalIdentityUpdateRepository updateRepository;
     private final NormalIdentityReadRepository readRepository;
+    private final NicknameValidator nicknameValidator;
 
     private final PasswordEncoder encoder;
 
@@ -42,11 +44,13 @@ public class NormalIdentityController {
                                     NormalIdentityCreateRepository createRepository,
                                     NormalIdentityUpdateRepository updateRepository,
                                     NormalIdentityReadRepository readRepository,
+                                    NicknameValidator nicknameValidator,
                                     @Qualifier("bcryptPasswordEncoder") PasswordEncoder encoder) {
         this.mapper = mapper;
         this.createRepository = createRepository;
         this.updateRepository = updateRepository;
         this.readRepository = readRepository;
+        this.nicknameValidator = nicknameValidator;
         this.encoder = encoder;
     }
 
@@ -67,7 +71,9 @@ public class NormalIdentityController {
                 throw new ExistsEntityException(NormalIdentityErrorCode.EXISTS_KAKAO_ACCOUNT, TableName.SITE_MEMBER);
             }
         } else {
-            if(readRepository.existsByNickname(Nickname.create(request.nickname()))) {
+            Nickname nickname = Nickname.create(request.nickname());
+            nicknameValidator.validate(nickname);
+            if(readRepository.existsByNickname(nickname)) {
                 throw new ExistsValueException(KernelErrorCode.EXISTS_NICKNAME, "nickname");
             }
             createRepository.save(mapper.toSignUpData(request));

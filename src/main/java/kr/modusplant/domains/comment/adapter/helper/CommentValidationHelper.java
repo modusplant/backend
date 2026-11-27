@@ -1,8 +1,8 @@
 package kr.modusplant.domains.comment.adapter.helper;
 
-import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.exception.DeletedReplyToCommentException;
 import kr.modusplant.domains.comment.domain.exception.enums.CommentErrorCode;
+import kr.modusplant.domains.comment.domain.vo.CommentAuthorId;
 import kr.modusplant.domains.comment.domain.vo.CommentPath;
 import kr.modusplant.domains.comment.domain.vo.ParentPostId;
 import kr.modusplant.domains.comment.usecase.port.repository.CommentAuthorRepository;

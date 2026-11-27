@@ -6,8 +6,11 @@ import kr.modusplant.domains.member.domain.vo.MemberId;
 import kr.modusplant.domains.member.framework.outbound.jpa.entity.CommentLikeEntity;
 import kr.modusplant.domains.member.framework.outbound.jpa.repository.CommentLikeJpaRepository;
 import kr.modusplant.domains.member.usecase.port.repository.ActivitySubjectCommentRepository;
+import kr.modusplant.shared.framework.jpa.exception.NotFoundEntityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import static kr.modusplant.shared.framework.jpa.exception.enums.EntityErrorCode.NOT_FOUND_COMMENT;
 
 @Repository
 @RequiredArgsConstructor
@@ -39,14 +42,17 @@ public class ActivitySubjectCommentRepositoryJpaAdapter implements ActivitySubje
     public boolean isDeleted(ActivitySubjectCommentId activitySubjectCommentId) {
         return commentJpaRepository.findByPostUlidAndPath(
                 activitySubjectCommentId.getActivitySubjectPostId().getValue(),
-                activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow().getIsDeleted().equals(true);
+                activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
+                .getIsDeleted().equals(true);
     }
 
     @Override
     public boolean isWrittenByMember(MemberId memberId, ActivitySubjectCommentId activitySubjectCommentId) {
         return commentJpaRepository.findByPostUlidAndPath(
                         activitySubjectCommentId.getActivitySubjectPostId().getValue(),
-                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow()
+                        activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
                 .getAuthMember().getUuid().equals(memberId.getValue());
     }
 
@@ -56,7 +62,9 @@ public class ActivitySubjectCommentRepositoryJpaAdapter implements ActivitySubje
         String path = activitySubjectCommentId.getActivitySubjectCommentPath().getValue();
 
         commentLikeJpaRepository.save(CommentLikeEntity.of(postId, path, memberId.getValue()));
-        commentJpaRepository.findByPostUlidAndPath(postId, path).orElseThrow().increaseLikeCount();
+        commentJpaRepository.findByPostUlidAndPath(postId, path)
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
+                .increaseLikeCount();
     }
 
     @Override
@@ -65,13 +73,17 @@ public class ActivitySubjectCommentRepositoryJpaAdapter implements ActivitySubje
         String path = activitySubjectCommentId.getActivitySubjectCommentPath().getValue();
 
         commentLikeJpaRepository.delete(CommentLikeEntity.of(postId, path, memberId.getValue()));
-        commentJpaRepository.findByPostUlidAndPath(postId, path).orElseThrow().decreaseLikeCount();
+        commentJpaRepository.findByPostUlidAndPath(postId, path)
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
+                .decreaseLikeCount();
     }
 
     @Override
     public void choose(ActivitySubjectCommentId activitySubjectCommentId) {
         commentJpaRepository.findByPostUlidAndPath(
                 activitySubjectCommentId.getActivitySubjectPostId().getValue(),
-                activitySubjectCommentId.getActivitySubjectCommentPath().getValue()).orElseThrow().markAsChosen();
+                activitySubjectCommentId.getActivitySubjectCommentPath().getValue())
+                .orElseThrow(() -> new NotFoundEntityException(NOT_FOUND_COMMENT, "comment"))
+                .markAsChosen();
     }
 }

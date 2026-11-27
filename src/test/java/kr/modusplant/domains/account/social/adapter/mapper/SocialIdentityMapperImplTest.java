@@ -8,8 +8,6 @@ import kr.modusplant.domains.account.social.usecase.record.LoginResult;
 import kr.modusplant.domains.account.social.usecase.record.SocialUserInfo;
 import kr.modusplant.shared.enums.AuthProvider;
 import kr.modusplant.shared.enums.Role;
-import kr.modusplant.shared.framework.jdbc.common.util.SwearHolderTestUtils;
-import kr.modusplant.shared.framework.jdbc.holder.SwearHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,9 +20,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
 class SocialIdentityMapperImplTest implements SocialMemberProfileTestUtils {
-    @SuppressWarnings("unused")
-    private final SwearHolder swearHolder = SwearHolderTestUtils.createSwearHolder();
-
     private final SocialIdentityMapper socialIdentityMapper = new SocialIdentityMapperImpl();
 
     @Test
